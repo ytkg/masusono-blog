@@ -5,7 +5,7 @@ import Footer from './components/Footer'
 import ArticlesList from './components/ArticlesList'
 import './App.css'
 import ArticleModalRoute from './routes/ArticleModalRoute'
-import footerImage from './assets/aimi.png'
+import FooterImage from './components/FooterImage'
 
 export default function App() {
   return (
@@ -14,10 +14,8 @@ export default function App() {
       <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0 }}>
         <ArticlesList />
       </Container>
-      {/* コンテンツとフッターの間に画像（上下の余白なし） */}
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Box component="img" src={footerImage} alt="" sx={{ height: { xs: 112, sm: 128 } }} />
-      </Box>
+      {/* コンテンツとフッターの間に画像（コンポーネント化） */}
+      <FooterImage />
       {/* URLに /articles/:id が含まれる場合のみモーダルを表示 */}
       <ArticleModalRoute />
       <Footer />
