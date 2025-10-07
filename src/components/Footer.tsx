@@ -7,13 +7,14 @@ export default function Footer() {
     <Box
       component="footer"
       sx={{
-        py: 3,
+        py: 1,
         textAlign: 'center',
         mt: 'auto',
-        bgcolor: 'background.paper',
+        bgcolor: 'primary.main',
+        color: 'common.white',
       }}
     >
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" color="inherit">
         © {year} 増田とその他！
       </Typography>
     </Box>
