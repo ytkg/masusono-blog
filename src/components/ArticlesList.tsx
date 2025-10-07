@@ -70,6 +70,15 @@ export default function ArticlesList() {
     }
   }, [])
 
+  const counts = useMemo(() => {
+    const byAuthor: Record<string, number> = {}
+    for (const a of items) {
+      const key = String(a.author?.id ?? '')
+      byAuthor[key] = (byAuthor[key] ?? 0) + 1
+    }
+    return { all: items.length, byAuthor }
+  }, [items])
+
   const filtered = useMemo(() => {
     if (tab === 'all') return items
     return items.filter((a) => String(a.author?.id ?? '') === tab)
@@ -87,9 +96,13 @@ export default function ArticlesList() {
     return (
       <>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" allowScrollButtonsMobile sx={{ mb: 2 }}>
-          <Tab label="みんな" value="all" />
+          <Tab label={`みんな (${counts.all})`} value="all" />
           {authors.map((au) => (
-            <Tab key={au.id ?? au.name} label={au.name ?? '(無名)'} value={String(au.id ?? au.name)} />
+            <Tab
+              key={au.id ?? au.name}
+              label={`${au.name ?? '(無名)'} (${counts.byAuthor[String(au.id ?? '')] ?? 0})`}
+              value={String(au.id ?? au.name)}
+            />
           ))}
         </Tabs>
         <Grid container spacing={2}>
@@ -135,9 +148,13 @@ export default function ArticlesList() {
         allowScrollButtonsMobile
         sx={{ mb: 2 }}
       >
-        <Tab label="みんな" value="all" />
+        <Tab label={`みんな (${counts.all})`} value="all" />
         {authors.map((au) => (
-          <Tab key={au.id ?? au.name} label={au.name ?? '(無名)'} value={String(au.id ?? au.name)} />
+          <Tab
+            key={au.id ?? au.name}
+            label={`${au.name ?? '(無名)'} (${counts.byAuthor[String(au.id ?? '')] ?? 0})`}
+            value={String(au.id ?? au.name)}
+          />
         ))}
       </Tabs>
       {!authorsLoading && authorsError && (
