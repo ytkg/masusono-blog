@@ -133,9 +133,9 @@ export default function ArticlesList() {
                     <Typography gutterBottom variant="h6" component="div">
                       {a.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {`著者: ${a.author?.name ?? '不明'} ・ ${formatDate(a.publishedAt || a.createdAt)}`}
-                    </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {`${formatDate(a.publishedAt || a.createdAt)} ${a.author?.name ?? '不明'}`}
+                  </Typography>
                   </CardContent>
                 </CardActionArea>
               </Card>

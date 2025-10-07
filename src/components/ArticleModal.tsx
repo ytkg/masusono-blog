@@ -79,7 +79,7 @@ export default function ArticleModal({ open, id, onClose }: Props) {
             '& p': { margin: '0 0 1em' },
           }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {`著者: ${author} ・ ${date}`}
+              {`${date} ${author}`}
             </Typography>
             {html ? (
               <Box dangerouslySetInnerHTML={{ __html: html }} />
