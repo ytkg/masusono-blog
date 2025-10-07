@@ -10,14 +10,18 @@ import Alert from '@mui/material/Alert'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { fetchArticles, fetchAuthors, type Article, type Author } from '../services/microcms'
-import ArticleModal from './ArticleModal'
+import { Link as RouterLink, useLocation, useSearchParams } from 'react-router-dom'
 
 export default function ArticlesList() {
+  const location = useLocation()
+  const [, setSearchParams] = useSearchParams()
   const [items, setItems] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selected, setSelected] = useState<Article | null>(null)
-  const [tab, setTab] = useState<string>('all')
+  const [tab, setTab] = useState<string>(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('tab') ?? 'all'
+  })
   const [authors, setAuthors] = useState<Author[]>([])
   const [authorsLoading, setAuthorsLoading] = useState(true)
   const [authorsError, setAuthorsError] = useState<string | null>(null)
@@ -71,6 +75,14 @@ export default function ArticlesList() {
     return items.filter((a) => String(a.author?.id ?? '') === tab)
   }, [items, tab])
 
+  // URLのクエリ (?tab=...) 変更を監視してタブを同期
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const q = params.get('tab') ?? 'all'
+    if (q !== tab) setTab(q)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search])
+
   if (loading) {
     return (
       <>
@@ -110,7 +122,19 @@ export default function ArticlesList() {
 
   return (
     <>
-      <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" allowScrollButtonsMobile sx={{ mb: 2 }}>
+      <Tabs
+        value={tab}
+        onChange={(_, v) => {
+          setTab(v)
+          const params = new URLSearchParams(location.search)
+          if (v === 'all') params.delete('tab')
+          else params.set('tab', v)
+          setSearchParams(params)
+        }}
+        variant="scrollable"
+        allowScrollButtonsMobile
+        sx={{ mb: 2 }}
+      >
         <Tab label="みんな" value="all" />
         {authors.map((au) => (
           <Tab key={au.id ?? au.name} label={au.name ?? '(無名)'} value={String(au.id ?? au.name)} />
@@ -128,7 +152,11 @@ export default function ArticlesList() {
           {filtered.map((a) => (
             <Grid key={a.id} size={{ xs: 12, sm: 6, md: 4 }}>
               <Card>
-                <CardActionArea onClick={() => setSelected(a)}>
+                <CardActionArea
+                  component={RouterLink}
+                  to={{ pathname: `/articles/${a.id}`, search: location.search }}
+                  state={{ article: a }}
+                >
                   <CardContent>
                     <Typography gutterBottom variant="h6" component="div">
                       {a.title}
@@ -144,7 +172,6 @@ export default function ArticlesList() {
         </Grid>
       )}
 
-      <ArticleModal open={!!selected} id={selected?.id ?? null} article={selected} onClose={() => setSelected(null)} />
     </>
   )
 }

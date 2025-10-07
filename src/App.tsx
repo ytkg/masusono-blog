@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import ArticlesList from './components/ArticlesList'
 import './App.css'
+import ArticleModalRoute from './routes/ArticleModalRoute'
 
 export default function App() {
   return (
@@ -12,6 +13,8 @@ export default function App() {
       <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0 }}>
         <ArticlesList />
       </Container>
+      {/* URLに /articles/:id が含まれる場合のみモーダルを表示 */}
+      <ArticleModalRoute />
       <Footer />
     </Box>
   )
