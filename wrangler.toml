@@ -1,0 +1,6 @@
+name = "masusono-blog"
+compatibility_date = "2025-08-13"
+
+[assets]
+directory = "./dist/"
+not_found_handling = "single-page-application"
