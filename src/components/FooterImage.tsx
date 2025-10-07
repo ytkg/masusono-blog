@@ -23,24 +23,30 @@ export default function FooterImage({
   sx,
   ouchText = '痛い！',
 }: Props) {
-  const [pops, setPops] = useState<Array<{ id: number; left: number; offset: number }>>([])
+  type Pop = { id: number; mode: 'left' | 'right' | 'top'; y: number; x?: number }
+  const [pops, setPops] = useState<Pop[]>([])
   const timersRef = useRef<number[]>([])
   const idRef = useRef(0)
+  const wrapRef = useRef<HTMLDivElement | null>(null)
 
-  const floatOut = keyframes({
-    '0%': { opacity: 0, transform: 'translate(-50%, -100%) translateY(8px)' },
+  // 動きは無し（フェードイン・アウトのみ）
+  const fadeInOut = keyframes({
+    '0%': { opacity: 0 },
     '20%': { opacity: 1 },
-    // 以前より高く浮かせる
-    '100%': { opacity: 0, transform: 'translate(-50%, -100%) translateY(-36px)' },
+    '100%': { opacity: 0 },
   })
 
   const handleClick = () => {
-    // ランダムな左右位置（20%〜80%）に表示
-    const left = 20 + Math.random() * 60
-    // ランダムな縦オフセット（より広範囲・高めまで）
-    const offset = 30 + Math.random() * 150 // 30px〜180px 上に
+    const rect = wrapRef.current?.getBoundingClientRect()
+    const h = rect?.height ?? 128
+    const w = rect?.width ?? 128
+    const y = Math.max(10, Math.min(h - 10, Math.random() * h))
+    const x = Math.max(10, Math.min(w - 10, Math.random() * w))
+    // 左・右・上のいずれか
+    const r = Math.random()
+    const mode: Pop['mode'] = r < 0.33 ? 'left' : r < 0.66 ? 'right' : 'top'
     const id = ++idRef.current
-    setPops((prev) => [...prev, { id, left, offset }])
+    setPops((prev) => [...prev, { id, mode, y, x }])
     const t = window.setTimeout(() => {
       setPops((prev) => prev.filter((p) => p.id !== id))
     }, 1200)
@@ -73,57 +79,66 @@ export default function FooterImage({
 
   return (
     <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'center', WebkitTapHighlightColor: 'transparent', ...sx }}>
-      {onClick ? (
-        <ButtonBase
-          onClick={handleClick}
-          disableRipple
-          disableTouchRipple
-          sx={{
-            p: 0,
-            borderRadius: 1,
-            WebkitTapHighlightColor: 'transparent',
-            '&:active img': { transform: 'scale(0.98)', filter: 'brightness(0.98)' },
-          }}
-          aria-label={alt || undefined}
-        >
-          {Img}
-        </ButtonBase>
-      ) : (
-        <ButtonBase
-          onClick={handleClick}
-          disableRipple
-          disableTouchRipple
-          sx={{
-            p: 0,
-            borderRadius: 1,
-            WebkitTapHighlightColor: 'transparent',
-            '&:active img': { transform: 'scale(0.98)', filter: 'brightness(0.98)' },
-          }}
-          aria-label={alt || undefined}
-        >
-          {Img}
-        </ButtonBase>
-      )}
-      {pops.map((p) => (
-        <Typography
-          key={p.id}
-          variant="subtitle1"
-          sx={{
-            position: 'absolute',
-            top: -p.offset,
-            left: `${p.left}%`,
-            transform: 'translate(-50%, -100%)',
-            color: 'text.primary',
-            fontWeight: 700,
-            textShadow: '0 1px 0 rgba(255,255,255,0.8), 0 1px 4px rgba(0,0,0,0.25)',
-            pointerEvents: 'none',
-            animation: `${floatOut} 1200ms ease-out forwards`,
-            userSelect: 'none',
-          }}
-        >
-          {ouchText}
-        </Typography>
-      ))}
+      <Box ref={wrapRef} sx={{ position: 'relative', display: 'inline-block', lineHeight: 0 }}>
+        {onClick ? (
+          <ButtonBase
+            onClick={handleClick}
+            disableRipple
+            disableTouchRipple
+            sx={{
+              p: 0,
+              borderRadius: 1,
+              WebkitTapHighlightColor: 'transparent',
+              '&:active img': { transform: 'scale(0.98)', filter: 'brightness(0.98)' },
+            }}
+            aria-label={alt || undefined}
+          >
+            {Img}
+          </ButtonBase>
+        ) : (
+          <ButtonBase
+            onClick={handleClick}
+            disableRipple
+            disableTouchRipple
+            sx={{
+              p: 0,
+              borderRadius: 1,
+              WebkitTapHighlightColor: 'transparent',
+              '&:active img': { transform: 'scale(0.98)', filter: 'brightness(0.98)' },
+            }}
+            aria-label={alt || undefined}
+          >
+            {Img}
+          </ButtonBase>
+        )}
+        {pops.map((p) => (
+          <Typography
+            key={p.id}
+            variant="subtitle1"
+            sx={{
+              position: 'absolute',
+              ...(p.mode === 'top'
+                ? {
+                    top: 0,
+                    left: `${p.x}px`,
+                    transform: 'translate(-50%, -100%)',
+                  }
+                : p.mode === 'right'
+                ? { top: `${p.y}px`, left: 'calc(100% + 8px)', transform: 'translateY(-50%)' }
+                : { top: `${p.y}px`, right: 'calc(100% + 8px)', transform: 'translateY(-50%)' }),
+              color: 'text.primary',
+              fontWeight: 700,
+              textShadow: '0 1px 0 rgba(255,255,255,0.8), 0 1px 4px rgba(0,0,0,0.25)',
+              pointerEvents: 'none',
+              animation: `${fadeInOut} 1200ms ease-out forwards`,
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {ouchText}
+          </Typography>
+        ))}
+      </Box>
     </Box>
   )
 }
