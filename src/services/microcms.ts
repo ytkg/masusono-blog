@@ -26,7 +26,7 @@ interface ListResponse<T> {
 const SERVICE_DOMAIN = 'masusono'
 const API_BASE = `https://${SERVICE_DOMAIN}.microcms.io/api/v1`
 
-const API_KEY = import.meta.env.VITE_MICROCMS_API_KEY as string | undefined
+const API_KEY: string = 'H5FVIb97NuVgDcqZjUam1ixou64qInmQCh7T'
 
 export async function fetchArticles(limit = 20): Promise<ListResponse<Article>> {
   if (!API_KEY) {
