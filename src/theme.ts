@@ -1,6 +1,10 @@
 import { createTheme } from '@mui/material/styles'
 
 const theme = createTheme({
+  typography: {
+    fontFamily:
+      "'Yusei Magic', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif",
+  },
   palette: {
     mode: 'light',
     primary: { main: '#000000' },
