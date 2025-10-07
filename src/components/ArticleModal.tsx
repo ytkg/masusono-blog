@@ -12,21 +12,32 @@ import { fetchArticle, type Article } from '../services/microcms'
 
 interface Props {
   open: boolean
-  id: string | null
+  id?: string | null
+  article?: Article | null
   onClose: () => void
 }
 
-export default function ArticleModal({ open, id, onClose }: Props) {
+export default function ArticleModal({ open, id, article, onClose }: Props) {
   const [data, setData] = useState<Article | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
-    if (!open || !id) {
+    if (!open) return () => { active = false }
+    // 既に記事データがある場合は即時表示
+    if (article) {
+      setData(article)
+      setError(null)
+      setLoading(false)
+      return () => { active = false }
+    }
+    // データが無い場合のみAPI取得
+    if (!id) {
       setData(null)
       setError(null)
-      return
+      setLoading(false)
+      return () => { active = false }
     }
     setLoading(true)
     setError(null)
@@ -46,7 +57,7 @@ export default function ArticleModal({ open, id, onClose }: Props) {
     return () => {
       active = false
     }
-  }, [open, id])
+  }, [open, id, article])
 
   const html = (data?.content ?? data?.body ?? '') as string
   const author = data?.author?.name ?? '不明'

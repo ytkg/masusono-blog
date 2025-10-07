@@ -16,7 +16,7 @@ export default function ArticlesList() {
   const [items, setItems] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [openId, setOpenId] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Article | null>(null)
   const [tab, setTab] = useState<string>('all')
   const [authors, setAuthors] = useState<Author[]>([])
   const [authorsLoading, setAuthorsLoading] = useState(true)
@@ -128,7 +128,7 @@ export default function ArticlesList() {
           {filtered.map((a) => (
             <Grid key={a.id} size={{ xs: 12, sm: 6, md: 4 }}>
               <Card>
-                <CardActionArea onClick={() => setOpenId(a.id)}>
+                <CardActionArea onClick={() => setSelected(a)}>
                   <CardContent>
                     <Typography gutterBottom variant="h6" component="div">
                       {a.title}
@@ -144,7 +144,7 @@ export default function ArticlesList() {
         </Grid>
       )}
 
-      <ArticleModal open={!!openId} id={openId} onClose={() => setOpenId(null)} />
+      <ArticleModal open={!!selected} id={selected?.id ?? null} article={selected} onClose={() => setSelected(null)} />
     </>
   )
 }
