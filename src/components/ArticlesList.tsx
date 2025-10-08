@@ -6,14 +6,8 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
-import Box from '@mui/material/Box'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import type { SelectChangeEvent } from '@mui/material/Select'
 import { fetchArticles, fetchAuthors, type Article, type Author } from '../services/microcms'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import ArticleInline from './ArticleInline'
@@ -109,25 +103,7 @@ export default function ArticlesList() {
   if (loading) {
     return (
       <>
-        <Box sx={{ display: { xs: 'block', sm: 'none' }, mb: 2 }}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="article-tab-label">カテゴリー</InputLabel>
-            <Select<string>
-              labelId="article-tab-label"
-              value={tab}
-              label="カテゴリー"
-              onChange={(e: SelectChangeEvent<string>) => applyTab(e.target.value as string)}
-            >
-              <MenuItem value="all">みんな ({counts.all})</MenuItem>
-              {authors.map((au) => (
-                <MenuItem key={au.id ?? au.name} value={String(au.id ?? au.name)}>
-                  {`${au.name ?? '(無名)'} (${counts.byAuthor[String(au.id ?? '')] ?? 0})`}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" allowScrollButtonsMobile sx={{ mb: 2, display: { xs: 'none', sm: 'block' } }}>
+        <Tabs value={tab} onChange={(_, v) => applyTab(v)} variant="scrollable" allowScrollButtonsMobile sx={{ mb: 2 }}>
           <Tab label={`みんな (${counts.all})`} value="all" sx={{ px: 1, minWidth: 'auto' }} />
           {authors.map((au) => (
             <Tab
@@ -168,31 +144,12 @@ export default function ArticlesList() {
 
   return (
     <>
-      {/* モバイル: セレクト */}
-      <Box sx={{ display: { xs: 'block', sm: 'none' }, mb: 2 }}>
-        <FormControl fullWidth size="small">
-          <InputLabel id="article-tab-label-md">カテゴリー</InputLabel>
-          <Select<string>
-            labelId="article-tab-label-md"
-            value={tab}
-            label="カテゴリー"
-            onChange={(e: SelectChangeEvent<string>) => applyTab(e.target.value as string)}
-          >
-            <MenuItem value="all">みんな ({counts.all})</MenuItem>
-            {authors.map((au) => (
-              <MenuItem key={au.id ?? au.name} value={String(au.id ?? au.name)}>
-                {`${au.name ?? '(無名)'} (${counts.byAuthor[String(au.id ?? '')] ?? 0})`}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
       <Tabs
         value={tab}
         onChange={(_, v) => applyTab(v)}
         variant="scrollable"
         allowScrollButtonsMobile
-        sx={{ mb: 2, display: { xs: 'none', sm: 'block' } }}
+        sx={{ mb: 2 }}
       >
         <Tab label={`みんな (${counts.all})`} value="all" sx={{ px: 1, minWidth: 'auto' }} />
         {authors.map((au) => (
