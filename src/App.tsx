@@ -7,6 +7,7 @@ import Podcast from './components/Podcast'
 import './App.css'
 import BottomTabs from './components/BottomTabs'
 import { Routes, Route } from 'react-router-dom'
+import MasudaRun from './pages/MasudaRun'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Blog />} />
           <Route path="/podcast" element={<Podcast />} />
+          <Route path="/run" element={<MasudaRun />} />
         </Routes>
         {/* ページ毎の固有要素は各ページ側で配置 */}
       </Container>
