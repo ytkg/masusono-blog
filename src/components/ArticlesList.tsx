@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-// import CardActionArea from '@mui/material/CardActionArea'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
@@ -25,7 +24,7 @@ export default function ArticlesList() {
   const { data: authorsRes, isLoading: authorsLoading, error: authorsErr } = useAuthors(50)
   const authors: Author[] = authorsRes?.contents ?? []
   const authorsError: string | null = authorsErr ? (authorsErr as Error).message : null
-  // 直接一覧に本文を表示するため、ルートや選択状態は不要
+  // 一覧に本文をインライン表示する構成
   const applyTab = (v: string) => {
     setTab(v)
     const params = new URLSearchParams(location.search)
@@ -134,9 +133,6 @@ export default function ArticlesList() {
           ))}
         </>
       )}
-
     </>
   )
 }
-
-// 日付表示は ArticleInline 側で対応

@@ -1,12 +1,5 @@
 import useSWR from 'swr'
-import { apiFetchJson, type Article, type Author } from '../services/microcms'
-
-interface ListResponse<T> {
-  contents: T[]
-  totalCount: number
-  offset: number
-  limit: number
-}
+import { apiFetchJson, type Article, type Author, type ListResponse } from '../services/microcms'
 
 export function useArticles(limit = 20) {
   const key = `articles?limit=${limit}`
@@ -32,4 +25,3 @@ export function useAuthors(limit = 50) {
   })
   return swr
 }
-
