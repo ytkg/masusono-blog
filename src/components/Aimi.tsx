@@ -15,7 +15,7 @@ interface Props {
   ouchText?: string
 }
 
-export default function FooterImage({
+export default function Aimi({
   src = defaultImage,
   alt = '',
   onClick,

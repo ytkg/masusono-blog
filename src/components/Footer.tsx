@@ -7,11 +7,17 @@ export default function Footer() {
     <Box
       component="footer"
       sx={{
-        py: 1,
-        textAlign: 'center',
-        mt: 'auto',
+        position: 'fixed',
+        left: 0,
+        bottom: 0,
+        width: '100%',
+        height: 44,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         bgcolor: 'primary.main',
         color: 'common.white',
+        zIndex: (t) => t.zIndex.appBar,
       }}
     >
       <Typography variant="body2" color="inherit">

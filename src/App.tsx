@@ -5,18 +5,21 @@ import Footer from './components/Footer'
 import Blog from './components/Blog'
 import Podcast from './components/Podcast'
 import './App.css'
-import FooterImage from './components/FooterImage'
+import BottomTabs from './components/BottomTabs'
+import { Routes, Route } from 'react-router-dom'
 
 export default function App() {
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       <Header />
-      <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0 }}>
-        <Blog />
-        <Podcast />
+      <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0, pb: { xs: 14, sm: 14 } }}>
+        <Routes>
+          <Route path="/" element={<Blog />} />
+          <Route path="/podcast" element={<Podcast />} />
+        </Routes>
+        {/* ページ毎の固有要素は各ページ側で配置 */}
       </Container>
-      {/* コンテンツとフッターの間に画像（コンポーネント化） */}
-      <FooterImage />
+      <BottomTabs />
       <Footer />
     </Box>
   )

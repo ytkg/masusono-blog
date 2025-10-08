@@ -1,15 +1,78 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Alert from '@mui/material/Alert'
+// import Alert from '@mui/material/Alert'
+import Aimi from './Aimi'
 
 export default function Podcast() {
   return (
-    <Box component="section" sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
+    <Box component="section" id="podcast" sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
       <Typography variant="h5" component="h2" gutterBottom>
         ポッドキャスト
       </Typography>
-      <Alert severity="info">準備中です。</Alert>
+      <Box
+        sx={{
+          mb: 2,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-end',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 1,
+          pt: { xs: 1.5, sm: 2 },
+          pl: { xs: 1.5, sm: 2 },
+          pr: 0,
+          pb: 0,
+          bgcolor: 'background.paper',
+          overflow: 'visible',
+        }}
+      >
+        <Box sx={{ position: 'relative', display: 'inline-block', zIndex: 1 }}>
+          {/* 吹き出し（Aimi の左側） */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 'calc(100% + 8px)',
+              bgcolor: 'background.paper',
+              color: 'text.primary',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              px: 1.5,
+              py: 0.5,
+              fontSize: '0.875rem',
+              boxShadow: 1,
+              whiteSpace: 'nowrap',
+              zIndex: 2,
+              '::before': {
+                content: '""',
+                position: 'absolute',
+                top: '50%',
+                left: '100%',
+                transform: 'translateY(-50%)',
+                borderTop: '7px solid transparent',
+                borderBottom: '7px solid transparent',
+                borderLeft: '7px solid',
+                borderLeftColor: 'divider',
+              },
+              '::after': {
+                content: '""',
+                position: 'absolute',
+                top: '50%',
+                left: '100%',
+                transform: 'translateY(-50%) translateX(-1px)',
+                borderTop: '6px solid transparent',
+                borderBottom: '6px solid transparent',
+                borderLeft: '6px solid',
+                borderLeftColor: 'background.paper',
+              },
+            }}
+          >
+            準備中だよ
+          </Box>
+          <Aimi />
+        </Box>
+      </Box>
     </Box>
   )
 }
-
