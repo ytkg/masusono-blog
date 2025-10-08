@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import CardActionArea from '@mui/material/CardActionArea'
+// import CardActionArea from '@mui/material/CardActionArea'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
@@ -10,7 +10,8 @@ import Alert from '@mui/material/Alert'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { fetchArticles, fetchAuthors, type Article, type Author } from '../services/microcms'
-import { Link as RouterLink, useLocation, useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
+import ArticleInline from './ArticleInline'
 
 export default function ArticlesList() {
   const location = useLocation()
@@ -25,6 +26,7 @@ export default function ArticlesList() {
   const [authors, setAuthors] = useState<Author[]>([])
   const [authorsLoading, setAuthorsLoading] = useState(true)
   const [authorsError, setAuthorsError] = useState<string | null>(null)
+  // 直接一覧に本文を表示するため、ルートや選択状態は不要
 
   useEffect(() => {
     let active = true
@@ -157,6 +159,7 @@ export default function ArticlesList() {
           />
         ))}
       </Tabs>
+      {/* 一覧ページに本文をそのまま表示するため、個別選択の挿入は不要 */}
       {!authorsLoading && authorsError && (
         <Alert severity="warning" sx={{ mb: 2 }}>
           著者の取得に失敗しました: {authorsError}
@@ -165,44 +168,15 @@ export default function ArticlesList() {
       {filtered.length === 0 ? (
         <Typography color="text.secondary">該当する記事がありません。</Typography>
       ) : (
-        <Grid container spacing={2}>
+        <>
           {filtered.map((a) => (
-            <Grid key={a.id} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card>
-                <CardActionArea
-                  component={RouterLink}
-                  to={{ pathname: `/articles/${a.id}`, search: location.search }}
-                  state={{ article: a }}
-                >
-                  <CardContent>
-                    <Typography gutterBottom variant="h6" component="div">
-                      {a.title}
-                    </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {`${formatDate(a.publishedAt || a.createdAt)} ${a.author?.name ?? '不明'}`}
-                  </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
+            <ArticleInline key={a.id} id={a.id} article={a} />
           ))}
-        </Grid>
+        </>
       )}
 
     </>
   )
 }
 
-function formatDate(input?: string) {
-  if (!input) return ''
-  try {
-    const d = new Date(input)
-    return new Intl.DateTimeFormat('ja-JP', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(d)
-  } catch {
-    return input
-  }
-}
+// 日付表示は ArticleInline 側で対応

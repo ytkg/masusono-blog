@@ -2,9 +2,8 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import ArticlesList from './components/ArticlesList'
+import Blog from './components/Blog'
 import './App.css'
-import ArticleModalRoute from './routes/ArticleModalRoute'
 import FooterImage from './components/FooterImage'
 
 export default function App() {
@@ -12,12 +11,10 @@ export default function App() {
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       <Header />
       <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0 }}>
-        <ArticlesList />
+        <Blog />
       </Container>
       {/* コンテンツとフッターの間に画像（コンポーネント化） */}
       <FooterImage />
-      {/* URLに /articles/:id が含まれる場合のみモーダルを表示 */}
-      <ArticleModalRoute />
       <Footer />
     </Box>
   )
