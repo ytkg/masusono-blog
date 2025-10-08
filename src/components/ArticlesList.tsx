@@ -8,23 +8,23 @@ import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
-import { fetchArticles, fetchAuthors, type Article, type Author } from '../services/microcms'
+import type { Article, Author } from '../services/microcms'
+import { useArticles, useAuthors } from '../hooks/useMicrocms'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import ArticleInline from './ArticleInline'
 
 export default function ArticlesList() {
   const location = useLocation()
   const [, setSearchParams] = useSearchParams()
-  const [items, setItems] = useState<Article[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data: articlesRes, isLoading: loading, error } = useArticles(20)
+  const items: Article[] = articlesRes?.contents ?? []
   const [tab, setTab] = useState<string>(() => {
     const params = new URLSearchParams(location.search)
     return params.get('tab') ?? 'all'
   })
-  const [authors, setAuthors] = useState<Author[]>([])
-  const [authorsLoading, setAuthorsLoading] = useState(true)
-  const [authorsError, setAuthorsError] = useState<string | null>(null)
+  const { data: authorsRes, isLoading: authorsLoading, error: authorsErr } = useAuthors(50)
+  const authors: Author[] = authorsRes?.contents ?? []
+  const authorsError: string | null = authorsErr ? (authorsErr as Error).message : null
   // 直接一覧に本文を表示するため、ルートや選択状態は不要
   const applyTab = (v: string) => {
     setTab(v)
@@ -34,49 +34,7 @@ export default function ArticlesList() {
     setSearchParams(params)
   }
 
-  useEffect(() => {
-    let active = true
-    setLoading(true)
-    setError(null)
-    fetchArticles(20)
-      .then((res) => {
-        if (!active) return
-        setItems(res.contents)
-      })
-      .catch((e: unknown) => {
-        if (!active) return
-        setError(e instanceof Error ? e.message : String(e))
-      })
-      .finally(() => {
-        if (!active) return
-        setLoading(false)
-      })
-    return () => {
-      active = false
-    }
-  }, [])
-
-  useEffect(() => {
-    let active = true
-    setAuthorsLoading(true)
-    setAuthorsError(null)
-    fetchAuthors(50)
-      .then((res) => {
-        if (!active) return
-        setAuthors(res.contents)
-      })
-      .catch((e: unknown) => {
-        if (!active) return
-        setAuthorsError(e instanceof Error ? e.message : String(e))
-      })
-      .finally(() => {
-        if (!active) return
-        setAuthorsLoading(false)
-      })
-    return () => {
-      active = false
-    }
-  }, [])
+  // SWR に置き換えたため副作用での取得は不要
 
   const counts = useMemo(() => {
     const byAuthor: Record<string, number> = {}

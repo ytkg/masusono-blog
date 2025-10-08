@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
-import { fetchArticle, type Article } from '../services/microcms'
+import { type Article } from '../services/microcms'
+import { useArticle } from '../hooks/useMicrocms'
 
 interface Props {
   id: string
@@ -11,24 +12,10 @@ interface Props {
 }
 
 export default function ArticleInline({ id, article }: Props) {
-  const hasBody = !!(article && (article.content || article.body))
-  const [data, setData] = useState<Article | null>(hasBody ? article : null)
-  const [loading, setLoading] = useState(!hasBody)
-  const [error, setError] = useState<string | null>(null)
+  const fallback = useMemo(() => (article && (article.content || article.body) ? article : null), [article])
+  const { data, isLoading: loading, error } = useArticle(id, fallback)
 
-  useEffect(() => {
-    let active = true
-    if (article && (article.content || article.body)) return () => { active = false }
-    setLoading(true)
-    setError(null)
-    fetchArticle(id)
-      .then((res) => { if (active) setData(res) })
-      .catch((e: unknown) => { if (active) setError(e instanceof Error ? e.message : String(e)) })
-      .finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
-  }, [id, article])
-
-  const html = (data?.content ?? data?.body ?? '') as string
+  const html = ((data?.content ?? data?.body ?? '') as unknown) as string
   const author = data?.author?.name ?? '不明'
   const date = formatDate(data?.publishedAt || data?.createdAt)
 
@@ -49,7 +36,7 @@ export default function ArticleInline({ id, article }: Props) {
           <Skeleton variant="rectangular" height={180} sx={{ mt: 2 }} />
         </Box>
       )}
-      {!loading && error && <Alert severity="error">{error}</Alert>}
+      {!loading && error && <Alert severity="error">{String((error as Error)?.message ?? error)}</Alert>}
       {!loading && !error && data && (
         <>
           <Typography variant="h5" component="h2" gutterBottom>
