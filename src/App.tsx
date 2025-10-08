@@ -3,6 +3,7 @@ import Container from '@mui/material/Container'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Blog from './components/Blog'
+import Podcast from './components/Podcast'
 import './App.css'
 import FooterImage from './components/FooterImage'
 
@@ -12,6 +13,7 @@ export default function App() {
       <Header />
       <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0 }}>
         <Blog />
+        <Podcast />
       </Container>
       {/* コンテンツとフッターの間に画像（コンポーネント化） */}
       <FooterImage />
