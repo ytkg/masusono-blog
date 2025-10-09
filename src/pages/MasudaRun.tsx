@@ -7,7 +7,7 @@ import charImgSrc from '../assets/masuda_run.png'
 // ===== Types =====
 type GameState = 'ready' | 'playing' | 'gameover'
 
-interface Player { x: number; y: number; vy: number; w: number; h: number; onGround: boolean }
+interface Player { x: number; y: number; vy: number; w: number; h: number; onGround: boolean; jumps: number }
 interface Obstacle { x: number; y: number; w: number; h: number }
 interface World {
   t: number
@@ -43,6 +43,8 @@ const CFG = {
   SHORT_H_RANGE: 20,        // 低め障害物の高さ幅
   OBS_W_MIN: 16,            // 障害物の最小幅
   OBS_W_RANGE: 16,          // 障害物の幅の幅
+  MAX_JUMPS: 2,             // 二段ジャンプまで
+  JUMP_VY: -11,             // ジャンプ初速度
 }
 
 const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
@@ -56,7 +58,7 @@ function createInitialWorld(): World {
     t: 0,
     speed: CFG.SPEED_BASE,
     groundY,
-    player: { x: 60, y: groundY - HIT_H, vy: 0, w: HIT_W, h: HIT_H, onGround: true },
+    player: { x: 60, y: groundY - HIT_H, vy: 0, w: HIT_W, h: HIT_H, onGround: true, jumps: 0 },
     gravity: CFG.GRAVITY,
     obstacles: [],
     nextSpawn: 0,
@@ -100,16 +102,26 @@ export default function MasudaRun() {
     setState('playing')
   }
 
+  const doJump = () => {
+    if (state !== 'playing') return
+    const p = world.current.player
+    // 空中でも最大回数まではジャンプ可能（着地でリセット）
+    if (p.jumps < CFG.MAX_JUMPS) {
+      p.vy = CFG.JUMP_VY
+      p.onGround = false
+      p.jumps += 1
+    }
+  }
+
   // キー操作
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat) return
-      const p = world.current.player
       if (e.type === 'keydown') {
         if (e.key === ' ' || e.key === 'ArrowUp') {
           e.preventDefault()
           if (state === 'ready' || state === 'gameover') { startOrRestart(); return }
-          if (p.onGround) { p.vy = -11; p.onGround = false }
+          doJump()
         } else if ((e.key === 'r' || e.key === 'R') && state === 'gameover') {
           startOrRestart()
         }
@@ -127,9 +139,8 @@ export default function MasudaRun() {
     const c = canvasRef.current
     if (!c) return
     const onPointerDown = () => {
-      const p = world.current.player
       if (state === 'ready' || state === 'gameover') return startOrRestart()
-      if (state === 'playing' && p.onGround) { p.vy = -11; p.onGround = false }
+      if (state === 'playing') doJump()
     }
     c.addEventListener('pointerdown', onPointerDown)
     return () => c.removeEventListener('pointerdown', onPointerDown)
@@ -149,7 +160,7 @@ export default function MasudaRun() {
     p.vy += w.gravity
     p.y += p.vy
     p.h = HIT_H
-    if (p.y + p.h >= w.groundY) { p.y = w.groundY - p.h; p.vy = 0; p.onGround = true }
+    if (p.y + p.h >= w.groundY) { p.y = w.groundY - p.h; p.vy = 0; p.onGround = true; p.jumps = 0 }
 
     // 障害物生成 + 移動
     w.nextSpawn -= dt
@@ -270,8 +281,7 @@ export default function MasudaRun() {
           onPointerDown={(e) => {
             e.preventDefault()
             if (state === 'playing') {
-              const p = world.current.player
-              if (p.onGround) { p.vy = -11; p.onGround = false }
+              doJump()
             } else {
               startOrRestart()
             }
@@ -279,8 +289,7 @@ export default function MasudaRun() {
           onClick={(e) => {
             e.preventDefault()
             if (state === 'playing') {
-              const p = world.current.player
-              if (p.onGround) { p.vy = -11; p.onGround = false }
+              doJump()
             } else {
               startOrRestart()
             }
