@@ -90,7 +90,16 @@ export default function Shops() {
       marker.bindTooltip(s.name)
       markersRef.current[key] = marker
     })
-  }, [shops, selected])
+  }, [shops])
+
+  // 選択状態に応じてツールチップを開く
+  useEffect(() => {
+    if (!selected) return
+    Object.entries(markersRef.current).forEach(([key, marker]) => {
+      if (key === selected) marker.openTooltip()
+      else marker.closeTooltip()
+    })
+  }, [selected])
 
   // 選択時に中心へ
   useEffect(() => {
