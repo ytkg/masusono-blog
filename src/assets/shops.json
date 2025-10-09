@@ -1,50 +1,34 @@
 [
   {
     "name": "遊飯家 酒舞",
-    "lat": 35,
-    "lng": 139,
+    "lat": 35.7318409,
+    "lng": 139.5633401,
     "category": "居酒屋",
-    "url": "",
+    "url": "https://maps.app.goo.gl/9C6Qtp6QuQgFPCL76",
     "desc": "うまい"
   },
   {
-    "name": "渋谷クラフトカフェ",
-    "lat": 35.6595,
-    "lng": 139.7005,
-    "category": "カフェ",
-    "url": "https://maps.google.com/?q=渋谷駅",
-    "desc": "自家焙煎と手作りスイーツが人気のカフェ。Wi‑Fi/電源あり。"
-  },
-  {
-    "name": "新宿濃厚ラーメン",
-    "lat": 35.6938,
-    "lng": 139.7034,
+    "name": "たなか青空笑店",
+    "lat": 35.7286194,
+    "lng": 139.5529434,
     "category": "ラーメン",
-    "url": "https://maps.google.com/?q=新宿駅",
-    "desc": "濃厚豚骨スープと極太麺。深夜まで営業。"
+    "url": "https://maps.app.goo.gl/eea5T7TdLXzWfbKR6",
+    "desc": "うまい"
   },
   {
-    "name": "浅草てんぷら まさだ",
-    "lat": 35.7148,
-    "lng": 139.7967,
-    "category": "和食",
-    "url": "https://maps.google.com/?q=浅草",
-    "desc": "揚げたての天ぷらをカウンターで。下町価格が嬉しい。"
-  },
-  {
-    "name": "上野サワードブレッド",
-    "lat": 35.7122,
-    "lng": 139.7785,
-    "category": "ベーカリー",
-    "url": "https://maps.google.com/?q=上野公園",
-    "desc": "天然酵母のハード系が充実。朝は行列必至。"
-  },
-  {
-    "name": "中目黒やきとり そら",
-    "lat": 35.6441,
-    "lng": 139.6981,
+    "name": "四文屋 新井薬師本店",
+    "lat": 35.7155403,
+    "lng": 139.6663461,
     "category": "居酒屋",
-    "url": "https://maps.google.com/?q=中目黒駅",
-    "desc": "備長炭で焼き上げる串が絶品。日本酒の品揃えも◎。"
+    "url": "https://maps.app.goo.gl/mwpZwHzWDA4T6EoX8",
+    "desc": "うまい"
+  },
+  {
+    "name": "地鶏割烹 おはじき新宿店",
+    "lat": 35.6937854,
+    "lng": 139.6943855,
+    "category": "居酒屋",
+    "url": "https://maps.app.goo.gl/8nGeBjzDgkm34fyk6",
+    "desc": "うまい"
   }
 ]
