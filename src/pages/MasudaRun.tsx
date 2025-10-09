@@ -32,11 +32,11 @@ const CFG = {
   GROUND_RATIO: 0.8,
   // 難易度（少し上げ、徐々に上がる）
   SPEED_BASE: 5.0,          // 初速を少し上げる
-  SPEED_GAIN_MAX: 5.0,      // 上限速度の上げ幅を拡大
+  SPEED_GAIN_MAX: 12.0,     // 上限速度の上げ幅を拡大（上限を延長）
   SPEED_GAIN_RATE: 0.00035, // 加速をやや強めに
   GRAVITY: 0.6,
   SPAWN_BASE: 1300,         // 出現間隔の基準を少し短く
-  SPAWN_REDUCE_MAX: 900,    // 時間とともにより短くなる
+  SPAWN_REDUCE_MAX: 1200,   // 時間とともにより短くなる（最小間隔をさらに短く）
   SPAWN_REDUCE_RATE: 0.06,  // 短縮率を少し強めに
   SPAWN_RAND: 700,
   TALL_PROB: 0.22,          // 背の高い障害物の確率を増やす
