@@ -3,12 +3,14 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import charImgSrc from '../assets/masuda_run.png'
+import obsShortSrc from '../assets/other1.png'
+import obsTallSrc from '../assets/other2.png'
 
 // ===== Types =====
 type GameState = 'ready' | 'playing' | 'gameover'
 
 interface Player { x: number; y: number; vy: number; w: number; h: number; onGround: boolean; jumps: number; spin: number }
-interface Obstacle { x: number; y: number; w: number; h: number }
+interface Obstacle { x: number; y: number; w: number; h: number; kind: 'short' | 'tall' }
 interface World {
   t: number
   speed: number
@@ -46,6 +48,7 @@ const CFG = {
   MAX_JUMPS: 2,             // 二段ジャンプまで
   JUMP_VY: -11,             // ジャンプ初速度
   SPIN_MS: 500,             // 二段ジャンプ時の回転時間（ms）
+  OBS_IMG_SCALE: 1.18,      // 障害物画像の拡大倍率（見た目のみ）
 }
 
 const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
@@ -91,11 +94,19 @@ export default function MasudaRun() {
 
   // 画像のプリロード（読み込み完了後は imgRef で描画）
   const imgRef = useRef<HTMLImageElement | null>(null)
+  const obsShortRef = useRef<HTMLImageElement | null>(null)
+  const obsTallRef = useRef<HTMLImageElement | null>(null)
   useEffect(() => {
     const img = new Image()
     img.src = charImgSrc
     img.onload = () => { imgRef.current = img }
-    return () => { imgRef.current = null }
+    const s = new Image()
+    s.src = obsShortSrc
+    s.onload = () => { obsShortRef.current = s }
+    const t = new Image()
+    t.src = obsTallSrc
+    t.onload = () => { obsTallRef.current = t }
+    return () => { imgRef.current = null; obsShortRef.current = null; obsTallRef.current = null }
   }, [])
 
   const startOrRestart = () => {
@@ -174,7 +185,7 @@ export default function MasudaRun() {
       const tall = Math.random() < CFG.TALL_PROB
       const h = tall ? CFG.TALL_H : CFG.SHORT_H_MIN + Math.random() * CFG.SHORT_H_RANGE
       const y = w.groundY - h
-      const obs = { x: W + 20, y, w: CFG.OBS_W_MIN + Math.random() * CFG.OBS_W_RANGE, h }
+      const obs: Obstacle = { x: W + 20, y, w: CFG.OBS_W_MIN + Math.random() * CFG.OBS_W_RANGE, h, kind: tall ? 'tall' : 'short' }
       w.obstacles.push(obs)
       w.nextSpawn = CFG.SPAWN_BASE - Math.min(CFG.SPAWN_REDUCE_MAX, w.t * CFG.SPAWN_REDUCE_RATE) + Math.random() * CFG.SPAWN_RAND
     }
@@ -203,7 +214,20 @@ export default function MasudaRun() {
 
     // 障害物
     ctx.fillStyle = '#000'
-    for (const o of w.obstacles) ctx.fillRect(o.x, o.y, o.w, o.h)
+    for (const o of w.obstacles) {
+      const img = o.kind === 'tall' ? obsTallRef.current : obsShortRef.current
+      if (img) {
+        const ratio = img.width / img.height
+        const drawH = o.h * CFG.OBS_IMG_SCALE
+        const drawW = Math.max(o.w, drawH * ratio)
+        const drawX = o.x + (o.w - drawW) / 2
+        // 見た目を大きくしても地面基準で下端を揃える
+        const drawY = o.y - (drawH - o.h)
+        ctx.drawImage(img, drawX, drawY, drawW, drawH)
+      } else {
+        ctx.fillRect(o.x, o.y, o.w, o.h)
+      }
+    }
 
     // キャラ
     const p = w.player
