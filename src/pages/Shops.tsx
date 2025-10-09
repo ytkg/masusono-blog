@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
@@ -27,10 +27,19 @@ type Shop = {
 // Leaflet を使った実マップ表示
 
 export default function Shops() {
-  const shops = (data as unknown as Shop[])
+  const shops = data as Shop[]
   // name + lat + lng で安定キーを生成（小数は丸め）
   const getKey = (s: Shop) => `${s.name}-${s.lat.toFixed(5)}-${s.lng.toFixed(5)}`
-  const [selected, setSelected] = useState<string | null>(shops[0] ? getKey(shops[0]) : null)
+  const [category, setCategory] = useState<string>('ALL')
+  const categories = useMemo(() => {
+    const uniq = Array.from(new Set(shops.map(s => s.category)))
+    return uniq.sort((a, b) => a.localeCompare(b, 'ja'))
+  }, [shops])
+  const filteredShops = useMemo(
+    () => (category === 'ALL' ? shops : shops.filter(s => s.category === category)),
+    [category, shops],
+  )
+  const [selected, setSelected] = useState<string | null>(() => (shops[0] ? getKey(shops[0]) : null))
   const mapElRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Record<string, L.Marker>>({})
@@ -68,6 +77,16 @@ export default function Shops() {
     return () => { ro.disconnect(); map.remove(); mapRef.current = null }
   }, [shops])
 
+  // 絞り込み変化時に初期選択を調整
+  useEffect(() => {
+    if (filteredShops.length === 0) {
+      if (selected !== null) setSelected(null)
+      return
+    }
+    const exists = filteredShops.some(s => getKey(s) === selected)
+    if (!exists) setSelected(getKey(filteredShops[0]))
+  }, [filteredShops, selected])
+
   // マーカー更新（ピン：Leaflet デフォルトアイコン）
   useEffect(() => {
     const map = mapRef.current
@@ -83,14 +102,14 @@ export default function Shops() {
       shadowSize: [41, 41],
       tooltipAnchor: [16, -28],
     })
-    shops.forEach(s => {
+    filteredShops.forEach(s => {
       const key = getKey(s)
       const marker = L.marker([s.lat, s.lng], { icon: defaultIcon }).addTo(map)
       marker.on('click', () => setSelected(key))
       marker.bindTooltip(s.name)
       markersRef.current[key] = marker
     })
-  }, [shops])
+  }, [filteredShops])
 
   // 選択状態に応じてツールチップを開く
   useEffect(() => {
@@ -105,9 +124,9 @@ export default function Shops() {
   useEffect(() => {
     const map = mapRef.current
     if (!map || !selected) return
-    const s = shops.find(v => getKey(v) === selected)
+    const s = filteredShops.find(v => getKey(v) === selected)
     if (s) map.setView([s.lat, s.lng], Math.max(14, map.getZoom()), { animate: true })
-  }, [selected, shops])
+  }, [selected, filteredShops])
 
   return (
     <Box
@@ -122,6 +141,25 @@ export default function Shops() {
     >
       <Typography variant="h5" sx={{ mb: 1 }}>推し店</Typography>
 
+      {/* カテゴリー絞り込み */}
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+        <Chip
+          label="すべて"
+          variant={category === 'ALL' ? 'filled' : 'outlined'}
+          color={category === 'ALL' ? 'primary' : 'default'}
+          onClick={() => setCategory('ALL')}
+        />
+        {categories.map(cat => (
+          <Chip
+            key={cat}
+            label={cat}
+            variant={category === cat ? 'filled' : 'outlined'}
+            color={category === cat ? 'primary' : 'default'}
+            onClick={() => setCategory(cat)}
+          />
+        ))}
+      </Box>
+
       {/* 実マップ（Leaflet） */}
       <Box
         ref={mapElRef}
@@ -131,7 +169,7 @@ export default function Shops() {
       {/* List: 独立スクロール領域（地図は固定） */}
       <Box sx={{ overflow: 'auto', pr: 1, flex: 1, minHeight: 0, pb: 8 }}>
         <Grid container spacing={2}>
-          {shops.map((s) => {
+          {filteredShops.map((s) => {
             const key = getKey(s)
             return (
             <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
