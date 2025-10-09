@@ -75,6 +75,8 @@ function drawCenterText(ctx: CanvasRenderingContext2D, W: number, H: number, tex
 // ===== Page =====
 export default function MasudaRun() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const canvasWrapRef = useRef<HTMLDivElement | null>(null)
+  const scaleRef = useRef(1)
   const reqRef = useRef<number | null>(null)
   const [state, setState] = useState<GameState>('ready')
   const scoreRef = useRef(0)
@@ -205,6 +207,31 @@ export default function MasudaRun() {
     else if (state === 'gameover') { ctx.font = '16px sans-serif'; drawCenterText(ctx, W, H, 'GAME OVER  -  スペース/タップで再開') }
   }
 
+  // キャンバスリサイズ（横幅いっぱい + 高解像度対応）
+  useEffect(() => {
+    const resize = () => {
+      const wrap = canvasWrapRef.current
+      const canvas = canvasRef.current
+      if (!wrap || !canvas) return
+      const cssW = wrap.clientWidth || CFG.BASE_W
+      const cssH = Math.round((CFG.BASE_H / CFG.BASE_W) * cssW)
+      const dpr = Math.max(1, window.devicePixelRatio || 1)
+      const scale = (cssW * dpr) / CFG.BASE_W
+      scaleRef.current = scale
+      canvas.style.width = cssW + 'px'
+      canvas.style.height = cssH + 'px'
+      canvas.width = Math.round(CFG.BASE_W * scale)
+      canvas.height = Math.round(CFG.BASE_H * scale)
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    window.addEventListener('orientationchange', resize)
+    return () => {
+      window.removeEventListener('resize', resize)
+      window.removeEventListener('orientationchange', resize)
+    }
+  }, [])
+
   // ループ
   useEffect(() => {
     const canvas = canvasRef.current
@@ -214,6 +241,8 @@ export default function MasudaRun() {
     const loop = (now: number) => {
       const dt = Math.min(32, now - last); last = now
       update(dt, CFG.BASE_W)
+      // 論理座標を物理解像度へスケール
+      ctx.setTransform(scaleRef.current, 0, 0, scaleRef.current, 0, 0)
       draw(ctx, CFG.BASE_W, CFG.BASE_H)
       reqRef.current = requestAnimationFrame(loop)
     }
@@ -227,10 +256,10 @@ export default function MasudaRun() {
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
       <Typography variant="h5" component="h2" gutterBottom>増田ラン</Typography>
-      <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden', width: '100%', maxWidth: CFG.BASE_W }}>
-        <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={{ width: '100%', display: 'block', outline: 'none' }} />
+      <Box ref={canvasWrapRef} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden', width: '100%' }}>
+        <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={{ width: '100%', height: 'auto', display: 'block', outline: 'none' }} />
       </Box>
-      <Box sx={{ maxWidth: CFG.BASE_W, width: '100%', mt: 1 }}>
+      <Box sx={{ width: '100%', mt: 1 }}>
         <Button
           fullWidth
           variant="contained"
