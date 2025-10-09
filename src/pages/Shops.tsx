@@ -35,6 +35,20 @@ export default function Shops() {
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Record<string, L.Marker>>({})
 
+  // ページ全体のスクロールを抑制（一覧のみスクロール可能にする）
+  useEffect(() => {
+    const originalHtmlOverflow = document.documentElement.style.overflow
+    const originalBodyOverflow = document.body.style.overflow
+
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.documentElement.style.overflow = originalHtmlOverflow
+      document.body.style.overflow = originalBodyOverflow
+    }
+  }, [])
+
   // 地図初期化
   useEffect(() => {
     const el = mapElRef.current
@@ -106,7 +120,7 @@ export default function Shops() {
       />
 
       {/* List: 独立スクロール領域（地図は固定） */}
-      <Box sx={{ overflow: 'auto', pr: 1, flex: 1, minHeight: 0 }}>
+      <Box sx={{ overflow: 'auto', pr: 1, flex: 1, minHeight: 0, pb: 8 }}>
         <Grid container spacing={2}>
           {shops.map((s) => {
             const key = getKey(s)
