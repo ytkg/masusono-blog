@@ -141,8 +141,14 @@ export default function Shops() {
     >
       <Typography variant="h5" sx={{ mb: 1 }}>推し店</Typography>
 
+      {/* 実マップ（Leaflet） */}
+      <Box
+        ref={mapElRef}
+        sx={{ height: { xs: 186, sm: 240 }, border: '1px solid', borderColor: 'divider', borderRadius: 1, mb: 1 }}
+      />
+
       {/* カテゴリー絞り込み */}
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1, mb: 1 }}>
         <Chip
           label="すべて"
           variant={category === 'ALL' ? 'filled' : 'outlined'}
@@ -160,12 +166,6 @@ export default function Shops() {
         ))}
       </Box>
 
-      {/* 実マップ（Leaflet） */}
-      <Box
-        ref={mapElRef}
-        sx={{ height: { xs: 186, sm: 240 }, border: '1px solid', borderColor: 'divider', borderRadius: 1, mb: 1 }}
-      />
-
       {/* List: 独立スクロール領域（地図は固定） */}
       <Box sx={{ overflow: 'auto', pr: 1, flex: 1, minHeight: 0, pb: 8 }}>
         <Grid container spacing={2}>
@@ -174,8 +174,8 @@ export default function Shops() {
             return (
             <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
               <Card
-                variant={selected === key ? 'elevation' : 'outlined'}
-                sx={{ borderColor: selected === key ? 'primary.main' : 'divider', cursor: 'pointer' }}
+                variant="outlined"
+                sx={{ borderColor: 'divider', cursor: 'pointer' }}
                 onClick={() => {
                   setSelected(key)
                   const map = mapRef.current
