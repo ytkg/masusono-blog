@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import charImgSrc from '../assets/masuda_run.png'
 
 // ===== Types =====
@@ -226,8 +227,37 @@ export default function MasudaRun() {
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
       <Typography variant="h5" component="h2" gutterBottom>増田ラン</Typography>
-      <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden', width: '100%', maxWidth: CFG.BASE_W, mb: 1 }}>
+      <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden', width: '100%', maxWidth: CFG.BASE_W }}>
         <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={{ width: '100%', display: 'block', outline: 'none' }} />
+      </Box>
+      <Box sx={{ maxWidth: CFG.BASE_W, width: '100%', mt: 1 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          size="large"
+          disableRipple
+          onPointerDown={(e) => {
+            e.preventDefault()
+            if (state === 'playing') {
+              const p = world.current.player
+              if (p.onGround) { p.vy = -11; p.onGround = false }
+            } else {
+              startOrRestart()
+            }
+          }}
+          onClick={(e) => {
+            e.preventDefault()
+            if (state === 'playing') {
+              const p = world.current.player
+              if (p.onGround) { p.vy = -11; p.onGround = false }
+            } else {
+              startOrRestart()
+            }
+          }}
+        >
+          {state === 'playing' ? 'ジャンプ' : state === 'ready' ? 'スタート' : 'リスタート'}
+        </Button>
       </Box>
       <Typography variant="body2" color="text.secondary">
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
