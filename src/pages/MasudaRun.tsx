@@ -85,6 +85,7 @@ export default function MasudaRun() {
   const [state, setState] = useState<GameState>('ready')
   const scoreRef = useRef(0)
   const [high, setHigh] = useState<number>(() => Number(localStorage.getItem('masudarun_highscore') || 0))
+  const suppressClickRef = useRef(false)
 
   const world = useRef<World>(createInitialWorld())
 
@@ -302,6 +303,9 @@ export default function MasudaRun() {
           disableRipple
           onPointerDown={(e) => {
             e.preventDefault()
+            // pointerdown 後に click が続いても二重実行しないための抑止
+            suppressClickRef.current = true
+            window.setTimeout(() => { suppressClickRef.current = false }, 300)
             if (state === 'playing') {
               doJump()
             } else {
@@ -310,6 +314,10 @@ export default function MasudaRun() {
           }}
           onClick={(e) => {
             e.preventDefault()
+            if (suppressClickRef.current) {
+              // 直前に pointerdown を処理済みの click は無視
+              return
+            }
             if (state === 'playing') {
               doJump()
             } else {
