@@ -311,7 +311,7 @@ export default function MasudaRun() {
 
     // HUD
     const sc = Math.floor(scoreRef.current)
-    ctx.fillStyle = '#000'; ctx.font = '14px sans-serif'
+    ctx.fillStyle = '#000'; ctx.font = '16px sans-serif'
     ctx.fillText(`SCORE ${sc.toString().padStart(5, '0')}`, 10, 18)
     const hsc = Math.max(high, sc)
     if (hsc) ctx.fillText(`HI ${hsc.toString().padStart(5, '0')}`, W - 100, 18)
