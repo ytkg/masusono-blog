@@ -8,6 +8,7 @@ import './App.css'
 import BottomTabs from './components/BottomTabs'
 import { Routes, Route } from 'react-router-dom'
 import MasudaRun from './pages/MasudaRun'
+import Horoscope from './pages/Horoscope'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/" element={<Blog />} />
           <Route path="/podcast" element={<Podcast />} />
           <Route path="/run" element={<MasudaRun />} />
+          <Route path="/horoscope" element={<Horoscope />} />
         </Routes>
         {/* ページ毎の固有要素は各ページ側で配置 */}
       </Container>
