@@ -7,7 +7,7 @@ import charImgSrc from '../assets/masuda_run.png'
 // ===== Types =====
 type GameState = 'ready' | 'playing' | 'gameover'
 
-interface Player { x: number; y: number; vy: number; w: number; h: number; onGround: boolean; jumps: number }
+interface Player { x: number; y: number; vy: number; w: number; h: number; onGround: boolean; jumps: number; spin: number }
 interface Obstacle { x: number; y: number; w: number; h: number }
 interface World {
   t: number
@@ -45,6 +45,7 @@ const CFG = {
   OBS_W_RANGE: 16,          // 障害物の幅の幅
   MAX_JUMPS: 2,             // 二段ジャンプまで
   JUMP_VY: -11,             // ジャンプ初速度
+  SPIN_MS: 500,             // 二段ジャンプ時の回転時間（ms）
 }
 
 const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
@@ -58,7 +59,7 @@ function createInitialWorld(): World {
     t: 0,
     speed: CFG.SPEED_BASE,
     groundY,
-    player: { x: 60, y: groundY - HIT_H, vy: 0, w: HIT_W, h: HIT_H, onGround: true, jumps: 0 },
+    player: { x: 60, y: groundY - HIT_H, vy: 0, w: HIT_W, h: HIT_H, onGround: true, jumps: 0, spin: 0 },
     gravity: CFG.GRAVITY,
     obstacles: [],
     nextSpawn: 0,
@@ -110,6 +111,10 @@ export default function MasudaRun() {
       p.vy = CFG.JUMP_VY
       p.onGround = false
       p.jumps += 1
+      if (p.jumps === 2) {
+        // 二段ジャンプで回転を開始
+        p.spin = CFG.SPIN_MS
+      }
     }
   }
 
@@ -160,7 +165,7 @@ export default function MasudaRun() {
     p.vy += w.gravity
     p.y += p.vy
     p.h = HIT_H
-    if (p.y + p.h >= w.groundY) { p.y = w.groundY - p.h; p.vy = 0; p.onGround = true; p.jumps = 0 }
+    if (p.y + p.h >= w.groundY) { p.y = w.groundY - p.h; p.vy = 0; p.onGround = true; p.jumps = 0; p.spin = 0 }
 
     // 障害物生成 + 移動
     w.nextSpawn -= dt
@@ -205,7 +210,21 @@ export default function MasudaRun() {
     const drawW = CHAR_W, drawH = CHAR_H
     const drawX = Math.round(p.x - (drawW - p.w) / 2)
     const drawY = Math.round(p.y + p.h - drawH)
-    if (img) ctx.drawImage(img, drawX, drawY, drawW, drawH)
+    if (img) {
+      if (p.spin > 0) {
+        const progress = 1 - p.spin / CFG.SPIN_MS
+        const angle = progress * Math.PI * 2 // 1回転
+        ctx.save()
+        const cx = drawX + drawW / 2
+        const cy = drawY + drawH / 2
+        ctx.translate(cx, cy)
+        ctx.rotate(angle)
+        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH)
+        ctx.restore()
+      } else {
+        ctx.drawImage(img, drawX, drawY, drawW, drawH)
+      }
+    }
     else { ctx.fillStyle = '#000'; ctx.fillRect(drawX, drawY, drawW, drawH) }
 
     // HUD
@@ -253,6 +272,9 @@ export default function MasudaRun() {
     const loop = (now: number) => {
       const dt = Math.min(32, now - last); last = now
       update(dt, CFG.BASE_W)
+      // 回転タイマーの更新（描画タイミングで減衰）
+      const p = world.current.player
+      if (p.spin > 0) p.spin = Math.max(0, p.spin - dt)
       // 論理座標を物理解像度へスケール
       ctx.setTransform(scaleRef.current, 0, 0, scaleRef.current, 0, 0)
       draw(ctx, CFG.BASE_W, CFG.BASE_H)
