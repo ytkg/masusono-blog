@@ -186,7 +186,7 @@ export default function Shops() {
                   if (mk) mk.openTooltip()
                 }}
               >
-                <CardContent>
+                <CardContent sx={{ px: 1.25, py: 1, '&:last-child': { pb: 1.5 } }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{s.name}</Typography>
                     {s.url && (
@@ -195,7 +195,7 @@ export default function Shops() {
                       </IconButton>
                     )}
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 0.5 }}>
                     <Chip size="small" label={s.category} />
                   </Box>
                   {s.desc && (
