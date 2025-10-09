@@ -163,7 +163,7 @@ export default function Shops() {
       {/* 実マップ（Leaflet） */}
       <Box
         ref={mapElRef}
-        sx={{ height: { xs: 280, sm: 360 }, border: '1px solid', borderColor: 'divider', borderRadius: 1, mb: 1 }}
+        sx={{ height: { xs: 186, sm: 240 }, border: '1px solid', borderColor: 'divider', borderRadius: 1, mb: 1 }}
       />
 
       {/* List: 独立スクロール領域（地図は固定） */}
