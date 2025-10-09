@@ -15,7 +15,7 @@ export default function App() {
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       <Header />
-      <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0, pb: { xs: 14, sm: 14 } }}>
+      <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0, pb: { xs: 12, sm: 12 } }}>
         <Routes>
           <Route path="/" element={<Blog />} />
           <Route path="/podcast" element={<Podcast />} />

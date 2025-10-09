@@ -22,7 +22,7 @@ export default function BottomTabs() {
     : 'blog'
 
   return (
-    <Paper square sx={{ position: 'fixed', left: 0, bottom: 44, width: '100%', zIndex: (t) => t.zIndex.appBar, borderTop: '1px solid', borderColor: 'divider' }}>
+    <Paper square sx={{ position: 'fixed', left: 0, bottom: 36, width: '100%', zIndex: (t) => t.zIndex.appBar, borderTop: '1px solid', borderColor: 'divider' }}>
       <BottomNavigation
         showLabels
         value={value}
@@ -32,6 +32,15 @@ export default function BottomTabs() {
           else if (v === 'run') navigate('/run')
           else if (v === 'horoscope') navigate('/horoscope')
           else navigate('/shops')
+        }}
+        sx={{
+          '.MuiBottomNavigationAction-root': {
+            minWidth: 0,
+            px: 0.5,
+          },
+          '.MuiBottomNavigationAction-label': {
+            whiteSpace: 'nowrap',
+          },
         }}
       >
         <BottomNavigationAction label="ブログ" value="blog" icon={<ArticleIcon />} />
