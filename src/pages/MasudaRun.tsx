@@ -28,20 +28,21 @@ const CFG = {
   HIT_W_RATIO: 0.55, // 当たり判定（画像幅に対する割合）
   HIT_H_RATIO: 0.8,  // 当たり判定（画像高に対する割合）
   GROUND_RATIO: 0.8,
-  SPEED_BASE: 4.5,
-  SPEED_GAIN_MAX: 3,
-  SPEED_GAIN_RATE: 0.00025,
+  // 難易度（少し上げ、徐々に上がる）
+  SPEED_BASE: 5.0,          // 初速を少し上げる
+  SPEED_GAIN_MAX: 5.0,      // 上限速度の上げ幅を拡大
+  SPEED_GAIN_RATE: 0.00035, // 加速をやや強めに
   GRAVITY: 0.6,
-  SPAWN_BASE: 1400,
-  SPAWN_REDUCE_MAX: 700,
-  SPAWN_REDUCE_RATE: 0.04,
+  SPAWN_BASE: 1300,         // 出現間隔の基準を少し短く
+  SPAWN_REDUCE_MAX: 900,    // 時間とともにより短くなる
+  SPAWN_REDUCE_RATE: 0.06,  // 短縮率を少し強めに
   SPAWN_RAND: 700,
-  TALL_PROB: 0.15,
-  TALL_H: 46,
-  SHORT_H_MIN: 22,
-  SHORT_H_RANGE: 16,
-  OBS_W_MIN: 14,
-  OBS_W_RANGE: 12,
+  TALL_PROB: 0.22,          // 背の高い障害物の確率を増やす
+  TALL_H: 54,               // 背の高い障害物の高さ
+  SHORT_H_MIN: 26,          // 低め障害物の最小高さ
+  SHORT_H_RANGE: 20,        // 低め障害物の高さ幅
+  OBS_W_MIN: 16,            // 障害物の最小幅
+  OBS_W_RANGE: 16,          // 障害物の幅の幅
 }
 
 const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
