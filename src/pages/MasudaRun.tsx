@@ -11,6 +11,7 @@ type GameState = 'ready' | 'playing' | 'gameover'
 
 interface Player { x: number; y: number; vy: number; w: number; h: number; onGround: boolean; jumps: number; spin: number }
 interface Obstacle { x: number; y: number; w: number; h: number; kind: 'short' | 'tall' }
+interface Cloud { x: number; y: number; w: number; h: number; speed: number; alpha: number }
 interface World {
   t: number
   speed: number
@@ -19,6 +20,8 @@ interface World {
   gravity: number
   obstacles: Obstacle[]
   nextSpawn: number
+  clouds: Cloud[]
+  nextCloud: number
 }
 
 // ===== Config =====
@@ -49,6 +52,11 @@ const CFG = {
   JUMP_VY: -11,             // ジャンプ初速度
   SPIN_MS: 500,             // 二段ジャンプ時の回転時間（ms）
   OBS_IMG_SCALE: 1.18,      // 障害物画像の拡大倍率（見た目のみ）
+  // 雲（背景）
+  CLOUD_SPAWN_BASE: 1600,
+  CLOUD_SPAWN_RAND: 1400,
+  CLOUD_SPEED_MIN: 0.4,
+  CLOUD_SPEED_MAX: 1.0,
 }
 
 const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
@@ -66,6 +74,8 @@ function createInitialWorld(): World {
     gravity: CFG.GRAVITY,
     obstacles: [],
     nextSpawn: 0,
+    clouds: [],
+    nextCloud: 0,
   }
 }
 
@@ -78,6 +88,31 @@ function drawCenterText(ctx: CanvasRenderingContext2D, W: number, H: number, tex
   const m = ctx.measureText(text)
   ctx.fillText(text, (W - m.width) / 2, H / 2)
 }
+
+// ふわっとした雲（楕円の重ね合わせ）
+function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  const r = h / 2
+  const parts = [
+    { dx: 0.00, dy: 0.25, s: 1.0 },
+    { dx: 0.25, dy: 0.05, s: 1.25 },
+    { dx: 0.55, dy: 0.18, s: 1.05 },
+    { dx: 0.80, dy: 0.12, s: 0.95 },
+  ]
+  ctx.fillStyle = '#e5e5e5'
+  for (const p of parts) {
+    const cx = x + p.dx * w
+    const cy = y + p.dy * h
+    ctx.beginPath()
+    ctx.ellipse(cx, cy, r * p.s, r * 0.9 * p.s, 0, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  ctx.beginPath()
+  ctx.ellipse(x + 0.45 * w, y + 0.38 * h, r * 1.6, r * 0.9, 0, 0, Math.PI * 2)
+  ctx.fillStyle = '#f0f0f0'
+  ctx.fill()
+}
+
+// 以前の素朴な雲描画を使用（オフスクリーン生成は未使用）
 
 // ===== Page =====
 export default function MasudaRun() {
@@ -192,6 +227,20 @@ export default function MasudaRun() {
     for (const o of w.obstacles) o.x -= w.speed
     w.obstacles = w.obstacles.filter((o) => o.x + o.w > -10)
 
+    // 雲生成 + 移動（障害物と独立・当たり判定なし）
+    w.nextCloud -= dt
+    if (w.nextCloud <= 0) {
+      const y = 20 + Math.random() * Math.max(20, w.groundY - 160)
+      const h = 18 + Math.random() * 22
+      const wCloud = h * (1.8 + Math.random() * 0.8)
+      const speed = CFG.CLOUD_SPEED_MIN + Math.random() * (CFG.CLOUD_SPEED_MAX - CFG.CLOUD_SPEED_MIN)
+      const alpha = 0.35 + Math.random() * 0.25
+      w.clouds.push({ x: W + 20, y, w: wCloud, h, speed, alpha })
+      w.nextCloud = CFG.CLOUD_SPAWN_BASE + Math.random() * CFG.CLOUD_SPAWN_RAND
+    }
+    for (const c of w.clouds) c.x -= (w.speed * 0.35 + c.speed)
+    w.clouds = w.clouds.filter((c) => c.x + c.w > -20)
+
     // 当たり判定
     for (const o of w.obstacles) {
       if (rectsIntersect(p.x, p.y, p.w, p.h, o.x, o.y, o.w, o.h)) {
@@ -210,6 +259,14 @@ export default function MasudaRun() {
   function draw(ctx: CanvasRenderingContext2D, W: number, H: number) {
     const w = world.current
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H)
+
+    // 雲（背景）
+    for (const c of w.clouds) {
+      ctx.save()
+      ctx.globalAlpha = c.alpha
+      drawCloud(ctx, c.x, c.y, c.w, c.h)
+      ctx.restore()
+    }
     ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.moveTo(0, w.groundY + 0.5); ctx.lineTo(W, w.groundY + 0.5); ctx.stroke()
 
     // 障害物
