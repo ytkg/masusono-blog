@@ -59,6 +59,8 @@ const CFG = {
   CLOUD_SPEED_MAX: 1.0,
 }
 
+const RESTART_DELAY_MS = 600
+
 const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
 const CHAR_W = Math.round(CHAR_H * CFG.IMG_RATIO)
 const HIT_W = Math.round(CHAR_W * CFG.HIT_W_RATIO)
@@ -114,6 +116,8 @@ function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 
 // 以前の素朴な雲描画を使用（オフスクリーン生成は未使用）
 
+const getNow = () => (typeof performance !== 'undefined' && typeof performance.now === 'function' ? performance.now() : Date.now())
+
 // ===== Page =====
 export default function MasudaRun() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -124,6 +128,8 @@ export default function MasudaRun() {
   const scoreRef = useRef(0)
   const [high, setHigh] = useState<number>(() => Number(localStorage.getItem('masudarun_highscore') || 0))
   const suppressClickRef = useRef(false)
+  const restartReadyAtRef = useRef(0)
+  const [restartReadyAt, setRestartReadyAt] = useState(0)
 
   const world = useRef<World>(createInitialWorld())
 
@@ -145,8 +151,12 @@ export default function MasudaRun() {
   }, [])
 
   const startOrRestart = () => {
+    const now = getNow()
+    if (state === 'gameover' && now < restartReadyAtRef.current) return
     world.current = createInitialWorld()
     scoreRef.current = 0
+    restartReadyAtRef.current = 0
+    setRestartReadyAt(0)
     setState('playing')
   }
 
@@ -198,6 +208,22 @@ export default function MasudaRun() {
     return () => c.removeEventListener('pointerdown', onPointerDown)
   }, [state])
 
+  // リスタートまでのクールダウンが過ぎたら自動で解除
+  useEffect(() => {
+    if (state !== 'gameover' || restartReadyAt <= 0) return
+    const remaining = restartReadyAt - getNow()
+    if (remaining <= 0) {
+      restartReadyAtRef.current = 0
+      setRestartReadyAt(0)
+      return
+    }
+    const id = window.setTimeout(() => {
+      restartReadyAtRef.current = 0
+      setRestartReadyAt(0)
+    }, remaining)
+    return () => window.clearTimeout(id)
+  }, [state, restartReadyAt])
+
   // ロジック更新
   function update(dt: number, W: number) {
     const w = world.current
@@ -246,6 +272,9 @@ export default function MasudaRun() {
       if (rectsIntersect(p.x, p.y, p.w, p.h, o.x, o.y, o.w, o.h)) {
         const newHigh = Math.max(high, Math.floor(scoreRef.current))
         if (newHigh !== high) { setHigh(newHigh); localStorage.setItem('masudarun_highscore', String(newHigh)) }
+        const readyAt = getNow() + RESTART_DELAY_MS
+        restartReadyAtRef.current = readyAt
+        setRestartReadyAt(readyAt)
         setState('gameover')
         return
       }
@@ -369,6 +398,8 @@ export default function MasudaRun() {
   // 初期ハイスコア
   useEffect(() => { setHigh(Number(localStorage.getItem('masudarun_highscore') || 0)) }, [])
 
+  const restartCooling = state === 'gameover' && restartReadyAt > 0
+
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
       <Typography variant="h5" component="h2" gutterBottom>増田ラン</Typography>
@@ -382,6 +413,7 @@ export default function MasudaRun() {
           color="primary"
           size="large"
           disableRipple
+          disabled={restartCooling}
           onPointerDown={(e) => {
             e.preventDefault()
             // pointerdown 後に click が続いても二重実行しないための抑止
