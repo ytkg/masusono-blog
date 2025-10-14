@@ -8,8 +8,8 @@ import './App.css'
 import BottomTabs from './components/BottomTabs'
 import { Routes, Route } from 'react-router-dom'
 import MasudaRun from './pages/MasudaRun'
-import Horoscope from './pages/Horoscope'
 import Shops from './pages/Shops'
+import Home from './pages/Home'
 
 export default function App() {
   return (
@@ -17,10 +17,10 @@ export default function App() {
       <Header />
       <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0, pb: { xs: 12, sm: 12 } }}>
         <Routes>
-          <Route path="/" element={<Blog />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/blog" element={<Blog />} />
           <Route path="/podcast" element={<Podcast />} />
           <Route path="/run" element={<MasudaRun />} />
-          <Route path="/horoscope" element={<Horoscope />} />
           <Route path="/shops" element={<Shops />} />
         </Routes>
         {/* ページ毎の固有要素は各ページ側で配置 */}
