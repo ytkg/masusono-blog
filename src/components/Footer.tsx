@@ -10,6 +10,7 @@ export default function Footer() {
         position: 'fixed',
         left: 0,
         bottom: 0,
+        pb: 1,
         width: '100%',
         height: 36,
         display: 'flex',
