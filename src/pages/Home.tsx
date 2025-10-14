@@ -14,17 +14,6 @@ const featureLinks = [
   { label: '推し店', description: 'おすすめスポットをマップで紹介', to: '/shops' },
 ]
 
-const sectionStyle = {
-  border: '1px solid',
-  borderColor: 'divider',
-  borderRadius: 2,
-  bgcolor: 'background.paper',
-  p: 2,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-} as const
-
 export default function Home() {
   const [now, setNow] = useState(() => new Date())
   const { key: horoscopeDate, entries: horoscopeEntries } = getTodayHoroscope()
