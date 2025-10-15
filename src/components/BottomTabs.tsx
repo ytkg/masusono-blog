@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Paper from '@mui/material/Paper'
 import BottomNavigation from '@mui/material/BottomNavigation'
@@ -10,7 +11,7 @@ import PlaceIcon from '@mui/icons-material/Place'
 
 type TabValue = 'home' | 'blog' | 'podcast' | 'games' | 'shops'
 
-const TABS: Array<{ value: TabValue; label: string; to: string; icon: JSX.Element }> = [
+const TABS: Array<{ value: TabValue; label: string; to: string; icon: ReactElement }> = [
   { value: 'home', label: 'ホーム', to: '/', icon: <HomeIcon /> },
   { value: 'blog', label: 'ブログ', to: '/blog', icon: <ArticleIcon /> },
   { value: 'podcast', label: 'ポッドキャスト', to: '/podcast', icon: <PodcastIcon /> },

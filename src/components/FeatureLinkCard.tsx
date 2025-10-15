@@ -13,24 +13,26 @@ interface FeatureLinkCardProps {
 }
 
 export default function FeatureLinkCard({ title, description, to, children, sx }: FeatureLinkCardProps) {
+  const mergedSx: SxProps<Theme> = [
+    {
+      p: { xs: 2, sm: 2.5 },
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 1,
+      textDecoration: 'none',
+      color: 'inherit',
+      transition: 'border-color 0.2s',
+      '&:hover': { borderColor: 'primary.main' },
+    },
+    ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+  ]
+
   return (
     <Paper
       component={RouterLink}
       to={to}
       variant="outlined"
-      sx={[
-        {
-          p: { xs: 2, sm: 2.5 },
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1,
-          textDecoration: 'none',
-          color: 'inherit',
-          transition: 'border-color 0.2s',
-          '&:hover': { borderColor: 'primary.main' },
-        },
-        sx,
-      ]}
+      sx={mergedSx}
     >
       <Typography variant="h6" component="h3">
         {title}

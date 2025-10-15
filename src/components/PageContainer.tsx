@@ -10,8 +10,13 @@ interface PageContainerProps {
 }
 
 export default function PageContainer({ children, component = 'section', id, sx }: PageContainerProps) {
+  const mergedSx: SxProps<Theme> = [
+    { px: { xs: 2, sm: 3 }, py: 2 },
+    ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+  ]
+
   return (
-    <Box component={component} id={id} sx={[{ px: { xs: 2, sm: 3 }, py: 2 }, sx]}>
+    <Box component={component} id={id} sx={mergedSx}>
       {children}
     </Box>
   )
