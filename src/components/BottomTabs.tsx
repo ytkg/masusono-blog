@@ -8,31 +8,30 @@ import PodcastIcon from '@mui/icons-material/Podcasts'
 import GameIcon from '@mui/icons-material/SportsEsports'
 import PlaceIcon from '@mui/icons-material/Place'
 
+type TabValue = 'home' | 'blog' | 'podcast' | 'games' | 'shops'
+
+const TABS: Array<{ value: TabValue; label: string; to: string; icon: JSX.Element }> = [
+  { value: 'home', label: 'ホーム', to: '/', icon: <HomeIcon /> },
+  { value: 'blog', label: 'ブログ', to: '/blog', icon: <ArticleIcon /> },
+  { value: 'podcast', label: 'ポッドキャスト', to: '/podcast', icon: <PodcastIcon /> },
+  { value: 'games', label: '増田ゲーム', to: '/games', icon: <GameIcon /> },
+  { value: 'shops', label: '推し店', to: '/shops', icon: <PlaceIcon /> },
+]
+
 export default function BottomTabs() {
   const location = useLocation()
   const navigate = useNavigate()
   const path = location.pathname
-  const value: 'home' | 'blog' | 'podcast' | 'games' | 'shops' = path.startsWith('/podcast')
-    ? 'podcast'
-    : path.startsWith('/games')
-    ? 'games'
-    : path.startsWith('/shops')
-    ? 'shops'
-    : path.startsWith('/blog')
-    ? 'blog'
-    : 'home'
+  const active = TABS.find((tab) => tab.to !== '/' && path.startsWith(tab.to))?.value ?? 'home'
 
   return (
     <Paper square sx={{ position: 'fixed', left: 0, bottom: 36, width: '100%', zIndex: (t) => t.zIndex.appBar, borderTop: '1px solid', borderColor: 'divider' }}>
       <BottomNavigation
         showLabels
-        value={value}
-        onChange={(_, v: 'home' | 'blog' | 'podcast' | 'games' | 'shops') => {
-          if (v === 'home') navigate('/')
-          else if (v === 'blog') navigate('/blog')
-          else if (v === 'podcast') navigate('/podcast')
-          else if (v === 'games') navigate('/games')
-          else navigate('/shops')
+        value={active}
+        onChange={(_, value: TabValue) => {
+          const tab = TABS.find((item) => item.value === value)
+          if (tab) navigate(tab.to)
         }}
         sx={{
           '.MuiBottomNavigationAction-root': {
@@ -44,11 +43,9 @@ export default function BottomTabs() {
           },
         }}
       >
-        <BottomNavigationAction label="ホーム" value="home" icon={<HomeIcon />} />
-        <BottomNavigationAction label="ブログ" value="blog" icon={<ArticleIcon />} />
-        <BottomNavigationAction label="ポッドキャスト" value="podcast" icon={<PodcastIcon />} />
-        <BottomNavigationAction label="増田ゲーム" value="games" icon={<GameIcon />} />
-        <BottomNavigationAction label="推し店" value="shops" icon={<PlaceIcon />} />
+        {TABS.map((tab) => (
+          <BottomNavigationAction key={tab.value} label={tab.label} value={tab.value} icon={tab.icon} />
+        ))}
       </BottomNavigation>
     </Paper>
   )
