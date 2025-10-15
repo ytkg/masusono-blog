@@ -1,11 +1,12 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import PageContainer from './PageContainer'
 // import Alert from '@mui/material/Alert'
 import Aimi from './Aimi'
 
 export default function Podcast() {
   return (
-    <Box component="section" id="podcast" sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
+    <PageContainer id="podcast">
       <Typography variant="h5" component="h2" gutterBottom>
         ポッドキャスト
       </Typography>
@@ -73,6 +74,6 @@ export default function Podcast() {
           <Aimi />
         </Box>
       </Box>
-    </Box>
+    </PageContainer>
   )
 }

@@ -14,6 +14,7 @@ import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
 import markerIcon2xUrl from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 import data from '../assets/shops.json'
+import PageContainer from '../components/PageContainer'
 
 type Shop = {
   name: string
@@ -129,10 +130,8 @@ export default function Shops() {
   }, [selected, filteredShops])
 
   return (
-    <Box
+    <PageContainer
       sx={{
-        px: { xs: 2, sm: 3 },
-        py: 2,
         height: 'calc(100dvh - 112px)',
         display: 'flex',
         flexDirection: 'column',
@@ -207,6 +206,6 @@ export default function Shops() {
           )})}
         </Grid>
       </Box>
-    </Box>
+    </PageContainer>
   )
 }

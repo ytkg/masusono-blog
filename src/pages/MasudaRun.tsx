@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import { Link as RouterLink } from 'react-router-dom'
+import PageContainer from '../components/PageContainer'
 import charImgSrc from '../assets/masuda_run.png'
 import obsShortSrc from '../assets/other1.png'
 import obsTallSrc from '../assets/other2.png'
@@ -401,7 +403,7 @@ export default function MasudaRun() {
   const restartCooling = state === 'gameover' && restartReadyAt > 0
 
   return (
-    <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
+    <PageContainer>
       <Typography variant="h5" component="h2" gutterBottom>増田ラン</Typography>
       <Box ref={canvasWrapRef} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden', width: '100%' }}>
         <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={{ width: '100%', height: 'auto', display: 'block', outline: 'none' }} />
@@ -444,6 +446,11 @@ export default function MasudaRun() {
       <Typography variant="body2" color="text.secondary">
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
-    </Box>
+      <Box sx={{ mt: 2 }}>
+        <Button component={RouterLink} to="/games" variant="outlined">
+          ゲーム一覧に戻る
+        </Button>
+      </Box>
+    </PageContainer>
   )
 }

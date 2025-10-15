@@ -12,10 +12,10 @@ export default function BottomTabs() {
   const location = useLocation()
   const navigate = useNavigate()
   const path = location.pathname
-  const value: 'home' | 'blog' | 'podcast' | 'run' | 'shops' = path.startsWith('/podcast')
+  const value: 'home' | 'blog' | 'podcast' | 'games' | 'shops' = path.startsWith('/podcast')
     ? 'podcast'
-    : path.startsWith('/run')
-    ? 'run'
+    : path.startsWith('/games')
+    ? 'games'
     : path.startsWith('/shops')
     ? 'shops'
     : path.startsWith('/blog')
@@ -27,11 +27,11 @@ export default function BottomTabs() {
       <BottomNavigation
         showLabels
         value={value}
-        onChange={(_, v: 'home' | 'blog' | 'podcast' | 'run' | 'shops') => {
+        onChange={(_, v: 'home' | 'blog' | 'podcast' | 'games' | 'shops') => {
           if (v === 'home') navigate('/')
           else if (v === 'blog') navigate('/blog')
           else if (v === 'podcast') navigate('/podcast')
-          else if (v === 'run') navigate('/run')
+          else if (v === 'games') navigate('/games')
           else navigate('/shops')
         }}
         sx={{
@@ -47,7 +47,7 @@ export default function BottomTabs() {
         <BottomNavigationAction label="ホーム" value="home" icon={<HomeIcon />} />
         <BottomNavigationAction label="ブログ" value="blog" icon={<ArticleIcon />} />
         <BottomNavigationAction label="ポッドキャスト" value="podcast" icon={<PodcastIcon />} />
-        <BottomNavigationAction label="増田ラン" value="run" icon={<GameIcon />} />
+        <BottomNavigationAction label="増田ゲーム" value="games" icon={<GameIcon />} />
         <BottomNavigationAction label="推し店" value="shops" icon={<PlaceIcon />} />
       </BottomNavigation>
     </Paper>

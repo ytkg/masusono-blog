@@ -3,14 +3,14 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Paper from '@mui/material/Paper'
-import { Link as RouterLink } from 'react-router-dom'
 import Chip from '@mui/material/Chip'
 import { getTodayHoroscope } from '../utils/horoscope'
+import FeatureLinkCard from '../components/FeatureLinkCard'
 
 const featureLinks = [
   { label: 'ブログ', description: '最新の記事やお知らせはこちら', to: '/blog' },
   { label: 'ポッドキャスト', description: '番組のアーカイブを毎週更新', to: '/podcast' },
-  { label: '増田ラン', description: 'タップで遊べるランゲーム', to: '/run' },
+  { label: '増田ゲーム', description: 'ミニゲームで遊べるコーナー', to: '/games' },
   { label: '推し店', description: 'おすすめスポットをマップで紹介', to: '/shops' },
 ]
 
@@ -48,29 +48,7 @@ export default function Home() {
 
       <Stack spacing={2}>
         {featureLinks.map((item) => (
-          <Paper
-            key={item.to}
-            component={RouterLink}
-            to={item.to}
-            variant="outlined"
-            sx={{
-              p: { xs: 2, sm: 2.5 },
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1,
-              textDecoration: 'none',
-              color: 'inherit',
-              transition: 'border-color 0.2s',
-              '&:hover': { borderColor: 'primary.main' },
-            }}
-          >
-            <Typography variant="h6" component="h3">
-              {item.label}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {item.description}
-            </Typography>
-          </Paper>
+          <FeatureLinkCard key={item.to} title={item.label} description={item.description} to={item.to} />
         ))}
 
         {horoscopeEntries.length > 0 && (
