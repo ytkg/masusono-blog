@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
@@ -170,6 +170,10 @@ function advanceBricks(model: GameModel) {
 export default function MasudaBreaker() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
+  const actionsRef = useRef<HTMLDivElement | null>(null)
+  const layoutRef = useRef<HTMLDivElement | null>(null)
+  const displayWidthRef = useRef(WIDTH)
+  const [displayWidth, setDisplayWidth] = useState(WIDTH)
   const gameRef = useRef<GameModel | null>(null)
   const phaseRef = useRef<GamePhase>('standby')
   const scoreRef = useRef(0)
@@ -556,7 +560,8 @@ export default function MasudaBreaker() {
   useEffect(() => {
     const canvas = canvasRef.current
     const wrap = wrapRef.current
-    if (!canvas || !wrap) return
+    const layout = layoutRef.current
+    if (!canvas || !wrap || !layout) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -584,14 +589,48 @@ export default function MasudaBreaker() {
     canvas.style.touchAction = 'none'
 
     const resize = () => {
-      const rect = wrap.getBoundingClientRect()
-      const scale = rect.width ? Math.min(rect.width / WIDTH, 1) : 1
-      canvas.style.width = `${WIDTH * scale}px`
-      canvas.style.height = `${HEIGHT * scale}px`
+      const currentCanvas = canvasRef.current
+      const currentWrap = wrapRef.current
+      const currentLayout = layoutRef.current
+      if (!currentCanvas || !currentWrap || !currentLayout) return
+
+      const layoutRect = currentLayout.getBoundingClientRect()
+      const wrapRect = currentWrap.getBoundingClientRect()
+      const widthAvailable = layoutRect.width > 0 ? layoutRect.width : WIDTH
+      let maxWidthByHeight = widthAvailable
+      if (typeof window !== 'undefined') {
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || HEIGHT
+        // 十分な余白を確保して下部ボタンなどを押し出さないようにする
+        let bottomBuffer = 72
+        if (actionsRef.current) {
+          const actionsRect = actionsRef.current.getBoundingClientRect()
+          bottomBuffer = Math.max(bottomBuffer, actionsRect.height + 48)
+        }
+        const availableHeight = viewportHeight - wrapRect.top - bottomBuffer
+        if (availableHeight > 0) {
+          maxWidthByHeight = Math.min(maxWidthByHeight, availableHeight * (WIDTH / HEIGHT))
+        }
+      }
+      const desiredWidth = Math.max(1, Math.min(widthAvailable, maxWidthByHeight))
+      const scale = desiredWidth / WIDTH
+      const desiredHeight = HEIGHT * scale
+
+      currentCanvas.style.width = `${desiredWidth}px`
+      currentCanvas.style.height = `${desiredHeight}px`
+      currentWrap.style.width = `${desiredWidth}px`
+      currentWrap.style.height = `${desiredHeight}px`
+
+      if (Math.abs(displayWidthRef.current - desiredWidth) > 0.5) {
+        displayWidthRef.current = desiredWidth
+        setDisplayWidth(desiredWidth)
+      }
     }
     resize()
     const observer = new ResizeObserver(resize)
-    observer.observe(wrap)
+    observer.observe(layout)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', resize)
+    }
 
     const onPointerDown = (event: PointerEvent) => {
       const current = gameRef.current
@@ -675,6 +714,9 @@ export default function MasudaBreaker() {
 
     return () => {
       observer.disconnect()
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', resize)
+      }
       canvas.removeEventListener('pointerdown', onPointerDown)
       canvas.removeEventListener('pointermove', onPointerMove)
       canvas.removeEventListener('pointerup', onPointerUp)
@@ -693,30 +735,32 @@ export default function MasudaBreaker() {
         増田崩し
       </Typography>
 
-      <Paper
-        elevation={0}
-        sx={{
-          width: '100%',
-          maxWidth: WIDTH,
-          mx: 'auto',
-          mt: 2,
-          borderRadius: 3,
-          border: '1px solid',
-          borderColor: 'divider',
-          overflow: 'hidden',
-        }}
-      >
-        <Box ref={wrapRef} sx={{ width: '100%' }}>
-          <canvas
-            ref={canvasRef}
-            width={WIDTH}
-            height={HEIGHT}
-            style={{ display: 'block', width: '100%', height: 'auto' }}
-          />
-        </Box>
-      </Paper>
+      <Box ref={layoutRef} sx={{ width: '100%' }}>
+        <Paper
+          elevation={0}
+          sx={{
+            width: `${displayWidth}px`,
+            maxWidth: '100%',
+            mx: 'auto',
+            mt: 2,
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            overflow: 'hidden',
+          }}
+        >
+          <Box ref={wrapRef}>
+            <canvas
+              ref={canvasRef}
+              width={WIDTH}
+              height={HEIGHT}
+              style={{ display: 'block', width: '100%', height: 'auto' }}
+            />
+          </Box>
+        </Paper>
+      </Box>
 
-      <Box sx={{ mt: 2 }}>
+      <Box ref={actionsRef} sx={{ mt: 2 }}>
         <Button component={RouterLink} to="/games" variant="outlined">
           ゲーム一覧に戻る
         </Button>
