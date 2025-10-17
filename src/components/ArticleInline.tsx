@@ -46,7 +46,17 @@ export default function ArticleInline({ id, article }: Props) {
             {`${date} ${author}`}
           </Typography>
           {html ? (
-            <Box dangerouslySetInnerHTML={{ __html: html }} />
+            <Box
+              sx={{
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
+                '& a': {
+                  overflowWrap: 'anywhere',
+                  wordBreak: 'break-word',
+                },
+              }}
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
           ) : (
             <Typography color="text.secondary">本文がありません。</Typography>
           )}
