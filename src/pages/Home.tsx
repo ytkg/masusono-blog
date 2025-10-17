@@ -31,6 +31,25 @@ export default function Home() {
     minute: '2-digit',
     second: '2-digit',
   })
+  const masudaBirthday = new Date(2025, 10, 12, 0, 0, 0)
+  const diffMs = masudaBirthday.getTime() - now.getTime()
+  const DAY_MS = 24 * 60 * 60 * 1000
+  const HOUR_MS = 60 * 60 * 1000
+  const MINUTE_MS = 60 * 1000
+  const countdown = diffMs > 0
+    ? {
+        days: Math.floor(diffMs / DAY_MS),
+        hours: Math.floor((diffMs % DAY_MS) / HOUR_MS),
+        minutes: Math.floor((diffMs % HOUR_MS) / MINUTE_MS),
+        seconds: Math.floor((diffMs % MINUTE_MS) / 1000),
+      }
+    : null
+  const masudaBirthdayLabel = masudaBirthday.toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  })
 
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, display: 'flex', flexDirection: 'column', gap: { xs: 3, sm: 4 } }}>
@@ -47,6 +66,57 @@ export default function Home() {
       </Box>
 
       <Stack spacing={2}>
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.5,
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h6" component="h2">{`増田のバースデー（${masudaBirthdayLabel}）まで`}</Typography>
+          {countdown ? (
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{
+                flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                justifyContent: 'center',
+                rowGap: 1.5,
+                width: '100%',
+              }}
+            >
+              {[
+                { label: '日', value: countdown.days.toString() },
+                { label: '時間', value: countdown.hours.toString().padStart(2, '0') },
+                { label: '分', value: countdown.minutes.toString().padStart(2, '0') },
+                { label: '秒', value: countdown.seconds.toString().padStart(2, '0') },
+              ].map((item) => (
+                <Box
+                  key={item.label}
+                  sx={{
+                    minWidth: 72,
+                    textAlign: 'center',
+                    px: 1,
+                  }}
+                >
+                  <Typography variant="h4" component="span" sx={{ display: 'block', fontWeight: 700 }}>
+                    {item.value}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {item.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          ) : (
+            <Typography variant="body1" sx={{ fontWeight: 600, textAlign: 'center' }}>
+              本日は増田バースデーです！お祝いしましょう。
+            </Typography>
+          )}
+        </Paper>
         {featureLinks.map((item) => (
           <FeatureLinkCard key={item.to} title={item.label} description={item.description} to={item.to} />
         ))}
