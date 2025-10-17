@@ -18,7 +18,8 @@ const HOUR_MS = 60 * 60 * 1000
 const MINUTE_MS = 60 * 1000
 
 export default function MasudaBirthdaySection({ now }: MasudaBirthdaySectionProps) {
-  const diffMs = MASUDA_BIRTHDAY.getTime() - now.getTime()
+  const nowRoundedMs = Math.floor(now.getTime() / 1000) * 1000
+  const diffMs = MASUDA_BIRTHDAY.getTime() - nowRoundedMs
   const countdown = diffMs > 0
     ? {
         days: Math.floor(diffMs / DAY_MS),
