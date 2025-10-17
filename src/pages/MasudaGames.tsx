@@ -9,6 +9,11 @@ const games = [
     description: 'ジャンプで障害物を避けるラン系アクション。',
     to: '/games/run',
   },
+  {
+    label: '増田崩し',
+    description: 'バーでボールを弾いてブロックを全消しするクラシックアクション。',
+    to: '/games/kuzushi',
+  },
 ]
 
 export default function MasudaGames() {

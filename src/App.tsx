@@ -8,6 +8,7 @@ import './App.css'
 import BottomTabs from './components/BottomTabs'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import MasudaRun from './pages/MasudaRun'
+import MasudaBreaker from './pages/MasudaBreaker'
 import MasudaGames from './pages/MasudaGames'
 import Shops from './pages/Shops'
 import Home from './pages/Home'
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/podcast" element={<Podcast />} />
           <Route path="/games" element={<MasudaGames />} />
           <Route path="/games/run" element={<MasudaRun />} />
+          <Route path="/games/kuzushi" element={<MasudaBreaker />} />
           <Route path="/run" element={<Navigate to="/games/run" replace />} />
           <Route path="/shops" element={<Shops />} />
         </Routes>
