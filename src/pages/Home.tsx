@@ -76,15 +76,16 @@ export default function Home() {
             alignItems: 'center',
           }}
         >
-          <Typography variant="h6" component="h2">{`増田のバースデー（${masudaBirthdayLabel}）まで`}</Typography>
+          <Box sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+            <Typography variant="h6" component="h2">増田のバースデーまで</Typography>
+            <Typography variant="body2" color="text.secondary">{`（${masudaBirthdayLabel}）`}</Typography>
+          </Box>
           {countdown ? (
-            <Stack
-              direction="row"
-              spacing={2}
+            <Box
               sx={{
-                flexWrap: { xs: 'wrap', sm: 'nowrap' },
-                justifyContent: 'center',
-                rowGap: 1.5,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                gap: { xs: 1, sm: 2 },
                 width: '100%',
               }}
             >
@@ -97,12 +98,15 @@ export default function Home() {
                 <Box
                   key={item.label}
                   sx={{
-                    minWidth: 72,
                     textAlign: 'center',
                     px: 1,
                   }}
                 >
-                  <Typography variant="h4" component="span" sx={{ display: 'block', fontWeight: 700 }}>
+                  <Typography
+                    variant="h4"
+                    component="span"
+                    sx={{ display: 'block', fontWeight: 700, fontSize: { xs: '1.75rem', sm: '2.125rem' } }}
+                  >
                     {item.value}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -110,7 +114,7 @@ export default function Home() {
                   </Typography>
                 </Box>
               ))}
-            </Stack>
+            </Box>
           ) : (
             <Typography variant="body1" sx={{ fontWeight: 600, textAlign: 'center' }}>
               本日は増田バースデーです！お祝いしましょう。
