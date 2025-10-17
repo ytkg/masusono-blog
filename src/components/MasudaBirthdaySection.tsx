@@ -41,7 +41,7 @@ export default function MasudaBirthdaySection({ now }: MasudaBirthdaySectionProp
     >
       <Box sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 0.25 }}>
         <Typography variant="h6" component="h2">増田のバースデーまで</Typography>
-        <Typography variant="body2" color="text.secondary">{`（${MASUDA_BIRTHDAY_LABEL}）`}</Typography>
+        <Typography variant="body2" color="text.secondary">{MASUDA_BIRTHDAY_LABEL}</Typography>
       </Box>
       {countdown ? (
         <Box
