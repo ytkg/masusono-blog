@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
-import Paper from '@mui/material/Paper'
 import Chip from '@mui/material/Chip'
 import { getTodayHoroscope } from '../utils/horoscope'
 import FeatureLinkCard from '../components/FeatureLinkCard'
+import MasudaBirthdaySection from '../components/MasudaBirthdaySection'
+import Paper from '@mui/material/Paper'
 
 const featureLinks = [
   { label: 'ブログ', description: '最新の記事やお知らせはこちら', to: '/blog' },
@@ -31,26 +32,6 @@ export default function Home() {
     minute: '2-digit',
     second: '2-digit',
   })
-  const masudaBirthday = new Date(2025, 10, 12, 0, 0, 0)
-  const diffMs = masudaBirthday.getTime() - now.getTime()
-  const DAY_MS = 24 * 60 * 60 * 1000
-  const HOUR_MS = 60 * 60 * 1000
-  const MINUTE_MS = 60 * 1000
-  const countdown = diffMs > 0
-    ? {
-        days: Math.floor(diffMs / DAY_MS),
-        hours: Math.floor((diffMs % DAY_MS) / HOUR_MS),
-        minutes: Math.floor((diffMs % HOUR_MS) / MINUTE_MS),
-        seconds: Math.floor((diffMs % MINUTE_MS) / 1000),
-      }
-    : null
-  const masudaBirthdayLabel = masudaBirthday.toLocaleDateString('ja-JP', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'short',
-  })
-
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, display: 'flex', flexDirection: 'column', gap: { xs: 3, sm: 4 } }}>
       <Box sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -66,61 +47,7 @@ export default function Home() {
       </Box>
 
       <Stack spacing={2}>
-        <Paper
-          variant="outlined"
-          sx={{
-            p: { xs: 2, sm: 2.5 },
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1.5,
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 0.25 }}>
-            <Typography variant="h6" component="h2">増田のバースデーまで</Typography>
-            <Typography variant="body2" color="text.secondary">{`（${masudaBirthdayLabel}）`}</Typography>
-          </Box>
-          {countdown ? (
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                gap: { xs: 1, sm: 2 },
-                width: '100%',
-              }}
-            >
-              {[
-                { label: '日', value: countdown.days.toString() },
-                { label: '時間', value: countdown.hours.toString().padStart(2, '0') },
-                { label: '分', value: countdown.minutes.toString().padStart(2, '0') },
-                { label: '秒', value: countdown.seconds.toString().padStart(2, '0') },
-              ].map((item) => (
-                <Box
-                  key={item.label}
-                  sx={{
-                    textAlign: 'center',
-                    px: 1,
-                  }}
-                >
-                  <Typography
-                    variant="h4"
-                    component="span"
-                    sx={{ display: 'block', fontWeight: 700, fontSize: { xs: '1.75rem', sm: '2.125rem' } }}
-                  >
-                    {item.value}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {item.label}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          ) : (
-            <Typography variant="body1" sx={{ fontWeight: 600, textAlign: 'center' }}>
-              本日は増田バースデーです！お祝いしましょう。
-            </Typography>
-          )}
-        </Paper>
+        <MasudaBirthdaySection now={now} />
         {featureLinks.map((item) => (
           <FeatureLinkCard key={item.to} title={item.label} description={item.description} to={item.to} />
         ))}
