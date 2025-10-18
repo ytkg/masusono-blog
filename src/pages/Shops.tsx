@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
@@ -25,27 +25,28 @@ type Shop = {
   desc?: string
 }
 
-// Leaflet を使った実マップ表示
+const DEFAULT_CATEGORY = 'ALL' as const
+const createShopKey = (shop: Shop) => `${shop.name}-${shop.lat.toFixed(5)}-${shop.lng.toFixed(5)}`
+const DEFAULT_MARKER_ICON = L.icon({
+  iconUrl: markerIconUrl,
+  iconRetinaUrl: markerIcon2xUrl,
+  shadowUrl: markerShadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  shadowSize: [41, 41],
+  tooltipAnchor: [16, -28],
+})
 
-export default function Shops() {
-  const shops = data as Shop[]
-  // name + lat + lng で安定キーを生成（小数は丸め）
-  const getKey = (s: Shop) => `${s.name}-${s.lat.toFixed(5)}-${s.lng.toFixed(5)}`
-  const [category, setCategory] = useState<string>('ALL')
-  const categories = useMemo(() => {
-    const uniq = Array.from(new Set(shops.map(s => s.category)))
-    return uniq.sort((a, b) => a.localeCompare(b, 'ja'))
-  }, [shops])
-  const filteredShops = useMemo(
-    () => (category === 'ALL' ? shops : shops.filter(s => s.category === category)),
-    [category, shops],
-  )
-  const [selected, setSelected] = useState<string | null>(() => (shops[0] ? getKey(shops[0]) : null))
-  const mapElRef = useRef<HTMLDivElement | null>(null)
-  const mapRef = useRef<L.Map | null>(null)
-  const markersRef = useRef<Record<string, L.Marker>>({})
+type UseLeafletMapOptions = {
+  mapContainerRef: MutableRefObject<HTMLDivElement | null>
+  shops: Shop[]
+  visibleShops: Shop[]
+  selectedKey: string | null
+  onSelect: (key: string) => void
+  getKey: (shop: Shop) => string
+}
 
-  // ページ全体のスクロールを抑制（一覧のみスクロール可能にする）
+function usePreventBodyScroll() {
   useEffect(() => {
     const originalHtmlOverflow = document.documentElement.style.overflow
     const originalBodyOverflow = document.body.style.overflow
@@ -58,13 +59,35 @@ export default function Shops() {
       document.body.style.overflow = originalBodyOverflow
     }
   }, [])
+}
 
-  // 地図初期化
+function useShopFilter(shops: Shop[]) {
+  const [category, setCategory] = useState<string>(DEFAULT_CATEGORY)
+
+  const categories = useMemo(() => {
+    const uniq = Array.from(new Set(shops.map(s => s.category)))
+    return uniq.sort((a, b) => a.localeCompare(b, 'ja'))
+  }, [shops])
+
+  const filteredShops = useMemo(
+    () => (category === DEFAULT_CATEGORY ? shops : shops.filter(s => s.category === category)),
+    [category, shops],
+  )
+
+  return { category, setCategory, categories, filteredShops }
+}
+
+function useLeafletMap({ mapContainerRef, shops, visibleShops, selectedKey, onSelect, getKey }: UseLeafletMapOptions) {
+  const mapRef = useRef<L.Map | null>(null)
+  const markersRef = useRef<Record<string, L.Marker>>({})
+
   useEffect(() => {
-    const el = mapElRef.current
+    const el = mapContainerRef.current
     if (!el || mapRef.current) return
+
     const map = L.map(el)
     mapRef.current = map
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors',
@@ -73,10 +96,68 @@ export default function Shops() {
     const bounds = L.latLngBounds(shops.map(s => [s.lat, s.lng]))
     if (bounds.isValid()) map.fitBounds(bounds.pad(0.2))
 
-    const ro = new ResizeObserver(() => map.invalidateSize())
-    ro.observe(el)
-    return () => { ro.disconnect(); map.remove(); mapRef.current = null }
-  }, [shops])
+    const resizeObserver = new ResizeObserver(() => map.invalidateSize())
+    resizeObserver.observe(el)
+
+    return () => {
+      resizeObserver.disconnect()
+      map.remove()
+      mapRef.current = null
+    }
+  }, [mapContainerRef, shops])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    Object.values(markersRef.current).forEach(marker => marker.remove())
+    markersRef.current = {}
+
+    visibleShops.forEach(shop => {
+      const key = getKey(shop)
+      const marker = L.marker([shop.lat, shop.lng], { icon: DEFAULT_MARKER_ICON }).addTo(map)
+      marker.on('click', () => onSelect(key))
+      marker.bindTooltip(shop.name)
+      markersRef.current[key] = marker
+    })
+  }, [visibleShops, onSelect, getKey])
+
+  useEffect(() => {
+    Object.entries(markersRef.current).forEach(([key, marker]) => {
+      if (selectedKey && key === selectedKey) marker.openTooltip()
+      else marker.closeTooltip()
+    })
+  }, [selectedKey])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !selectedKey) return
+
+    const targetShop = visibleShops.find(shop => getKey(shop) === selectedKey)
+    if (!targetShop) return
+
+    map.setView([targetShop.lat, targetShop.lng], Math.max(14, map.getZoom()), { animate: true })
+  }, [selectedKey, visibleShops, getKey])
+}
+
+// Leaflet を使った実マップ表示
+
+export default function Shops() {
+  const shops = useMemo(() => data as Shop[], [])
+  const getKey = useCallback(createShopKey, [])
+  const { category, setCategory, categories, filteredShops } = useShopFilter(shops)
+  const [selected, setSelected] = useState<string | null>(() => (shops[0] ? getKey(shops[0]) : null))
+  const mapElRef = useRef<HTMLDivElement | null>(null)
+
+  usePreventBodyScroll()
+  useLeafletMap({
+    mapContainerRef: mapElRef,
+    shops,
+    visibleShops: filteredShops,
+    selectedKey: selected,
+    onSelect: setSelected,
+    getKey,
+  })
 
   // 絞り込み変化時に初期選択を調整
   useEffect(() => {
@@ -86,48 +167,7 @@ export default function Shops() {
     }
     const exists = filteredShops.some(s => getKey(s) === selected)
     if (!exists) setSelected(getKey(filteredShops[0]))
-  }, [filteredShops, selected])
-
-  // マーカー更新（ピン：Leaflet デフォルトアイコン）
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map) return
-    Object.values(markersRef.current).forEach(m => m.remove())
-    markersRef.current = {}
-    const defaultIcon = L.icon({
-      iconUrl: markerIconUrl,
-      iconRetinaUrl: markerIcon2xUrl,
-      shadowUrl: markerShadowUrl,
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      shadowSize: [41, 41],
-      tooltipAnchor: [16, -28],
-    })
-    filteredShops.forEach(s => {
-      const key = getKey(s)
-      const marker = L.marker([s.lat, s.lng], { icon: defaultIcon }).addTo(map)
-      marker.on('click', () => setSelected(key))
-      marker.bindTooltip(s.name)
-      markersRef.current[key] = marker
-    })
-  }, [filteredShops])
-
-  // 選択状態に応じてツールチップを開く
-  useEffect(() => {
-    if (!selected) return
-    Object.entries(markersRef.current).forEach(([key, marker]) => {
-      if (key === selected) marker.openTooltip()
-      else marker.closeTooltip()
-    })
-  }, [selected])
-
-  // 選択時に中心へ
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map || !selected) return
-    const s = filteredShops.find(v => getKey(v) === selected)
-    if (s) map.setView([s.lat, s.lng], Math.max(14, map.getZoom()), { animate: true })
-  }, [selected, filteredShops])
+  }, [filteredShops, selected, getKey])
 
   return (
     <PageContainer
@@ -150,9 +190,9 @@ export default function Shops() {
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1, mb: 1 }}>
         <Chip
           label="すべて"
-          variant={category === 'ALL' ? 'filled' : 'outlined'}
-          color={category === 'ALL' ? 'primary' : 'default'}
-          onClick={() => setCategory('ALL')}
+          variant={category === DEFAULT_CATEGORY ? 'filled' : 'outlined'}
+          color={category === DEFAULT_CATEGORY ? 'primary' : 'default'}
+          onClick={() => setCategory(DEFAULT_CATEGORY)}
         />
         {categories.map(cat => (
           <Chip
@@ -175,15 +215,7 @@ export default function Shops() {
               <Card
                 variant="outlined"
                 sx={{ borderColor: 'divider', cursor: 'pointer' }}
-                onClick={() => {
-                  setSelected(key)
-                  const map = mapRef.current
-                  if (map) {
-                    map.setView([s.lat, s.lng], Math.max(14, map.getZoom()), { animate: true })
-                  }
-                  const mk = markersRef.current[key]
-                  if (mk) mk.openTooltip()
-                }}
+                onClick={() => setSelected(key)}
               >
                 <CardContent sx={{ px: 1.25, py: 1, '&:last-child': { pb: 1.5 } }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
