@@ -515,7 +515,7 @@ export default function MasudaBreaker() {
     }
 
     ctx.fillStyle = '#161616'
-    ctx.font = '12px sans-serif'
+    ctx.font = '12px "Noto Sans JP", sans-serif'
     ctx.textBaseline = 'top'
     ctx.textAlign = 'left'
     ctx.fillText(`SCORE ${String(scoreRef.current).padStart(5, '0')}`, 12, 10)
@@ -542,11 +542,11 @@ export default function MasudaBreaker() {
       ctx.lineWidth = 2
       ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
       ctx.fillStyle = '#202020'
-      ctx.font = 'bold 20px sans-serif'
+      ctx.font = 'bold 20px "Noto Sans JP", sans-serif'
       ctx.textBaseline = 'middle'
       ctx.textAlign = 'center'
       ctx.fillText(overlay.title, WIDTH / 2, boxY + paddingY + titleHeight / 2)
-      ctx.font = '14px sans-serif'
+      ctx.font = '14px "Noto Sans JP", sans-serif'
       ctx.fillStyle = 'rgba(0,0,0,0.65)'
       const startY = boxY + paddingY + titleHeight + bodyLineHeight / 2
       bodyLines.forEach((line, idx) => {

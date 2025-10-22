@@ -342,13 +342,13 @@ export default function MasudaRun() {
 
     // HUD
     const sc = Math.floor(scoreRef.current)
-    ctx.fillStyle = '#000'; ctx.font = '16px sans-serif'
+    ctx.fillStyle = '#000'; ctx.font = '16px "Noto Sans JP", sans-serif'
     ctx.fillText(`SCORE ${sc.toString().padStart(5, '0')}`, 10, 18)
     const hsc = Math.max(high, sc)
     if (hsc) ctx.fillText(`HI ${hsc.toString().padStart(5, '0')}`, W - 100, 18)
 
-    if (state === 'ready') { ctx.font = '16px sans-serif'; drawCenterText(ctx, W, H, '増田ラン - スペース/タップで開始') }
-    else if (state === 'gameover') { ctx.font = '16px sans-serif'; drawCenterText(ctx, W, H, 'GAME OVER  -  スペース/タップで再開') }
+    if (state === 'ready') { ctx.font = '16px "Noto Sans JP", sans-serif'; drawCenterText(ctx, W, H, '増田ラン - スペース/タップで開始') }
+    else if (state === 'gameover') { ctx.font = '16px "Noto Sans JP", sans-serif'; drawCenterText(ctx, W, H, 'GAME OVER  -  スペース/タップで再開') }
   }
 
   // キャンバスリサイズ（横幅いっぱい + 高解像度対応）
