@@ -39,7 +39,12 @@ export default function ArticleInline({ id, article }: Props) {
       {!loading && error && <Alert severity="error">{String((error as Error)?.message ?? error)}</Alert>}
       {!loading && !error && data && (
         <>
-          <Typography variant="h5" component="h2" gutterBottom>
+          <Typography
+            variant="h5"
+            component="h2"
+            gutterBottom
+            sx={{ fontSize: { xs: '1.3rem', sm: '1.35rem' }, fontWeight: 700 }}
+          >
             {data.title}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
