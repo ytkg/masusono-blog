@@ -5,7 +5,6 @@ import Footer from './components/Footer'
 import Blog from './components/Blog'
 import Podcast from './components/Podcast'
 import './App.css'
-import BottomTabs from './components/BottomTabs'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import MasudaRun from './pages/MasudaRun'
 import MasudaBreaker from './pages/MasudaBreaker'
@@ -30,7 +29,6 @@ export default function App() {
         </Routes>
         {/* ページ毎の固有要素は各ページ側で配置 */}
       </Container>
-      <BottomTabs />
       <Footer />
     </Box>
   )
