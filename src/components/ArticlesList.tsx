@@ -129,7 +129,7 @@ export default function ArticlesList() {
       ) : (
         <>
           {filtered.map((a) => (
-            <ArticleInline key={a.id} id={a.id} article={a} />
+            <ArticleInline key={a.id} id={a.id} article={a} linkTo={`/blog/${a.id}`} linkState={{ article: a }} />
           ))}
         </>
       )}

@@ -3,15 +3,18 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
-import { type Article } from '../services/microcms'
+import { Link as RouterLink } from 'react-router-dom'
+import type { Article } from '../services/microcms'
 import { useArticle } from '../hooks/useMicrocms'
 
 interface Props {
   id: string
   article?: Article | null
+  linkTo?: string
+  linkState?: unknown
 }
 
-export default function ArticleInline({ id, article }: Props) {
+export default function ArticleInline({ id, article, linkTo, linkState }: Props) {
   const fallback = useMemo(() => (article && (article.content || article.body) ? article : null), [article])
   const { data, isLoading: loading, error } = useArticle(id, fallback)
 
@@ -48,7 +51,23 @@ export default function ArticleInline({ id, article }: Props) {
             gutterBottom
             sx={{ fontSize: { xs: '1.3rem', sm: '1.35rem' }, fontWeight: 700 }}
           >
-            {data.title}
+            {linkTo ? (
+              <Box
+                component={RouterLink}
+                to={linkTo}
+                state={linkState}
+                sx={{
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
+              >
+                {data.title}
+              </Box>
+            ) : (
+              data.title
+            )}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             {`${date} ${author}`}
