@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
-import Chip from '@mui/material/Chip'
-import { getTodayHoroscope } from '../utils/horoscope'
 import FeatureLinkCard from '../components/FeatureLinkCard'
 import MasudaBirthdaySection from '../components/MasudaBirthdaySection'
-import Paper from '@mui/material/Paper'
 
 const featureLinks = [
   { label: 'ブログ', description: '最新の記事やお知らせはこちら', to: '/blog' },
@@ -17,7 +14,6 @@ const featureLinks = [
 
 export default function Home() {
   const [now, setNow] = useState(() => new Date())
-  const { key: horoscopeDate, entries: horoscopeEntries } = getTodayHoroscope()
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(id)
@@ -51,69 +47,6 @@ export default function Home() {
         {featureLinks.map((item) => (
           <FeatureLinkCard key={item.to} title={item.label} description={item.description} to={item.to} />
         ))}
-
-        {horoscopeEntries.length > 0 && (
-          <Paper
-            variant="outlined"
-            sx={{
-              p: { xs: 2, sm: 2.5 },
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1.5,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-              <Typography variant="h6" component="h3">増田の星座占い</Typography>
-              <Typography variant="body2" color="text.secondary">{horoscopeDate}</Typography>
-            </Box>
-            <Box sx={{ overflowX: 'auto', pt: 1, pb: 0.5 }}>
-              <Stack direction="row" spacing={2} sx={{ minWidth: 'max-content', pr: { xs: 1.5, sm: 0 } }}>
-                {horoscopeEntries.map((entry) => (
-                  <Paper
-                    key={entry.sign}
-                    variant="outlined"
-                    sx={{
-                      width: {
-                        xs: 'clamp(260px, 85vw, 320px)',
-                        sm: 360,
-                        md: 380,
-                      },
-                      flexShrink: 0,
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 1.2,
-                    }}
-                  >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {`第${entry.rank}位 ${entry.sign}`}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {entry.content}
-                    </Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap">
-                      <Chip size="small" label={`総合運 ${entry.total}`} />
-                      <Chip size="small" label={`恋愛運 ${entry.love}`} />
-                      <Chip size="small" label={`仕事運 ${entry.job}`} />
-                      <Chip size="small" label={`金運 ${entry.money}`} />
-                    </Stack>
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{
-                        flexWrap: { xs: 'wrap', sm: 'nowrap' },
-                        rowGap: 1,
-                      }}
-                    >
-                      <Chip size="small" label={`ラッキーアイテム: ${entry.item}`} />
-                      <Chip size="small" label={`カラー: ${entry.color}`} />
-                    </Stack>
-                  </Paper>
-                ))}
-              </Stack>
-            </Box>
-          </Paper>
-        )}
       </Stack>
     </Box>
   )
