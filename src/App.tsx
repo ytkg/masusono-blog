@@ -11,11 +11,13 @@ import MasudaBreaker from './pages/MasudaBreaker'
 import MasudaGames from './pages/MasudaGames'
 import Shops from './pages/Shops'
 import Home from './pages/Home'
+import ScrollRestoration from './components/ScrollRestoration'
 
 export default function App() {
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       <Header />
+      <ScrollRestoration />
       <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0, pb: { xs: 12, sm: 12 } }}>
         <Routes>
           <Route path="/" element={<Home />} />
