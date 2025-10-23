@@ -2,6 +2,7 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import PageContainer from '../components/PageContainer'
 import FeatureLinkCard from '../components/FeatureLinkCard'
+import { usePageMeta } from '../hooks/usePageMeta'
 
 const games = [
   {
@@ -17,9 +18,15 @@ const games = [
 ]
 
 export default function MasudaGames() {
+  usePageMeta({
+    title: '増田ゲーム',
+    description: '増田RUNや増田崩しなど、増田とその他！オリジナルのミニゲームをまとめています。',
+    canonicalPath: '/games',
+  })
+
   return (
     <PageContainer>
-      <Typography variant="h5" component="h2" gutterBottom>
+      <Typography variant="h5" component="h1" gutterBottom>
         増田ゲーム
       </Typography>
 

@@ -3,11 +3,18 @@ import Typography from '@mui/material/Typography'
 import PageContainer from './PageContainer'
 // import Alert from '@mui/material/Alert'
 import Aimi from './Aimi'
+import { usePageMeta } from '../hooks/usePageMeta'
 
 export default function Podcast() {
+  usePageMeta({
+    title: 'ポッドキャスト',
+    description: '増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします（準備中）。',
+    canonicalPath: '/podcast',
+  })
+
   return (
     <PageContainer id="podcast">
-      <Typography variant="h5" component="h2" gutterBottom>
+      <Typography variant="h5" component="h1" gutterBottom>
         ポッドキャスト
       </Typography>
       <Box

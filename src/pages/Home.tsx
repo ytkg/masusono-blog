@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import FeatureLinkCard from '../components/FeatureLinkCard'
 import MasudaBirthdaySection from '../components/MasudaBirthdaySection'
+import { usePageMeta } from '../hooks/usePageMeta'
 
 const featureLinks = [
   { label: 'ブログ', description: '最新の記事やお知らせはこちら', to: '/blog' },
@@ -14,6 +15,7 @@ const featureLinks = [
 
 export default function Home() {
   const [now, setNow] = useState(() => new Date())
+  usePageMeta({ canonicalPath: '/' })
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(id)

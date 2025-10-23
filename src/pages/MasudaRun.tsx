@@ -7,6 +7,7 @@ import PageContainer from '../components/PageContainer'
 import charImgSrc from '../assets/masuda_run.png'
 import obsShortSrc from '../assets/other1.png'
 import obsTallSrc from '../assets/other2.png'
+import { usePageMeta } from '../hooks/usePageMeta'
 
 // ===== Types =====
 type GameState = 'ready' | 'playing' | 'gameover'
@@ -132,6 +133,11 @@ export default function MasudaRun() {
   const suppressClickRef = useRef(false)
   const restartReadyAtRef = useRef(0)
   const [restartReadyAt, setRestartReadyAt] = useState(0)
+  usePageMeta({
+    title: '増田RUN',
+    description: '増田RUNは障害物をジャンプで避けながらハイスコアを目指すランゲームです。ブラウザで気軽に遊べます。',
+    canonicalPath: '/games/run',
+  })
 
   const world = useRef<World>(createInitialWorld())
 
@@ -404,7 +410,7 @@ export default function MasudaRun() {
 
   return (
     <PageContainer>
-      <Typography variant="h5" component="h2" gutterBottom>増田ラン</Typography>
+      <Typography variant="h5" component="h1" gutterBottom>増田ラン</Typography>
       <Box ref={canvasWrapRef} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden', width: '100%' }}>
         <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={{ width: '100%', height: 'auto', display: 'block', outline: 'none' }} />
       </Box>

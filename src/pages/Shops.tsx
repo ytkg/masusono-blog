@@ -15,6 +15,7 @@ import markerIcon2xUrl from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 import data from '../assets/shops.json'
 import PageContainer from '../components/PageContainer'
+import { usePageMeta } from '../hooks/usePageMeta'
 
 type Shop = {
   name: string
@@ -148,6 +149,11 @@ export default function Shops() {
   const { category, setCategory, categories, filteredShops } = useShopFilter(shops)
   const [selected, setSelected] = useState<string | null>(() => (shops[0] ? getKey(shops[0]) : null))
   const mapElRef = useRef<HTMLDivElement | null>(null)
+  usePageMeta({
+    title: '推し店',
+    description: '増田とその他！おすすめのスポットをマップ付きで紹介。カテゴリー別に推し店を探せます。',
+    canonicalPath: '/shops',
+  })
 
   usePreventBodyScroll()
   useLeafletMap({
@@ -178,7 +184,9 @@ export default function Shops() {
         overflow: 'hidden',
       }}
     >
-      <Typography variant="h5" sx={{ mb: 1 }}>推し店</Typography>
+      <Typography variant="h5" component="h1" sx={{ mb: 1 }}>
+        推し店
+      </Typography>
 
       {/* 実マップ（Leaflet） */}
       <Box

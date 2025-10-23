@@ -12,9 +12,19 @@ interface Props {
   article?: Article | null
   linkTo?: string
   linkState?: unknown
+  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 }
 
-export default function ArticleInline({ id, article, linkTo, linkState }: Props) {
+const headingVariantMap: Record<NonNullable<Props['headingLevel']>, 'h3' | 'h4' | 'h5' | 'h6' | 'subtitle1'> = {
+  h1: 'h4',
+  h2: 'h5',
+  h3: 'h5',
+  h4: 'h6',
+  h5: 'subtitle1',
+  h6: 'subtitle1',
+}
+
+export default function ArticleInline({ id, article, linkTo, linkState, headingLevel = 'h2' }: Props) {
   const fallback = useMemo(() => (article && (article.content || article.body) ? article : null), [article])
   const { data, isLoading: loading, error } = useArticle(id, fallback)
 
@@ -46,8 +56,8 @@ export default function ArticleInline({ id, article, linkTo, linkState }: Props)
       {!loading && !error && data && (
         <>
           <Typography
-            variant="h5"
-            component="h2"
+            variant={headingVariantMap[headingLevel]}
+            component={headingLevel}
             gutterBottom
             sx={{ fontSize: { xs: '1.3rem', sm: '1.35rem' }, fontWeight: 700 }}
           >

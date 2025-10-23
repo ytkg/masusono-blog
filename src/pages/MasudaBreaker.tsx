@@ -6,6 +6,7 @@ import Button from '@mui/material/Button'
 import { Link as RouterLink } from 'react-router-dom'
 import PageContainer from '../components/PageContainer'
 import breakerBlocksSprite from '../assets/breaker_blocks.png'
+import { usePageMeta } from '../hooks/usePageMeta'
 
 type GamePhase = 'standby' | 'aim' | 'running' | 'clear' | 'over'
 
@@ -181,6 +182,11 @@ export default function MasudaBreaker() {
   const bestInitial = typeof window === 'undefined' ? 0 : Number(window.localStorage.getItem(HIGH_KEY) || 0)
   const bestRef = useRef(bestInitial)
   const blocksImgRef = useRef<HTMLImageElement | null>(null)
+  usePageMeta({
+    title: '増田崩し',
+    description: '増田崩しはバーでボールを弾き返しブロックを消していくクラシックゲーム。パワーアップやハイスコア要素も楽しめます。',
+    canonicalPath: '/games/kuzushi',
+  })
 
   useEffect(() => {
     const img = new Image()
@@ -731,7 +737,7 @@ export default function MasudaBreaker() {
 
   return (
     <PageContainer>
-      <Typography variant="h5" component="h2" gutterBottom>
+      <Typography variant="h5" component="h1" gutterBottom>
         増田崩し
       </Typography>
 

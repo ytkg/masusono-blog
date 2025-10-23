@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography'
 import Link from '@mui/material/Link'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import type { Article } from '../services/microcms'
+import { useArticle } from '../hooks/useMicrocms'
+import { usePageMeta } from '../hooks/usePageMeta'
 
 type LocationState = {
   article?: Article
@@ -19,12 +21,24 @@ export default function ArticleDetail() {
     return <Navigate to="/blog" replace />
   }
 
+  const { data } = useArticle(articleId, state?.article)
+  const article = data ?? state?.article ?? null
+  const textContent = article?.content ?? article?.body ?? ''
+  const plainText = typeof textContent === 'string' ? textContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() : ''
+  const metaDescription = plainText ? plainText.slice(0, 120) + (plainText.length > 120 ? '…' : '') : undefined
+
+  usePageMeta({
+    title: article?.title ?? 'ブログ記事',
+    description: metaDescription,
+    canonicalPath: `/blog/${articleId}`,
+  })
+
   return (
     <PageContainer component="article">
       <Typography variant="h5" component="h2" gutterBottom>
         ブログ
       </Typography>
-      <ArticleInline id={articleId} article={state?.article} />
+      <ArticleInline id={articleId} article={article ?? undefined} headingLevel="h1" />
       <Link
         component={RouterLink}
         to="/blog"
