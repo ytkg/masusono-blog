@@ -206,7 +206,7 @@ export default function Shops() {
       </Box>
 
       {/* List: 独立スクロール領域（地図は固定） */}
-      <Box sx={{ overflow: 'auto', pr: 1, flex: 1, minHeight: 0, pb: 8 }}>
+      <Box sx={{ overflow: 'auto', pr: 1, flex: 1, minHeight: 0, pb: 4 }}>
         <Grid container spacing={2}>
           {filteredShops.map((s) => {
             const key = getKey(s)

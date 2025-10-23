@@ -20,16 +20,19 @@ export default function ArticleInline({ id, article }: Props) {
   const date = formatDate(data?.publishedAt || data?.createdAt)
 
   return (
-    <Box sx={{
-      border: '1px solid',
-      borderColor: 'divider',
-      borderRadius: 1,
-      p: { xs: 2, sm: 3 },
-      mb: 2,
-      '& img': { maxWidth: '100%', height: 'auto' },
-      '& p': { margin: '0 0 1em' },
-      backgroundColor: 'background.paper',
-    }}>
+    <Box
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: { xs: 2, sm: 3 },
+        mb: 2,
+        '&:last-of-type': { mb: 0 },
+        '& img': { maxWidth: '100%', height: 'auto' },
+        '& p': { margin: '0 0 1em' },
+        backgroundColor: 'background.paper',
+      }}
+    >
       {loading && (
         <Box>
           <Skeleton variant="text" height={36} width="80%" />
