@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import Link from '@mui/material/Link'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Link as RouterLink } from 'react-router-dom'
 import PageContainer from '../components/PageContainer'
 import charImgSrc from '../assets/masuda_run.png'
@@ -453,9 +455,16 @@ export default function MasudaRun() {
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
       <Box sx={{ mt: 2 }}>
-        <Button component={RouterLink} to="/games" variant="outlined">
+        <Link
+          component={RouterLink}
+          to="/games"
+          color="inherit"
+          underline="hover"
+          sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}
+        >
+          <ArrowBackIcon fontSize="small" />
           ゲーム一覧に戻る
-        </Button>
+        </Link>
       </Box>
     </PageContainer>
   )
