@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -65,6 +65,12 @@ const CFG = {
 }
 
 const RESTART_DELAY_MS = 600
+const HIGH_SCORE_KEY = 'masudarun_highscore'
+
+function getStoredHighScore() {
+  if (typeof window === 'undefined') return 0
+  return Number(window.localStorage.getItem(HIGH_SCORE_KEY) || 0)
+}
 
 const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
 const CHAR_W = Math.round(CHAR_H * CFG.IMG_RATIO)
@@ -131,7 +137,7 @@ export default function MasudaRun() {
   const reqRef = useRef<number | null>(null)
   const [state, setState] = useState<GameState>('ready')
   const scoreRef = useRef(0)
-  const [high, setHigh] = useState<number>(() => Number(localStorage.getItem('masudarun_highscore') || 0))
+  const [high, setHigh] = useState<number>(() => getStoredHighScore())
   const suppressClickRef = useRef(false)
   const restartReadyAtRef = useRef(0)
   const [restartReadyAt, setRestartReadyAt] = useState(0)
@@ -160,7 +166,7 @@ export default function MasudaRun() {
     return () => { imgRef.current = null; obsShortRef.current = null; obsTallRef.current = null }
   }, [])
 
-  const startOrRestart = () => {
+  const startOrRestart = useCallback(() => {
     const now = getNow()
     if (state === 'gameover' && now < restartReadyAtRef.current) return
     world.current = createInitialWorld()
@@ -168,9 +174,9 @@ export default function MasudaRun() {
     restartReadyAtRef.current = 0
     setRestartReadyAt(0)
     setState('playing')
-  }
+  }, [state])
 
-  const doJump = () => {
+  const doJump = useCallback(() => {
     if (state !== 'playing') return
     const p = world.current.player
     // 空中でも最大回数まではジャンプ可能（着地でリセット）
@@ -183,7 +189,7 @@ export default function MasudaRun() {
         p.spin = CFG.SPIN_MS
       }
     }
-  }
+  }, [state])
 
   // キー操作
   useEffect(() => {
@@ -204,7 +210,7 @@ export default function MasudaRun() {
     window.addEventListener('keydown', onKey)
     window.addEventListener('keyup', onKey)
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKey) }
-  }, [state])
+  }, [state, startOrRestart, doJump])
 
   // タップ操作（開始/再開、プレイ中はジャンプ）
   useEffect(() => {
@@ -216,7 +222,7 @@ export default function MasudaRun() {
     }
     c.addEventListener('pointerdown', onPointerDown)
     return () => c.removeEventListener('pointerdown', onPointerDown)
-  }, [state])
+  }, [state, startOrRestart, doJump])
 
   // リスタートまでのクールダウンが過ぎたら自動で解除
   useEffect(() => {
@@ -281,7 +287,12 @@ export default function MasudaRun() {
     for (const o of w.obstacles) {
       if (rectsIntersect(p.x, p.y, p.w, p.h, o.x, o.y, o.w, o.h)) {
         const newHigh = Math.max(high, Math.floor(scoreRef.current))
-        if (newHigh !== high) { setHigh(newHigh); localStorage.setItem('masudarun_highscore', String(newHigh)) }
+        if (newHigh !== high) {
+          setHigh(newHigh)
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(HIGH_SCORE_KEY, String(newHigh))
+          }
+        }
         const readyAt = getNow() + RESTART_DELAY_MS
         restartReadyAtRef.current = readyAt
         setRestartReadyAt(readyAt)
@@ -406,9 +417,14 @@ export default function MasudaRun() {
   }, [state, high])
 
   // 初期ハイスコア
-  useEffect(() => { setHigh(Number(localStorage.getItem('masudarun_highscore') || 0)) }, [])
-
   const restartCooling = state === 'gameover' && restartReadyAt > 0
+  const handlePrimaryAction = useCallback(() => {
+    if (state === 'playing') {
+      doJump()
+    } else {
+      startOrRestart()
+    }
+  }, [state, doJump, startOrRestart])
 
   return (
     <PageContainer>
@@ -429,11 +445,7 @@ export default function MasudaRun() {
             // pointerdown 後に click が続いても二重実行しないための抑止
             suppressClickRef.current = true
             window.setTimeout(() => { suppressClickRef.current = false }, 300)
-            if (state === 'playing') {
-              doJump()
-            } else {
-              startOrRestart()
-            }
+            handlePrimaryAction()
           }}
           onClick={(e) => {
             e.preventDefault()
@@ -441,11 +453,7 @@ export default function MasudaRun() {
               // 直前に pointerdown を処理済みの click は無視
               return
             }
-            if (state === 'playing') {
-              doJump()
-            } else {
-              startOrRestart()
-            }
+            handlePrimaryAction()
           }}
         >
           {state === 'playing' ? 'ジャンプ' : state === 'ready' ? 'スタート' : 'リスタート'}

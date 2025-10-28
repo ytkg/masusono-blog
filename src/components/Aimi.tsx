@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import Typography from '@mui/material/Typography'
@@ -36,7 +36,7 @@ export default function Aimi({
     '100%': { opacity: 0 },
   })
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     const rect = wrapRef.current?.getBoundingClientRect()
     const h = rect?.height ?? 128
     const w = rect?.width ?? 128
@@ -52,7 +52,7 @@ export default function Aimi({
     }, 1200)
     timersRef.current.push(t)
     onClick?.()
-  }
+  }, [onClick])
 
   useEffect(() => () => {
     // アンマウント時にタイマーをクリア
@@ -80,37 +80,20 @@ export default function Aimi({
   return (
     <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'center', WebkitTapHighlightColor: 'transparent', ...sx }}>
       <Box ref={wrapRef} sx={{ position: 'relative', display: 'inline-block', lineHeight: 0 }}>
-        {onClick ? (
-          <ButtonBase
-            onClick={handleClick}
-            disableRipple
-            disableTouchRipple
-            sx={{
-              p: 0,
-              borderRadius: 1,
-              WebkitTapHighlightColor: 'transparent',
-              '&:active img': { transform: 'scale(0.98)', filter: 'brightness(0.98)' },
-            }}
-            aria-label={alt || undefined}
-          >
-            {Img}
-          </ButtonBase>
-        ) : (
-          <ButtonBase
-            onClick={handleClick}
-            disableRipple
-            disableTouchRipple
-            sx={{
-              p: 0,
-              borderRadius: 1,
-              WebkitTapHighlightColor: 'transparent',
-              '&:active img': { transform: 'scale(0.98)', filter: 'brightness(0.98)' },
-            }}
-            aria-label={alt || undefined}
-          >
-            {Img}
-          </ButtonBase>
-        )}
+        <ButtonBase
+          onClick={handleClick}
+          disableRipple
+          disableTouchRipple
+          sx={{
+            p: 0,
+            borderRadius: 1,
+            WebkitTapHighlightColor: 'transparent',
+            '&:active img': { transform: 'scale(0.98)', filter: 'brightness(0.98)' },
+          }}
+          aria-label={alt || undefined}
+        >
+          {Img}
+        </ButtonBase>
         {pops.map((p) => (
           <Typography
             key={p.id}
