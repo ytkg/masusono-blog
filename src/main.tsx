@@ -7,7 +7,7 @@ import App from './App.tsx'
 import theme from './theme.ts'
 import { BrowserRouter } from 'react-router-dom'
 
-function RootApp() {
+export function RootApp() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
@@ -202,25 +202,25 @@ export default function MasudaBreaker() {
     }
   }, [])
 
-  const setPhaseSafe = (value: GamePhase) => {
+  const setPhaseSafe = useCallback((value: GamePhase) => {
     if (phaseRef.current === value) return
     phaseRef.current = value
-  }
-  const syncScore = (value: number) => {
+  }, [])
+  const syncScore = useCallback((value: number) => {
     scoreRef.current = value
-  }
-  const syncLives = (value: number) => {
+  }, [])
+  const syncLives = useCallback((value: number) => {
     livesRef.current = value
-  }
-  const updateBest = (value: number) => {
+  }, [])
+  const updateBest = useCallback((value: number) => {
     if (value <= bestRef.current) return
     bestRef.current = value
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(HIGH_KEY, String(value))
     }
-  }
+  }, [])
 
-  const startNewGame = () => {
+  const startNewGame = useCallback(() => {
     const model = gameRef.current
     if (!model) return
     model.bricks = createBricks()
@@ -233,9 +233,9 @@ export default function MasudaBreaker() {
     syncScore(0)
     syncLives(INITIAL_LIVES)
     setPhaseSafe('aim')
-  }
+  }, [setPhaseSafe, syncLives, syncScore])
 
-  const launchBall = () => {
+  const launchBall = useCallback(() => {
     const model = gameRef.current
     if (!model) return
     if (phaseRef.current !== 'aim') return
@@ -249,9 +249,9 @@ export default function MasudaBreaker() {
     ball.vy = -Math.cos(angle) * speed
     ball.stuck = false
     setPhaseSafe('running')
-  }
+  }, [setPhaseSafe])
 
-  const finishRound = (cleared: boolean) => {
+  const finishRound = useCallback((cleared: boolean) => {
     const model = gameRef.current
     if (!model) return
     model.combo = 0
@@ -271,9 +271,9 @@ export default function MasudaBreaker() {
     } else {
       setPhaseSafe('aim')
     }
-  }
+  }, [setPhaseSafe, syncLives, updateBest])
 
-  const updatePointer = (clientX: number) => {
+  const updatePointer = useCallback((clientX: number) => {
     const canvas = canvasRef.current
     const model = gameRef.current
     if (!canvas || !model) return
@@ -283,9 +283,112 @@ export default function MasudaBreaker() {
     const left = clamp(center - model.paddle.w / 2, 0, WIDTH - model.paddle.w)
     model.paddle.x = left
     alignStuckBallsToPaddle(model)
-  }
+  }, [])
 
-  const tick = (timestamp: number) => {
+  const drawScene = useCallback((model: GameModel) => {
+    const { ctx, paddle, balls, bricks, items } = model
+    ctx.clearRect(0, 0, WIDTH, HEIGHT)
+
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, WIDTH, HEIGHT)
+
+    ctx.fillStyle = 'rgba(0,0,0,0.04)'
+    for (let y = 40; y < HEIGHT; y += 40) ctx.fillRect(0, y, WIDTH, 1)
+    for (let x = 40; x < WIDTH; x += 40) ctx.fillRect(x, 0, 1, HEIGHT)
+
+    const sprite = blocksImgRef.current
+    const tileW = sprite ? sprite.width / SPRITE_COLS : 0
+    const tileH = sprite ? sprite.height / SPRITE_ROWS : 0
+    for (const brick of bricks) {
+      if (!brick.alive) continue
+      if (sprite && tileW > 0 && tileH > 0) {
+        const sx = brick.col * tileW
+        const sy = brick.row * tileH
+        ctx.drawImage(sprite, sx, sy, tileW, tileH, brick.x, brick.y, brick.w, brick.h)
+      } else {
+        ctx.fillStyle = brick.color
+        ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+      }
+    }
+
+    ctx.fillStyle = '#1e1e1e'
+    ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h)
+    ctx.fillStyle = '#3b3b3b'
+    ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h * 0.35)
+
+    for (const ball of balls) {
+      ctx.beginPath()
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2)
+      ctx.fillStyle = '#111111'
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(ball.x - ball.r * 0.35, ball.y - ball.r * 0.35, ball.r * 0.35, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(255,255,255,0.25)'
+      ctx.fill()
+    }
+
+    for (const item of items) {
+      if (!item.active) continue
+      ctx.beginPath()
+      ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(30, 30, 30, 0.85)'
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(item.x, item.y, item.r * 0.55, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(255,255,255,0.4)'
+      ctx.fill()
+    }
+
+    ctx.fillStyle = '#161616'
+    ctx.font = '12px "Noto Sans JP", sans-serif'
+    ctx.textBaseline = 'top'
+    ctx.textAlign = 'left'
+    ctx.fillText(`SCORE ${String(scoreRef.current).padStart(5, '0')}`, 12, 10)
+    ctx.textAlign = 'center'
+    ctx.fillText(`BEST ${String(bestRef.current).padStart(5, '0')}`, WIDTH / 2, 10)
+    ctx.textAlign = 'right'
+    ctx.fillText(`LIVES ${livesRef.current}`, WIDTH - 12, 10)
+    ctx.textAlign = 'left'
+
+    const overlay = overlayTexts[phaseRef.current]
+    if (overlay && overlay.title) {
+      ctx.fillStyle = 'rgba(255,255,255,0.92)'
+      const boxWidth = WIDTH - 40
+      const bodyLines = overlay.body.split('\n')
+      const bodyLineHeight = 18
+      const bodyHeight = bodyLines.length * bodyLineHeight
+      const titleHeight = 28
+      const paddingY = 18
+      const boxHeight = paddingY * 2 + titleHeight + bodyHeight
+      const boxX = (WIDTH - boxWidth) / 2
+      const boxY = (HEIGHT - boxHeight) / 2
+      ctx.fillRect(boxX, boxY, boxWidth, boxHeight)
+      ctx.strokeStyle = 'rgba(0,0,0,0.08)'
+      ctx.lineWidth = 2
+      ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
+      ctx.fillStyle = '#202020'
+      ctx.font = 'bold 20px "Noto Sans JP", sans-serif'
+      ctx.textBaseline = 'middle'
+      ctx.textAlign = 'center'
+      ctx.fillText(overlay.title, WIDTH / 2, boxY + paddingY + titleHeight / 2)
+      ctx.font = '14px "Noto Sans JP", sans-serif'
+      ctx.fillStyle = 'rgba(0,0,0,0.65)'
+      const startY = boxY + paddingY + titleHeight + bodyLineHeight / 2
+      bodyLines.forEach((line, idx) => {
+        ctx.fillText(line, WIDTH / 2, startY + idx * bodyLineHeight)
+      })
+      ctx.textBaseline = 'top'
+      ctx.textAlign = 'left'
+    }
+  }, [])
+
+  const tick = useCallback((timestamp: number) => {
     const model = gameRef.current
     if (!model) return
     let delta = (timestamp - model.lastTime) / 1000
@@ -458,111 +561,7 @@ export default function MasudaBreaker() {
 
     drawScene(model)
     model.animId = requestAnimationFrame(tick)
-  }
-
-
-  const drawScene = (model: GameModel) => {
-    const { ctx, paddle, balls, bricks, items } = model
-    ctx.clearRect(0, 0, WIDTH, HEIGHT)
-
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, WIDTH, HEIGHT)
-
-    ctx.fillStyle = 'rgba(0,0,0,0.04)'
-    for (let y = 40; y < HEIGHT; y += 40) ctx.fillRect(0, y, WIDTH, 1)
-    for (let x = 40; x < WIDTH; x += 40) ctx.fillRect(x, 0, 1, HEIGHT)
-
-    const sprite = blocksImgRef.current
-    const tileW = sprite ? sprite.width / SPRITE_COLS : 0
-    const tileH = sprite ? sprite.height / SPRITE_ROWS : 0
-    for (const brick of bricks) {
-      if (!brick.alive) continue
-      if (sprite && tileW > 0 && tileH > 0) {
-        const sx = brick.col * tileW
-        const sy = brick.row * tileH
-        ctx.drawImage(sprite, sx, sy, tileW, tileH, brick.x, brick.y, brick.w, brick.h)
-      } else {
-        ctx.fillStyle = brick.color
-        ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
-      }
-    }
-
-    ctx.fillStyle = '#1e1e1e'
-    ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h)
-    ctx.fillStyle = '#3b3b3b'
-    ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h * 0.35)
-
-    for (const ball of balls) {
-      ctx.beginPath()
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2)
-      ctx.fillStyle = '#111111'
-      ctx.fill()
-      ctx.strokeStyle = 'rgba(0,0,0,0.35)'
-      ctx.lineWidth = 1
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.arc(ball.x - ball.r * 0.35, ball.y - ball.r * 0.35, ball.r * 0.35, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255,255,255,0.25)'
-      ctx.fill()
-    }
-
-    for (const item of items) {
-      if (!item.active) continue
-      ctx.beginPath()
-      ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(30, 30, 30, 0.85)'
-      ctx.fill()
-      ctx.strokeStyle = 'rgba(255,255,255,0.3)'
-      ctx.lineWidth = 1
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.arc(item.x, item.y, item.r * 0.55, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255,255,255,0.4)'
-      ctx.fill()
-    }
-
-    ctx.fillStyle = '#161616'
-    ctx.font = '12px "Noto Sans JP", sans-serif'
-    ctx.textBaseline = 'top'
-    ctx.textAlign = 'left'
-    ctx.fillText(`SCORE ${String(scoreRef.current).padStart(5, '0')}`, 12, 10)
-    ctx.textAlign = 'center'
-    ctx.fillText(`BEST ${String(bestRef.current).padStart(5, '0')}`, WIDTH / 2, 10)
-    ctx.textAlign = 'right'
-    ctx.fillText(`LIVES ${livesRef.current}`, WIDTH - 12, 10)
-    ctx.textAlign = 'left'
-
-    const overlay = overlayTexts[phaseRef.current]
-    if (overlay && overlay.title) {
-      ctx.fillStyle = 'rgba(255,255,255,0.92)'
-      const boxWidth = WIDTH - 40
-      const bodyLines = overlay.body.split('\n')
-      const bodyLineHeight = 18
-      const bodyHeight = bodyLines.length * bodyLineHeight
-      const titleHeight = 28
-      const paddingY = 18
-      const boxHeight = paddingY * 2 + titleHeight + bodyHeight
-      const boxX = (WIDTH - boxWidth) / 2
-      const boxY = (HEIGHT - boxHeight) / 2
-      ctx.fillRect(boxX, boxY, boxWidth, boxHeight)
-      ctx.strokeStyle = 'rgba(0,0,0,0.08)'
-      ctx.lineWidth = 2
-      ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
-      ctx.fillStyle = '#202020'
-      ctx.font = 'bold 20px "Noto Sans JP", sans-serif'
-      ctx.textBaseline = 'middle'
-      ctx.textAlign = 'center'
-      ctx.fillText(overlay.title, WIDTH / 2, boxY + paddingY + titleHeight / 2)
-      ctx.font = '14px "Noto Sans JP", sans-serif'
-      ctx.fillStyle = 'rgba(0,0,0,0.65)'
-      const startY = boxY + paddingY + titleHeight + bodyLineHeight / 2
-      bodyLines.forEach((line, idx) => {
-        ctx.fillText(line, WIDTH / 2, startY + idx * bodyLineHeight)
-      })
-      ctx.textBaseline = 'top'
-      ctx.textAlign = 'left'
-    }
-  }
+  }, [drawScene, finishRound, syncScore, updateBest])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -734,7 +733,7 @@ export default function MasudaBreaker() {
       if (model.animId) cancelAnimationFrame(model.animId)
       gameRef.current = null
     }
-  }, [])
+  }, [drawScene, launchBall, setPhaseSafe, startNewGame, syncLives, syncScore, tick, updatePointer])
 
   return (
     <PageContainer>

@@ -241,7 +241,7 @@ export default function MasudaRun() {
   }, [state, restartReadyAt])
 
   // ロジック更新
-  function update(dt: number, W: number) {
+  const update = useCallback((dt: number, W: number) => {
     const w = world.current
     if (state !== 'playing') return
 
@@ -303,10 +303,10 @@ export default function MasudaRun() {
 
     // スコア加算（描画時に scoreRef を参照して描画）
     scoreRef.current += w.speed * dt * 0.01
-  }
+  }, [state, high, setHigh, setRestartReadyAt, setState])
 
   // 描画
-  function draw(ctx: CanvasRenderingContext2D, W: number, H: number) {
+  const draw = useCallback((ctx: CanvasRenderingContext2D, W: number, H: number) => {
     const w = world.current
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H)
 
@@ -368,7 +368,7 @@ export default function MasudaRun() {
 
     if (state === 'ready') { ctx.font = '16px "Noto Sans JP", sans-serif'; drawCenterText(ctx, W, H, '増田ラン - スペース/タップで開始') }
     else if (state === 'gameover') { ctx.font = '16px "Noto Sans JP", sans-serif'; drawCenterText(ctx, W, H, 'GAME OVER  -  スペース/タップで再開') }
-  }
+  }, [state, high])
 
   // キャンバスリサイズ（横幅いっぱい + 高解像度対応）
   useEffect(() => {
@@ -414,7 +414,7 @@ export default function MasudaRun() {
     }
     reqRef.current = requestAnimationFrame(loop)
     return () => { if (reqRef.current) cancelAnimationFrame(reqRef.current); reqRef.current = null }
-  }, [state, high])
+  }, [draw, update])
 
   // 初期ハイスコア
   const restartCooling = state === 'gameover' && restartReadyAt > 0

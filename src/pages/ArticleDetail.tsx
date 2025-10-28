@@ -17,10 +17,6 @@ export default function ArticleDetail() {
   const location = useLocation()
   const state = location.state as LocationState | undefined
 
-  if (!articleId) {
-    return <Navigate to="/blog" replace />
-  }
-
   const { data } = useArticle(articleId, state?.article)
   const article = data ?? state?.article ?? null
   const textContent = article?.content ?? article?.body ?? ''
@@ -30,8 +26,12 @@ export default function ArticleDetail() {
   usePageMeta({
     title: article?.title ?? 'ブログ記事',
     description: metaDescription,
-    canonicalPath: `/blog/${articleId}`,
+    canonicalPath: articleId ? `/blog/${articleId}` : undefined,
   })
+
+  if (!articleId) {
+    return <Navigate to="/blog" replace />
+  }
 
   return (
     <PageContainer component="article">
