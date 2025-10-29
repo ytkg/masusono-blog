@@ -10,17 +10,12 @@ const games = [
     description: 'ジャンプで障害物を避けるラン系アクション。',
     to: '/games/run',
   },
-  {
-    label: '増田崩し',
-    description: 'バーでボールを弾いてブロックを全消しするクラシックアクション。',
-    to: '/games/kuzushi',
-  },
 ]
 
 export default function MasudaGames() {
   usePageMeta({
     title: '増田ゲーム',
-    description: '増田RUNや増田崩しなど、増田とその他！オリジナルのミニゲームをまとめています。',
+    description: '増田RUNなど、増田とその他！オリジナルのミニゲームをまとめています。',
     canonicalPath: '/games',
   })
 
