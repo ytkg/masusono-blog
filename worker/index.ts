@@ -6,27 +6,34 @@ type Bindings = {
   }
 }
 
+const MICROCMS_API_KEY = 'H5FVIb97NuVgDcqZjUam1ixou64qInmQCh7T'
+const MICROCMS_ARTICLES_ENDPOINT = 'https://masusono.microcms.io/api/v1/articles'
+
 const app = new Hono<{ Bindings: Bindings }>()
 
-app.get('/api', (c) => c.text('Hello'))
+app.get('/api/articles', async (c) => {
+  const upstreamUrl = new URL(MICROCMS_ARTICLES_ENDPOINT)
+  upstreamUrl.searchParams.set('limit', '100')
 
-app.all('*', async (c) => {
-  const assetResponse = await c.env.ASSETS.fetch(c.req.raw)
-  if (
-    assetResponse.status !== 404 ||
-    (c.req.method !== 'GET' && c.req.method !== 'HEAD')
-  ) {
-    return assetResponse
-  }
+  const response = await fetch(upstreamUrl.toString(), {
+    headers: {
+      'X-API-KEY': MICROCMS_API_KEY,
+      Accept: 'application/json',
+    },
+  })
 
-  const accept = c.req.header('accept') ?? ''
-  if (accept.includes('text/html')) {
-    const indexUrl = new URL('/index.html', c.req.url)
-    const indexRequest = new Request(indexUrl.toString(), c.req.raw)
-    return c.env.ASSETS.fetch(indexRequest)
-  }
-
-  return assetResponse
+  const json = await response.json()
+  const articles = Array.isArray(json?.contents) ? json.contents : []
+  const filtered = articles.map((article) => ({
+    id: article.id,
+    publishedAt: article.publishedAt,
+    title: article.title,
+    content: article.content,
+    author: article.author?.name ?? null,
+  }))
+  return c.json(filtered)
 })
+
+app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw))
 
 export default app
