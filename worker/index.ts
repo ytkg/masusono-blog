@@ -9,11 +9,94 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
+const sitemapStaticEntries: Array<{
+  path: string
+  changefreq: string
+  priority: number
+}> = [
+  { path: '/', changefreq: 'weekly', priority: 1.0 },
+  { path: '/blog', changefreq: 'weekly', priority: 0.8 },
+  { path: '/podcast', changefreq: 'weekly', priority: 0.8 },
+  { path: '/games', changefreq: 'weekly', priority: 0.8 },
+  { path: '/games/run', changefreq: 'weekly', priority: 0.8 },
+  { path: '/shops', changefreq: 'weekly', priority: 0.8 },
+]
+
 app.get('/api/articles', async (c) => {
   const articles = await fetchArticles()
   return c.json(articles)
 })
 
+app.get('/sitemap.xml', async (c) => {
+  const url = new URL(c.req.url)
+  const baseUrl = url.origin
+  const entries = sitemapStaticEntries.map((entry) => ({
+    loc: `${baseUrl}${entry.path}`,
+    changefreq: entry.changefreq,
+    priority: entry.priority,
+  }))
+
+  const articles = await fetchArticles()
+  for (const article of articles) {
+    if (!article.id) continue
+    entries.push({
+      loc: `${baseUrl}/blog/${article.id}`,
+      lastmod: article.publishedAt ?? undefined,
+      changefreq: 'monthly',
+      priority: 0.6,
+    })
+  }
+
+  const xml = buildSitemapXml(entries)
+  return c.body(xml, 200, {
+    'content-type': 'application/xml; charset=utf-8',
+  })
+})
+
 app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw))
 
 export default app
+
+type SitemapEntry = {
+  loc: string
+  lastmod?: string
+  changefreq?: string
+  priority?: number
+}
+
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+function normalizeDate(value?: string) {
+  if (!value) return undefined
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return undefined
+  return date.toISOString()
+}
+
+function buildSitemapXml(entries: SitemapEntry[]) {
+  const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+  for (const entry of entries) {
+    lines.push('  <url>')
+    lines.push(`    <loc>${escapeXml(entry.loc)}</loc>`)
+    const lastmod = normalizeDate(entry.lastmod)
+    if (lastmod) {
+      lines.push(`    <lastmod>${escapeXml(lastmod)}</lastmod>`)
+    }
+    if (entry.changefreq) {
+      lines.push(`    <changefreq>${escapeXml(entry.changefreq)}</changefreq>`)
+    }
+    if (entry.priority !== undefined) {
+      lines.push(`    <priority>${entry.priority.toFixed(1)}</priority>`)
+    }
+    lines.push('  </url>')
+  }
+  lines.push('</urlset>')
+  return `${lines.join('\n')}\n`
+}
