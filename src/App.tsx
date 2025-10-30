@@ -12,6 +12,7 @@ import Shops from './pages/Shops'
 import Home from './pages/Home'
 import ScrollRestoration from './components/ScrollRestoration'
 import ArticleDetail from './pages/ArticleDetail'
+import About from './pages/About'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:articleId" element={<ArticleDetail />} />
+          <Route path="/about" element={<About />} />
           <Route path="/podcast" element={<Podcast />} />
           <Route path="/games" element={<MasudaGames />} />
           <Route path="/games/run" element={<MasudaRun />} />
