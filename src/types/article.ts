@@ -1,9 +1,3 @@
-export interface Author {
-  id?: string
-  name?: string
-  [key: string]: unknown
-}
-
 export interface Article {
   id: string
   title: string
@@ -12,6 +6,9 @@ export interface Article {
   createdAt?: string
   content?: string
   body?: string
-  author?: Author
-  [key: string]: unknown
+  author?: ArticleAuthor | null
+}
+
+export interface ArticleAuthor {
+  name: string
 }

@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import type { Article, Author } from '../types/article'
+import type { Article } from '../types/article'
 
 type ProxyArticle = {
   id: string
@@ -21,11 +21,7 @@ const fetcher = async (url: string): Promise<Article[]> => {
     publishedAt: article.publishedAt,
     title: article.title ?? '',
     content: article.content,
-    author: article.author
-      ? ({
-          name: article.author,
-        } satisfies Author)
-      : undefined,
+    author: article.author ? { name: article.author } : undefined,
   }))
 }
 

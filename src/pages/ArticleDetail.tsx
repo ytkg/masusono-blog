@@ -17,7 +17,7 @@ export default function ArticleDetail() {
   const location = useLocation()
   const state = location.state as LocationState | undefined
 
-  const { data } = useArticle(articleId, state?.article)
+  const { data, error, isLoading } = useArticle(articleId, state?.article)
   const article = data ?? state?.article ?? null
   const textContent = article?.content ?? article?.body ?? ''
   const plainText = typeof textContent === 'string' ? textContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() : ''
@@ -38,7 +38,7 @@ export default function ArticleDetail() {
       <Typography variant="h5" component="h2" gutterBottom>
         ブログ
       </Typography>
-      <ArticleInline id={articleId} article={article ?? undefined} headingLevel="h1" />
+      <ArticleInline article={article ?? undefined} headingLevel="h1" loading={isLoading} error={error} />
       <Link
         component={RouterLink}
         to="/blog"

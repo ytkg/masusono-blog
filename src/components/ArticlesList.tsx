@@ -4,49 +4,53 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
-import type { Article } from '../types/article'
 import { useArticles } from '../hooks/useArticles'
 import ArticleInline from './ArticleInline'
 
-export default function ArticlesList() {
-  const { data: articlesRes, isLoading: loading, error } = useArticles()
-  const items: Article[] = articlesRes ?? []
+const SKELETON_COUNT = 6
 
-  if (loading) {
+export default function ArticlesList() {
+  const { data: articles, isLoading, error } = useArticles()
+
+  if (isLoading && !articles) {
     return (
-      <>
-        <Grid container spacing={2}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card>
-                <CardContent>
-                  <Skeleton variant="text" width="80%" height={28} />
-                  <Skeleton variant="text" width="40%" />
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </>
+      <Grid container spacing={2}>
+        {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+          <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Card>
+              <CardContent>
+                <Skeleton variant="text" width="80%" height={28} />
+                <Skeleton variant="text" width="40%" />
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     )
   }
 
-  if (error) {
+  if (error && !articles) {
     return (
       <Alert severity="error">
-        記事の取得に失敗しました: {error}
+        記事の取得に失敗しました: {String((error as Error)?.message ?? error)}
       </Alert>
     )
   }
 
-  if (!items.length) {
+  if (!articles?.length) {
     return <Typography color="text.secondary">記事がありません。</Typography>
   }
 
   return (
     <>
-      {items.map((a) => (
-        <ArticleInline key={a.id} id={a.id} article={a} linkTo={`/blog/${a.id}`} linkState={{ article: a }} headingLevel="h3" />
+      {articles.map((article) => (
+        <ArticleInline
+          key={article.id}
+          article={article}
+          linkTo={`/blog/${article.id}`}
+          linkState={{ article }}
+          headingLevel="h3"
+        />
       ))}
     </>
   )
