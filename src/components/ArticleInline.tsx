@@ -4,8 +4,8 @@ import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
 import { Link as RouterLink } from 'react-router-dom'
-import type { Article } from '../services/microcms'
-import { useArticle } from '../hooks/useMicrocms'
+import type { Article } from '../types/article'
+import { useArticle } from '../hooks/useArticle'
 
 interface Props {
   id: string

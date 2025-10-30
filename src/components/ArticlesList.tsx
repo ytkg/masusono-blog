@@ -4,13 +4,13 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
-import type { Article } from '../services/microcms'
-import { useArticles } from '../hooks/useMicrocms'
+import type { Article } from '../types/article'
+import { useArticles } from '../hooks/useArticles'
 import ArticleInline from './ArticleInline'
 
 export default function ArticlesList() {
-  const { data: articlesRes, isLoading: loading, error } = useArticles(20)
-  const items: Article[] = articlesRes?.contents ?? []
+  const { data: articlesRes, isLoading: loading, error } = useArticles()
+  const items: Article[] = articlesRes ?? []
 
   if (loading) {
     return (

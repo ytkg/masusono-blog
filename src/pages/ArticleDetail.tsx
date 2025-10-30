@@ -4,8 +4,8 @@ import ArticleInline from '../components/ArticleInline'
 import Typography from '@mui/material/Typography'
 import Link from '@mui/material/Link'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import type { Article } from '../services/microcms'
-import { useArticle } from '../hooks/useMicrocms'
+import type { Article } from '../types/article'
+import { useArticle } from '../hooks/useArticle'
 import { usePageMeta } from '../hooks/usePageMeta'
 
 type LocationState = {
