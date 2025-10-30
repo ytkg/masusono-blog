@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://masusono-blog.pages.dev/sitemap.xml
