@@ -264,7 +264,7 @@ export default function MasudaRunGame() {
 
       if (state === 'ready') {
         ctx.font = '16px "Noto Sans JP", sans-serif'
-        drawCenterText(ctx, W, H, '増田ラン - スペース/タップで開始')
+        drawCenterText(ctx, W, H, '増田RUN - スペース/タップで開始')
       } else if (state === 'gameover') {
         ctx.font = '16px "Noto Sans JP", sans-serif'
         drawCenterText(ctx, W, H, 'GAME OVER  -  スペース/タップで再開')
