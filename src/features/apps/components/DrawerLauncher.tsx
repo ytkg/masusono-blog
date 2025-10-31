@@ -27,12 +27,14 @@ export default function DrawerLauncher({
   const [open, setOpen] = useState(false)
   const titleId = useId()
   const iconBaseSx: SxProps<Theme> = {
-    border: '1px solid',
-    borderColor: 'divider',
     borderRadius: 2,
     width: 56,
     height: 56,
-    bgcolor: 'background.paper',
+    bgcolor: 'common.black',
+    color: 'common.white',
+    '&:hover': {
+      bgcolor: 'common.black',
+    },
   }
   const iconSx: SxProps<Theme> = buttonSx ? ([iconBaseSx, buttonSx] as SxProps<Theme>) : iconBaseSx
   const paperBaseSx: SxProps<Theme> = {
