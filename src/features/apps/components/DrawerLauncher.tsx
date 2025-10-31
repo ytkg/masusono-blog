@@ -37,6 +37,17 @@ export default function DrawerLauncher({
     },
   }
   const iconSx: SxProps<Theme> = buttonSx ? ([iconBaseSx, buttonSx] as SxProps<Theme>) : iconBaseSx
+  const closeButtonSx: SxProps<Theme> = {
+    border: '1px solid',
+    borderColor: 'divider',
+    bgcolor: 'background.paper',
+    borderRadius: 1,
+    px: 1.5,
+    py: 1,
+    '&:hover': {
+      bgcolor: 'background.paper',
+    },
+  }
   const paperBaseSx: SxProps<Theme> = {
     height: '100dvh',
     width: '100%',
@@ -76,11 +87,13 @@ export default function DrawerLauncher({
             <Typography id={titleId} variant="h5" component="h2" sx={{ fontWeight: 600 }}>
               {title}
             </Typography>
-            <IconButton aria-label="閉じる" onClick={() => setOpen(false)}>
+          </Box>
+          <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{open ? children : null}</Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <IconButton aria-label="閉じる" onClick={() => setOpen(false)} sx={closeButtonSx}>
               <CloseIcon />
             </IconButton>
           </Box>
-          <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{open ? children : null}</Box>
         </Box>
       </Drawer>
     </Box>
