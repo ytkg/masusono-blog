@@ -6,18 +6,16 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import HomeIcon from '@mui/icons-material/Home'
 import ArticleIcon from '@mui/icons-material/MenuBook'
 import PodcastIcon from '@mui/icons-material/Podcasts'
-import GameIcon from '@mui/icons-material/SportsEsports'
 import PlaceIcon from '@mui/icons-material/Place'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
-type TabValue = 'home' | 'blog' | 'podcast' | 'games' | 'shops'
+type TabValue = 'home' | 'blog' | 'podcast' | 'shops'
 
 const TABS: Array<{ value: TabValue; label: string; to: string; icon: ReactElement }> = [
   { value: 'home', label: 'ホーム', to: '/', icon: <HomeIcon /> },
   { value: 'blog', label: 'ブログ', to: '/blog', icon: <ArticleIcon /> },
   { value: 'podcast', label: 'ポッドキャスト', to: '/podcast', icon: <PodcastIcon /> },
-  { value: 'games', label: '増田ゲーム', to: '/games', icon: <GameIcon /> },
   { value: 'shops', label: '推し店', to: '/shops', icon: <PlaceIcon /> },
 ]
 

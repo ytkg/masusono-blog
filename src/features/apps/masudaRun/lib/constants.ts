@@ -1,0 +1,39 @@
+export const CFG = {
+  BASE_W: 900,
+  BASE_H: 300,
+  IMG_RATIO: 0.45,
+  CHAR_SCALE: 0.42,
+  HIT_W_RATIO: 0.55,
+  HIT_H_RATIO: 0.8,
+  GROUND_RATIO: 0.8,
+  SPEED_BASE: 5.0,
+  SPEED_GAIN_MAX: 12.0,
+  SPEED_GAIN_RATE: 0.00035,
+  GRAVITY: 0.6,
+  SPAWN_BASE: 1300,
+  SPAWN_REDUCE_MAX: 1200,
+  SPAWN_REDUCE_RATE: 0.06,
+  SPAWN_RAND: 700,
+  TALL_PROB: 0.22,
+  TALL_H: 54,
+  SHORT_H_MIN: 26,
+  SHORT_H_RANGE: 20,
+  OBS_W_MIN: 16,
+  OBS_W_RANGE: 16,
+  MAX_JUMPS: 2,
+  JUMP_VY: -11,
+  SPIN_MS: 500,
+  OBS_IMG_SCALE: 1.18,
+  CLOUD_SPAWN_BASE: 1600,
+  CLOUD_SPAWN_RAND: 1400,
+  CLOUD_SPEED_MIN: 0.4,
+  CLOUD_SPEED_MAX: 1.0,
+} as const
+
+export const RESTART_DELAY_MS = 600
+export const HIGH_SCORE_KEY = 'masudarun_highscore'
+
+export const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
+export const CHAR_W = Math.round(CHAR_H * CFG.IMG_RATIO)
+export const HIT_W = Math.round(CHAR_W * CFG.HIT_W_RATIO)
+export const HIT_H = Math.round(CHAR_H * CFG.HIT_H_RATIO)

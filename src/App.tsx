@@ -5,9 +5,7 @@ import Footer from './components/Footer'
 import Blog from './components/Blog'
 import Podcast from './components/Podcast'
 import './App.css'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import MasudaRun from './pages/MasudaRun'
-import MasudaGames from './pages/MasudaGames'
+import { Routes, Route } from 'react-router-dom'
 import Shops from './pages/Shops'
 import Home from './pages/Home'
 import ScrollRestoration from './components/ScrollRestoration'
@@ -26,9 +24,6 @@ export default function App() {
           <Route path="/blog/:articleId" element={<ArticleDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/podcast" element={<Podcast />} />
-          <Route path="/games" element={<MasudaGames />} />
-          <Route path="/games/run" element={<MasudaRun />} />
-          <Route path="/run" element={<Navigate to="/games/run" replace />} />
           <Route path="/shops" element={<Shops />} />
         </Routes>
         {/* ページ毎の固有要素は各ページ側で配置 */}
