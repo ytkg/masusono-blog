@@ -10,15 +10,15 @@ export default function Header() {
       position="sticky"
       color="primary"
       enableColorOnDark
-      sx={{ minHeight: { xs: 48, sm: 56 } }}
+      sx={{ minHeight: { xs: 40, sm: 48 } }}
     >
-      <Toolbar sx={{ justifyContent: 'center', minHeight: { xs: 48, sm: 56 } }}>
+      <Toolbar sx={{ justifyContent: 'center', minHeight: { xs: 40, sm: 48 } }}>
         <Box
           component="img"
           src={logo}
           alt="増田とその他！"
           sx={{
-            height: { xs: 36, sm: 44 },
+            height: { xs: 40, sm: 48 },
             maxWidth: '100%',
             objectFit: 'contain',
           }}
