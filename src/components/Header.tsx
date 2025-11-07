@@ -10,9 +10,18 @@ export default function Header() {
       position="sticky"
       color="primary"
       enableColorOnDark
-      sx={{ minHeight: { xs: 40, sm: 48 } }}
+      sx={{ minHeight: { xs: 44, sm: 52 }, py: 0 }}
     >
-      <Toolbar sx={{ justifyContent: 'center', minHeight: { xs: 40, sm: 48 } }}>
+      <Toolbar
+        disableGutters
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'flex-end',
+          minHeight: { xs: 44, sm: 52 },
+          pt: 0,
+          pb: { xs: 0.5, sm: 0.75 },
+        }}
+      >
         <Box
           component="img"
           src={logo}
