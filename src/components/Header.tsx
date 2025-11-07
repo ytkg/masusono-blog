@@ -1,6 +1,8 @@
 import AppBar from '@mui/material/AppBar'
+import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
+
+import logo from '../assets/logo.png'
 
 export default function Header() {
   return (
@@ -11,9 +13,16 @@ export default function Header() {
       sx={{ minHeight: { xs: 48, sm: 56 } }}
     >
       <Toolbar sx={{ justifyContent: 'center', minHeight: { xs: 48, sm: 56 } }}>
-        <Typography variant="h6" component="div" sx={{ textAlign: 'center' }}>
-          増田とその他！
-        </Typography>
+        <Box
+          component="img"
+          src={logo}
+          alt="増田とその他！"
+          sx={{
+            height: { xs: 36, sm: 44 },
+            maxWidth: '100%',
+            objectFit: 'contain',
+          }}
+        />
       </Toolbar>
     </AppBar>
   )
