@@ -3,7 +3,6 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import FeatureLinkCard from '../components/FeatureLinkCard'
-import MasudaBirthdaySection from '../components/MasudaBirthdaySection'
 import { usePageMeta } from '../hooks/usePageMeta'
 import MasudaRunApp from '../features/apps/masudaRun/MasudaRunApp'
 
@@ -47,7 +46,6 @@ export default function Home() {
         </Box>
 
         <Stack spacing={1.75}>
-          <MasudaBirthdaySection now={now} />
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {appLaunchers}
           </Box>
