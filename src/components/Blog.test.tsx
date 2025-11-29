@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react"
-import { vi } from "vitest"
+import { type MockedFunction, vi } from "vitest"
 import Blog from "./Blog"
 import { usePageMeta } from "../hooks/usePageMeta"
 
@@ -11,7 +11,7 @@ vi.mock("./ArticlesList", () => ({
   default: () => <div data-testid="articles-list" />,
 }))
 
-const usePageMetaMock = usePageMeta as unknown as vi.MockedFunction<typeof usePageMeta>
+const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageMeta>
 
 describe("Blog", () => {
   afterEach(() => {

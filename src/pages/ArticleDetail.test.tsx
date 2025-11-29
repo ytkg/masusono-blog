@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
-import { vi } from "vitest"
+import { type MockedFunction, vi } from "vitest"
 import ArticleDetail from "./ArticleDetail"
 import { useArticle } from "../hooks/useArticle"
 import { usePageMeta } from "../hooks/usePageMeta"
@@ -14,8 +14,8 @@ vi.mock("../hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 
-const useArticleMock = useArticle as unknown as vi.MockedFunction<typeof useArticle>
-const usePageMetaMock = usePageMeta as unknown as vi.MockedFunction<typeof usePageMeta>
+const useArticleMock = useArticle as unknown as MockedFunction<typeof useArticle>
+const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageMeta>
 
 const createUseArticleResult = (overrides: Partial<ReturnType<typeof useArticle>> = {}) =>
   ({

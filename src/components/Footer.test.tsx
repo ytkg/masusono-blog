@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { MemoryRouter, useNavigate } from "react-router-dom"
-import { vi } from "vitest"
+import { type MockedFunction, vi } from "vitest"
 import Footer from "./Footer"
 
 vi.mock("react-router-dom", async () => {
@@ -11,7 +11,7 @@ vi.mock("react-router-dom", async () => {
   }
 })
 
-const useNavigateMock = useNavigate as unknown as vi.MockedFunction<typeof useNavigate>
+const useNavigateMock = useNavigate as unknown as MockedFunction<typeof useNavigate>
 
 describe("Footer", () => {
   const navigateMock = vi.fn()
