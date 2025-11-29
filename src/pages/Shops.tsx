@@ -111,7 +111,9 @@ function useLeafletMap({ mapContainerRef, shops, visibleShops, selectedKey, onSe
     const map = mapRef.current
     if (!map) return
 
-    Object.values(markersRef.current).forEach(marker => marker.remove())
+    Object.values(markersRef.current).forEach((marker) => {
+      marker.remove()
+    })
     markersRef.current = {}
 
     visibleShops.forEach(shop => {

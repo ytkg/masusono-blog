@@ -31,29 +31,27 @@ export default function Home() {
   })
   const appLaunchers = [<MasudaRunApp key="masuda-run" />]
   return (
-    <>
-      <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, display: 'flex', flexDirection: 'column', gap: { xs: 3, sm: 4 } }}>
-        <Box sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
-            ようこそ
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {formatted}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            ブログやポッドキャスト、ちょっとしたゲームまで。最新のコンテンツをまとめてチェックできます。
-          </Typography>
-        </Box>
-
-        <Stack spacing={1.75}>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-            {appLaunchers}
-          </Box>
-          {featureLinks.map((item) => (
-            <FeatureLinkCard key={item.to} title={item.label} description={item.description} to={item.to} />
-          ))}
-        </Stack>
+    <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, display: 'flex', flexDirection: 'column', gap: { xs: 3, sm: 4 } }}>
+      <Box sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
+          ようこそ
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {formatted}
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          ブログやポッドキャスト、ちょっとしたゲームまで。最新のコンテンツをまとめてチェックできます。
+        </Typography>
       </Box>
-    </>
+
+      <Stack spacing={1.75}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+          {appLaunchers}
+        </Box>
+        {featureLinks.map((item) => (
+          <FeatureLinkCard key={item.to} title={item.label} description={item.description} to={item.to} />
+        ))}
+      </Stack>
+    </Box>
   )
 }

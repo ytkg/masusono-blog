@@ -93,6 +93,7 @@ export default function ArticleInline({ article, linkTo, linkState, headingLevel
                   wordBreak: 'break-word',
                 },
               }}
+              /* biome-ignore lint/security/noDangerouslySetInnerHtml: 記事本文はサーバー側でサニタイズ済み */
               dangerouslySetInnerHTML={{ __html: html }}
             />
           ) : (

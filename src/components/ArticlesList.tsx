@@ -8,6 +8,7 @@ import { useArticles } from '../hooks/useArticles'
 import ArticleInline from './ArticleInline'
 
 const SKELETON_COUNT = 6
+const SKELETON_KEYS = Array.from({ length: SKELETON_COUNT }, (_, index) => `skeleton-${index}`)
 
 export default function ArticlesList() {
   const { data: articles, isLoading, error } = useArticles()
@@ -15,8 +16,8 @@ export default function ArticlesList() {
   if (isLoading && !articles) {
     return (
       <Grid container spacing={2}>
-        {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-          <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+        {SKELETON_KEYS.map((key) => (
+          <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
             <Card>
               <CardContent>
                 <Skeleton variant="text" width="80%" height={28} />

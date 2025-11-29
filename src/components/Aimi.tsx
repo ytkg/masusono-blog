@@ -56,7 +56,9 @@ export default function Aimi({
 
   useEffect(() => () => {
     // アンマウント時にタイマーをクリア
-    timersRef.current.forEach((t) => clearTimeout(t))
+    timersRef.current.forEach((t) => {
+      window.clearTimeout(t)
+    })
     timersRef.current = []
   }, [])
 
