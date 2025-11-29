@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "biome lint .",
     "lint:biome": "biome lint .",
+    "format:check": "biome format --write . && git diff --exit-code",
     "format": "biome format --write .",
     "preview": "vite preview",
     "deploy": "npm run build && npx wrangler deploy"
