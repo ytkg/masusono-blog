@@ -1,5 +1,5 @@
-import useSWR from 'swr'
-import type { Article } from '../types/article'
+import useSWR from "swr"
+import type { Article } from "../types/article"
 
 type ProxyArticle = {
   id: string
@@ -19,14 +19,14 @@ const fetcher = async (url: string): Promise<Article[]> => {
   return body.map((article) => ({
     id: article.id,
     publishedAt: article.publishedAt,
-    title: article.title ?? '',
+    title: article.title ?? "",
     content: article.content,
     author: article.author ? { name: article.author } : undefined,
   }))
 }
 
 export function useArticles() {
-  return useSWR<Article[]>('/api/articles', fetcher, {
+  return useSWR<Article[]>("/api/articles", fetcher, {
     revalidateOnFocus: false,
   })
 }

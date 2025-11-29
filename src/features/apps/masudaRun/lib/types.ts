@@ -1,4 +1,4 @@
-export type GameState = 'ready' | 'playing' | 'gameover'
+export type GameState = "ready" | "playing" | "gameover"
 
 export interface Player {
   x: number
@@ -16,7 +16,7 @@ export interface Obstacle {
   y: number
   w: number
   h: number
-  kind: 'short' | 'tall'
+  kind: "short" | "tall"
 }
 
 export interface Cloud {

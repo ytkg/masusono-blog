@@ -1,9 +1,9 @@
-import Paper from '@mui/material/Paper'
-import Typography from '@mui/material/Typography'
-import type { ReactNode } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
-import type { SxProps, Theme } from '@mui/material/styles'
-import { mergeSx } from '../utils/sx'
+import Paper from "@mui/material/Paper"
+import Typography from "@mui/material/Typography"
+import type { ReactNode } from "react"
+import { Link as RouterLink } from "react-router-dom"
+import type { SxProps, Theme } from "@mui/material/styles"
+import { mergeSx } from "../utils/sx"
 
 interface FeatureLinkCardProps {
   title: string
@@ -17,24 +17,19 @@ export default function FeatureLinkCard({ title, description, to, children, sx }
   const mergedSx: SxProps<Theme> = mergeSx(
     {
       p: { xs: 2, sm: 2.5 },
-      display: 'flex',
-      flexDirection: 'column',
+      display: "flex",
+      flexDirection: "column",
       gap: 1,
-      textDecoration: 'none',
-      color: 'inherit',
-      transition: 'border-color 0.2s',
-      '&:hover': { borderColor: 'primary.main' },
+      textDecoration: "none",
+      color: "inherit",
+      transition: "border-color 0.2s",
+      "&:hover": { borderColor: "primary.main" },
     },
     sx,
   )
 
   return (
-    <Paper
-      component={RouterLink}
-      to={to}
-      variant="outlined"
-      sx={mergedSx}
-    >
+    <Paper component={RouterLink} to={to} variant="outlined" sx={mergedSx}>
       <Typography variant="h6" component="h3">
         {title}
       </Typography>

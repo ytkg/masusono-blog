@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
-import { useArticles } from './useArticles'
-import type { Article } from '../types/article'
+import { useMemo } from "react"
+import { useArticles } from "./useArticles"
+import type { Article } from "../types/article"
 
 export function useArticle(id?: string | null, fallback?: Article | null) {
   const swr = useArticles()
@@ -15,7 +15,7 @@ export function useArticle(id?: string | null, fallback?: Article | null) {
   const resolvedError = useMemo(() => {
     if (error) return error
     if (id && articles && !article) {
-      return new Error('記事が見つかりません。')
+      return new Error("記事が見つかりません。")
     }
     return undefined
   }, [error, id, articles, article])

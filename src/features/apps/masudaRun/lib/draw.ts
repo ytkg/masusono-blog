@@ -11,7 +11,7 @@ export function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, w
     { dx: 0.55, dy: 0.18, s: 1.05 },
     { dx: 0.8, dy: 0.12, s: 0.95 },
   ]
-  ctx.fillStyle = '#e5e5e5'
+  ctx.fillStyle = "#e5e5e5"
   for (const p of parts) {
     const cx = x + p.dx * w
     const cy = y + p.dy * h
@@ -21,6 +21,6 @@ export function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, w
   }
   ctx.beginPath()
   ctx.ellipse(x + 0.45 * w, y + 0.38 * h, r * 1.6, r * 0.9, 0, 0, Math.PI * 2)
-  ctx.fillStyle = '#f0f0f0'
+  ctx.fillStyle = "#f0f0f0"
   ctx.fill()
 }

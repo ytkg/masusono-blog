@@ -1,4 +1,4 @@
-import { fetchArticles } from './articles'
+import { fetchArticles } from "./articles"
 
 type SitemapStaticEntry = {
   path: string
@@ -14,15 +14,15 @@ type SitemapEntry = {
 }
 
 const staticEntries: SitemapStaticEntry[] = [
-  { path: '/', changefreq: 'weekly', priority: 1.0 },
-  { path: '/blog', changefreq: 'weekly', priority: 0.8 },
-  { path: '/about', changefreq: 'monthly', priority: 0.7 },
-  { path: '/podcast', changefreq: 'weekly', priority: 0.8 },
-  { path: '/shops', changefreq: 'weekly', priority: 0.8 },
+  { path: "/", changefreq: "weekly", priority: 1.0 },
+  { path: "/blog", changefreq: "weekly", priority: 0.8 },
+  { path: "/about", changefreq: "monthly", priority: 0.7 },
+  { path: "/podcast", changefreq: "weekly", priority: 0.8 },
+  { path: "/shops", changefreq: "weekly", priority: 0.8 },
 ]
 
 export async function generateSitemapXml(origin: string): Promise<string> {
-  const baseUrl = origin.replace(/\/$/, '')
+  const baseUrl = origin.replace(/\/$/, "")
   const entries: SitemapEntry[] = staticEntries.map((entry) => ({
     loc: `${baseUrl}${entry.path}`,
     changefreq: entry.changefreq,
@@ -35,7 +35,7 @@ export async function generateSitemapXml(origin: string): Promise<string> {
     entries.push({
       loc: `${baseUrl}/blog/${article.id}`,
       lastmod: article.publishedAt ?? undefined,
-      changefreq: 'monthly',
+      changefreq: "monthly",
       priority: 0.6,
     })
   }
@@ -44,9 +44,12 @@ export async function generateSitemapXml(origin: string): Promise<string> {
 }
 
 function buildSitemapXml(entries: SitemapEntry[]) {
-  const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+  const lines = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  ]
   for (const entry of entries) {
-    lines.push('  <url>')
+    lines.push("  <url>")
     lines.push(`    <loc>${escapeXml(entry.loc)}</loc>`)
     const lastmod = normalizeDate(entry.lastmod)
     if (lastmod) {
@@ -58,19 +61,19 @@ function buildSitemapXml(entries: SitemapEntry[]) {
     if (entry.priority !== undefined) {
       lines.push(`    <priority>${entry.priority.toFixed(1)}</priority>`)
     }
-    lines.push('  </url>')
+    lines.push("  </url>")
   }
-  lines.push('</urlset>')
-  return `${lines.join('\n')}\n`
+  lines.push("</urlset>")
+  return `${lines.join("\n")}\n`
 }
 
 function escapeXml(value: string) {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;")
 }
 
 function normalizeDate(value?: string) {

@@ -1,14 +1,13 @@
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import PageContainer from '../components/PageContainer'
-import { usePageMeta } from '../hooks/usePageMeta'
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
+import PageContainer from "../components/PageContainer"
+import { usePageMeta } from "../hooks/usePageMeta"
 
 export default function About() {
   usePageMeta({
-    title: '「増田とその他！」について',
-    description:
-      '飲み仲間3人による、日常をゆるく綴るプロジェクト「増田とその他！」の紹介ページです。',
-    canonicalPath: '/about',
+    title: "「増田とその他！」について",
+    description: "飲み仲間3人による、日常をゆるく綴るプロジェクト「増田とその他！」の紹介ページです。",
+    canonicalPath: "/about",
   })
 
   return (
@@ -23,7 +22,8 @@ export default function About() {
 
       <Typography component="p" sx={{ mb: 2 }}>
         中心となるのは、実在の人物・<strong>増田愛美</strong>。そして彼女を取り巻く “その他！” の2人、
-        <strong>チャーリー</strong> と <strong>上ちゃん</strong>。この3人が、まるで居酒屋のカウンターで話しているようなテンションで、日々の出来事や考えたことを交代で書いています。
+        <strong>チャーリー</strong> と <strong>上ちゃん</strong>
+        。この3人が、まるで居酒屋のカウンターで話しているようなテンションで、日々の出来事や考えたことを交代で書いています。
       </Typography>
 
       <Typography component="p" sx={{ mb: 2 }}>
@@ -31,19 +31,24 @@ export default function About() {
       </Typography>
 
       <Typography component="p" sx={{ mb: 2 }}>
-        公式サイト <a href="https://masusono.com" target="_blank" rel="noreferrer">masusono.com</a> では、日常のブログを中心に、今後公開予定の <strong>ポッドキャスト</strong>、さらにおすすめの <strong>居酒屋・ラーメン屋紹介ページ</strong> なども用意しています。
+        公式サイト{" "}
+        <a href="https://masusono.com" target="_blank" rel="noreferrer">
+          masusono.com
+        </a>{" "}
+        では、日常のブログを中心に、今後公開予定の <strong>ポッドキャスト</strong>、さらにおすすめの{" "}
+        <strong>居酒屋・ラーメン屋紹介ページ</strong> なども用意しています。
       </Typography>
 
       <Box
         component="blockquote"
         sx={{
-          borderLeft: '4px solid',
-          borderColor: 'divider',
+          borderLeft: "4px solid",
+          borderColor: "divider",
           pl: 2,
           py: 1,
           my: 3,
-          fontStyle: 'italic',
-          color: 'text.secondary',
+          fontStyle: "italic",
+          color: "text.secondary",
         }}
       >
         一言でいえば、「飲み仲間たちのゆるい日記」。

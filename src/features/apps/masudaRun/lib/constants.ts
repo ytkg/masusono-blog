@@ -31,7 +31,7 @@ export const CFG = {
 } as const
 
 export const RESTART_DELAY_MS = 600
-export const HIGH_SCORE_KEY = 'masudarun_highscore'
+export const HIGH_SCORE_KEY = "masudarun_highscore"
 
 export const CHAR_H = Math.round(CFG.BASE_H * CFG.CHAR_SCALE)
 export const CHAR_W = Math.round(CHAR_H * CFG.IMG_RATIO)

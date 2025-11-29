@@ -1,5 +1,5 @@
-import { CFG, HIT_H, HIT_W, HIGH_SCORE_KEY } from './constants'
-import type { World } from './types'
+import { CFG, HIT_H, HIT_W, HIGH_SCORE_KEY } from "./constants"
+import type { World } from "./types"
 
 export function createInitialWorld(): World {
   const groundY = Math.round(CFG.BASE_H * CFG.GROUND_RATIO)
@@ -30,11 +30,11 @@ export function rectsIntersect(
 }
 
 export function getStoredHighScore() {
-  if (typeof window === 'undefined') return 0
+  if (typeof window === "undefined") return 0
   return Number(window.localStorage.getItem(HIGH_SCORE_KEY) || 0)
 }
 
 export function persistHighScore(value: number) {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return
   window.localStorage.setItem(HIGH_SCORE_KEY, String(value))
 }

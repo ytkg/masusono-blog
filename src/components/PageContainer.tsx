@@ -1,7 +1,7 @@
-import Box from '@mui/material/Box'
-import type { SxProps, Theme } from '@mui/material/styles'
-import type { ReactNode, ElementType } from 'react'
-import { mergeSx } from '../utils/sx'
+import Box from "@mui/material/Box"
+import type { SxProps, Theme } from "@mui/material/styles"
+import type { ReactNode, ElementType } from "react"
+import { mergeSx } from "../utils/sx"
 
 interface PageContainerProps {
   children: ReactNode
@@ -10,7 +10,7 @@ interface PageContainerProps {
   sx?: SxProps<Theme>
 }
 
-export default function PageContainer({ children, component = 'section', id, sx }: PageContainerProps) {
+export default function PageContainer({ children, component = "section", id, sx }: PageContainerProps) {
   const mergedSx: SxProps<Theme> = mergeSx({ px: { xs: 2, sm: 3 }, py: 2 }, sx)
 
   return (

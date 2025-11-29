@@ -1,11 +1,11 @@
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import Skeleton from '@mui/material/Skeleton'
-import Alert from '@mui/material/Alert'
-import { useArticles } from '../hooks/useArticles'
-import ArticleInline from './ArticleInline'
+import Grid from "@mui/material/Grid"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import Typography from "@mui/material/Typography"
+import Skeleton from "@mui/material/Skeleton"
+import Alert from "@mui/material/Alert"
+import { useArticles } from "../hooks/useArticles"
+import ArticleInline from "./ArticleInline"
 
 const SKELETON_COUNT = 6
 const SKELETON_KEYS = Array.from({ length: SKELETON_COUNT }, (_, index) => `skeleton-${index}`)
@@ -31,11 +31,7 @@ export default function ArticlesList() {
   }
 
   if (error && !articles) {
-    return (
-      <Alert severity="error">
-        記事の取得に失敗しました: {String((error as Error)?.message ?? error)}
-      </Alert>
-    )
+    return <Alert severity="error">記事の取得に失敗しました: {String((error as Error)?.message ?? error)}</Alert>
   }
 
   if (!articles?.length) {

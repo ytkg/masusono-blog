@@ -1,4 +1,4 @@
-import type { SxProps, Theme } from '@mui/material/styles'
+import type { SxProps, Theme } from "@mui/material/styles"
 
 export function mergeSx(base?: SxProps<Theme>, extra?: SxProps<Theme>): SxProps<Theme> {
   const baseArray = normalize(base)

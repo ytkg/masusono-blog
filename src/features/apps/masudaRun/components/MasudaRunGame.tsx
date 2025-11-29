@@ -1,22 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import charImgSrc from '../../../../assets/masuda_run.png'
-import obsShortSrc from '../../../../assets/other1.png'
-import obsTallSrc from '../../../../assets/other2.png'
-import { CFG, CHAR_H, CHAR_W, HIT_H, RESTART_DELAY_MS } from '../lib/constants'
-import { getStoredHighScore, createInitialWorld, persistHighScore, rectsIntersect } from '../lib/world'
-import { drawCenterText, drawCloud } from '../lib/draw'
-import { getNow } from '../lib/time'
-import type { GameState, World } from '../lib/types'
+import { useCallback, useEffect, useRef, useState } from "react"
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
+import charImgSrc from "../../../../assets/masuda_run.png"
+import obsShortSrc from "../../../../assets/other1.png"
+import obsTallSrc from "../../../../assets/other2.png"
+import { CFG, CHAR_H, CHAR_W, HIT_H, RESTART_DELAY_MS } from "../lib/constants"
+import { getStoredHighScore, createInitialWorld, persistHighScore, rectsIntersect } from "../lib/world"
+import { drawCenterText, drawCloud } from "../lib/draw"
+import { getNow } from "../lib/time"
+import type { GameState, World } from "../lib/types"
 
 export default function MasudaRunGame() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const canvasWrapRef = useRef<HTMLDivElement | null>(null)
   const scaleRef = useRef(1)
   const reqRef = useRef<number | null>(null)
-  const [state, setState] = useState<GameState>('ready')
+  const [state, setState] = useState<GameState>("ready")
   const scoreRef = useRef(0)
   const [high, setHigh] = useState<number>(() => getStoredHighScore())
   const suppressClickRef = useRef(false)
@@ -54,16 +54,16 @@ export default function MasudaRunGame() {
 
   const startOrRestart = useCallback(() => {
     const now = getNow()
-    if (state === 'gameover' && now < restartReadyAtRef.current) return
+    if (state === "gameover" && now < restartReadyAtRef.current) return
     world.current = createInitialWorld()
     scoreRef.current = 0
     restartReadyAtRef.current = 0
     setRestartReadyAt(0)
-    setState('playing')
+    setState("playing")
   }, [state])
 
   const doJump = useCallback(() => {
-    if (state !== 'playing') return
+    if (state !== "playing") return
     const p = world.current.player
     if (p.jumps < CFG.MAX_JUMPS) {
       p.vy = CFG.JUMP_VY
@@ -76,26 +76,26 @@ export default function MasudaRunGame() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat) return
-      if (e.type === 'keydown') {
-        if (e.key === ' ' || e.key === 'ArrowUp') {
+      if (e.type === "keydown") {
+        if (e.key === " " || e.key === "ArrowUp") {
           e.preventDefault()
-          if (state === 'ready' || state === 'gameover') {
+          if (state === "ready" || state === "gameover") {
             startOrRestart()
             return
           }
           doJump()
-        } else if ((e.key === 'r' || e.key === 'R') && state === 'gameover') {
+        } else if ((e.key === "r" || e.key === "R") && state === "gameover") {
           startOrRestart()
         }
-      } else if (e.type === 'keyup') {
-        if (e.key === ' ' || e.key === 'ArrowUp') e.preventDefault()
+      } else if (e.type === "keyup") {
+        if (e.key === " " || e.key === "ArrowUp") e.preventDefault()
       }
     }
-    window.addEventListener('keydown', onKey)
-    window.addEventListener('keyup', onKey)
+    window.addEventListener("keydown", onKey)
+    window.addEventListener("keyup", onKey)
     return () => {
-      window.removeEventListener('keydown', onKey)
-      window.removeEventListener('keyup', onKey)
+      window.removeEventListener("keydown", onKey)
+      window.removeEventListener("keyup", onKey)
     }
   }, [state, startOrRestart, doJump])
 
@@ -103,15 +103,15 @@ export default function MasudaRunGame() {
     const canvas = canvasRef.current
     if (!canvas) return
     const onPointerDown = () => {
-      if (state === 'ready' || state === 'gameover') return startOrRestart()
-      if (state === 'playing') doJump()
+      if (state === "ready" || state === "gameover") return startOrRestart()
+      if (state === "playing") doJump()
     }
-    canvas.addEventListener('pointerdown', onPointerDown)
-    return () => canvas.removeEventListener('pointerdown', onPointerDown)
+    canvas.addEventListener("pointerdown", onPointerDown)
+    return () => canvas.removeEventListener("pointerdown", onPointerDown)
   }, [state, startOrRestart, doJump])
 
   useEffect(() => {
-    if (state !== 'gameover' || restartReadyAt <= 0) return
+    if (state !== "gameover" || restartReadyAt <= 0) return
     const remaining = restartReadyAt - getNow()
     if (remaining <= 0) {
       restartReadyAtRef.current = 0
@@ -128,7 +128,7 @@ export default function MasudaRunGame() {
   const update = useCallback(
     (dt: number, W: number) => {
       const w = world.current
-      if (state !== 'playing') return
+      if (state !== "playing") return
 
       w.t += dt
       w.speed = CFG.SPEED_BASE + Math.min(CFG.SPEED_GAIN_MAX, w.t * CFG.SPEED_GAIN_RATE)
@@ -150,8 +150,8 @@ export default function MasudaRunGame() {
         const tall = Math.random() < CFG.TALL_PROB
         const h = tall ? CFG.TALL_H : CFG.SHORT_H_MIN + Math.random() * CFG.SHORT_H_RANGE
         const y = w.groundY - h
-        const kind: World['obstacles'][number]['kind'] = tall ? 'tall' : 'short'
-        const obs: World['obstacles'][number] = {
+        const kind: World["obstacles"][number]["kind"] = tall ? "tall" : "short"
+        const obs: World["obstacles"][number] = {
           x: W + 20,
           y,
           w: CFG.OBS_W_MIN + Math.random() * CFG.OBS_W_RANGE,
@@ -159,7 +159,8 @@ export default function MasudaRunGame() {
           kind,
         }
         w.obstacles.push(obs)
-        w.nextSpawn = CFG.SPAWN_BASE - Math.min(CFG.SPAWN_REDUCE_MAX, w.t * CFG.SPAWN_REDUCE_RATE) + Math.random() * CFG.SPAWN_RAND
+        w.nextSpawn =
+          CFG.SPAWN_BASE - Math.min(CFG.SPAWN_REDUCE_MAX, w.t * CFG.SPAWN_REDUCE_RATE) + Math.random() * CFG.SPAWN_RAND
       }
       for (const o of w.obstacles) o.x -= w.speed
       w.obstacles = w.obstacles.filter((o) => o.x + o.w > -10)
@@ -187,7 +188,7 @@ export default function MasudaRunGame() {
           const readyAt = getNow() + RESTART_DELAY_MS
           restartReadyAtRef.current = readyAt
           setRestartReadyAt(readyAt)
-          setState('gameover')
+          setState("gameover")
           return
         }
       }
@@ -200,7 +201,7 @@ export default function MasudaRunGame() {
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, W: number, H: number) => {
       const w = world.current
-      ctx.fillStyle = '#fff'
+      ctx.fillStyle = "#fff"
       ctx.fillRect(0, 0, W, H)
 
       for (const c of w.clouds) {
@@ -209,15 +210,15 @@ export default function MasudaRunGame() {
         drawCloud(ctx, c.x, c.y, c.w, c.h)
         ctx.restore()
       }
-      ctx.strokeStyle = '#000'
+      ctx.strokeStyle = "#000"
       ctx.beginPath()
       ctx.moveTo(0, w.groundY + 0.5)
       ctx.lineTo(W, w.groundY + 0.5)
       ctx.stroke()
 
-      ctx.fillStyle = '#000'
+      ctx.fillStyle = "#000"
       for (const o of w.obstacles) {
-        const img = o.kind === 'tall' ? obsTallRef.current : obsShortRef.current
+        const img = o.kind === "tall" ? obsTallRef.current : obsShortRef.current
         if (img) {
           const ratio = img.width / img.height
           const drawH = o.h * CFG.OBS_IMG_SCALE
@@ -251,23 +252,23 @@ export default function MasudaRunGame() {
           ctx.drawImage(img, drawX, drawY, drawW, drawH)
         }
       } else {
-        ctx.fillStyle = '#000'
+        ctx.fillStyle = "#000"
         ctx.fillRect(drawX, drawY, drawW, drawH)
       }
 
       const sc = Math.floor(scoreRef.current)
-      ctx.fillStyle = '#000'
+      ctx.fillStyle = "#000"
       ctx.font = '16px "Noto Sans JP", sans-serif'
-      ctx.fillText(`SCORE ${sc.toString().padStart(5, '0')}`, 10, 18)
+      ctx.fillText(`SCORE ${sc.toString().padStart(5, "0")}`, 10, 18)
       const hsc = Math.max(high, sc)
-      if (hsc) ctx.fillText(`HI ${hsc.toString().padStart(5, '0')}`, W - 100, 18)
+      if (hsc) ctx.fillText(`HI ${hsc.toString().padStart(5, "0")}`, W - 100, 18)
 
-      if (state === 'ready') {
+      if (state === "ready") {
         ctx.font = '16px "Noto Sans JP", sans-serif'
-        drawCenterText(ctx, W, H, '増田RUN - スペース/タップで開始')
-      } else if (state === 'gameover') {
+        drawCenterText(ctx, W, H, "増田RUN - スペース/タップで開始")
+      } else if (state === "gameover") {
         ctx.font = '16px "Noto Sans JP", sans-serif'
-        drawCenterText(ctx, W, H, 'GAME OVER  -  スペース/タップで再開')
+        drawCenterText(ctx, W, H, "GAME OVER  -  スペース/タップで再開")
       }
     },
     [state, high],
@@ -289,18 +290,18 @@ export default function MasudaRunGame() {
       canvas.height = Math.round(CFG.BASE_H * scale)
     }
     resize()
-    window.addEventListener('resize', resize)
-    window.addEventListener('orientationchange', resize)
+    window.addEventListener("resize", resize)
+    window.addEventListener("orientationchange", resize)
     return () => {
-      window.removeEventListener('resize', resize)
-      window.removeEventListener('orientationchange', resize)
+      window.removeEventListener("resize", resize)
+      window.removeEventListener("orientationchange", resize)
     }
   }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext("2d")
     if (!ctx) return
     let last = performance.now()
     const loop = (now: number) => {
@@ -320,9 +321,9 @@ export default function MasudaRunGame() {
     }
   }, [draw, update])
 
-  const restartCooling = state === 'gameover' && restartReadyAt > 0
+  const restartCooling = state === "gameover" && restartReadyAt > 0
   const handlePrimaryAction = useCallback(() => {
-    if (state === 'playing') {
+    if (state === "playing") {
       doJump()
     } else {
       startOrRestart()
@@ -330,27 +331,27 @@ export default function MasudaRunGame() {
   }, [state, doJump, startOrRestart])
 
   const containerSx = {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     gap: 2,
-    width: '100%',
+    width: "100%",
   }
 
   return (
     <Box sx={containerSx}>
       <Box
         ref={canvasWrapRef}
-        sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden', width: '100%' }}
+        sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, overflow: "hidden", width: "100%" }}
       >
         <canvas
           ref={canvasRef}
           width={CFG.BASE_W}
           height={CFG.BASE_H}
           tabIndex={0}
-          style={{ width: '100%', height: 'auto', display: 'block', outline: 'none' }}
+          style={{ width: "100%", height: "auto", display: "block", outline: "none" }}
         />
       </Box>
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: "100%" }}>
         <Button
           fullWidth
           variant="contained"
@@ -372,7 +373,7 @@ export default function MasudaRunGame() {
             handlePrimaryAction()
           }}
         >
-          {state === 'playing' ? 'ジャンプ' : state === 'ready' ? 'スタート' : 'リスタート'}
+          {state === "playing" ? "ジャンプ" : state === "ready" ? "スタート" : "リスタート"}
         </Button>
       </Box>
       <Typography variant="body2" color="text.secondary">

@@ -1,20 +1,20 @@
-import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
-import Header from './components/Header'
-import Footer from './components/Footer'
-import Blog from './components/Blog'
-import Podcast from './components/Podcast'
-import './App.css'
-import { Routes, Route } from 'react-router-dom'
-import Shops from './pages/Shops'
-import Home from './pages/Home'
-import ScrollRestoration from './components/ScrollRestoration'
-import ArticleDetail from './pages/ArticleDetail'
-import About from './pages/About'
+import Box from "@mui/material/Box"
+import Container from "@mui/material/Container"
+import Header from "./components/Header"
+import Footer from "./components/Footer"
+import Blog from "./components/Blog"
+import Podcast from "./components/Podcast"
+import "./App.css"
+import { Routes, Route } from "react-router-dom"
+import Shops from "./pages/Shops"
+import Home from "./pages/Home"
+import ScrollRestoration from "./components/ScrollRestoration"
+import ArticleDetail from "./pages/ArticleDetail"
+import About from "./pages/About"
 
 export default function App() {
   return (
-    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
       <Header />
       <ScrollRestoration />
       <Container component="main" disableGutters sx={{ flexGrow: 1, py: 0, px: 0, pb: { xs: 12, sm: 12 } }}>
