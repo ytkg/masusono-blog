@@ -24,3 +24,6 @@ jobs:
 
       - name: Run tests (Vitest)
         run: npm test
+
+      - name: Run build
+        run: npm run build
