@@ -1,4 +1,4 @@
-name: Lint and Format
+name: Test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  lint-and-format:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,8 +22,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run lint (Biome)
-        run: npm run lint
-
-      - name: Run format check (Biome)
-        run: npm run format:check
+      - name: Run tests (Vitest)
+        run: npm test
