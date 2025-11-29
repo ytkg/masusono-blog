@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
-import { vi } from "vitest"
+import { type MockedFunction, vi } from "vitest"
 import ArticlesList from "./ArticlesList"
 import { useArticles } from "../hooks/useArticles"
 import type { Article } from "../types/article"
@@ -9,7 +9,7 @@ vi.mock("../hooks/useArticles", () => ({
   useArticles: vi.fn(),
 }))
 
-const useArticlesMock = useArticles as unknown as vi.MockedFunction<typeof useArticles>
+const useArticlesMock = useArticles as unknown as MockedFunction<typeof useArticles>
 
 const createUseArticlesResult = (overrides: Partial<ReturnType<typeof useArticles>> = {}) =>
   ({
