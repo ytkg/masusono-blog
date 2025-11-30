@@ -42,11 +42,31 @@ const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageM
 
 describe("Shops", () => {
   beforeAll(() => {
-    ;(globalThis as { ResizeObserver?: typeof ResizeObserver }).ResizeObserver =
-      (class {
-        observe() {}
-        disconnect() {}
-      }) as typeof ResizeObserver
+    const ResizeObserverMock: typeof ResizeObserver = class implements ResizeObserver {
+      private readonly callback: ResizeObserverCallback
+
+      constructor(callback: ResizeObserverCallback) {
+        this.callback = callback
+      }
+
+      observe(target: Element, options?: ResizeObserverOptions) {
+        void this.callback
+        void target
+        void options
+      }
+
+      unobserve(target: Element) {
+        void target
+      }
+
+      disconnect() {}
+
+      takeRecords(): ResizeObserverEntry[] {
+        return []
+      }
+    }
+
+    ;(globalThis as { ResizeObserver?: typeof ResizeObserver }).ResizeObserver = ResizeObserverMock
   })
 
   afterEach(() => {
