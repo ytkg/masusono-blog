@@ -7,6 +7,7 @@ services:
         RAILS_ENV: development
         BUNDLE_WITHOUT: ""
         BUNDLE_DEPLOYMENT: "0"
+        INSTALL_DEV_TOOLS: "1"
     command: ./bin/rails server -b 0.0.0.0 -p 3000
     volumes:
       - .:/rails
