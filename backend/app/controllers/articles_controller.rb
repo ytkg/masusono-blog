@@ -1,16 +1,13 @@
 class ArticlesController < ApplicationController
-  def index
-    client = Microcms::ArticlesClient.new
-    response = client.response
+  include MicrocmsResponseHandling
 
-    if response.success?
-      render json: client.articles
-    else
-      content_type = response.headers["content-type"] || "application/json"
-      render body: response.body, status: response.status, content_type: content_type
-    end
+  def index
+    response = microcms_client.response
+    return render_microcms_error(response) unless response.success?
+
+    render json: microcms_client.articles
   rescue StandardError => e
-    Rails.logger.error("microCMS fetch failed: #{e.class}: #{e.message}")
+    log_microcms_error("microCMS fetch failed", e)
     head :bad_gateway
   end
 end

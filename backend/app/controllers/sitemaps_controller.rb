@@ -1,6 +1,11 @@
 require "time"
 
 class SitemapsController < ApplicationController
+  include MicrocmsResponseHandling
+
+  CONTENT_TYPE = "application/xml; charset=utf-8".freeze
+  BLOG_ENTRY = { changefreq: "monthly", priority: 0.6 }.freeze
+
   STATIC_ENTRIES = [
     { path: "/", changefreq: "weekly", priority: 1.0 },
     { path: "/blog", changefreq: "weekly", priority: 0.8 },
@@ -10,18 +15,13 @@ class SitemapsController < ApplicationController
   ].freeze
 
   def show
-    client = Microcms::ArticlesClient.new
-    response = client.response
+    response = microcms_client.response
+    return render_microcms_error(response) unless response.success?
 
-    unless response.success?
-      content_type = response.headers["content-type"] || "application/json"
-      return render body: response.body, status: response.status, content_type: content_type
-    end
-
-    xml = build_sitemap_xml(client.articles)
-    render plain: xml, content_type: "application/xml; charset=utf-8"
+    xml = build_sitemap_xml(microcms_client.articles)
+    render plain: xml, content_type: CONTENT_TYPE
   rescue StandardError => e
-    Rails.logger.error("sitemap generation failed: #{e.class}: #{e.message}")
+    log_microcms_error("sitemap generation failed", e)
     head :bad_gateway
   end
 
@@ -29,27 +29,32 @@ class SitemapsController < ApplicationController
 
   def build_sitemap_xml(articles)
     base_url = request.base_url.sub(%r{/\z}, "")
-    entries = STATIC_ENTRIES.map do |entry|
+    entries = static_entries(base_url) + article_entries(articles, base_url)
+    serialize_entries(entries)
+  end
+
+  def static_entries(base_url)
+    STATIC_ENTRIES.map do |entry|
       {
         loc: "#{base_url}#{entry[:path]}",
         changefreq: entry[:changefreq],
         priority: entry[:priority],
       }
     end
+  end
 
-    articles.each do |article|
+  def article_entries(articles, base_url)
+    articles.filter_map do |article|
       id = article["id"]
       next if id.nil? || id == ""
 
-      entries << {
+      {
         loc: "#{base_url}/blog/#{id}",
         lastmod: article["publishedAt"],
-        changefreq: "monthly",
-        priority: 0.6,
+        changefreq: BLOG_ENTRY[:changefreq],
+        priority: BLOG_ENTRY[:priority],
       }
     end
-
-    serialize_entries(entries)
   end
 
   def serialize_entries(entries)
