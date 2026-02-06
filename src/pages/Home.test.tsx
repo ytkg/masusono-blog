@@ -12,6 +12,10 @@ vi.mock("../features/apps/masudaRun/MasudaRunApp", () => ({
   default: () => <div data-testid="masuda-run-app" />,
 }))
 
+vi.mock("../features/apps/numbers/NumbersApp", () => ({
+  default: () => <div data-testid="numbers-app" />,
+}))
+
 const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageMeta>
 
 describe("Home", () => {
@@ -32,6 +36,7 @@ describe("Home", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "ようこそ" })).toBeInTheDocument()
     expect(screen.getByTestId("masuda-run-app")).toBeInTheDocument()
+    expect(screen.getByTestId("numbers-app")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /ブログ/ })).toHaveAttribute("href", "/blog")
     expect(screen.getByRole("link", { name: /ポッドキャスト/ })).toHaveAttribute("href", "/podcast")
     expect(screen.getByRole("link", { name: /推し店/ })).toHaveAttribute("href", "/shops")

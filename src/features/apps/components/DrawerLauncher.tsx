@@ -9,6 +9,7 @@ import type { SxProps, Theme } from "@mui/material/styles"
 
 export interface DrawerLauncherProps {
   title: string
+  launcherLabel?: string
   buttonAriaLabel: string
   children: ReactNode
   buttonSx?: SxProps<Theme>
@@ -18,6 +19,7 @@ export interface DrawerLauncherProps {
 
 export default function DrawerLauncher({
   title,
+  launcherLabel,
   buttonAriaLabel,
   children,
   buttonSx,
@@ -57,6 +59,7 @@ export default function DrawerLauncher({
     overflow: "hidden",
   }
   const paperCombinedSx: SxProps<Theme> = paperSx ? ([paperBaseSx, paperSx] as SxProps<Theme>) : paperBaseSx
+  const launcherLabelText = launcherLabel ?? title
 
   return (
     <Box
@@ -72,7 +75,7 @@ export default function DrawerLauncher({
           {buttonIcon ?? <AppsIcon />}
         </IconButton>
         <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", width: "100%" }}>
-          {title}
+          {launcherLabelText}
         </Typography>
       </Box>
       <Drawer

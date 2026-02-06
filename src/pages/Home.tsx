@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack"
 import FeatureLinkCard from "../components/FeatureLinkCard"
 import { usePageMeta } from "../hooks/usePageMeta"
 import MasudaRunApp from "../features/apps/masudaRun/MasudaRunApp"
+import NumbersApp from "../features/apps/numbers/NumbersApp"
 
 const featureLinks = [
   { label: "ブログ", description: "最新の記事やお知らせはこちら", to: "/blog" },
@@ -29,7 +30,7 @@ export default function Home() {
     minute: "2-digit",
     second: "2-digit",
   })
-  const appLaunchers = [<MasudaRunApp key="masuda-run" />]
+  const appLaunchers = [<MasudaRunApp key="masuda-run" />, <NumbersApp key="numbers-app" />]
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, display: "flex", flexDirection: "column", gap: { xs: 3, sm: 4 } }}>
       <Box sx={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 2 }}>
