@@ -1,14 +1,21 @@
 import Box from "@mui/material/Box"
+import Link from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
 import PageContainer from "./PageContainer"
-// import Alert from '@mui/material/Alert'
-import Aimi from "./Aimi"
 import { usePageMeta } from "../hooks/usePageMeta"
+
+const episodes = [
+  {
+    id: "001",
+    title: "プライベートとか普通とかの話",
+    audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3",
+  },
+] as const
 
 export default function Podcast() {
   usePageMeta({
     title: "ポッドキャスト",
-    description: "増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします（準備中）。",
+    description: "増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします。",
     canonicalPath: "/podcast",
   })
 
@@ -17,69 +24,41 @@ export default function Podcast() {
       <Typography variant="h5" component="h1" gutterBottom>
         ポッドキャスト
       </Typography>
-      <Box
-        sx={{
-          mb: 2,
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "flex-end",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 1,
-          pt: { xs: 1.5, sm: 2 },
-          pl: { xs: 1.5, sm: 2 },
-          pr: 0,
-          pb: 0,
-          bgcolor: "background.paper",
-          overflow: "visible",
-        }}
-      >
-        <Box sx={{ position: "relative", display: "inline-block", zIndex: 1 }}>
-          {/* 吹き出し（Aimi の左側） */}
+      <Box sx={{ display: "grid", gap: 2 }}>
+        {episodes.map((episode) => (
           <Box
+            key={episode.id}
             sx={{
-              position: "absolute",
-              top: 8,
-              right: "calc(100% + 8px)",
-              bgcolor: "background.paper",
-              color: "text.primary",
               border: "1px solid",
               borderColor: "divider",
               borderRadius: 1,
-              px: 1.5,
-              py: 0.5,
-              fontSize: "0.875rem",
-              boxShadow: 1,
-              whiteSpace: "nowrap",
-              zIndex: 2,
-              "::before": {
-                content: '""',
-                position: "absolute",
-                top: "50%",
-                left: "100%",
-                transform: "translateY(-50%)",
-                borderTop: "7px solid transparent",
-                borderBottom: "7px solid transparent",
-                borderLeft: "7px solid",
-                borderLeftColor: "divider",
-              },
-              "::after": {
-                content: '""',
-                position: "absolute",
-                top: "50%",
-                left: "100%",
-                transform: "translateY(-50%) translateX(-1px)",
-                borderTop: "6px solid transparent",
-                borderBottom: "6px solid transparent",
-                borderLeft: "6px solid",
-                borderLeftColor: "background.paper",
-              },
+              p: { xs: 2, sm: 2.5 },
+              bgcolor: "background.paper",
             }}
           >
-            準備中だよ
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 700 }}>
+              {episode.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Episode {episode.id}
+            </Typography>
+            <Box
+              component="audio"
+              controls
+              preload="none"
+              src={episode.audioUrl}
+              aria-label={`エピソード音声: ${episode.title}`}
+              sx={{ width: "100%" }}
+            >
+              お使いのブラウザでは音声再生に対応していません。
+            </Box>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              <Link href={episode.audioUrl} target="_blank" rel="noreferrer">
+                音声ファイルを開く
+              </Link>
+            </Typography>
           </Box>
-          <Aimi />
-        </Box>
+        ))}
       </Box>
     </PageContainer>
   )

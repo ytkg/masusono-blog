@@ -7,10 +7,6 @@ vi.mock("../hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 
-vi.mock("./Aimi", () => ({
-  default: () => <div data-testid="aimi" />,
-}))
-
 const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageMeta>
 
 describe("Podcast", () => {
@@ -18,15 +14,23 @@ describe("Podcast", () => {
     vi.clearAllMocks()
   })
 
-  it("メタ情報を設定し、準備中メッセージと Aimi を表示する", () => {
+  it("メタ情報を設定し、公開済みエピソードを表示する", () => {
     render(<Podcast />)
 
     expect(screen.getByRole("heading", { level: 1, name: "ポッドキャスト" })).toBeInTheDocument()
-    expect(screen.getByText("準備中だよ")).toBeInTheDocument()
-    expect(screen.getByTestId("aimi")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
+    expect(screen.getByText("Episode 001")).toBeInTheDocument()
+    expect(screen.getByLabelText("エピソード音声: プライベートとか普通とかの話")).toHaveAttribute(
+      "src",
+      "https://storage.googleapis.com/masusono-podcast/001.mp3",
+    )
+    expect(screen.getByRole("link", { name: "音声ファイルを開く" })).toHaveAttribute(
+      "href",
+      "https://storage.googleapis.com/masusono-podcast/001.mp3",
+    )
     expect(usePageMetaMock).toHaveBeenCalledWith({
       title: "ポッドキャスト",
-      description: "増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします（準備中）。",
+      description: "増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします。",
       canonicalPath: "/podcast",
     })
   })
