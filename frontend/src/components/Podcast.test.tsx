@@ -20,10 +20,12 @@ describe("Podcast", () => {
     expect(screen.getByRole("heading", { level: 1, name: "ポッドキャスト" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
     expect(screen.getByText("Episode 001")).toBeInTheDocument()
-    expect(screen.getByLabelText("エピソード音声: プライベートとか普通とかの話")).toHaveAttribute(
-      "src",
-      "https://storage.googleapis.com/masusono-podcast/001.mp3",
-    )
+    const audio = screen.getByLabelText("エピソード音声: プライベートとか普通とかの話")
+    expect(audio).toHaveAttribute("preload", "metadata")
+    expect(audio).toHaveAttribute("playsinline")
+    const source = audio.querySelector("source")
+    expect(source).toHaveAttribute("src", "https://storage.googleapis.com/masusono-podcast/001.mp3")
+    expect(source).toHaveAttribute("type", "audio/mpeg")
     expect(screen.getByRole("link", { name: "音声ファイルを開く" })).toHaveAttribute(
       "href",
       "https://storage.googleapis.com/masusono-podcast/001.mp3",
