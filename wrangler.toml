@@ -1,8 +1,5 @@
-name = "masusono-blog"
-main = "worker/index.ts"
-compatibility_date = "2025-08-13"
+compatibility_date = "2026-02-06"
 
 [assets]
-binding = "ASSETS"
 directory = "./dist/"
 not_found_handling = "single-page-application"

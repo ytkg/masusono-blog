@@ -23,6 +23,6 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**/*.{js,ts,jsx,tsx}", "!dist", "!dist-ssr", "!node_modules", "!.wrangler"]
+    "includes": ["**/*.{js,ts,jsx,tsx}", "!dist", "!dist-ssr", "!node_modules"]
   }
 }
