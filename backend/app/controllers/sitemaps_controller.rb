@@ -28,7 +28,7 @@ class SitemapsController < ApplicationController
   private
 
   def build_sitemap_xml(articles)
-    base_url = request.base_url.sub(%r{/\z}, "")
+    base_url = "https://masusono.com"
     entries = static_entries(base_url) + article_entries(articles, base_url)
     serialize_entries(entries)
   end
