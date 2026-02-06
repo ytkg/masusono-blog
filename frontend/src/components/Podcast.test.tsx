@@ -26,10 +26,6 @@ describe("Podcast", () => {
     const source = audio.querySelector("source")
     expect(source).toHaveAttribute("src", "https://storage.googleapis.com/masusono-podcast/001.mp3")
     expect(source).toHaveAttribute("type", "audio/mpeg")
-    expect(screen.getByRole("link", { name: "音声ファイルを開く" })).toHaveAttribute(
-      "href",
-      "https://storage.googleapis.com/masusono-podcast/001.mp3",
-    )
     expect(usePageMetaMock).toHaveBeenCalledWith({
       title: "ポッドキャスト",
       description: "増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします。",

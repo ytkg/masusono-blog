@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box"
-import Link from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
 import PageContainer from "./PageContainer"
 import { usePageMeta } from "../hooks/usePageMeta"
@@ -52,11 +51,6 @@ export default function Podcast() {
               <source src={episode.audioUrl} type="audio/mpeg" />
               お使いのブラウザでは音声再生に対応していません。
             </audio>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              <Link href={episode.audioUrl} target="_blank" rel="noreferrer">
-                音声ファイルを開く
-              </Link>
-            </Typography>
           </Box>
         ))}
       </Box>
