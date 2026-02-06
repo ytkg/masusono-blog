@@ -65,6 +65,7 @@ class MetricsController < ApplicationController
             "value" => format_count(PODCAST_TOTAL, "本"),
           },
         },
+        build_shops_block,
       ],
     }
   end
@@ -89,6 +90,31 @@ class MetricsController < ApplicationController
     end
 
     totals
+  end
+
+  def build_shops_block
+    shops = Shop.all
+    categories = shops.group_by { |shop| normalize_shop_category(shop["category"]) }
+    children = categories.sort_by { |name, _| name }.map do |name, items|
+      { "label" => "#{name}の件数", "value" => format_count(items.size, "件") }
+    end
+
+    {
+      "kind" => "group",
+      "label" => "推し店",
+      "groups" => [
+        {
+          "label" => "総件数",
+          "value" => format_count(shops.size, "件"),
+          "children" => children,
+        },
+      ],
+    }
+  end
+
+  def normalize_shop_category(category)
+    normalized = category.to_s.strip
+    normalized == "" ? "未分類" : normalized
   end
 
   def days_since_launch
