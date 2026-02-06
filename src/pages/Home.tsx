@@ -3,6 +3,7 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Stack from "@mui/material/Stack"
 import FeatureLinkCard from "../components/FeatureLinkCard"
+import UechanBirthdaySection from "../components/UechanBirthdaySection"
 import { usePageMeta } from "../hooks/usePageMeta"
 import MasudaRunApp from "../features/apps/masudaRun/MasudaRunApp"
 import NumbersApp from "../features/apps/numbers/NumbersApp"
@@ -46,6 +47,7 @@ export default function Home() {
       </Box>
 
       <Stack spacing={1.75}>
+        <UechanBirthdaySection now={now} />
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>{appLaunchers}</Box>
         {featureLinks.map((item) => (
           <FeatureLinkCard key={item.to} title={item.label} description={item.description} to={item.to} />
