@@ -13,18 +13,10 @@ import L from "leaflet"
 import markerIconUrl from "leaflet/dist/images/marker-icon.png"
 import markerIcon2xUrl from "leaflet/dist/images/marker-icon-2x.png"
 import markerShadowUrl from "leaflet/dist/images/marker-shadow.png"
-import data from "../assets/shops.json"
 import PageContainer from "../components/PageContainer"
 import { usePageMeta } from "../hooks/usePageMeta"
-
-type Shop = {
-  name: string
-  lat: number
-  lng: number
-  category: string
-  url?: string
-  desc?: string
-}
+import { useShops } from "../hooks/useShops"
+import type { Shop } from "../types/shop"
 
 const DEFAULT_CATEGORY = "ALL" as const
 const createShopKey = (shop: Shop) => `${shop.name}-${shop.lat.toFixed(5)}-${shop.lng.toFixed(5)}`
@@ -81,6 +73,7 @@ function useShopFilter(shops: Shop[]) {
 function useLeafletMap({ mapContainerRef, shops, visibleShops, selectedKey, onSelect, getKey }: UseLeafletMapOptions) {
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Record<string, L.Marker>>({})
+  const [mapReady, setMapReady] = useState(false)
 
   useEffect(() => {
     const el = mapContainerRef.current
@@ -94,18 +87,24 @@ function useLeafletMap({ mapContainerRef, shops, visibleShops, selectedKey, onSe
       attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map)
 
-    const bounds = L.latLngBounds(shops.map((s) => [s.lat, s.lng]))
-    if (bounds.isValid()) map.fitBounds(bounds.pad(0.2))
-
     const resizeObserver = new ResizeObserver(() => map.invalidateSize())
     resizeObserver.observe(el)
+    setMapReady(true)
 
     return () => {
       resizeObserver.disconnect()
       map.remove()
       mapRef.current = null
     }
-  }, [mapContainerRef, shops])
+  }, [mapContainerRef])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map || shops.length === 0) return
+
+    const bounds = L.latLngBounds(shops.map((s) => [s.lat, s.lng]))
+    if (bounds.isValid()) map.fitBounds(bounds.pad(0.2))
+  }, [mapReady, shops])
 
   useEffect(() => {
     const map = mapRef.current
@@ -146,10 +145,11 @@ function useLeafletMap({ mapContainerRef, shops, visibleShops, selectedKey, onSe
 // Leaflet を使った実マップ表示
 
 export default function Shops() {
-  const shops = useMemo(() => data as Shop[], [])
+  const { data, error, isLoading } = useShops()
+  const shops = useMemo(() => data ?? [], [data])
   const getKey = useCallback(createShopKey, [])
   const { category, setCategory, categories, filteredShops } = useShopFilter(shops)
-  const [selected, setSelected] = useState<string | null>(() => (shops[0] ? getKey(shops[0]) : null))
+  const [selected, setSelected] = useState<string | null>(null)
   const mapElRef = useRef<HTMLDivElement | null>(null)
   usePageMeta({
     title: "推し店",
@@ -217,48 +217,65 @@ export default function Shops() {
 
       {/* List: 独立スクロール領域（地図は固定） */}
       <Box sx={{ overflow: "auto", pr: 1, flex: 1, minHeight: 0, pb: 4 }}>
-        <Grid container spacing={2}>
-          {filteredShops.map((s) => {
-            const key = getKey(s)
-            return (
-              <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
-                <Card
-                  variant="outlined"
-                  sx={{ borderColor: "divider", cursor: "pointer" }}
-                  onClick={() => setSelected(key)}
-                >
-                  <CardContent sx={{ px: 1.25, py: 1, "&:last-child": { pb: 1.5 } }}>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {s.name}
-                      </Typography>
-                      {s.url && (
-                        <IconButton
-                          component="a"
-                          href={s.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          size="small"
-                          aria-label="open"
-                        >
-                          <OpenInNewIcon fontSize="small" />
-                        </IconButton>
+        {isLoading && (
+          <Typography variant="body2" color="text.secondary">
+            読み込み中...
+          </Typography>
+        )}
+        {error && (
+          <Typography variant="body2" color="text.secondary">
+            データの取得に失敗しました。
+          </Typography>
+        )}
+        {!isLoading && !error && filteredShops.length === 0 && (
+          <Typography variant="body2" color="text.secondary">
+            表示する推し店がありません。
+          </Typography>
+        )}
+        {!isLoading && !error && filteredShops.length > 0 && (
+          <Grid container spacing={2}>
+            {filteredShops.map((s) => {
+              const key = getKey(s)
+              return (
+                <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Card
+                    variant="outlined"
+                    sx={{ borderColor: "divider", cursor: "pointer" }}
+                    onClick={() => setSelected(key)}
+                  >
+                    <CardContent sx={{ px: 1.25, py: 1, "&:last-child": { pb: 1.5 } }}>
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                          {s.name}
+                        </Typography>
+                        {s.url && (
+                          <IconButton
+                            component="a"
+                            href={s.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            size="small"
+                            aria-label="open"
+                          >
+                            <OpenInNewIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                      </Box>
+                      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 0.5 }}>
+                        <Chip size="small" label={s.category} />
+                      </Box>
+                      {s.desc && (
+                        <Typography variant="body2" color="text.secondary">
+                          {s.desc}
+                        </Typography>
                       )}
-                    </Box>
-                    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 0.5 }}>
-                      <Chip size="small" label={s.category} />
-                    </Box>
-                    {s.desc && (
-                      <Typography variant="body2" color="text.secondary">
-                        {s.desc}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            )
-          })}
-        </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )
+            })}
+          </Grid>
+        )}
       </Box>
     </PageContainer>
   )
