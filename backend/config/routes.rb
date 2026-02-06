@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   get "sitemap.xml" => "sitemaps#show"
   get "articles" => "articles#index"
+  get "metrics" => "metrics#show"
 
   # Defines the root path route ("/")
   # root "posts#index"
