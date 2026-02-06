@@ -1,5 +1,6 @@
 import useSWR from "swr"
 import type { Article } from "../types/article"
+import { API_BASE } from "../lib/apiBase"
 
 type ProxyArticle = {
   id: string
@@ -26,7 +27,7 @@ const fetcher = async (url: string): Promise<Article[]> => {
 }
 
 export function useArticles() {
-  return useSWR<Article[]>("https://api.masusono.com/articles", fetcher, {
+  return useSWR<Article[]>(`${API_BASE}/articles`, fetcher, {
     revalidateOnFocus: false,
   })
 }
