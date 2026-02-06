@@ -21,11 +21,9 @@ describe("Podcast", () => {
     expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
     expect(screen.getByText("Episode 001")).toBeInTheDocument()
     const audio = screen.getByLabelText("エピソード音声: プライベートとか普通とかの話")
+    expect(audio).toHaveAttribute("src", "https://storage.googleapis.com/masusono-podcast/001.mp3")
     expect(audio).toHaveAttribute("preload", "metadata")
     expect(audio).toHaveAttribute("playsinline")
-    const source = audio.querySelector("source")
-    expect(source).toHaveAttribute("src", "https://storage.googleapis.com/masusono-podcast/001.mp3")
-    expect(source).toHaveAttribute("type", "audio/mpeg")
     expect(usePageMetaMock).toHaveBeenCalledWith({
       title: "ポッドキャスト",
       description: "増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします。",

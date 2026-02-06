@@ -41,16 +41,17 @@ export default function Podcast() {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               Episode {episode.id}
             </Typography>
-            <audio
+            <Box
+              component="audio"
               controls
               preload="metadata"
               playsInline
+              src={episode.audioUrl}
               aria-label={`エピソード音声: ${episode.title}`}
-              style={{ width: "100%" }}
+              sx={{ width: "100%" }}
             >
-              <source src={episode.audioUrl} type="audio/mpeg" />
               お使いのブラウザでは音声再生に対応していません。
-            </audio>
+            </Box>
           </Box>
         ))}
       </Box>
