@@ -26,7 +26,7 @@ RSpec.describe Podcast do
           {
             "id" => "001",
             "title" => "テスト回",
-            "publishedAt" => "2026-02-07T17:04:12.291Z",
+            "publishedAt" => "2026/02/07",
             "audioUrl" => "https://example.com/podcast/001.mp3"
           }
         ]

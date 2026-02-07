@@ -8,7 +8,7 @@ class Article
 
       {
         id: article["id"],
-        publishedAt: article["publishedAt"],
+        publishedAt: PublishedAtFormatter.format(article["publishedAt"]),
         title: article["title"],
         content: article["content"],
         author: author

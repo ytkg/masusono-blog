@@ -5,7 +5,7 @@ class Podcast
     podcasts.map do |podcast|
       podcast_id = podcast["no"].to_s
       title = podcast["title"]
-      published_at = podcast["publishedAt"]
+      published_at = PublishedAtFormatter.format(podcast["publishedAt"])
       audio_url = podcast["audioUrl"]
 
       {
