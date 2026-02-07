@@ -3,7 +3,7 @@ import { API_BASE } from "../constants"
 import type { PodcastEpisode } from "../types/podcast"
 
 const fetcher = async (url: string): Promise<PodcastEpisode[]> => {
-  const res = await fetch(url)
+  const res = await fetch(url, { cache: "no-store" })
   if (!res.ok) {
     throw new Error(`APIリクエスト失敗: ${res.status} ${res.statusText}`)
   }
