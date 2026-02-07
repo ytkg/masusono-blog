@@ -13,12 +13,7 @@ interface PodcastEpisodeCardProps {
   error?: unknown
 }
 
-export default function PodcastEpisodeCard({
-  episode,
-  mode = "list",
-  loading,
-  error,
-}: PodcastEpisodeCardProps) {
+export default function PodcastEpisodeCard({ episode, mode = "list", loading, error }: PodcastEpisodeCardProps) {
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
   const headingLevel = mode === "detail" ? "h1" : "h2"

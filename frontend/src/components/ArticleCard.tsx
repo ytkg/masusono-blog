@@ -13,12 +13,7 @@ interface ArticleCardProps {
   error?: unknown
 }
 
-export default function ArticleCard({
-  article,
-  mode = "list",
-  loading,
-  error,
-}: ArticleCardProps) {
+export default function ArticleCard({ article, mode = "list", loading, error }: ArticleCardProps) {
   const isLoading = Boolean(loading)
   const html = article?.content ?? ""
   const author = article?.author ?? "不明"
