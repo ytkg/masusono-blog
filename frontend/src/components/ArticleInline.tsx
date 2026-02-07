@@ -34,9 +34,9 @@ const ArticleTitleLink = styled(RouterLink)<RouterLinkProps>(({ theme }) => ({
 
 export default function ArticleInline({ article, linkTo, linkState, headingLevel = "h2", loading, error }: Props) {
   const isLoading = Boolean(loading)
-  const html = (article?.content ?? article?.body ?? "") || ""
-  const author = article?.author?.name ?? "不明"
-  const date = article?.publishedDate || article?.createdAt || ""
+  const html = article?.content ?? ""
+  const author = article?.author ?? "不明"
+  const date = article?.publishedDate ?? ""
   const hasBody = Boolean(html.trim())
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
 

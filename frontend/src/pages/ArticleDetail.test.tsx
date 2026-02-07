@@ -53,7 +53,7 @@ describe("ArticleDetail", () => {
       title: "テスト記事",
       content: "<p>本文テキスト</p>",
       publishedDate: "2024-01-02",
-      author: { name: "Tester" },
+      author: "Tester",
     }
     useArticleMock.mockReturnValue(createUseArticleResult({ data: article }))
 

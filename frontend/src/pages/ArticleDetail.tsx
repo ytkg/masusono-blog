@@ -19,7 +19,7 @@ export default function ArticleDetail() {
 
   const { data, error, isLoading } = useArticle(articleId, state?.article)
   const article = data ?? state?.article ?? null
-  const textContent = article?.content ?? article?.body ?? ""
+  const textContent = article?.content ?? ""
   const plainText =
     typeof textContent === "string"
       ? textContent
