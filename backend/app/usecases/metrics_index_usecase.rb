@@ -2,7 +2,6 @@ class MetricsIndexUsecase
   include ActiveSupport::NumberHelper
 
   LAUNCH_DATE = Date.new(2025, 10, 5)
-  PODCAST_TOTAL = 0
 
   def self.call
     new.call
@@ -54,7 +53,7 @@ class MetricsIndexUsecase
           "kind" => "single",
           "metric" => {
             "label" => "ポッドキャスト総本数",
-            "value" => format_count(PODCAST_TOTAL, "本")
+            "value" => format_count(podcast_total, "本")
           }
         },
         build_shops_block
@@ -107,6 +106,10 @@ class MetricsIndexUsecase
   def normalize_shop_category(category)
     normalized = category.to_s.strip
     normalized == "" ? "未分類" : normalized
+  end
+
+  def podcast_total
+    Podcast.all.size
   end
 
   def days_since_launch

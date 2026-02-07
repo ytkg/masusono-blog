@@ -31,10 +31,17 @@ RSpec.describe MetricsIndexUsecase do
       ]
     end
 
+    let(:podcasts) do
+      [
+        { "id" => "001" }
+      ]
+    end
+
     before do
       allow(Date).to receive(:current).and_return(Date.new(2025, 10, 10))
       allow(Article).to receive(:all).and_return(articles)
       allow(Shop).to receive(:all).and_return(shops)
+      allow(Podcast).to receive(:all).and_return(podcasts)
     end
 
     let(:blocks) { result[:metrics]["blocks"] }
@@ -97,6 +104,18 @@ RSpec.describe MetricsIndexUsecase do
           { "label" => "居酒屋の件数", "value" => "2 件" },
           { "label" => "ラーメンの件数", "value" => "1 件" }
         )
+      end
+    end
+
+    describe "ポッドキャスト" do
+      let(:podcast_block) { blocks.find { |block| block.dig("metric", "label") == "ポッドキャスト総本数" } }
+
+      it do
+        expect(podcast_block).not_to be_nil
+      end
+
+      it do
+        expect(podcast_block.dig("metric", "value")).to eq("1 本")
       end
     end
   end
