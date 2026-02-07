@@ -1,7 +1,7 @@
 export interface Article {
   id: string
   title: string
-  publishedAt?: string
+  publishedDate?: string
   updatedAt?: string
   createdAt?: string
   content?: string

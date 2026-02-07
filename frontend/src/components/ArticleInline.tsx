@@ -36,7 +36,7 @@ export default function ArticleInline({ article, linkTo, linkState, headingLevel
   const isLoading = Boolean(loading)
   const html = (article?.content ?? article?.body ?? "") || ""
   const author = article?.author?.name ?? "不明"
-  const date = article?.publishedAt || article?.createdAt || ""
+  const date = article?.publishedDate || article?.createdAt || ""
   const hasBody = Boolean(html.trim())
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
 

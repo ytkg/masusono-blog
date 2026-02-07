@@ -4,7 +4,7 @@ import { API_BASE } from "../constants"
 
 type ProxyArticle = {
   id: string
-  publishedAt?: string
+  publishedDate?: string
   title?: string
   content?: string
   author: string | null
@@ -19,7 +19,7 @@ const fetcher = async (url: string): Promise<Article[]> => {
   const body = (await res.json()) as ProxyArticle[]
   return body.map((article) => ({
     id: article.id,
-    publishedAt: article.publishedAt,
+    publishedDate: article.publishedDate,
     title: article.title ?? "",
     content: article.content,
     author: article.author ? { name: article.author } : undefined,

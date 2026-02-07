@@ -53,7 +53,7 @@ export default function PodcastEpisodesList() {
             {episode.title}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            {`${episode.publishedAt} Episode ${episode.id}`}
+            {`${episode.publishedDate} Episode ${episode.id}`}
           </Typography>
           <Box
             component="audio"

@@ -52,7 +52,7 @@ describe("ArticlesList", () => {
 
   it("記事がある場合はリストを表示する", () => {
     const articles: Article[] = [
-      { id: "1", title: "初めての投稿", content: "本文", author: { name: "Masuda" }, publishedAt: "2024-01-01" },
+      { id: "1", title: "初めての投稿", content: "本文", author: { name: "Masuda" }, publishedDate: "2024-01-01" },
     ]
     useArticlesMock.mockReturnValue(createUseArticlesResult({ data: articles }))
 

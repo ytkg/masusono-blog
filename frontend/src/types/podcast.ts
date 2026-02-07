@@ -1,6 +1,6 @@
 export type PodcastEpisode = {
   id: string
   title: string
-  publishedAt: string
+  publishedDate: string
   audioUrl: string
 }

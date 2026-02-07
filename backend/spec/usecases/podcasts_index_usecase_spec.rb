@@ -9,7 +9,7 @@ RSpec.describe PodcastsIndexUsecase do
         {
           "id" => "001",
           "title" => "テスト回",
-          "publishedAt" => "2026/02/07",
+          "publishedDate" => "2026/02/07",
           "audioUrl" => "https://example.com/podcast/001.mp3"
         }
       ]

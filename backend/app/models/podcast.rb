@@ -11,7 +11,7 @@ class Podcast
       {
         "id" => podcast_id,
         "title" => title,
-        "publishedAt" => published_at,
+        "publishedDate" => published_at,
         "audioUrl" => audio_url
       }
     end

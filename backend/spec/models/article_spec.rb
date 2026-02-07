@@ -32,14 +32,14 @@ RSpec.describe Article do
         [
           {
             id: "first",
-            publishedAt: "2025/10/05",
+            publishedDate: "2025/10/05",
             title: "first title",
             content: "<p>first body</p>",
             author: "増田太郎"
           },
           {
             id: "second",
-            publishedAt: "2025/10/06",
+            publishedDate: "2025/10/06",
             title: "second title",
             content: "<p>second body</p>",
             author: nil

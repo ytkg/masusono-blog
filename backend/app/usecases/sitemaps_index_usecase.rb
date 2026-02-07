@@ -45,7 +45,7 @@ class SitemapsIndexUsecase
 
       {
         loc: "#{BASE_URL}/blog/#{id}",
-        lastmod: article[:publishedAt],
+        lastmod: article[:publishedDate],
         changefreq: BLOG_ENTRY[:changefreq],
         priority: BLOG_ENTRY[:priority]
       }
