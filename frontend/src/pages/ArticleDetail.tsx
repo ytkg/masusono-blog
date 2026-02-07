@@ -1,6 +1,6 @@
 import { Navigate, useLocation, useParams, Link as RouterLink } from "react-router-dom"
 import PageContainer from "../components/PageContainer"
-import ArticleInline from "../components/ArticleInline"
+import ArticleCard from "../components/ArticleCard"
 import Typography from "@mui/material/Typography"
 import Link from "@mui/material/Link"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
@@ -44,7 +44,7 @@ export default function ArticleDetail() {
       <Typography variant="h5" component="h2" gutterBottom>
         ブログ
       </Typography>
-      <ArticleInline article={article ?? undefined} headingLevel="h1" loading={isLoading} error={error} />
+      <ArticleCard article={article ?? undefined} mode="detail" loading={isLoading} error={error} />
       <Link
         component={RouterLink}
         to="/blog"

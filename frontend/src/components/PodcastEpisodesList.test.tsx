@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import PodcastEpisodesList from "./PodcastEpisodesList"
 import { usePodcasts } from "../hooks/usePodcasts"
@@ -28,7 +29,11 @@ describe("PodcastEpisodesList", () => {
   it("ロード中はスケルトンを表示する", () => {
     usePodcastsMock.mockReturnValue(createUsePodcastsResult({ isLoading: true }))
 
-    const { container } = render(<PodcastEpisodesList />)
+    const { container } = render(
+      <MemoryRouter>
+        <PodcastEpisodesList />
+      </MemoryRouter>,
+    )
 
     expect(container.querySelectorAll(".MuiSkeleton-root").length).toBeGreaterThan(0)
   })
@@ -36,7 +41,11 @@ describe("PodcastEpisodesList", () => {
   it("エラー時はメッセージを表示する", () => {
     usePodcastsMock.mockReturnValue(createUsePodcastsResult({ error: new Error("API error") }))
 
-    render(<PodcastEpisodesList />)
+    render(
+      <MemoryRouter>
+        <PodcastEpisodesList />
+      </MemoryRouter>,
+    )
 
     expect(screen.getByText("エピソードの取得に失敗しました: API error")).toBeInTheDocument()
   })
@@ -44,7 +53,11 @@ describe("PodcastEpisodesList", () => {
   it("空配列のときは空状態メッセージを表示する", () => {
     usePodcastsMock.mockReturnValue(createUsePodcastsResult({ data: [] }))
 
-    render(<PodcastEpisodesList />)
+    render(
+      <MemoryRouter>
+        <PodcastEpisodesList />
+      </MemoryRouter>,
+    )
 
     expect(screen.getByText("エピソードがありません。")).toBeInTheDocument()
   })
@@ -60,9 +73,14 @@ describe("PodcastEpisodesList", () => {
     ]
     usePodcastsMock.mockReturnValue(createUsePodcastsResult({ data: episodes }))
 
-    render(<PodcastEpisodesList />)
+    render(
+      <MemoryRouter>
+        <PodcastEpisodesList />
+      </MemoryRouter>,
+    )
 
     expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "プライベートとか普通とかの話" })).toHaveAttribute("href", "/podcast/001")
     expect(screen.getByText("2026/02/07 Episode 001")).toBeInTheDocument()
     expect(screen.getByLabelText("エピソード音声: プライベートとか普通とかの話")).toHaveAttribute(
       "src",

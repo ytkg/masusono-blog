@@ -11,6 +11,7 @@ import Home from "./pages/Home"
 import ScrollRestoration from "./components/ScrollRestoration"
 import ArticleDetail from "./pages/ArticleDetail"
 import About from "./pages/About"
+import PodcastDetail from "./pages/PodcastDetail"
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/blog/:articleId" element={<ArticleDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/podcast" element={<Podcast />} />
+          <Route path="/podcast/:episodeId" element={<PodcastDetail />} />
           <Route path="/shops" element={<Shops />} />
         </Routes>
         {/* ページ毎の固有要素は各ページ側で配置 */}
