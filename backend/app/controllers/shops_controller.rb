@@ -1,5 +1,6 @@
 class ShopsController < ApplicationController
   def index
-    render json: Shop.all
+    result = ShopsIndexUsecase.call
+    render json: result[:shops]
   end
 end
