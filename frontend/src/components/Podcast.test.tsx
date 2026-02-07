@@ -19,7 +19,7 @@ describe("Podcast", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "ポッドキャスト" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
-    expect(screen.getByText("Episode 001")).toBeInTheDocument()
+    expect(screen.getByText("2026/02/07 Episode 001")).toBeInTheDocument()
     const audio = screen.getByLabelText("エピソード音声: プライベートとか普通とかの話")
     expect(audio).toHaveAttribute("src", "https://storage.googleapis.com/masusono-podcast/001.mp3")
     expect(audio).toHaveAttribute("preload", "metadata")

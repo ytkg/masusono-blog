@@ -7,6 +7,7 @@ const episodes = [
   {
     id: "001",
     title: "プライベートとか普通とかの話",
+    publishedAt: "2026/02/07",
     audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3",
   },
 ] as const
@@ -39,7 +40,7 @@ export default function Podcast() {
               {episode.title}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Episode {episode.id}
+              {`${episode.publishedAt} Episode ${episode.id}`}
             </Typography>
             <Box
               component="audio"
