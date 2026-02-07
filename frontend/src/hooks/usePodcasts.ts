@@ -11,7 +11,7 @@ const fetcher = async (url: string): Promise<PodcastEpisode[]> => {
 }
 
 export function usePodcasts() {
-  return useSWR<PodcastEpisode[]>(`${API_BASE}/podcasts`, fetcher, {
+  return useSWR<PodcastEpisode[]>(`${API_BASE}/podcasts.json`, fetcher, {
     revalidateOnFocus: false,
   })
 }

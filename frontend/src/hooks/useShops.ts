@@ -11,7 +11,7 @@ const fetcher = async (url: string): Promise<Shop[]> => {
 }
 
 export function useShops() {
-  return useSWR<Shop[]>(`${API_BASE}/shops`, fetcher, {
+  return useSWR<Shop[]>(`${API_BASE}/shops.json`, fetcher, {
     revalidateOnFocus: false,
   })
 }

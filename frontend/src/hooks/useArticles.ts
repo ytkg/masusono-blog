@@ -27,7 +27,7 @@ const fetcher = async (url: string): Promise<Article[]> => {
 }
 
 export function useArticles() {
-  return useSWR<Article[]>(`${API_BASE}/articles`, fetcher, {
+  return useSWR<Article[]>(`${API_BASE}/articles.json`, fetcher, {
     revalidateOnFocus: false,
   })
 }

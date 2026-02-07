@@ -48,6 +48,7 @@ This agent must execute the following steps **before starting any task**, regard
 - Compose sets `INSTALL_DEV_TOOLS=1` so native gems can compile during `bundle install`.
 - Cloud Run expects the app to listen on `$PORT` (default 8080); `backend/Dockerfile` uses `${PORT:-8080}`.
 - Current focus is API replacement; frontend is hosted separately (not served by Rails).
+- For frontend API calls, prefer explicit JSON endpoints (`/articles.json`, `/metrics.json`, `/shops.json`, `/podcasts.json`).
 - `/articles` returns article summaries from microCMS (expects credentials `microcms.api_key`; endpoint is hardcoded).
 - microCMS fetch uses Faraday.
 - `/sitemap.xml` is generated from static routes plus microCMS articles.

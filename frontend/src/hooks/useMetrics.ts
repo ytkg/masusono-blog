@@ -11,7 +11,7 @@ const fetcher = async (url: string): Promise<MetricsResponse> => {
 }
 
 export function useMetrics() {
-  return useSWR<MetricsResponse>(`${API_BASE}/metrics`, fetcher, {
+  return useSWR<MetricsResponse>(`${API_BASE}/metrics.json`, fetcher, {
     revalidateOnFocus: false,
   })
 }
