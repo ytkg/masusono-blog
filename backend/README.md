@@ -1,24 +1,40 @@
-# masusono-blog backend
+# masusono-blog バックエンド
 
-Rails API backend for masusono-blog.
+masusono-blog の Rails API バックエンドです。
 
-## Local development
+## ローカル開発
 
-Run from `backend/`:
+`backend/` で実行します:
 
 ```bash
 docker compose up --build
 ```
 
-## Deploy to Cloud Run
+## APIエンドポイント
 
-Use the deployment script from `backend/`:
+- `GET /articles.json`
+- `GET /metrics.json`
+- `GET /podcasts.json`
+- `GET /shops.json`
+- `GET /sitemap.xml`
+
+## テスト
+
+`backend/` で実行します:
+
+```bash
+bundle exec rspec
+```
+
+## Cloud Run へのデプロイ
+
+`backend/` でデプロイスクリプトを実行します:
 
 ```bash
 ./deploy.sh
 ```
 
-`deploy.sh` runs:
+`deploy.sh` では以下を実行します:
 
 ```bash
 gcloud run deploy masusono \
@@ -29,7 +45,7 @@ gcloud run deploy masusono \
   --set-env-vars RAILS_MASTER_KEY=$(cat config/master.key)
 ```
 
-Prerequisites:
+前提条件:
 
-- `gcloud` CLI is installed and authenticated.
-- `config/master.key` exists.
+- `gcloud` CLI がインストール済みで、認証済みであること
+- `config/master.key` が存在すること

@@ -46,6 +46,7 @@ npm start
 
 - 開発環境: `http://localhost:3000`
 - ステージング環境・本番環境: `https://api.masusono.com`
+- APIパスは明示的に `.json` を付けます（例: `/articles.json`, `/metrics.json`, `/shops.json`, `/podcasts.json`）。
 
 ### テスト / ビルド
 

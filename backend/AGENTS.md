@@ -64,6 +64,7 @@ This agent must execute the following steps **before starting any task**, regard
 - Keep shared stubs in an outer `before`; in nested `context`s, override only differing parts via `let`.
 - If return values/errors are asserted, avoid extra interaction assertions like `have_received` or `have_been_made`.
 - Values used only inside `before` should be local variables in `before`; use `let` for overridable test data.
+- For model specs that depend on external APIs, use WebMock and keep network calls disabled.
 
 ## Skills
 A skill is a set of local instructions to follow that is stored in a `SKILL.md` file. Below is the list of skills that can be used. Each entry includes a name, description, and file path so you can open the source for full instructions when using a specific skill.
