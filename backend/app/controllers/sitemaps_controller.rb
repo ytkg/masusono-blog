@@ -11,7 +11,7 @@ class SitemapsController < ApplicationController
     { path: "/blog", changefreq: "weekly", priority: 0.8 },
     { path: "/about", changefreq: "monthly", priority: 0.7 },
     { path: "/podcast", changefreq: "weekly", priority: 0.8 },
-    { path: "/shops", changefreq: "weekly", priority: 0.8 },
+    { path: "/shops", changefreq: "weekly", priority: 0.8 }
   ].freeze
 
   def index
@@ -38,7 +38,7 @@ class SitemapsController < ApplicationController
       {
         loc: "#{base_url}#{entry[:path]}",
         changefreq: entry[:changefreq],
-        priority: entry[:priority],
+        priority: entry[:priority]
       }
     end
   end
@@ -52,7 +52,7 @@ class SitemapsController < ApplicationController
         loc: "#{base_url}/blog/#{id}",
         lastmod: article["publishedAt"],
         changefreq: BLOG_ENTRY[:changefreq],
-        priority: BLOG_ENTRY[:priority],
+        priority: BLOG_ENTRY[:priority]
       }
     end
   end
@@ -60,7 +60,7 @@ class SitemapsController < ApplicationController
   def serialize_entries(entries)
     lines = [
       '<?xml version="1.0" encoding="UTF-8"?>',
-      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     ]
 
     entries.each do |entry|

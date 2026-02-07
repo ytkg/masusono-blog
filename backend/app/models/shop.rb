@@ -6,7 +6,7 @@ class Shop
       "lng" => 139.56593645767256,
       "category" => "居酒屋",
       "url" => "https://maps.app.goo.gl/9C6Qtp6QuQgFPCL76",
-      "desc" => "うまい",
+      "desc" => "うまい"
     },
     {
       "name" => "たなか青空笑店",
@@ -14,7 +14,7 @@ class Shop
       "lng" => 139.55626931570987,
       "category" => "ラーメン",
       "url" => "https://maps.app.goo.gl/eea5T7TdLXzWfbKR6",
-      "desc" => "店主の田中さんが作る煮干しラーメン、タナニボ。",
+      "desc" => "店主の田中さんが作る煮干しラーメン、タナニボ。"
     },
     {
       "name" => "四文屋 新井薬師本店",
@@ -22,7 +22,7 @@ class Shop
       "lng" => 139.6712455122299,
       "category" => "居酒屋",
       "url" => "https://maps.app.goo.gl/mwpZwHzWDA4T6EoX8",
-      "desc" => "うまい",
+      "desc" => "うまい"
     },
     {
       "name" => "地鶏割烹 おはじき新宿店",
@@ -30,8 +30,8 @@ class Shop
       "lng" => 139.69791526359788,
       "category" => "居酒屋",
       "url" => "https://maps.app.goo.gl/8nGeBjzDgkm34fyk6",
-      "desc" => "うまい",
-    },
+      "desc" => "うまい"
+    }
   ].freeze
 
   def self.all

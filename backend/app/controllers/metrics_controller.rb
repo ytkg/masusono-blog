@@ -24,7 +24,7 @@ class MetricsController < ApplicationController
       [
         name.include?("増田") ? 0 : 1,
         -data[:articles],
-        name,
+        name
       ]
     end
     author_article_children = author_rows.map do |name, data|
@@ -39,8 +39,8 @@ class MetricsController < ApplicationController
           "kind" => "single",
           "metric" => {
             "label" => "増田とその他！始動から（#{LAUNCH_DATE.strftime('%Y/%m/%d')}〜）",
-            "value" => "#{days_since_launch} 日",
-          },
+            "value" => "#{days_since_launch} 日"
+          }
         },
         {
           "kind" => "group",
@@ -49,24 +49,24 @@ class MetricsController < ApplicationController
             {
               "label" => "総記事数",
               "value" => format_count(totals[:articles], "本"),
-              "children" => author_article_children,
+              "children" => author_article_children
             },
             {
               "label" => "総文字数",
               "value" => format_count(totals[:chars], "字"),
-              "children" => author_char_children,
-            },
-          ],
+              "children" => author_char_children
+            }
+          ]
         },
         {
           "kind" => "single",
           "metric" => {
             "label" => "ポッドキャスト総本数",
-            "value" => format_count(PODCAST_TOTAL, "本"),
-          },
+            "value" => format_count(PODCAST_TOTAL, "本")
+          }
         },
-        build_shops_block,
-      ],
+        build_shops_block
+      ]
     }
   end
 
@@ -74,7 +74,7 @@ class MetricsController < ApplicationController
     totals = {
       articles: 0,
       chars: 0,
-      authors: Hash.new { |hash, key| hash[key] = { articles: 0, chars: 0 } },
+      authors: Hash.new { |hash, key| hash[key] = { articles: 0, chars: 0 } }
     }
 
     articles.each do |article|
@@ -106,9 +106,9 @@ class MetricsController < ApplicationController
         {
           "label" => "総件数",
           "value" => format_count(shops.size, "件"),
-          "children" => children,
-        },
-      ],
+          "children" => children
+        }
+      ]
     }
   end
 

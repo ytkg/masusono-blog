@@ -60,7 +60,7 @@ module Microcms
           "publishedAt" => content["publishedAt"],
           "title" => content["title"],
           "content" => content["content"],
-          "author" => author,
+          "author" => author
         }
       end
     end
@@ -70,7 +70,7 @@ module Microcms
       {
         total_count: json["totalCount"],
         limit: json["limit"],
-        offset: json["offset"],
+        offset: json["offset"]
       }
     rescue JSON::ParserError
       {}
