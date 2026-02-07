@@ -1,14 +1,19 @@
 class Podcast
-  ALL = [
-    {
-      "id" => "001",
-      "title" => "プライベートとか普通とかの話",
-      "publishedAt" => "2026/02/07",
-      "audioUrl" => "https://storage.googleapis.com/masusono-podcast/001.mp3"
-    }
-  ].freeze
-
   def self.all
-    ALL
+    podcasts = Microcms::FetchPodcastsService.execute
+
+    podcasts.map do |podcast|
+      podcast_id = podcast["no"].to_s
+      title = podcast["title"]
+      published_at = podcast["publishedAt"]
+      audio_url = podcast["audioUrl"]
+
+      {
+        "id" => podcast_id,
+        "title" => title,
+        "publishedAt" => published_at,
+        "audioUrl" => audio_url
+      }
+    end
   end
 end
