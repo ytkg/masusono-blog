@@ -7,6 +7,10 @@ vi.mock("../hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 
+vi.mock("./PodcastEpisodesList", () => ({
+  default: () => <div data-testid="podcast-episodes-list" />,
+}))
+
 const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageMeta>
 
 describe("Podcast", () => {
@@ -14,16 +18,11 @@ describe("Podcast", () => {
     vi.clearAllMocks()
   })
 
-  it("メタ情報を設定し、公開済みエピソードを表示する", () => {
+  it("ページメタを設定し、エピソード一覧を表示する", () => {
     render(<Podcast />)
 
     expect(screen.getByRole("heading", { level: 1, name: "ポッドキャスト" })).toBeInTheDocument()
-    expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
-    expect(screen.getByText("2026/02/07 Episode 001")).toBeInTheDocument()
-    const audio = screen.getByLabelText("エピソード音声: プライベートとか普通とかの話")
-    expect(audio).toHaveAttribute("src", "https://storage.googleapis.com/masusono-podcast/001.mp3")
-    expect(audio).toHaveAttribute("preload", "metadata")
-    expect(audio).toHaveAttribute("playsinline")
+    expect(screen.getByTestId("podcast-episodes-list")).toBeInTheDocument()
     expect(usePageMetaMock).toHaveBeenCalledWith({
       title: "ポッドキャスト",
       description: "増田とその他！のポッドキャスト情報。番組のアーカイブや最新エピソードをお届けします。",

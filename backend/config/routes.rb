@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get "sitemap.xml", to: "sitemaps#index"
   resources :articles, only: :index
   resources :metrics, only: :index
+  resources :podcasts, only: :index
   resources :shops, only: :index
 
   # Defines the root path route ("/")
