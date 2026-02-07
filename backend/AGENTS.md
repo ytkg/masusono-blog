@@ -22,6 +22,9 @@ This agent must execute the following steps **before starting any task**, regard
 
 - Only after the pre-task action is fully completed, the agent may proceed with the user’s instruction.
 - All responses must be written in **concise and polite Japanese** unless the user requests otherwise.
+- For backend code changes, always run both lint and tests before reporting completion:
+  - `RUBOCOP_CACHE_ROOT=tmp/rubocop_cache ~/.rbenv/shims/bundle exec rubocop`
+  - `~/.rbenv/shims/bundle exec rspec`
 
 ---
 

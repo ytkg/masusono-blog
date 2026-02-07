@@ -2,8 +2,22 @@ require "faraday"
 require "json"
 
 module Microcms
-  class ArticlesClient
+  class FetchArticlesService
     MICROCMS_ARTICLES_ENDPOINT = "https://masusono.microcms.io/api/v1/articles".freeze
+
+    class FetchError < StandardError
+      attr_reader :status, :body
+
+      def initialize(status:, body:)
+        @status = status
+        @body = body
+        super("microCMS request failed: status=#{status}, body=#{body}")
+      end
+    end
+
+    def self.execute(api_key: nil, faraday: nil, response: nil)
+      new(api_key: api_key, faraday: faraday).execute(response: response)
+    end
 
     def initialize(api_key: nil, faraday: nil)
       @api_key = api_key || Rails.application.credentials.dig(:microcms, :api_key)
@@ -15,6 +29,27 @@ module Microcms
       end
     end
 
+    def execute(response: nil)
+      initial_response = response || self.response
+      raise_on_error!(initial_response)
+
+      articles = parse_articles(initial_response.body)
+      meta = parse_meta(initial_response.body)
+      return articles unless pageable?(meta)
+
+      total_count = meta[:total_count]
+      limit = meta[:limit]
+      offset = meta[:offset]
+      while offset + limit < total_count
+        offset += limit
+        res = fetch_response(limit: limit, offset: offset)
+        raise_on_error!(res)
+        articles.concat(parse_articles(res.body))
+      end
+
+      articles
+    end
+
     def response
       @response ||= fetch_response
     end
@@ -24,28 +59,6 @@ module Microcms
         req.headers["X-API-KEY"] = api_key
         req.headers["Accept"] = "application/json"
       end
-    end
-
-    def articles
-      parse_articles(response.body)
-    end
-
-    def all_articles(response: nil)
-      initial_response = response || fetch_response
-      articles = parse_articles(initial_response.body)
-      meta = parse_meta(initial_response.body)
-      total_count = meta[:total_count]
-      limit = meta[:limit]
-      offset = meta[:offset]
-      return articles unless total_count.is_a?(Integer) && limit.is_a?(Integer) && offset.is_a?(Integer)
-
-      while offset + limit < total_count
-        offset += limit
-        res = fetch_response(limit: limit, offset: offset)
-        articles.concat(parse_articles(res.body))
-      end
-
-      articles
     end
 
     def parse_articles(body)
@@ -79,6 +92,18 @@ module Microcms
     private
 
     attr_reader :api_key, :faraday
+
+    def raise_on_error!(response)
+      return if response.success?
+
+      raise FetchError.new(status: response.status, body: response.body)
+    end
+
+    def pageable?(meta)
+      meta[:total_count].is_a?(Integer) &&
+        meta[:limit].is_a?(Integer) &&
+        meta[:offset].is_a?(Integer)
+    end
 
     def microcms_uri(limit:, offset:)
       uri = URI(MICROCMS_ARTICLES_ENDPOINT)
