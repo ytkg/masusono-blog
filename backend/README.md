@@ -1,24 +1,35 @@
-# README
+# masusono-blog backend
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Rails API backend for masusono-blog.
 
-Things you may want to cover:
+## Local development
 
-* Ruby version
+Run from `backend/`:
 
-* System dependencies
+```bash
+docker compose up --build
+```
 
-* Configuration
+## Deploy to Cloud Run
 
-* Database creation
+Use the deployment script from `backend/`:
 
-* Database initialization
+```bash
+./deploy.sh
+```
 
-* How to run the test suite
+`deploy.sh` runs:
 
-* Services (job queues, cache servers, search engines, etc.)
+```bash
+gcloud run deploy masusono \
+  --source . \
+  --project masusono \
+  --region asia-northeast1 \
+  --allow-unauthenticated \
+  --set-env-vars RAILS_MASTER_KEY=$(cat config/master.key)
+```
 
-* Deployment instructions
+Prerequisites:
 
-* ...
+- `gcloud` CLI is installed and authenticated.
+- `config/master.key` exists.
