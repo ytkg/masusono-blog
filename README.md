@@ -2,6 +2,31 @@
 
 このリポジトリは `backend` と `frontend` の2ディレクトリ構成です。
 
+## アーキテクチャ図
+
+```mermaid
+flowchart LR
+    U[ユーザー / ブラウザ]
+    subgraph FE["Frontend"]
+        direction TB
+        subgraph CFW["Cloudflare Workers Assets"]
+            direction TB
+            F[React + TypeScript + Vite]
+        end
+    end
+
+    subgraph BE["Backend API"]
+        direction TB
+        subgraph CR["Cloud Run"]
+            direction TB
+            B[Ruby on Rails]
+        end
+    end
+
+    U --> F
+    F --> B
+```
+
 ## ディレクトリ構成
 
 - `backend`: Rails API
