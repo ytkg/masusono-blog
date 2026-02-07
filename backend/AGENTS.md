@@ -55,6 +55,12 @@ This agent must execute the following steps **before starting any task**, regard
 - Prefer rbenv shims for Ruby/Rails/Bundler (e.g. `~/.rbenv/shims/rails`); avoid `/usr/bin/rails`.
 - No DB service is configured yet; compose is app-only for now.
 
+## 5. Test Coding Rules
+
+- In RSpec usecase specs, place mocks/stubs (e.g. `allow(...).to receive(...)`) in a `before` block by default.
+- In RSpec usecase specs, define `subject(:result) { described_class.call }` and use `result` in expectations.
+- In RSpec, omit `it` descriptions when the expectation is obvious from the code.
+
 ## Skills
 A skill is a set of local instructions to follow that is stored in a `SKILL.md` file. Below is the list of skills that can be used. Each entry includes a name, description, and file path so you can open the source for full instructions when using a specific skill.
 ### Available skills

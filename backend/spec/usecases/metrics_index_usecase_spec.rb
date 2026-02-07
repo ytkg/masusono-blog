@@ -1,0 +1,103 @@
+require "rails_helper"
+
+RSpec.describe MetricsIndexUsecase do
+  describe ".call" do
+    subject(:result) { described_class.call }
+
+    let(:articles) do
+      [
+        {
+          "id" => "first",
+          "publishedAt" => "2025-10-05T00:00:00.000Z",
+          "title" => "first title",
+          "content" => "<p>abc</p>",
+          "author" => "増田太郎"
+        },
+        {
+          "id" => "second",
+          "publishedAt" => "2025-10-06T00:00:00.000Z",
+          "title" => "second title",
+          "content" => "de",
+          "author" => nil
+        }
+      ]
+    end
+
+    let(:shops) do
+      [
+        { "category" => "居酒屋" },
+        { "category" => "居酒屋" },
+        { "category" => "ラーメン" }
+      ]
+    end
+
+    before do
+      allow(Date).to receive(:current).and_return(Date.new(2025, 10, 10))
+      allow(Article).to receive(:all).and_return(articles)
+      allow(Shop).to receive(:all).and_return(shops)
+    end
+
+    let(:blocks) { result[:metrics]["blocks"] }
+
+    describe "起算日" do
+      it do
+        expect(blocks.first).to eq(
+          {
+            "kind" => "single",
+            "metric" => {
+              "label" => "増田とその他！始動から（2025/10/05〜）",
+              "value" => "5 日"
+            }
+          }
+        )
+      end
+    end
+
+    describe "ブログ" do
+      let(:blog_block) { blocks.find { |block| block["label"] == "ブログ" } }
+      let(:groups) { blog_block["groups"] }
+
+      it do
+        expect(blog_block).not_to be_nil
+      end
+
+      it do
+        total_articles = groups.find { |group| group["label"] == "総記事数" }
+
+        expect(total_articles["value"]).to eq("2 本")
+        expect(total_articles["children"]).to include(
+          { "label" => "増田太郎の総記事数", "value" => "1 本" },
+          { "label" => "不明の総記事数", "value" => "1 本" }
+        )
+      end
+
+      it do
+        total_chars = groups.find { |group| group["label"] == "総文字数" }
+
+        expect(total_chars["value"]).to eq("5 字")
+        expect(total_chars["children"]).to include(
+          { "label" => "増田太郎の総文字数", "value" => "3 字" },
+          { "label" => "不明の総文字数", "value" => "2 字" }
+        )
+      end
+    end
+
+    describe "推し店" do
+      let(:shops_block) { blocks.find { |block| block["label"] == "推し店" } }
+
+      it do
+        expect(shops_block).not_to be_nil
+      end
+
+      it do
+        total_shops = shops_block["groups"].first
+
+        expect(total_shops["value"]).to eq("3 件")
+        expect(total_shops["children"]).to include(
+          { "label" => "居酒屋の件数", "value" => "2 件" },
+          { "label" => "ラーメンの件数", "value" => "1 件" }
+        )
+      end
+    end
+  end
+end
