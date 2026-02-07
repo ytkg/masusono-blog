@@ -14,7 +14,7 @@ class SitemapsController < ApplicationController
     { path: "/shops", changefreq: "weekly", priority: 0.8 },
   ].freeze
 
-  def show
+  def index
     response = microcms_client.response
     return render_microcms_error(response) unless response.success?
 

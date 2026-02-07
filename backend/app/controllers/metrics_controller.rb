@@ -5,7 +5,7 @@ class MetricsController < ApplicationController
   LAUNCH_DATE = Date.new(2025, 10, 5)
   PODCAST_TOTAL = 0
 
-  def show
+  def index
     response = microcms_client.response
     return render_microcms_error(response) unless response.success?
 
