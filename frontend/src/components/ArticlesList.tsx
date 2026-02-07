@@ -15,7 +15,7 @@ export default function ArticlesList() {
     return (
       <Box sx={{ display: "grid", gap: 2 }}>
         {SKELETON_KEYS.map((key) => (
-          <ContentCardSkeleton key={key} titleWidth="80%" subtitleWidth="40%" />
+          <ContentCardSkeleton key={key} />
         ))}
       </Box>
     )

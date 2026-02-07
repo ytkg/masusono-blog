@@ -2,6 +2,7 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Alert from "@mui/material/Alert"
 import { usePodcasts } from "../hooks/usePodcasts"
+import ContentCardSkeleton from "./ContentCardSkeleton"
 import PodcastEpisodeCard from "./PodcastEpisodeCard"
 
 const SKELETON_COUNT = 3
@@ -14,7 +15,7 @@ export default function PodcastEpisodesList() {
     return (
       <Box sx={{ display: "grid", gap: 2 }}>
         {SKELETON_KEYS.map((key) => (
-          <PodcastEpisodeCard key={key} loading />
+          <ContentCardSkeleton key={key} />
         ))}
       </Box>
     )

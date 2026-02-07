@@ -11,7 +11,7 @@ interface ContentCardSkeletonProps {
 
 export default function ContentCardSkeleton({
   titleWidth = "80%",
-  subtitleWidth,
+  subtitleWidth = "40%",
   mediaHeight,
   sx,
 }: ContentCardSkeletonProps) {
