@@ -40,6 +40,11 @@ This agent must execute the following steps **before starting any task**, regard
 - Dev environment uses Docker Compose at `backend/compose.yml` (run from `backend/`): `docker compose up --build`.
 - `backend/Dockerfile` is shared for development and production; dev uses build args to override envs.
 - Ruby version is pinned to 4.0.1 in `backend/.ruby-version` and `backend/Gemfile`.
+- Running `bundle exec rubocop` on host may fail if host Ruby/Bundler differs (e.g. lockfile requires Bundler 4.0.6 while system Ruby is 2.6.x).
+- Prefer RuboCop in container from `backend/`: `docker compose run --rm backend bundle exec rubocop`.
+- For auto-fix, run: `docker compose run --rm backend bundle exec rubocop -A`.
+- If images are stale or missing gems, retry with build: `docker compose run --rm --build backend bundle exec rubocop`.
+- In sandboxed agent environments, Docker daemon access may require escalation approval.
 - Compose sets `INSTALL_DEV_TOOLS=1` so native gems can compile during `bundle install`.
 - Cloud Run expects the app to listen on `$PORT` (default 8080); `backend/Dockerfile` uses `${PORT:-8080}`.
 - Current focus is API replacement; frontend is hosted separately (not served by Rails).
