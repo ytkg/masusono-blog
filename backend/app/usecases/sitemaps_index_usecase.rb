@@ -40,12 +40,12 @@ class SitemapsIndexUsecase
 
   def article_entries(articles)
     articles.filter_map do |article|
-      id = article["id"]
+      id = article[:id]
       next if id.nil? || id == ""
 
       {
         loc: "#{BASE_URL}/blog/#{id}",
-        lastmod: article["publishedAt"],
+        lastmod: article[:publishedAt],
         changefreq: BLOG_ENTRY[:changefreq],
         priority: BLOG_ENTRY[:priority]
       }

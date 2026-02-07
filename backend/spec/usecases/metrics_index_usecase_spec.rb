@@ -7,18 +7,18 @@ RSpec.describe MetricsIndexUsecase do
     let(:articles) do
       [
         {
-          "id" => "first",
-          "publishedAt" => "2025-10-05T00:00:00.000Z",
-          "title" => "first title",
-          "content" => "<p>abc</p>",
-          "author" => "増田太郎"
+          id: "first",
+          publishedAt: "2025-10-05T00:00:00.000Z",
+          title: "first title",
+          content: "<p>abc</p>",
+          author: "増田太郎"
         },
         {
-          "id" => "second",
-          "publishedAt" => "2025-10-06T00:00:00.000Z",
-          "title" => "second title",
-          "content" => "de",
-          "author" => nil
+          id: "second",
+          publishedAt: "2025-10-06T00:00:00.000Z",
+          title: "second title",
+          content: "de",
+          author: nil
         }
       ]
     end

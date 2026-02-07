@@ -7,25 +7,25 @@ RSpec.describe SitemapsIndexUsecase do
     let(:articles) do
       [
         {
-          "id" => "hello-world",
-          "publishedAt" => "2025-10-05T12:34:56+09:00",
-          "title" => "hello world",
-          "content" => "<p>content</p>",
-          "author" => "増田太郎"
+          id: "hello-world",
+          publishedAt: "2025-10-05T12:34:56+09:00",
+          title: "hello world",
+          content: "<p>content</p>",
+          author: "増田太郎"
         },
         {
-          "id" => "broken-date",
-          "publishedAt" => "invalid-date",
-          "title" => "broken date",
-          "content" => "<p>content</p>",
-          "author" => "増田太郎"
+          id: "broken-date",
+          publishedAt: "invalid-date",
+          title: "broken date",
+          content: "<p>content</p>",
+          author: "増田太郎"
         },
         {
-          "id" => nil,
-          "publishedAt" => "2025-10-05T00:00:00.000Z",
-          "title" => "ignored",
-          "content" => "<p>content</p>",
-          "author" => "増田太郎"
+          id: nil,
+          publishedAt: "2025-10-05T00:00:00.000Z",
+          title: "ignored",
+          content: "<p>content</p>",
+          author: "増田太郎"
         }
       ]
     end

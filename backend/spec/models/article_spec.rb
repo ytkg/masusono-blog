@@ -11,7 +11,14 @@ RSpec.describe Article do
           "publishedAt" => "2025-10-05T00:00:00.000Z",
           "title" => "first title",
           "content" => "<p>first body</p>",
-          "author" => "増田太郎"
+          "author" => { "name" => "増田太郎" }
+        },
+        {
+          "id" => "second",
+          "publishedAt" => "2025-10-06T00:00:00.000Z",
+          "title" => "second title",
+          "content" => "<p>second body</p>",
+          "author" => nil
         }
       ]
     end
@@ -21,7 +28,24 @@ RSpec.describe Article do
     end
 
     it do
-      expect(result).to eq(articles)
+      expect(result).to eq(
+        [
+          {
+            id: "first",
+            publishedAt: "2025-10-05T00:00:00.000Z",
+            title: "first title",
+            content: "<p>first body</p>",
+            author: "増田太郎"
+          },
+          {
+            id: "second",
+            publishedAt: "2025-10-06T00:00:00.000Z",
+            title: "second title",
+            content: "<p>second body</p>",
+            author: nil
+          }
+        ]
+      )
     end
   end
 end

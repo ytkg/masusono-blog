@@ -69,12 +69,12 @@ class MetricsIndexUsecase
     }
 
     articles.each do |article|
-      content = article["content"].to_s
+      content = article[:content].to_s
       char_count = strip_html(content).length
       totals[:articles] += 1
       totals[:chars] += char_count
 
-      author_name = article["author"].to_s.strip
+      author_name = article[:author].to_s.strip
       author_name = "不明" if author_name == ""
       totals[:authors][author_name][:articles] += 1
       totals[:authors][author_name][:chars] += char_count

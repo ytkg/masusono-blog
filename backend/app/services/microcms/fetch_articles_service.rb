@@ -66,16 +66,7 @@ module Microcms
       contents = json["contents"]
       return [] unless contents.is_a?(Array)
 
-      contents.map do |content|
-        author = content["author"].is_a?(Hash) ? content["author"]["name"] : nil
-        {
-          "id" => content["id"],
-          "publishedAt" => content["publishedAt"],
-          "title" => content["title"],
-          "content" => content["content"],
-          "author" => author
-        }
-      end
+      contents
     end
 
     def parse_meta(body)

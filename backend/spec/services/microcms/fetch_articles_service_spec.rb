@@ -65,7 +65,7 @@ RSpec.describe Microcms::FetchArticlesService do
               "publishedAt" => "2025-10-05T00:00:00.000Z",
               "title" => "first title",
               "content" => "<p>first body</p>",
-              "author" => "増田太郎"
+              "author" => { "name" => "増田太郎" }
             }
           ]
         )
