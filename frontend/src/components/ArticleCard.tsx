@@ -64,7 +64,7 @@ export default function ArticleCard({
       titleComponent={headingLevel}
       titleTo={linkTo}
       titleState={linkState}
-      meta={`${date} ${author}`}
+      metaParts={[date, author]}
     >
       {hasBody ? (
         <Box

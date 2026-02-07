@@ -59,7 +59,7 @@ export default function PodcastEpisodeCard({
       titleComponent={headingLevel}
       titleTo={linkTo}
       titleState={linkState}
-      meta={`${episode.publishedDate} Episode ${episode.id}`}
+      metaParts={[episode.publishedDate, `Episode ${episode.id}`]}
     >
       <Box
         component="audio"

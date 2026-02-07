@@ -14,6 +14,8 @@ interface ContentItemCardProps {
   titleTo?: string
   titleState?: unknown
   meta?: ReactNode
+  metaParts?: string[]
+  metaSeparator?: string
   metaSx?: SxProps<Theme>
   children: ReactNode
   sx?: SxProps<Theme>
@@ -35,10 +37,15 @@ export default function ContentItemCard({
   titleTo,
   titleState,
   meta,
+  metaParts,
+  metaSeparator = " ",
   metaSx,
   children,
   sx,
 }: ContentItemCardProps) {
+  const normalizedMetaParts = (metaParts ?? []).map((part) => part.trim()).filter((part) => part.length > 0)
+  const resolvedMeta = meta ?? (normalizedMetaParts.length ? normalizedMetaParts.join(metaSeparator) : undefined)
+
   return (
     <ContentCard sx={sx}>
       <Typography
@@ -55,9 +62,9 @@ export default function ContentItemCard({
           title
         )}
       </Typography>
-      {meta ? (
+      {resolvedMeta ? (
         <Typography variant="body2" color="text.secondary" sx={mergeSx({ mb: 2 }, metaSx)}>
-          {meta}
+          {resolvedMeta}
         </Typography>
       ) : null}
       {children}
