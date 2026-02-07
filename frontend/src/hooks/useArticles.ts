@@ -1,6 +1,6 @@
 import useSWR from "swr"
 import type { Article } from "../types/article"
-import { API_BASE } from "../lib/apiBase"
+import { API_BASE } from "../constants"
 
 type ProxyArticle = {
   id: string

@@ -1,6 +1,6 @@
 import useSWR from "swr"
 import type { MetricsResponse } from "../types/metrics"
-import { API_BASE } from "../lib/apiBase"
+import { API_BASE } from "../constants"
 
 const fetcher = async (url: string): Promise<MetricsResponse> => {
   const res = await fetch(url)

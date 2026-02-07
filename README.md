@@ -40,6 +40,13 @@ npm ci
 npm start
 ```
 
+### API接続先
+
+`frontend/src/constants.ts` で固定管理しています。
+
+- 開発環境: `http://localhost:3000`
+- ステージング環境・本番環境: `https://api.masusono.com`
+
 ### テスト / ビルド
 
 ```bash
