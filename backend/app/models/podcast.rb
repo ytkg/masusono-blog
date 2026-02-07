@@ -3,10 +3,10 @@ class Podcast
     podcasts = Microcms::FetchPodcastsService.execute
 
     podcasts.map do |podcast|
-      podcast_id = podcast["no"].to_s
+      audio_url = podcast["audioUrl"]
+      podcast_id = extract_podcast_id(audio_url)
       title = podcast["title"]
       published_at = PublishedAtFormatter.format(podcast["publishedAt"])
-      audio_url = podcast["audioUrl"]
 
       {
         "id" => podcast_id,
@@ -16,4 +16,10 @@ class Podcast
       }
     end
   end
+
+  def self.extract_podcast_id(audio_url)
+    match = audio_url.to_s.match(%r{\Ahttps://storage\.googleapis\.com/masusono-podcast/(?<id>\d+)\.mp3(?:\?.*)?\z})
+    match ? match[:id] : ""
+  end
+  private_class_method :extract_podcast_id
 end
