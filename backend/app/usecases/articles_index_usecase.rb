@@ -17,8 +17,8 @@ class ArticlesIndexUsecase
   def build_article(article)
     {
       id: article[:id],
-      publishedDate: PublishedAtFormatter.format(article[:publishedAt]),
       title: article[:title],
+      publishedDate: PublishedAtFormatter.format(article[:publishedAt]),
       content: article[:content],
       author: extract_author_name(article[:author])
     }

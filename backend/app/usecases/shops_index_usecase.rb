@@ -6,6 +6,20 @@ class ShopsIndexUsecase
   end
 
   def call
-    Result.new(shops: Shop.all)
+    shops = Shop.all.map { |shop| build_shop(shop) }
+    Result.new(shops: shops)
+  end
+
+  private
+
+  def build_shop(shop)
+    {
+      name: shop[:name],
+      category: shop[:category],
+      lat: shop[:lat],
+      lng: shop[:lng],
+      url: shop[:url],
+      desc: shop[:desc]
+    }
   end
 end

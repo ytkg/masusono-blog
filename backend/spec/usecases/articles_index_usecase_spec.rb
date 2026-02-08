@@ -32,20 +32,24 @@ RSpec.describe ArticlesIndexUsecase do
         [
           {
             id: "first",
-            publishedDate: "2025/10/05",
             title: "first title",
+            publishedDate: "2025/10/05",
             content: "<p>first body</p>",
             author: "増田太郎"
           },
           {
             id: "second",
-            publishedDate: "2025/10/06",
             title: "second title",
+            publishedDate: "2025/10/06",
             content: "<p>second body</p>",
             author: nil
           }
         ]
       )
+    end
+
+    it "キー順は id, title, publishedDate, content, author" do
+      expect(result.articles.map(&:keys)).to all(eq(%i[id title publishedDate content author]))
     end
   end
 end
