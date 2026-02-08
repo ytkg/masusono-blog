@@ -3,7 +3,7 @@ import { shouldShowMiniPlayer } from "./miniPlayerVisibility"
 
 describe("shouldShowMiniPlayer", () => {
   it("再生対象エピソードがない場合は非表示にする", () => {
-    expect(shouldShowMiniPlayer({ pathname: "/podcast", currentEpisodeId: null, visibleEpisodeIds: new Set() })).toBe(
+    expect(shouldShowMiniPlayer({ pathname: "/podcast", currentEpisodeId: null, visibleEpisodeId: null })).toBe(
       false,
     )
   })
@@ -13,7 +13,7 @@ describe("shouldShowMiniPlayer", () => {
       shouldShowMiniPlayer({
         pathname: "/blog",
         currentEpisodeId: "001",
-        visibleEpisodeIds: new Set(["001"]),
+        visibleEpisodeId: "001",
       }),
     ).toBe(true)
   })
@@ -23,7 +23,7 @@ describe("shouldShowMiniPlayer", () => {
       shouldShowMiniPlayer({
         pathname: "/podcast",
         currentEpisodeId: "001",
-        visibleEpisodeIds: new Set(["001"]),
+        visibleEpisodeId: "001",
       }),
     ).toBe(false)
   })
@@ -33,7 +33,7 @@ describe("shouldShowMiniPlayer", () => {
       shouldShowMiniPlayer({
         pathname: "/podcast/002",
         currentEpisodeId: "001",
-        visibleEpisodeIds: new Set(["002"]),
+        visibleEpisodeId: null,
       }),
     ).toBe(true)
   })

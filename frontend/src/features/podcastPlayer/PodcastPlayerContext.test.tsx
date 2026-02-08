@@ -49,7 +49,7 @@ function Probe() {
       <output data-testid="status">{player.status}</output>
       <output data-testid="error">{player.error ?? ""}</output>
       <output data-testid="current-time">{String(player.currentTime)}</output>
-      <output data-testid="visible-ids">{Array.from(player.visibleEpisodeIds).join(",")}</output>
+      <output data-testid="visible-episode-id">{player.visibleEpisodeId ?? ""}</output>
     </div>
   )
 }
@@ -193,7 +193,7 @@ describe("PodcastPlayerContext", () => {
       expect(screen.getByTestId("current-episode")).toHaveTextContent("001")
     })
     fireEvent.click(screen.getByRole("button", { name: "visible-on" }))
-    expect(screen.getByTestId("visible-ids")).toHaveTextContent("001")
+    expect(screen.getByTestId("visible-episode-id")).toHaveTextContent("001")
 
     fireEvent.click(screen.getByRole("button", { name: "stop" }))
 
@@ -202,7 +202,7 @@ describe("PodcastPlayerContext", () => {
       expect(screen.getByTestId("is-playing")).toHaveTextContent("false")
       expect(screen.getByTestId("status")).toHaveTextContent("idle")
       expect(screen.getByTestId("current-time")).toHaveTextContent("0")
-      expect(screen.getByTestId("visible-ids")).toHaveTextContent("")
+      expect(screen.getByTestId("visible-episode-id")).toHaveTextContent("")
     })
     expect(pauseSpy).toHaveBeenCalled()
     expect(loadSpy).toHaveBeenCalled()

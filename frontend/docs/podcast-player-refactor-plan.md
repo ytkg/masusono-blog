@@ -15,7 +15,6 @@ frontend/src/features/podcastPlayer/
     miniPlayerVisibility.ts
     miniPlayerVisibility.test.ts
     podcastPlayerState.ts
-    visibleEpisodeState.ts
   hooks/
     usePodcastPlayerController.ts
     usePodcastPlayerAudioEvents.ts
@@ -68,10 +67,17 @@ frontend/src/features/podcastPlayer/
 ## 追加予定ファイル（Issue #65 の後続タスク用）
 
 - `frontend/src/features/podcastPlayer/model/podcastPlayerState.ts`
-- `frontend/src/features/podcastPlayer/model/visibleEpisodeState.ts`
 - `frontend/src/features/podcastPlayer/hooks/usePodcastPlayerController.ts`
 - `frontend/src/features/podcastPlayer/hooks/usePodcastPlayerAudioEvents.ts`
 - `frontend/src/features/podcastPlayer/hooks/useMiniPlayerVisibility.ts`
 - `frontend/src/features/podcastPlayer/lib/formatAudioError.ts`
 
 上記の追加ファイルは、Issue #65 の 2〜7 の作業で段階的に実装する。
+
+## `visibleEpisodeIds` モデルの決定（Issue #65-5）
+
+- 結論: `Set<string>` の `visibleEpisodeIds` は廃止し、`visibleEpisodeId: string | null` に置き換える。
+- 理由:
+- ミニプレイヤー表示判定で必要なのは「再生中エピソードIDが可視かどうか」の1点のみで、複数IDの同時保持は不要。
+- 単一IDにすることで状態モデルと用途が1対1になり、`has()` 判定用の集合管理が不要になる。
+- `setEpisodeVisibility(episodeId, visible)` は維持し、ID一致時のみ解除することで既存UIイベントとの互換を保つ。

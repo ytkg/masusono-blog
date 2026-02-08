@@ -30,7 +30,7 @@ function createPlayerMock(overrides: Partial<ReturnType<typeof usePodcastPlayer>
     duration: 0,
     status: "idle",
     error: null,
-    visibleEpisodeIds: new Set<string>(),
+    visibleEpisodeId: null,
     playEpisode: vi.fn(),
     togglePlayPause: vi.fn(),
     seekTo: vi.fn(),

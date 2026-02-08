@@ -10,7 +10,7 @@ import { shouldShowMiniPlayer } from "@/features/podcastPlayer/miniPlayerVisibil
 
 export default function GlobalPodcastMiniPlayer() {
   const location = useLocation()
-  const { currentEpisode, isPlaying, currentTime, duration, visibleEpisodeIds, togglePlayPause, seekBy, seekTo } =
+  const { currentEpisode, isPlaying, currentTime, duration, visibleEpisodeId, togglePlayPause, seekBy, seekTo } =
     usePodcastPlayer()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { playerRef, containerStyle, isCustomCollapsedPosition, startDrag, shouldExpandAfterClick, resetPosition } =
@@ -21,9 +21,9 @@ export default function GlobalPodcastMiniPlayer() {
       shouldShowMiniPlayer({
         pathname: location.pathname,
         currentEpisodeId: currentEpisode?.id ?? null,
-        visibleEpisodeIds,
+        visibleEpisodeId,
       }),
-    [location.pathname, currentEpisode?.id, visibleEpisodeIds],
+    [location.pathname, currentEpisode?.id, visibleEpisodeId],
   )
 
   useEffect(() => {

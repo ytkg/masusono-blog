@@ -14,7 +14,7 @@ export interface PodcastPlayerControllerValue {
   duration: number
   status: PodcastPlayerStatus
   error: string | null
-  visibleEpisodeIds: ReadonlySet<string>
+  visibleEpisodeId: string | null
   playEpisode: (episode: PodcastEpisode) => Promise<void>
   togglePlayPause: () => Promise<void>
   seekTo: (seconds: number) => void
@@ -29,7 +29,7 @@ export function usePodcastPlayerController() {
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [visibleEpisodeIds, setVisibleEpisodeIds] = useState<Set<string>>(() => new Set())
+  const [visibleEpisodeId, setVisibleEpisodeId] = useState<string | null>(null)
   const { isPlaying, status, error } = playerState
 
   const handleLoadedMetadata = useCallback((nextDuration: number) => {
@@ -155,24 +155,18 @@ export function usePodcastPlayerController() {
     setCurrentEpisode(null)
     setCurrentTime(0)
     setDuration(0)
-    setVisibleEpisodeIds(new Set())
+    setVisibleEpisodeId(null)
     dispatch({ type: "STOPPED" })
   }, [])
 
   const setEpisodeVisibility = useCallback((episodeId: string, visible: boolean) => {
     if (!episodeId) return
 
-    setVisibleEpisodeIds((prev) => {
-      const alreadyVisible = prev.has(episodeId)
-      if ((visible && alreadyVisible) || (!visible && !alreadyVisible)) return prev
-
-      const next = new Set(prev)
+    setVisibleEpisodeId((prev) => {
       if (visible) {
-        next.add(episodeId)
-      } else {
-        next.delete(episodeId)
+        return prev === episodeId ? prev : episodeId
       }
-      return next
+      return prev === episodeId ? null : prev
     })
   }, [])
 
@@ -184,7 +178,7 @@ export function usePodcastPlayerController() {
       duration,
       status,
       error,
-      visibleEpisodeIds,
+      visibleEpisodeId,
       playEpisode,
       togglePlayPause,
       seekTo,
@@ -199,7 +193,7 @@ export function usePodcastPlayerController() {
       duration,
       status,
       error,
-      visibleEpisodeIds,
+      visibleEpisodeId,
       playEpisode,
       togglePlayPause,
       seekTo,

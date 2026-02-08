@@ -1,11 +1,11 @@
 interface MiniPlayerVisibilityParams {
   pathname: string
   currentEpisodeId: string | null
-  visibleEpisodeIds: ReadonlySet<string>
+  visibleEpisodeId: string | null
 }
 
-export function shouldShowMiniPlayer({ pathname, currentEpisodeId, visibleEpisodeIds }: MiniPlayerVisibilityParams) {
+export function shouldShowMiniPlayer({ pathname, currentEpisodeId, visibleEpisodeId }: MiniPlayerVisibilityParams) {
   if (!currentEpisodeId) return false
   if (!pathname.startsWith("/podcast")) return true
-  return !visibleEpisodeIds.has(currentEpisodeId)
+  return visibleEpisodeId !== currentEpisodeId
 }
