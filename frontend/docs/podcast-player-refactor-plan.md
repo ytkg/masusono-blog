@@ -81,3 +81,9 @@ frontend/src/features/podcastPlayer/
 - ミニプレイヤー表示判定で必要なのは「再生中エピソードIDが可視かどうか」の1点のみで、複数IDの同時保持は不要。
 - 単一IDにすることで状態モデルと用途が1対1になり、`has()` 判定用の集合管理が不要になる。
 - `setEpisodeVisibility(episodeId, visible)` は維持し、ID一致時のみ解除することで既存UIイベントとの互換を保つ。
+
+## 実装時の必須手順
+
+- 各ステップの実装後は必ず `cd frontend && npm run lint` を実行する。
+- 各ステップの実装後は必ず `cd frontend && npm run format` を実行する。
+- `lint` と `format` 実行後に、対象機能の関連テストを実行してからコミットする。

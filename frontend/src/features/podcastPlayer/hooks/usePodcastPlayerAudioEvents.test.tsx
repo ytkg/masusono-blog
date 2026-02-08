@@ -2,16 +2,7 @@ import { renderHook } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import { usePodcastPlayerAudioEvents } from "./usePodcastPlayerAudioEvents"
 
-const eventNames = [
-  "loadedmetadata",
-  "timeupdate",
-  "play",
-  "pause",
-  "ended",
-  "waiting",
-  "canplay",
-  "error",
-] as const
+const eventNames = ["loadedmetadata", "timeupdate", "play", "pause", "ended", "waiting", "canplay", "error"] as const
 
 describe("usePodcastPlayerAudioEvents", () => {
   it("8つのAudioイベントを登録し、unmount時に同数を解除する", () => {

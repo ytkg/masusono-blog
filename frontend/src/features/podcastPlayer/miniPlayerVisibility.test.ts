@@ -3,9 +3,7 @@ import { getMiniPlayerVisibility, shouldShowMiniPlayer } from "./miniPlayerVisib
 
 describe("shouldShowMiniPlayer", () => {
   it("再生対象エピソードがない場合は非表示にする", () => {
-    expect(shouldShowMiniPlayer({ pathname: "/podcast", currentEpisodeId: null, visibleEpisodeId: null })).toBe(
-      false,
-    )
+    expect(shouldShowMiniPlayer({ pathname: "/podcast", currentEpisodeId: null, visibleEpisodeId: null })).toBe(false)
   })
 
   it("ポッドキャスト以外のルートでは表示する", () => {
