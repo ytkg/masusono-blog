@@ -229,6 +229,9 @@ export default function GlobalPodcastMiniPlayer() {
             boxShadow: 3,
             overflow: "hidden",
             cursor: "grab",
+            touchAction: "none",
+            userSelect: "none",
+            WebkitUserSelect: "none",
           }}
         >
           <CardMedia
