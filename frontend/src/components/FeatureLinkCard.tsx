@@ -22,8 +22,6 @@ export default function FeatureLinkCard({ title, description, to, children, sx }
       gap: 1,
       textDecoration: "none",
       color: "inherit",
-      transition: "border-color 0.2s",
-      "&:hover": { borderColor: "primary.main" },
     },
     sx,
   )
