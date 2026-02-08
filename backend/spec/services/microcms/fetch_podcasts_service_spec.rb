@@ -23,7 +23,6 @@ RSpec.describe Microcms::FetchPodcastsService do
             "updatedAt" => "2026-02-07T17:04:15.788Z",
             "publishedAt" => "2026-02-07T17:04:12.291Z",
             "revisedAt" => "2026-02-07T17:04:15.788Z",
-            "no" => "001",
             "title" => "プライベートとか普通とかの話",
             "audioUrl" => "https://storage.googleapis.com/masusono-podcast/001.mp3"
           }
@@ -70,7 +69,6 @@ RSpec.describe Microcms::FetchPodcastsService do
               "title" => "プライベートとか普通とかの話",
               "publishedAt" => "2026-02-07T17:04:12.291Z",
               "revisedAt" => "2026-02-07T17:04:15.788Z",
-              "no" => "001",
               "audioUrl" => "https://storage.googleapis.com/masusono-podcast/001.mp3"
             }
           ]
@@ -87,7 +85,6 @@ RSpec.describe Microcms::FetchPodcastsService do
             {
               "id" => "x2qq-26pty99",
               "publishedAt" => "2026-02-08T17:04:12.291Z",
-              "no" => "002",
               "title" => "二本目",
               "audioUrl" => "https://storage.googleapis.com/masusono-podcast/002.mp3"
             }
@@ -99,7 +96,7 @@ RSpec.describe Microcms::FetchPodcastsService do
       end
 
       it do
-        expect(result.map { |podcast| podcast["no"] }).to eq(%w[001 002])
+        expect(result.map { |podcast| podcast["id"] }).to eq(%w[i4qq-26pty84 x2qq-26pty99])
       end
     end
 
