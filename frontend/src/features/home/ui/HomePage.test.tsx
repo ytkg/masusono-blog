@@ -19,15 +19,7 @@ vi.mock("@/features/apps/numbers/NumbersApp", () => ({
 const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageMeta>
 
 describe("HomePage", () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
-  it("メタ情報を設定し、アプリランチャーとリンクカードを表示する", () => {
+  it("メタ情報を設定し、アプリランチャーとリンクカードを表示する", async () => {
     render(
       <MemoryRouter>
         <HomePage />
@@ -35,8 +27,8 @@ describe("HomePage", () => {
     )
 
     expect(screen.getByRole("heading", { level: 1, name: "ようこそ" })).toBeInTheDocument()
-    expect(screen.getByTestId("masuda-run-app")).toBeInTheDocument()
-    expect(screen.getByTestId("numbers-app")).toBeInTheDocument()
+    expect(await screen.findByTestId("masuda-run-app")).toBeInTheDocument()
+    expect(await screen.findByTestId("numbers-app")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /ブログ/ })).toHaveAttribute("href", "/blog")
     expect(screen.getByRole("link", { name: /ポッドキャスト/ })).toHaveAttribute("href", "/podcast")
     expect(screen.getByRole("link", { name: /推し店/ })).toHaveAttribute("href", "/shops")
