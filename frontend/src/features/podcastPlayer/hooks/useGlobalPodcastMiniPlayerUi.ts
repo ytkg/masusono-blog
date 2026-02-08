@@ -18,7 +18,7 @@ export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }: UseGlobalPod
     }
   }, [hasCurrentEpisode, resetPosition])
 
-  const expandFromCollapsed = useCallback(() => {
+  const expand = useCallback(() => {
     if (!shouldExpandAfterClick()) return
     setIsCollapsed(false)
   }, [shouldExpandAfterClick])
@@ -46,7 +46,7 @@ export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }: UseGlobalPod
     containerStyle,
     containerSx,
     startDrag,
-    expandFromCollapsed,
+    expand,
     collapse,
   }
 }

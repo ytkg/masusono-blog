@@ -10,7 +10,7 @@ export default function GlobalPodcastMiniPlayer() {
   const location = useLocation()
   const { currentEpisode, isPlaying, currentTime, duration, visibleEpisodeId, togglePlayPause, seekBy, seekTo } =
     usePodcastPlayer()
-  const { isCollapsed, playerRef, containerStyle, containerSx, startDrag, expandFromCollapsed, collapse } =
+  const { isCollapsed, playerRef, containerStyle, containerSx, startDrag, expand, collapse } =
     useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode: currentEpisode != null })
 
   const miniPlayerVisibility = useMiniPlayerVisibility({
@@ -32,18 +32,14 @@ export default function GlobalPodcastMiniPlayer() {
       sx={containerSx}
     >
       {isCollapsed ? (
-        <CollapsedMiniPlayerThumbnail
-          title={currentEpisode.title}
-          onPointerDown={startDrag}
-          onClick={expandFromCollapsed}
-        />
+        <CollapsedMiniPlayerThumbnail title={currentEpisode.title} onStartDrag={startDrag} onExpand={expand} />
       ) : (
         <ExpandedMiniPlayerPanel
           title={currentEpisode.title}
           isPlaying={isPlaying}
           currentTime={currentTime}
           duration={duration}
-          onTogglePlayback={togglePlayPause}
+          onTogglePlayPause={togglePlayPause}
           onSeekBy={seekBy}
           onSeekTo={seekTo}
           onCollapse={collapse}

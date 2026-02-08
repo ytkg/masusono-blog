@@ -4,8 +4,8 @@ import CardMedia from "@mui/material/CardMedia"
 
 interface CollapsedMiniPlayerThumbnailProps {
   title: string
-  onPointerDown: (event: ReactPointerEvent<HTMLElement>) => void
-  onClick: () => void
+  onStartDrag: (event: ReactPointerEvent<HTMLElement>) => void
+  onExpand: () => void
 }
 
 const thumbnailSx = {
@@ -25,15 +25,15 @@ const thumbnailSx = {
   WebkitUserSelect: "none",
 }
 
-function CollapsedMiniPlayerThumbnail({ title, onPointerDown, onClick }: CollapsedMiniPlayerThumbnailProps) {
+function CollapsedMiniPlayerThumbnail({ title, onStartDrag, onExpand }: CollapsedMiniPlayerThumbnailProps) {
   return (
     <Box
       component="button"
       type="button"
       data-testid="global-podcast-mini-player-thumbnail"
       aria-label="プレイヤーを展開"
-      onPointerDown={onPointerDown}
-      onClick={onClick}
+      onPointerDown={onStartDrag}
+      onClick={onExpand}
       sx={thumbnailSx}
     >
       <CardMedia

@@ -9,7 +9,7 @@ interface ExpandedMiniPlayerPanelProps {
   isPlaying: boolean
   currentTime: number
   duration: number
-  onTogglePlayback: () => void | Promise<void>
+  onTogglePlayPause: () => void | Promise<void>
   onSeekBy: (deltaSeconds: number) => void
   onSeekTo: (value: number) => void
   onCollapse: () => void
@@ -37,7 +37,7 @@ function ExpandedMiniPlayerPanel({
   isPlaying,
   currentTime,
   duration,
-  onTogglePlayback,
+  onTogglePlayPause,
   onSeekBy,
   onSeekTo,
   onCollapse,
@@ -52,7 +52,7 @@ function ExpandedMiniPlayerPanel({
         isPlaying={isPlaying}
         currentTime={currentTime}
         duration={duration}
-        onTogglePlayback={onTogglePlayback}
+        onTogglePlayback={onTogglePlayPause}
         onSeekBy={onSeekBy}
         onSeekTo={onSeekTo}
         variant="mini"
