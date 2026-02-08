@@ -13,7 +13,7 @@ import {
   MINI_PLAYER_EDGE_MARGIN_PX,
 } from "@/features/podcastPlayer/lib/miniPlayerStyleConstants"
 
-type Position = {
+export type CollapsedMiniPlayerPosition = {
   left: number
   top: number
 }
@@ -30,7 +30,7 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(value, max))
 }
 
-function clampPosition(position: Position, width: number, height: number) {
+function clampPosition(position: CollapsedMiniPlayerPosition, width: number, height: number) {
   const maxLeft = Math.max(MINI_PLAYER_EDGE_MARGIN_PX, window.innerWidth - width - MINI_PLAYER_EDGE_MARGIN_PX)
   const maxTop = Math.max(MINI_PLAYER_EDGE_MARGIN_PX, window.innerHeight - height - MINI_PLAYER_EDGE_MARGIN_PX)
   return {
@@ -39,12 +39,12 @@ function clampPosition(position: Position, width: number, height: number) {
   }
 }
 
-function isSamePosition(a: Position | null, b: Position) {
+function isSamePosition(a: CollapsedMiniPlayerPosition | null, b: CollapsedMiniPlayerPosition) {
   return a != null && a.left === b.left && a.top === b.top
 }
 
 export function useCollapsedMiniPlayerDrag(isCollapsed: boolean) {
-  const [collapsedPosition, setCollapsedPosition] = useState<Position | null>(null)
+  const [collapsedPosition, setCollapsedPosition] = useState<CollapsedMiniPlayerPosition | null>(null)
   const playerRef = useRef<HTMLDivElement | null>(null)
   const dragStateRef = useRef<DragState | null>(null)
   const draggedRef = useRef(false)
@@ -169,6 +169,7 @@ export function useCollapsedMiniPlayerDrag(isCollapsed: boolean) {
 
   return {
     playerRef,
+    collapsedPosition,
     containerStyle,
     isCustomCollapsedPosition,
     startDrag,

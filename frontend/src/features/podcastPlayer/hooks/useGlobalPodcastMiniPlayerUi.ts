@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import type { SxProps, Theme } from "@mui/material/styles"
+import type { Theme } from "@mui/material/styles"
+import type { SystemStyleObject } from "@mui/system"
 import { useCollapsedMiniPlayerDrag } from "@/features/podcastPlayer/hooks/useCollapsedMiniPlayerDrag"
 import {
   MINI_PLAYER_CONTAINER_BOTTOM,
@@ -16,8 +17,15 @@ interface UseGlobalPodcastMiniPlayerUiParams {
 
 export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }: UseGlobalPodcastMiniPlayerUiParams) {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const { playerRef, containerStyle, isCustomCollapsedPosition, startDrag, shouldExpandAfterClick, resetPosition } =
-    useCollapsedMiniPlayerDrag(isCollapsed)
+  const {
+    playerRef,
+    collapsedPosition,
+    containerStyle,
+    isCustomCollapsedPosition,
+    startDrag,
+    shouldExpandAfterClick,
+    resetPosition,
+  } = useCollapsedMiniPlayerDrag(isCollapsed)
 
   useEffect(() => {
     if (!hasCurrentEpisode) {
@@ -35,7 +43,7 @@ export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }: UseGlobalPod
     setIsCollapsed(true)
   }, [])
 
-  const containerSx = useMemo<SxProps<Theme>>(
+  const containerSx = useMemo<SystemStyleObject<Theme>>(
     () => ({
       position: "fixed",
       right: isCustomCollapsedPosition ? "auto" : MINI_PLAYER_CONTAINER_RIGHT,
@@ -43,7 +51,7 @@ export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }: UseGlobalPod
       bottom: MINI_PLAYER_CONTAINER_BOTTOM,
       width: isCollapsed ? "auto" : MINI_PLAYER_CONTAINER_WIDTH_EXPANDED,
       ...(isCollapsed ? { maxWidth: MINI_PLAYER_CONTAINER_MAX_WIDTH_COLLAPSED } : {}),
-      zIndex: (theme) => theme.zIndex.appBar + MINI_PLAYER_CONTAINER_Z_INDEX_OFFSET,
+      zIndex: (theme: Theme) => theme.zIndex.appBar + MINI_PLAYER_CONTAINER_Z_INDEX_OFFSET,
     }),
     [isCollapsed, isCustomCollapsedPosition],
   )
@@ -51,6 +59,7 @@ export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }: UseGlobalPod
   return {
     isCollapsed,
     playerRef,
+    collapsedPosition,
     containerStyle,
     containerSx,
     startDrag,

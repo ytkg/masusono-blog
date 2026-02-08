@@ -87,10 +87,15 @@ describe("GlobalPodcastMiniPlayer", () => {
 
     fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
 
-    expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })).toBeInTheDocument()
-    expect(within(miniPlayer).queryByRole("button", { name: "プレイヤーを上下に移動" })).not.toBeInTheDocument()
-    expect(within(miniPlayer).getByTestId("global-podcast-mini-player-thumbnail")).toBeInTheDocument()
-    expect(within(miniPlayer).getByAltText("テストエピソード")).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })).toBeInTheDocument()
+        expect(within(miniPlayer).queryByRole("button", { name: "プレイヤーを上下に移動" })).not.toBeInTheDocument()
+        expect(within(miniPlayer).getByTestId("global-podcast-mini-player-thumbnail")).toBeInTheDocument()
+        expect(within(miniPlayer).getByAltText("テストエピソード")).toBeInTheDocument()
+      },
+      { timeout: 2000 },
+    )
   })
 
   it("再生操作ボタンをタップしても折りたたみ表示に切り替わらない", async () => {
@@ -113,7 +118,12 @@ describe("GlobalPodcastMiniPlayer", () => {
     const miniPlayer = await navigateToBlogWithPlayback()
     const collapseButton = within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" })
     fireEvent.keyDown(collapseButton, { key: "Enter" })
-    expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })).toBeInTheDocument()
+      },
+      { timeout: 2000 },
+    )
 
     const expandButton = within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })
     fireEvent.keyDown(expandButton, { key: " " })

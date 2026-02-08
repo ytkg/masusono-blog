@@ -2,6 +2,7 @@ import Box from "@mui/material/Box"
 import { useLocation } from "react-router-dom"
 import CollapsedMiniPlayerThumbnail from "./CollapsedMiniPlayerThumbnail"
 import ExpandedMiniPlayerPanel from "./ExpandedMiniPlayerPanel"
+import { useMiniPlayerFlipAnimation } from "@/features/podcastPlayer/hooks/useMiniPlayerFlipAnimation"
 import { useGlobalPodcastMiniPlayerUi } from "@/features/podcastPlayer/hooks/useGlobalPodcastMiniPlayerUi"
 import { useMiniPlayerVisibility } from "@/features/podcastPlayer/hooks/useMiniPlayerVisibility"
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
@@ -12,6 +13,12 @@ export default function GlobalPodcastMiniPlayer() {
     usePodcastPlayer()
   const { isCollapsed, playerRef, containerStyle, containerSx, startDrag, expand, collapse } =
     useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode: currentEpisode != null })
+  const { collapseWithAnimation, expandWithAnimation, animationSx } = useMiniPlayerFlipAnimation({
+    isCollapsed,
+    playerRef,
+    collapse,
+    expand,
+  })
 
   const miniPlayerVisibility = useMiniPlayerVisibility({
     pathname: location.pathname,
@@ -29,10 +36,14 @@ export default function GlobalPodcastMiniPlayer() {
       data-testid="global-podcast-mini-player"
       data-visibility-reason={miniPlayerVisibility.reason}
       style={containerStyle}
-      sx={containerSx}
+      sx={[containerSx, animationSx]}
     >
       {isCollapsed ? (
-        <CollapsedMiniPlayerThumbnail title={currentEpisode.title} onStartDrag={startDrag} onExpand={expand} />
+        <CollapsedMiniPlayerThumbnail
+          title={currentEpisode.title}
+          onStartDrag={startDrag}
+          onExpand={expandWithAnimation}
+        />
       ) : (
         <ExpandedMiniPlayerPanel
           title={currentEpisode.title}
@@ -42,7 +53,7 @@ export default function GlobalPodcastMiniPlayer() {
           onTogglePlayPause={togglePlayPause}
           onSeekBy={seekBy}
           onSeekTo={seekTo}
-          onCollapse={collapse}
+          onCollapse={collapseWithAnimation}
         />
       )}
     </Box>
