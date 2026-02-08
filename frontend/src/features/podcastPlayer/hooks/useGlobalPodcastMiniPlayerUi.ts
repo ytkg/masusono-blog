@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { SxProps, Theme } from "@mui/material/styles"
 import { useCollapsedMiniPlayerDrag } from "@/features/podcastPlayer/hooks/useCollapsedMiniPlayerDrag"
+import {
+  MINI_PLAYER_CONTAINER_BOTTOM,
+  MINI_PLAYER_CONTAINER_LEFT_EXPANDED,
+  MINI_PLAYER_CONTAINER_MAX_WIDTH_COLLAPSED,
+  MINI_PLAYER_CONTAINER_RIGHT,
+  MINI_PLAYER_CONTAINER_WIDTH_EXPANDED,
+  MINI_PLAYER_CONTAINER_Z_INDEX_OFFSET,
+} from "@/features/podcastPlayer/lib/miniPlayerStyleConstants"
 
 interface UseGlobalPodcastMiniPlayerUiParams {
   hasCurrentEpisode: boolean
@@ -30,12 +38,12 @@ export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }: UseGlobalPod
   const containerSx = useMemo<SxProps<Theme>>(
     () => ({
       position: "fixed",
-      right: isCustomCollapsedPosition ? "auto" : { xs: 8, sm: 12 },
-      left: isCollapsed ? "auto" : { xs: 8, sm: "auto" },
-      bottom: { xs: "calc(96px + env(safe-area-inset-bottom))", sm: 108 },
-      width: isCollapsed ? "auto" : { xs: "calc(100% - 16px)", sm: 380 },
-      ...(isCollapsed ? { maxWidth: "calc(100% - 16px)" } : {}),
-      zIndex: (theme) => theme.zIndex.appBar + 1,
+      right: isCustomCollapsedPosition ? "auto" : MINI_PLAYER_CONTAINER_RIGHT,
+      left: isCollapsed ? "auto" : MINI_PLAYER_CONTAINER_LEFT_EXPANDED,
+      bottom: MINI_PLAYER_CONTAINER_BOTTOM,
+      width: isCollapsed ? "auto" : MINI_PLAYER_CONTAINER_WIDTH_EXPANDED,
+      ...(isCollapsed ? { maxWidth: MINI_PLAYER_CONTAINER_MAX_WIDTH_COLLAPSED } : {}),
+      zIndex: (theme) => theme.zIndex.appBar + MINI_PLAYER_CONTAINER_Z_INDEX_OFFSET,
     }),
     [isCollapsed, isCustomCollapsedPosition],
   )

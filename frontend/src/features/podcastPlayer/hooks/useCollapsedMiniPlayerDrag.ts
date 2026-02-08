@@ -7,10 +7,11 @@ import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from "react"
-
-const EDGE_MARGIN = 8
-const DEFAULT_PLAYER_SIZE = 72
-const DRAG_THRESHOLD_PX = 3
+import {
+  MINI_PLAYER_DRAG_FALLBACK_SIZE_PX,
+  MINI_PLAYER_DRAG_THRESHOLD_PX,
+  MINI_PLAYER_EDGE_MARGIN_PX,
+} from "@/features/podcastPlayer/lib/miniPlayerStyleConstants"
 
 type Position = {
   left: number
@@ -30,11 +31,11 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function clampPosition(position: Position, width: number, height: number) {
-  const maxLeft = Math.max(EDGE_MARGIN, window.innerWidth - width - EDGE_MARGIN)
-  const maxTop = Math.max(EDGE_MARGIN, window.innerHeight - height - EDGE_MARGIN)
+  const maxLeft = Math.max(MINI_PLAYER_EDGE_MARGIN_PX, window.innerWidth - width - MINI_PLAYER_EDGE_MARGIN_PX)
+  const maxTop = Math.max(MINI_PLAYER_EDGE_MARGIN_PX, window.innerHeight - height - MINI_PLAYER_EDGE_MARGIN_PX)
   return {
-    left: clamp(position.left, EDGE_MARGIN, maxLeft),
-    top: clamp(position.top, EDGE_MARGIN, maxTop),
+    left: clamp(position.left, MINI_PLAYER_EDGE_MARGIN_PX, maxLeft),
+    top: clamp(position.top, MINI_PLAYER_EDGE_MARGIN_PX, maxTop),
   }
 }
 
@@ -57,8 +58,8 @@ export function useCollapsedMiniPlayerDrag(isCollapsed: boolean) {
       if (!player) return
 
       const rect = player.getBoundingClientRect()
-      const width = rect.width || DEFAULT_PLAYER_SIZE
-      const height = rect.height || DEFAULT_PLAYER_SIZE
+      const width = rect.width || MINI_PLAYER_DRAG_FALLBACK_SIZE_PX
+      const height = rect.height || MINI_PLAYER_DRAG_FALLBACK_SIZE_PX
       const initialPosition = clampPosition({ left: rect.left, top: rect.top }, width, height)
       setCollapsedPosition((prev) => (isSamePosition(prev, initialPosition) ? prev : initialPosition))
       draggedRef.current = false
@@ -83,8 +84,8 @@ export function useCollapsedMiniPlayerDrag(isCollapsed: boolean) {
       if (!drag || !player || drag.pointerId !== event.pointerId) return
 
       const rect = player.getBoundingClientRect()
-      const width = rect.width || DEFAULT_PLAYER_SIZE
-      const height = rect.height || DEFAULT_PLAYER_SIZE
+      const width = rect.width || MINI_PLAYER_DRAG_FALLBACK_SIZE_PX
+      const height = rect.height || MINI_PLAYER_DRAG_FALLBACK_SIZE_PX
       const nextPosition = clampPosition(
         {
           left: event.clientX - drag.offsetX,
@@ -94,8 +95,8 @@ export function useCollapsedMiniPlayerDrag(isCollapsed: boolean) {
         height,
       )
       if (
-        Math.abs(event.clientX - drag.startClientX) > DRAG_THRESHOLD_PX ||
-        Math.abs(event.clientY - drag.startClientY) > DRAG_THRESHOLD_PX
+        Math.abs(event.clientX - drag.startClientX) > MINI_PLAYER_DRAG_THRESHOLD_PX ||
+        Math.abs(event.clientY - drag.startClientY) > MINI_PLAYER_DRAG_THRESHOLD_PX
       ) {
         draggedRef.current = true
       }
@@ -127,8 +128,8 @@ export function useCollapsedMiniPlayerDrag(isCollapsed: boolean) {
       const player = playerRef.current
       if (!player) return
       const rect = player.getBoundingClientRect()
-      const width = rect.width || DEFAULT_PLAYER_SIZE
-      const height = rect.height || DEFAULT_PLAYER_SIZE
+      const width = rect.width || MINI_PLAYER_DRAG_FALLBACK_SIZE_PX
+      const height = rect.height || MINI_PLAYER_DRAG_FALLBACK_SIZE_PX
       const nextPosition = clampPosition(collapsedPosition, width, height)
       setCollapsedPosition((prev) => (isSamePosition(prev, nextPosition) ? prev : nextPosition))
     }

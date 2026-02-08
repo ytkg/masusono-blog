@@ -1,6 +1,13 @@
 import { memo, type PointerEvent as ReactPointerEvent } from "react"
 import Box from "@mui/material/Box"
 import CardMedia from "@mui/material/CardMedia"
+import {
+  MINI_PLAYER_CARD_BORDER_RADIUS,
+  MINI_PLAYER_CARD_BOX_SHADOW,
+  MINI_PLAYER_CARD_PADDING,
+  MINI_PLAYER_THUMBNAIL_IMAGE_BORDER_RADIUS,
+  MINI_PLAYER_THUMBNAIL_SIZE,
+} from "@/features/podcastPlayer/lib/miniPlayerStyleConstants"
 
 interface CollapsedMiniPlayerThumbnailProps {
   title: string
@@ -10,14 +17,14 @@ interface CollapsedMiniPlayerThumbnailProps {
 
 const thumbnailSx = {
   display: "block",
-  p: 0.75,
-  width: { xs: 56, sm: 64 },
-  height: { xs: 56, sm: 64 },
-  borderRadius: 2,
+  p: MINI_PLAYER_CARD_PADDING,
+  width: MINI_PLAYER_THUMBNAIL_SIZE,
+  height: MINI_PLAYER_THUMBNAIL_SIZE,
+  borderRadius: MINI_PLAYER_CARD_BORDER_RADIUS,
   border: "1px solid",
   borderColor: "divider",
   bgcolor: "background.paper",
-  boxShadow: 3,
+  boxShadow: MINI_PLAYER_CARD_BOX_SHADOW,
   overflow: "hidden",
   cursor: "grab",
   touchAction: "none",
@@ -40,7 +47,12 @@ function CollapsedMiniPlayerThumbnail({ title, onStartDrag, onExpand }: Collapse
         component="img"
         image="/icons/icon-192.png"
         alt={title}
-        sx={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 1 }}
+        sx={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: MINI_PLAYER_THUMBNAIL_IMAGE_BORDER_RADIUS,
+        }}
       />
     </Box>
   )

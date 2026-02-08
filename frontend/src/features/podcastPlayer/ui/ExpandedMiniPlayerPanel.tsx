@@ -3,6 +3,15 @@ import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit"
 import PodcastAudioPlayer from "@/features/podcast/ui/PodcastAudioPlayer"
+import {
+  MINI_PLAYER_CARD_BORDER_RADIUS,
+  MINI_PLAYER_CARD_BOX_SHADOW,
+  MINI_PLAYER_CARD_PADDING,
+  MINI_PLAYER_COLLAPSE_BUTTON_LEFT,
+  MINI_PLAYER_COLLAPSE_BUTTON_SIZE_PX,
+  MINI_PLAYER_COLLAPSE_BUTTON_TOP,
+  MINI_PLAYER_COLLAPSE_ICON_SIZE_PX,
+} from "@/features/podcastPlayer/lib/miniPlayerStyleConstants"
 
 interface ExpandedMiniPlayerPanelProps {
   title: string
@@ -17,19 +26,19 @@ interface ExpandedMiniPlayerPanelProps {
 
 const panelSx = {
   position: "relative",
-  borderRadius: 2,
+  borderRadius: MINI_PLAYER_CARD_BORDER_RADIUS,
   bgcolor: "background.paper",
-  boxShadow: 3,
-  p: 0.75,
+  boxShadow: MINI_PLAYER_CARD_BOX_SHADOW,
+  p: MINI_PLAYER_CARD_PADDING,
 }
 
 const collapseButtonSx = {
   position: "absolute",
-  left: { xs: 6, sm: 8 },
-  top: { xs: 6, sm: 8 },
+  left: MINI_PLAYER_COLLAPSE_BUTTON_LEFT,
+  top: MINI_PLAYER_COLLAPSE_BUTTON_TOP,
   zIndex: 1,
-  width: 32,
-  height: 32,
+  width: MINI_PLAYER_COLLAPSE_BUTTON_SIZE_PX,
+  height: MINI_PLAYER_COLLAPSE_BUTTON_SIZE_PX,
 }
 
 function ExpandedMiniPlayerPanel({
@@ -45,7 +54,7 @@ function ExpandedMiniPlayerPanel({
   return (
     <Box sx={panelSx}>
       <IconButton aria-label="プレイヤーを縮小" size="small" onClick={onCollapse} sx={collapseButtonSx}>
-        <FullscreenExitIcon sx={{ fontSize: 28 }} />
+        <FullscreenExitIcon sx={{ fontSize: MINI_PLAYER_COLLAPSE_ICON_SIZE_PX }} />
       </IconButton>
       <PodcastAudioPlayer
         title={title}
