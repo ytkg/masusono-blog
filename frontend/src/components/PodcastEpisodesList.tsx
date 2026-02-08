@@ -2,7 +2,7 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Alert from "@mui/material/Alert"
 import { usePodcasts } from "@/hooks/usePodcasts"
-import ContentCardSkeleton from "./ContentCardSkeleton"
+import ContentCardSkeleton from "@/shared/ui/ContentCardSkeleton"
 import PodcastEpisodeCard from "./PodcastEpisodeCard"
 
 const SKELETON_COUNT = 3

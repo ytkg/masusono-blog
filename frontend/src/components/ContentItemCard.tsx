@@ -4,7 +4,7 @@ import type { SxProps, Theme } from "@mui/material/styles"
 import type { ReactNode } from "react"
 import { Link as RouterLink, type LinkProps as RouterLinkProps } from "react-router-dom"
 import { mergeSx } from "@/shared/lib/sx"
-import ContentCard from "./ContentCard"
+import ContentCard from "@/shared/ui/ContentCard"
 
 interface ContentItemCardProps {
   title: ReactNode

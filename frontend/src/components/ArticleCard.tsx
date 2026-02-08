@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
 import Alert from "@mui/material/Alert"
 import type { Article } from "@/types/article"
-import ContentCard from "./ContentCard"
+import ContentCard from "@/shared/ui/ContentCard"
 import ContentItemCard from "./ContentItemCard"
 
 interface ArticleCardProps {

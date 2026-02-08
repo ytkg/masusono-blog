@@ -32,16 +32,16 @@
 ## `shared` に置く候補の棚卸し（2026-02-08）
 
 - 判定基準は「ドメイン非依存」「複数箇所で再利用」「`app` への逆依存なし」。
-- 2026-02-08 時点で第1バッチ（`fetchJson` / `mergeSx` / `PageContainer`）は移設済み。
+- 2026-02-08 時点で第1・第2バッチの対象は移設済み。
 
 | 対象 | 現パス（2026-02-08更新） | `shared` 配置案 | 判定 | 根拠 |
 | --- | --- | --- | --- | --- |
 | `fetchJson` | `src/shared/api/fetchJson.ts` | `src/shared/api/fetchJson.ts` | 完了 | APIドメインに依存しない HTTP JSON 取得関数。`hooks` 4箇所で共通利用。 |
 | `mergeSx` | `src/shared/lib/sx.ts` | `src/shared/lib/sx.ts` | 完了 | MUIの `sx` マージ処理。共通コンポーネント 4箇所で利用。 |
 | `PageContainer` | `src/shared/ui/PageContainer.tsx` | `src/shared/ui/PageContainer.tsx` | 完了 | ページ共通の余白レイアウト。`pages` 6箇所で利用。 |
-| `ContentCard` | `src/components/ContentCard.tsx` | `src/shared/ui/ContentCard.tsx` | 候補（中） | 表示ドメイン非依存のカード枠。複数カード系コンポーネントで利用。 |
-| `ContentCardSkeleton` | `src/components/ContentCardSkeleton.tsx` | `src/shared/ui/ContentCardSkeleton.tsx` | 候補（中） | `ContentCard` と対で再利用される汎用スケルトン。 |
-| `FeatureLinkCard` | `src/components/FeatureLinkCard.tsx` | `src/shared/ui/FeatureLinkCard.tsx` | 保留 | 汎用UIだが `react-router-dom` 依存があるため、`shared/ui` 直下か `shared/navigation` 配下かを要検討。 |
+| `ContentCard` | `src/shared/ui/ContentCard.tsx` | `src/shared/ui/ContentCard.tsx` | 完了 | 表示ドメイン非依存のカード枠。複数カード系コンポーネントで利用。 |
+| `ContentCardSkeleton` | `src/shared/ui/ContentCardSkeleton.tsx` | `src/shared/ui/ContentCardSkeleton.tsx` | 完了 | `ContentCard` と対で再利用される汎用スケルトン。 |
+| `FeatureLinkCard` | `src/shared/navigation/FeatureLinkCard.tsx` | `src/shared/navigation/FeatureLinkCard.tsx` | 完了 | ルーティング依存を明示するため `shared/navigation` に配置。 |
 
 ## `shared` 対象外（現時点）
 
@@ -51,4 +51,4 @@
 
 ## 次の移行バッチ（提案）
 
-- 第2バッチ: `ContentCard` / `ContentCardSkeleton` / `FeatureLinkCard` を、ルーティング依存の整理後に移設。
+- 第3バッチ候補: `src/app` 実体化に伴う `app` / `shared` 依存境界の検証と整理。
