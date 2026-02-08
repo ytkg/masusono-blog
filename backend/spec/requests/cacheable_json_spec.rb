@@ -25,7 +25,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
   describe "GET /articles.json" do
     before do
       allow(ArticlesIndexUsecase).to receive(:call).and_return(
-        {
+        ArticlesIndexUsecase::Result.new(
           articles: [
             {
               id: "first",
@@ -35,7 +35,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
               author: "増田太郎"
             }
           ]
-        }
+        )
       )
     end
 
@@ -47,7 +47,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
   describe "GET /podcasts.json" do
     before do
       allow(PodcastsIndexUsecase).to receive(:call).and_return(
-        {
+        PodcastsIndexUsecase::Result.new(
           podcasts: [
             {
               "id" => "001",
@@ -56,7 +56,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
               "audioUrl" => "https://example.com/podcast/001.mp3"
             }
           ]
-        }
+        )
       )
     end
 
@@ -68,7 +68,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
   describe "GET /metrics.json" do
     before do
       allow(MetricsIndexUsecase).to receive(:call).and_return(
-        {
+        MetricsIndexUsecase::Result.new(
           metrics: {
             "blocks" => [
               {
@@ -80,7 +80,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
               }
             ]
           }
-        }
+        )
       )
     end
 
@@ -92,7 +92,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
   describe "GET /shops.json" do
     before do
       allow(ShopsIndexUsecase).to receive(:call).and_return(
-        {
+        ShopsIndexUsecase::Result.new(
           shops: [
             {
               "name" => "テスト居酒屋",
@@ -103,7 +103,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
               "desc" => "テスト説明"
             }
           ]
-        }
+        )
       )
     end
 
@@ -115,8 +115,8 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
   describe "ETag invalidation" do
     before do
       allow(ArticlesIndexUsecase).to receive(:call).and_return(
-        { articles: [ { id: "first", title: "first title" } ] },
-        { articles: [ { id: "first", title: "updated title" } ] }
+        ArticlesIndexUsecase::Result.new(articles: [ { id: "first", title: "first title" } ]),
+        ArticlesIndexUsecase::Result.new(articles: [ { id: "first", title: "updated title" } ])
       )
     end
 
