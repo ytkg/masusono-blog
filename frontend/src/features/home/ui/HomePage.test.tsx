@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
-import Home from "./Home"
+import HomePage from "./HomePage"
 import { usePageMeta } from "@/hooks/usePageMeta"
 
 vi.mock("@/hooks/usePageMeta", () => ({
@@ -18,7 +18,7 @@ vi.mock("@/features/apps/numbers/NumbersApp", () => ({
 
 const usePageMetaMock = usePageMeta as unknown as MockedFunction<typeof usePageMeta>
 
-describe("Home", () => {
+describe("HomePage", () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -30,7 +30,7 @@ describe("Home", () => {
   it("メタ情報を設定し、アプリランチャーとリンクカードを表示する", () => {
     render(
       <MemoryRouter>
-        <Home />
+        <HomePage />
       </MemoryRouter>,
     )
 
