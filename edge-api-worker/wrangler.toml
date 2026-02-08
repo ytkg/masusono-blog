@@ -1,0 +1,6 @@
+name = "masusono-api-edge"
+main = "src/index.ts"
+compatibility_date = "2026-02-08"
+
+[vars]
+ORIGIN_API_BASE = "https://masusono-332902117625.asia-northeast1.run.app/"

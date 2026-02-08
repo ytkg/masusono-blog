@@ -31,6 +31,7 @@ flowchart LR
 
 - `backend`: Rails API
 - `frontend`: React + TypeScript + Vite
+- `edge-api-worker`: Cloudflare Worker (Cloud Run API のプロキシ用)
 
 ## Frontend
 
@@ -113,3 +114,7 @@ npx wrangler deploy
 ## Backend
 
 バックエンドのセットアップと実行方法は `backend/README.md` を参照してください。
+
+## Edge API Worker
+
+`api.masusono.com` を Worker 経由で運用する場合は `edge-api-worker/README.md` を参照してください。
