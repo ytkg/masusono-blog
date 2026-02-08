@@ -10,9 +10,9 @@ interface CollapsedMiniPlayerThumbnailProps {
 
 const thumbnailSx = {
   display: "block",
-  p: 1,
-  width: { xs: 68, sm: 76 },
-  height: { xs: 68, sm: 76 },
+  p: 0.75,
+  width: { xs: 56, sm: 64 },
+  height: { xs: 56, sm: 64 },
   borderRadius: 2,
   border: "1px solid",
   borderColor: "divider",

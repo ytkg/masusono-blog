@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import type { SxProps, Theme } from "@mui/material/styles"
 import { useLocation } from "react-router-dom"
@@ -7,23 +7,6 @@ import ExpandedMiniPlayerPanel from "./ExpandedMiniPlayerPanel"
 import { useCollapsedMiniPlayerDrag } from "./useCollapsedMiniPlayerDrag"
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
 import { shouldShowMiniPlayer } from "@/features/podcastPlayer/miniPlayerVisibility"
-
-const INTERACTIVE_SELECTOR = [
-  "button",
-  "a",
-  "input",
-  "select",
-  "textarea",
-  "[role='button']",
-  "[role='link']",
-  "[role='slider']",
-  "[contenteditable='true']",
-].join(",")
-
-function isInteractiveTarget(target: EventTarget | null) {
-  if (!(target instanceof Element)) return false
-  return target.closest(INTERACTIVE_SELECTOR) != null
-}
 
 export default function GlobalPodcastMiniPlayer() {
   const location = useLocation()
@@ -54,11 +37,6 @@ export default function GlobalPodcastMiniPlayer() {
     if (!shouldExpandAfterClick()) return
     setIsCollapsed(false)
   }, [shouldExpandAfterClick])
-
-  const collapseFromExpanded = useCallback((event: ReactMouseEvent<HTMLElement>) => {
-    if (isInteractiveTarget(event.target)) return
-    setIsCollapsed(true)
-  }, [])
 
   const containerSx = useMemo<SxProps<Theme>>(
     () => ({
@@ -92,7 +70,7 @@ export default function GlobalPodcastMiniPlayer() {
           onTogglePlayback={togglePlayPause}
           onSeekBy={seekBy}
           onSeekTo={seekTo}
-          onBackgroundClick={collapseFromExpanded}
+          onCollapse={() => setIsCollapsed(true)}
         />
       )}
     </Box>

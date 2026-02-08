@@ -1,5 +1,7 @@
-import { memo, type MouseEvent as ReactMouseEvent } from "react"
+import { memo } from "react"
 import Box from "@mui/material/Box"
+import IconButton from "@mui/material/IconButton"
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit"
 import PodcastAudioPlayer from "@/features/podcast/ui/PodcastAudioPlayer"
 
 interface ExpandedMiniPlayerPanelProps {
@@ -10,7 +12,7 @@ interface ExpandedMiniPlayerPanelProps {
   onTogglePlayback: () => void | Promise<void>
   onSeekBy: (deltaSeconds: number) => void
   onSeekTo: (value: number) => void
-  onBackgroundClick: (event: ReactMouseEvent<HTMLElement>) => void
+  onCollapse: () => void
 }
 
 const panelSx = {
@@ -21,6 +23,15 @@ const panelSx = {
   p: 0.75,
 }
 
+const collapseButtonSx = {
+  position: "absolute",
+  left: { xs: 6, sm: 8 },
+  top: { xs: 6, sm: 8 },
+  zIndex: 1,
+  width: 32,
+  height: 32,
+}
+
 function ExpandedMiniPlayerPanel({
   title,
   isPlaying,
@@ -29,10 +40,13 @@ function ExpandedMiniPlayerPanel({
   onTogglePlayback,
   onSeekBy,
   onSeekTo,
-  onBackgroundClick,
+  onCollapse,
 }: ExpandedMiniPlayerPanelProps) {
   return (
-    <Box onClick={onBackgroundClick} sx={panelSx}>
+    <Box sx={panelSx}>
+      <IconButton aria-label="プレイヤーを縮小" size="small" onClick={onCollapse} sx={collapseButtonSx}>
+        <FullscreenExitIcon sx={{ fontSize: 28 }} />
+      </IconButton>
       <PodcastAudioPlayer
         title={title}
         isPlaying={isPlaying}
