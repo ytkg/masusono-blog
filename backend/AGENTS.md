@@ -57,6 +57,10 @@ This agent must execute the following steps **before starting any task**, regard
 - `/sitemap.xml` is generated from static routes plus microCMS articles.
 - CORS is handled by rack-cors; allowed origins include localhost:5173 and masusono.com/static.
 - Prefer rbenv shims for Ruby/Rails/Bundler (e.g. `~/.rbenv/shims/rails`); avoid `/usr/bin/rails`.
+- In non-interactive agent shells, `ruby`/`bundle` may resolve to `/usr/bin/*` (system Ruby 2.6). For backend commands, always use one of:
+  - `source ~/.zshrc && cd backend && bundle ...`
+  - `cd backend && RBENV_VERSION=4.0.1 rbenv exec bundle ...`
+- Never use `/usr/bin/bundle` for this project.
 - No DB service is configured yet; compose is app-only for now.
 
 ## 5. Test Coding Rules
