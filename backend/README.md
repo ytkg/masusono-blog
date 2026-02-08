@@ -35,6 +35,34 @@ docker compose up --build
 - `GET /shops.json`
 - `GET /sitemap.xml`
 
+## APIエラーレスポンス仕様
+
+API で例外が発生した場合、レスポンス形式は次に統一します。
+
+```json
+{
+  "error": {
+    "code": "upstream_timeout",
+    "message": "Upstream service request timed out."
+  }
+}
+```
+
+`ApplicationController` でのマッピング:
+
+- `Microcms::FetchContentsService::FetchError`
+  - upstream `408` -> `504 Gateway Timeout` (`upstream_timeout`)
+  - upstream `429` -> `503 Service Unavailable` (`upstream_rate_limited`)
+  - upstream `400..499` -> `424 Failed Dependency` (`upstream_client_error`)
+  - upstream `500..599` -> `502 Bad Gateway` (`upstream_server_error`)
+- `Faraday::TimeoutError` -> `504 Gateway Timeout` (`upstream_timeout`)
+- `Faraday::ConnectionFailed` -> `502 Bad Gateway` (`upstream_connection_error`)
+- その他の `Faraday::Error` -> `502 Bad Gateway` (`upstream_error`)
+
+補足:
+- 依存先（microCMS/HTTP）起因の障害は 5xx または 424 で返します。
+- エラーレスポンスでは `Cache-Control: no-store` を返し、失敗レスポンスをキャッシュしません。
+
 ## microCMS ページング保護
 
 `Microcms::FetchContentsService` では、異常レスポンスや過大取得による過負荷を防ぐために以下のガードを入れています。
