@@ -7,7 +7,7 @@ describe("fetchJson", () => {
     vi.unstubAllGlobals()
   })
 
-  it("正常レスポンス時はJSONを返し、no-storeでfetchする", async () => {
+  it("正常レスポンス時はJSONを返し、fetchする", async () => {
     const payload = { ok: true }
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -18,7 +18,7 @@ describe("fetchJson", () => {
     const result = await fetchJson<typeof payload>("https://example.com/api")
 
     expect(result).toEqual(payload)
-    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api", { cache: "no-store" })
+    expect(fetchMock).toHaveBeenCalledWith("https://example.com/api")
   })
 
   it("非200レスポンス時はステータス付きエラーを投げる", async () => {
