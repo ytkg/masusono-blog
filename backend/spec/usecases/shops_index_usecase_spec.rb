@@ -22,7 +22,7 @@ RSpec.describe ShopsIndexUsecase do
     end
 
     it do
-      expect(result).to eq({ shops: shops })
+      expect(result.shops).to eq(shops)
     end
   end
 end

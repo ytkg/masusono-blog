@@ -28,7 +28,7 @@ RSpec.describe ArticlesIndexUsecase do
     end
 
     it do
-      expect(result).to eq({ articles: articles })
+      expect(result.articles).to eq(articles)
     end
   end
 end

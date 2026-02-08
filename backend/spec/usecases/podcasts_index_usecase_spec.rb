@@ -20,7 +20,7 @@ RSpec.describe PodcastsIndexUsecase do
     end
 
     it do
-      expect(result).to eq({ podcasts: podcasts })
+      expect(result.podcasts).to eq(podcasts)
     end
   end
 end
