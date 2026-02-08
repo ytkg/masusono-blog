@@ -1,7 +1,13 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
-import { PodcastPlayerProvider, usePodcastPlayer } from "./PodcastPlayerContext"
+import {
+  mockAudioPlaybackEvents,
+  mockAudioPlayRejected,
+  mockToggleableAudioPlayback,
+  renderWithPodcastPlayerProvider,
+} from "@/features/podcastPlayer/test/podcastPlayerTestUtils"
+import { usePodcastPlayer } from "./PodcastPlayerContext"
 
 const episode: PodcastEpisode = {
   id: "001",
@@ -55,11 +61,7 @@ function Probe() {
 }
 
 function renderProvider() {
-  const utils = render(
-    <PodcastPlayerProvider>
-      <Probe />
-    </PodcastPlayerProvider>,
-  )
+  const utils = renderWithPodcastPlayerProvider(<Probe />)
   const audio = utils.container.querySelector("audio") as HTMLAudioElement
   if (!audio) {
     throw new Error("audio element not found")
@@ -73,10 +75,7 @@ describe("PodcastPlayerContext", () => {
   })
 
   it("playEpisode成功時に再生中ステータスへ遷移する", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
+    mockAudioPlaybackEvents()
 
     renderProvider()
 
@@ -91,7 +90,7 @@ describe("PodcastPlayerContext", () => {
   })
 
   it("playEpisode失敗時にerrorステータスへ遷移する", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockRejectedValue(new Error("blocked"))
+    mockAudioPlayRejected("blocked")
 
     renderProvider()
 
@@ -105,21 +104,7 @@ describe("PodcastPlayerContext", () => {
   })
 
   it("togglePlayPauseでpause/playを切り替える", async () => {
-    const pausedState = new WeakMap<HTMLMediaElement, boolean>()
-    vi.spyOn(HTMLMediaElement.prototype, "paused", "get").mockImplementation(function (this: HTMLMediaElement) {
-      return pausedState.get(this) ?? true
-    })
-    const playSpy = vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      pausedState.set(this, false)
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    const pauseSpy = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (
-      this: HTMLMediaElement,
-    ) {
-      pausedState.set(this, true)
-      this.dispatchEvent(new Event("pause"))
-    })
+    const { playSpy, pauseSpy } = mockToggleableAudioPlayback()
 
     renderProvider()
 
@@ -144,10 +129,7 @@ describe("PodcastPlayerContext", () => {
   it("seekToは0〜durationにクランプされる", async () => {
     const { audio } = renderProvider()
 
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
+    mockAudioPlaybackEvents()
 
     Object.defineProperty(audio, "duration", { value: 120, writable: true, configurable: true })
     Object.defineProperty(audio, "currentTime", { value: 0, writable: true, configurable: true })
@@ -169,21 +151,7 @@ describe("PodcastPlayerContext", () => {
   })
 
   it("stopで再生状態と可視IDを初期化する", async () => {
-    const pausedState = new WeakMap<HTMLMediaElement, boolean>()
-    vi.spyOn(HTMLMediaElement.prototype, "paused", "get").mockImplementation(function (this: HTMLMediaElement) {
-      return pausedState.get(this) ?? true
-    })
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      pausedState.set(this, false)
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    const pauseSpy = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (
-      this: HTMLMediaElement,
-    ) {
-      pausedState.set(this, true)
-      this.dispatchEvent(new Event("pause"))
-    })
+    const { pauseSpy } = mockToggleableAudioPlayback()
     const loadSpy = vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {})
 
     renderProvider()

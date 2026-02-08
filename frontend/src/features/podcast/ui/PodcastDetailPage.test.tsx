@@ -1,11 +1,11 @@
-import { render, screen } from "@testing-library/react"
-import { MemoryRouter, Route, Routes } from "react-router-dom"
+import { screen } from "@testing-library/react"
+import { Route, Routes } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import PodcastDetail from "./PodcastDetailPage"
 import { usePodcast } from "@/features/podcast/hooks/usePodcast"
 import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
-import { PodcastPlayerProvider } from "@/features/podcastPlayer/PodcastPlayerContext"
+import { renderWithPodcastPlayerRouter } from "@/features/podcastPlayer/test/podcastPlayerTestUtils"
 
 vi.mock("@/features/podcast/hooks/usePodcast", () => ({
   usePodcast: vi.fn(),
@@ -33,17 +33,14 @@ describe("PodcastDetail", () => {
     vi.clearAllMocks()
   })
 
-  const renderDetail = (initialEntries: Parameters<typeof MemoryRouter>[0]["initialEntries"]) =>
-    render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <PodcastPlayerProvider>
-          <Routes>
-            <Route path="/" element={<PodcastDetail />} />
-            <Route path="/podcast" element={<div>ポッドキャスト一覧</div>} />
-            <Route path="/podcast/:episodeId" element={<PodcastDetail />} />
-          </Routes>
-        </PodcastPlayerProvider>
-      </MemoryRouter>,
+  const renderDetail = (initialEntries: string[]) =>
+    renderWithPodcastPlayerRouter(
+      <Routes>
+        <Route path="/" element={<PodcastDetail />} />
+        <Route path="/podcast" element={<div>ポッドキャスト一覧</div>} />
+        <Route path="/podcast/:episodeId" element={<PodcastDetail />} />
+      </Routes>,
+      { initialEntries },
     )
 
   it("エピソードIDがない場合はポッドキャスト一覧にリダイレクトする", async () => {

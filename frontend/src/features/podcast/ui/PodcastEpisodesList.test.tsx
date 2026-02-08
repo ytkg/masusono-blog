@@ -1,10 +1,9 @@
-import { render, screen } from "@testing-library/react"
-import { MemoryRouter } from "react-router-dom"
+import { screen } from "@testing-library/react"
 import { type MockedFunction, vi } from "vitest"
 import PodcastEpisodesList from "./PodcastEpisodesList"
 import { usePodcasts } from "@/features/podcast/hooks/usePodcasts"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
-import { PodcastPlayerProvider } from "@/features/podcastPlayer/PodcastPlayerContext"
+import { renderWithPodcastPlayerRouter } from "@/features/podcastPlayer/test/podcastPlayerTestUtils"
 
 vi.mock("@/features/podcast/hooks/usePodcasts", () => ({
   usePodcasts: vi.fn(),
@@ -27,14 +26,7 @@ describe("PodcastEpisodesList", () => {
     vi.clearAllMocks()
   })
 
-  const renderList = () =>
-    render(
-      <MemoryRouter>
-        <PodcastPlayerProvider>
-          <PodcastEpisodesList />
-        </PodcastPlayerProvider>
-      </MemoryRouter>,
-    )
+  const renderList = () => renderWithPodcastPlayerRouter(<PodcastEpisodesList />)
 
   it("ロード中はスケルトンを表示する", () => {
     usePodcastsMock.mockReturnValue(createUsePodcastsResult({ isLoading: true }))

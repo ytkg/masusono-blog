@@ -1,8 +1,11 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
-import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
+import { fireEvent, screen, waitFor, within } from "@testing-library/react"
+import { Link, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
-import { PodcastPlayerProvider } from "@/features/podcastPlayer/PodcastPlayerContext"
+import {
+  mockAudioPlaybackEvents,
+  renderWithPodcastPlayerRouter,
+} from "@/features/podcastPlayer/test/podcastPlayerTestUtils"
 import PodcastEpisodeCard from "@/features/podcast/ui/PodcastEpisodeCard"
 import GlobalPodcastMiniPlayer from "./GlobalPodcastMiniPlayer"
 
@@ -27,16 +30,15 @@ function BlogPage() {
 }
 
 function renderWithRouter() {
-  return render(
-    <MemoryRouter initialEntries={["/podcast"]}>
-      <PodcastPlayerProvider>
-        <Routes>
-          <Route path="/podcast" element={<PodcastPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-        </Routes>
-        <GlobalPodcastMiniPlayer />
-      </PodcastPlayerProvider>
-    </MemoryRouter>,
+  return renderWithPodcastPlayerRouter(
+    <>
+      <Routes>
+        <Route path="/podcast" element={<PodcastPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+      </Routes>
+      <GlobalPodcastMiniPlayer />
+    </>,
+    { initialEntries: ["/podcast"] },
   )
 }
 
@@ -61,13 +63,7 @@ describe("GlobalPodcastMiniPlayer", () => {
   })
 
   it("再生開始後に別ルートへ遷移してもミニプレイヤーを表示する", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("pause"))
-    })
+    mockAudioPlaybackEvents()
 
     renderWithRouter()
 
@@ -80,13 +76,7 @@ describe("GlobalPodcastMiniPlayer", () => {
   })
 
   it("背景タップでは折りたたまず、縮小ボタンで折りたたみ表示に切り替えできる", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("pause"))
-    })
+    mockAudioPlaybackEvents()
 
     renderWithRouter()
 
@@ -104,13 +94,7 @@ describe("GlobalPodcastMiniPlayer", () => {
   })
 
   it("再生操作ボタンをタップしても折りたたみ表示に切り替わらない", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("pause"))
-    })
+    mockAudioPlaybackEvents()
 
     renderWithRouter()
 
@@ -122,13 +106,7 @@ describe("GlobalPodcastMiniPlayer", () => {
   })
 
   it("縮小サムネイルのドラッグで位置を変更できる", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("pause"))
-    })
+    mockAudioPlaybackEvents()
 
     renderWithRouter()
 
@@ -145,13 +123,7 @@ describe("GlobalPodcastMiniPlayer", () => {
   })
 
   it("ドラッグ後に展開して再縮小すると同じ位置に戻る", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("pause"))
-    })
+    mockAudioPlaybackEvents()
 
     renderWithRouter()
 
@@ -180,13 +152,7 @@ describe("GlobalPodcastMiniPlayer", () => {
   })
 
   it("展開/縮小は Enter/Space キーでも操作できる", async () => {
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"))
-      return Promise.resolve()
-    })
-    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("pause"))
-    })
+    mockAudioPlaybackEvents()
 
     renderWithRouter()
 
