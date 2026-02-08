@@ -60,6 +60,28 @@ npm start
 - 新しいトップレベルディレクトリは、用途を `README` または `frontend/docs` に明記してから追加します。
 - 詳細なフロントエンド開発規約は `frontend/docs/development-conventions.md` を参照してください。
 
+### `frontend/src` の責務分割（2026-02-08時点）
+
+- `src/main.tsx`: DOMマウントのみを担当。
+- `src/app`: アプリ初期化と全体構成（`RootApp`, `App`, `AppLayout`, `AppRoutes`）。
+- `src/pages`: ルート単位の画面。
+- `src/features`: 機能単位の実装。
+- `src/shared`: ドメイン非依存の共通実装。
+- `src/components`: アプリ共通レイアウト寄りのコンポーネント（例: `Header`, `Footer`, `ScrollRestoration`）。
+
+### `src/shared` の現行内訳
+
+- `src/shared/api`: 共通 API ヘルパー（`fetchJson`）。
+- `src/shared/lib`: 共通ユーティリティ（`sx` のマージ処理）。
+- `src/shared/ui`: 汎用 UI（`PageContainer`, `ContentCard`, `ContentCardSkeleton`）。
+- `src/shared/navigation`: ルーティング依存の共通 UI（`FeatureLinkCard`）。
+
+### Import 境界ルール
+
+- `src/pages` / `src/features` / `src/shared` から `src/app` を import しません。
+- 旧パス（例: `@/utils/fetchJson`, `@/utils/sx`, `@/components/PageContainer`）は使用しません。
+- 上記は `frontend/biome.json` の `style.noRestrictedImports` で lint 強制しています。
+
 ### テスト / ビルド
 
 ```bash
