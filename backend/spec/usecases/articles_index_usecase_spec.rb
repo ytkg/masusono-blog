@@ -28,7 +28,7 @@ RSpec.describe ArticlesIndexUsecase do
     end
 
     it do
-      expect(result.articles).to eq(
+      expect(result[:articles]).to eq(
         [
           {
             id: "first",
@@ -49,7 +49,7 @@ RSpec.describe ArticlesIndexUsecase do
     end
 
     it "キー順は id, title, publishedDate, content, author" do
-      expect(result.articles.map(&:keys)).to all(eq(%i[id title publishedDate content author]))
+      expect(result[:articles].map(&:keys)).to all(eq(%i[id title publishedDate content author]))
     end
   end
 end

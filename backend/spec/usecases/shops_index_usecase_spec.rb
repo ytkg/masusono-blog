@@ -22,7 +22,7 @@ RSpec.describe ShopsIndexUsecase do
     end
 
     it do
-      expect(result.shops).to eq(
+      expect(result[:shops]).to eq(
         [
           {
             name: "テスト居酒屋",
@@ -37,7 +37,7 @@ RSpec.describe ShopsIndexUsecase do
     end
 
     it "キー順は name, category, lat, lng, url, desc" do
-      expect(result.shops.map(&:keys)).to all(eq(%i[name category lat lng url desc]))
+      expect(result[:shops].map(&:keys)).to all(eq(%i[name category lat lng url desc]))
     end
   end
 end

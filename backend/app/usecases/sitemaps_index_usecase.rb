@@ -1,5 +1,4 @@
 class SitemapsIndexUsecase
-  Result = Struct.new(:xml, :content_type, keyword_init: true)
   CONTENT_TYPE = "application/xml; charset=utf-8".freeze
   BASE_URL = "https://masusono.com".freeze
   BLOG_ENTRY = { changefreq: "monthly", priority: 0.6 }.freeze
@@ -17,7 +16,7 @@ class SitemapsIndexUsecase
   end
 
   def call
-    Result.new(xml: build_sitemap_xml(Article.all), content_type: CONTENT_TYPE)
+    { xml: build_sitemap_xml(Article.all), content_type: CONTENT_TYPE }
   end
 
   private

@@ -1,13 +1,11 @@
 class ShopsIndexUsecase
-  Result = Struct.new(:shops, keyword_init: true)
-
   def self.call
     new.call
   end
 
   def call
     shops = Shop.all.map { |shop| build_shop(shop) }
-    Result.new(shops: shops)
+    { shops: shops }
   end
 
   private

@@ -32,7 +32,7 @@ RSpec.describe PodcastsIndexUsecase do
     end
 
     it do
-      expect(result.podcasts).to eq(
+      expect(result[:podcasts]).to eq(
         [
           {
             id: "001",
@@ -57,7 +57,7 @@ RSpec.describe PodcastsIndexUsecase do
     end
 
     it "キー順は id, title, publishedDate, audioUrl" do
-      expect(result.podcasts.map(&:keys)).to all(eq(%i[id title publishedDate audioUrl]))
+      expect(result[:podcasts].map(&:keys)).to all(eq(%i[id title publishedDate audioUrl]))
     end
   end
 end

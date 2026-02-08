@@ -16,7 +16,7 @@ RSpec.describe "Articles", type: :request do
     end
 
     before do
-      allow(ArticlesIndexUsecase).to receive(:call).and_return(ArticlesIndexUsecase::Result.new(articles: articles))
+      allow(ArticlesIndexUsecase).to receive(:call).and_return({ articles: articles })
     end
 
     it do

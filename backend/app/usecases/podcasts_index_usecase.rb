@@ -1,13 +1,11 @@
 class PodcastsIndexUsecase
-  Result = Struct.new(:podcasts, keyword_init: true)
-
   def self.call
     new.call
   end
 
   def call
     podcasts = Podcast.all.map { |podcast| build_podcast(podcast) }
-    Result.new(podcasts: podcasts)
+    { podcasts: podcasts }
   end
 
   private

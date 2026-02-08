@@ -1,15 +1,13 @@
 class ArticlesIndexUsecase
   include AuthorNameExtractor
 
-  Result = Struct.new(:articles, keyword_init: true)
-
   def self.call
     new.call
   end
 
   def call
     articles = Article.all.map { |article| build_article(article) }
-    Result.new(articles: articles)
+    { articles: articles }
   end
 
   private

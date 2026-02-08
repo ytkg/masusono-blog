@@ -2,7 +2,6 @@ class MetricsIndexUsecase
   include ActiveSupport::NumberHelper
   include AuthorNameExtractor
 
-  Result = Struct.new(:metrics, keyword_init: true)
   LAUNCH_DATE = Date.new(2025, 10, 5)
 
   def self.call
@@ -10,7 +9,7 @@ class MetricsIndexUsecase
   end
 
   def call
-    Result.new(metrics: build_metrics(Article.all))
+    { metrics: build_metrics(Article.all) }
   end
 
   private
