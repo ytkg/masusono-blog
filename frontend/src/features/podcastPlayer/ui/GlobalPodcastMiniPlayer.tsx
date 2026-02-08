@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useState, type MouseEvent as ReactMous
 import Box from "@mui/material/Box"
 import type { SxProps, Theme } from "@mui/material/styles"
 import { useLocation } from "react-router-dom"
-import CollapsedMiniPlayerThumbnail from "./globalPodcastMiniPlayer/CollapsedMiniPlayerThumbnail"
-import ExpandedMiniPlayerPanel from "./globalPodcastMiniPlayer/ExpandedMiniPlayerPanel"
-import { useCollapsedMiniPlayerDrag } from "./globalPodcastMiniPlayer/useCollapsedMiniPlayerDrag"
-import { usePodcastPlayer } from "../features/podcastPlayer/PodcastPlayerContext"
-import { shouldShowMiniPlayer } from "../features/podcastPlayer/miniPlayerVisibility"
+import CollapsedMiniPlayerThumbnail from "./CollapsedMiniPlayerThumbnail"
+import ExpandedMiniPlayerPanel from "./ExpandedMiniPlayerPanel"
+import { useCollapsedMiniPlayerDrag } from "./useCollapsedMiniPlayerDrag"
+import { usePodcastPlayer } from "../PodcastPlayerContext"
+import { shouldShowMiniPlayer } from "../miniPlayerVisibility"
 
 const INTERACTIVE_SELECTOR = [
   "button",
