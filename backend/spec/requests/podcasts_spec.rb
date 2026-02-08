@@ -5,10 +5,10 @@ RSpec.describe "Podcasts", type: :request do
     let(:podcasts) do
       [
         {
-          "id" => "001",
-          "title" => "テスト回",
-          "publishedDate" => "2026/02/07",
-          "audioUrl" => "https://example.com/podcast/001.mp3"
+          id: "001",
+          title: "テスト回",
+          publishedDate: "2026/02/07",
+          audioUrl: "https://example.com/podcast/001.mp3"
         }
       ]
     end
@@ -21,7 +21,7 @@ RSpec.describe "Podcasts", type: :request do
       get "/podcasts"
 
       expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)).to eq(podcasts)
+      expect(JSON.parse(response.body)).to eq(podcasts.as_json)
     end
   end
 end

@@ -50,10 +50,10 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
         PodcastsIndexUsecase::Result.new(
           podcasts: [
             {
-              "id" => "001",
-              "title" => "テスト回",
-              "publishedDate" => "2026/02/07",
-              "audioUrl" => "https://example.com/podcast/001.mp3"
+              id: "001",
+              title: "テスト回",
+              publishedDate: "2026/02/07",
+              audioUrl: "https://example.com/podcast/001.mp3"
             }
           ]
         )
