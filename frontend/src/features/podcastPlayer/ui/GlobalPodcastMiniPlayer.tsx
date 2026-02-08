@@ -5,8 +5,8 @@ import { useLocation } from "react-router-dom"
 import CollapsedMiniPlayerThumbnail from "./CollapsedMiniPlayerThumbnail"
 import ExpandedMiniPlayerPanel from "./ExpandedMiniPlayerPanel"
 import { useCollapsedMiniPlayerDrag } from "./useCollapsedMiniPlayerDrag"
+import { useMiniPlayerVisibility } from "@/features/podcastPlayer/hooks/useMiniPlayerVisibility"
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
-import { shouldShowMiniPlayer } from "@/features/podcastPlayer/miniPlayerVisibility"
 
 export default function GlobalPodcastMiniPlayer() {
   const location = useLocation()
@@ -16,27 +16,13 @@ export default function GlobalPodcastMiniPlayer() {
   const { playerRef, containerStyle, isCustomCollapsedPosition, startDrag, shouldExpandAfterClick, resetPosition } =
     useCollapsedMiniPlayerDrag(isCollapsed)
 
-  const isVisible = useMemo(
-    () =>
-      shouldShowMiniPlayer({
-        pathname: location.pathname,
-        currentEpisodeId: currentEpisode?.id ?? null,
-        visibleEpisodeId,
-      }),
-    [location.pathname, currentEpisode?.id, visibleEpisodeId],
-  )
+  const miniPlayerVisibility = useMiniPlayerVisibility({
+    pathname: location.pathname,
+    currentEpisodeId: currentEpisode?.id ?? null,
+    visibleEpisodeId,
+  })
 
-  useEffect(() => {
-    if (!currentEpisode) {
-      setIsCollapsed(false)
-      resetPosition()
-    }
-  }, [currentEpisode, resetPosition])
-
-  const expandFromCollapsed = useCallback(() => {
-    if (!shouldExpandAfterClick()) return
-    setIsCollapsed(false)
-  }, [shouldExpandAfterClick])
+  const isVisible = miniPlayerVisibility.isVisible
 
   const containerSx = useMemo<SxProps<Theme>>(
     () => ({
@@ -51,10 +37,28 @@ export default function GlobalPodcastMiniPlayer() {
     [isCollapsed, isCustomCollapsedPosition],
   )
 
+  useEffect(() => {
+    if (!currentEpisode) {
+      setIsCollapsed(false)
+      resetPosition()
+    }
+  }, [currentEpisode, resetPosition])
+
+  const expandFromCollapsed = useCallback(() => {
+    if (!shouldExpandAfterClick()) return
+    setIsCollapsed(false)
+  }, [shouldExpandAfterClick])
+
   if (!isVisible || !currentEpisode) return null
 
   return (
-    <Box ref={playerRef} data-testid="global-podcast-mini-player" style={containerStyle} sx={containerSx}>
+    <Box
+      ref={playerRef}
+      data-testid="global-podcast-mini-player"
+      data-visibility-reason={miniPlayerVisibility.reason}
+      style={containerStyle}
+      sx={containerSx}
+    >
       {isCollapsed ? (
         <CollapsedMiniPlayerThumbnail
           title={currentEpisode.title}
