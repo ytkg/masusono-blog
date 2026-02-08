@@ -1,3 +1,4 @@
+import { memo } from "react"
 import Box from "@mui/material/Box"
 import CardMedia from "@mui/material/CardMedia"
 import IconButton from "@mui/material/IconButton"
@@ -28,7 +29,7 @@ function formatTime(value: number) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
 }
 
-export default function PodcastAudioPlayer({
+function PodcastAudioPlayer({
   title,
   isPlaying,
   currentTime,
@@ -110,3 +111,8 @@ export default function PodcastAudioPlayer({
     </Box>
   )
 }
+
+const MemoizedPodcastAudioPlayer = memo(PodcastAudioPlayer)
+MemoizedPodcastAudioPlayer.displayName = "PodcastAudioPlayer"
+
+export default MemoizedPodcastAudioPlayer

@@ -98,6 +98,24 @@ describe("GlobalPodcastMiniPlayer", () => {
     expect(within(miniPlayer).getByAltText("テストエピソード")).toBeInTheDocument()
   })
 
+  it("再生操作ボタンをタップしても折りたたみ表示に切り替わらない", async () => {
+    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
+      this.dispatchEvent(new Event("play"))
+      return Promise.resolve()
+    })
+    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
+      this.dispatchEvent(new Event("pause"))
+    })
+
+    renderWithRouter()
+
+    const miniPlayer = await navigateToBlogWithPlayback()
+    fireEvent.click(within(miniPlayer).getByRole("button", { name: "一時停止" }))
+
+    expect(within(miniPlayer).queryByTestId("global-podcast-mini-player-thumbnail")).not.toBeInTheDocument()
+    expect(within(miniPlayer).getByRole("button", { name: "一時停止" })).toBeInTheDocument()
+  })
+
   it("縮小サムネイルのドラッグで位置を変更できる", async () => {
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
       this.dispatchEvent(new Event("play"))
