@@ -1,6 +1,6 @@
 import Typography from "@mui/material/Typography"
 import PageContainer from "@/shared/ui/PageContainer"
-import { usePageMeta } from "@/hooks/usePageMeta"
+import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import PodcastEpisodesList from "@/features/podcast/ui/PodcastEpisodesList"
 
 export default function Podcast() {

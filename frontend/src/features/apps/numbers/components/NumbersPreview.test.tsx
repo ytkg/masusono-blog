@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react"
 import { type MockedFunction, vi } from "vitest"
 import NumbersPreview from "./NumbersPreview"
-import { useMetrics } from "@/hooks/useMetrics"
-import type { MetricsResponse } from "@/types/metrics"
+import { useMetrics } from "@/features/apps/numbers/hooks/useMetrics"
+import type { MetricsResponse } from "@/features/apps/numbers/model/metrics"
 
-vi.mock("@/hooks/useMetrics", () => ({
+vi.mock("@/features/apps/numbers/hooks/useMetrics", () => ({
   useMetrics: vi.fn(),
 }))
 

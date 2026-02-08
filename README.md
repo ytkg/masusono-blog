@@ -67,7 +67,13 @@ npm start
 - `src/pages`: ルート単位の薄い画面ラッパー（featureのページ実装を合成）。
 - `src/features`: 機能単位の実装。
 - `src/shared`: ドメイン非依存の共通実装。
-- `src/components`: アプリ共通レイアウト寄りのコンポーネント（例: `Header`, `Footer`, `ScrollRestoration`）。
+
+### Phase 4 の整理結果（2026-02-08更新）
+
+- 旧トップレベルの `src/components` / `src/hooks` / `src/types` は撤去。
+- アプリ全体レイアウト部品は `src/app/ui` に配置（`Header`, `Footer`, `ScrollRestoration`）。
+- ページメタ用 hook は `src/shared/hooks/usePageMeta.ts` に配置。
+- 数値アプリ専用の hook / 型は `src/features/apps/numbers/hooks` と `src/features/apps/numbers/model` に配置。
 
 ### `src/features` の現行内訳（Phase 3 更新）
 

@@ -6,7 +6,7 @@ import Link from "@mui/material/Link"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import type { Article } from "@/features/blog/model/article"
 import { useArticle } from "@/features/blog/hooks/useArticle"
-import { usePageMeta } from "@/hooks/usePageMeta"
+import { usePageMeta } from "@/shared/hooks/usePageMeta"
 
 type LocationState = {
   article?: Article

@@ -6,7 +6,7 @@ import PageContainer from "@/shared/ui/PageContainer"
 import PodcastEpisodeCard from "@/features/podcast/ui/PodcastEpisodeCard"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { usePodcast } from "@/features/podcast/hooks/usePodcast"
-import { usePageMeta } from "@/hooks/usePageMeta"
+import { usePageMeta } from "@/shared/hooks/usePageMeta"
 
 type LocationState = {
   episode?: PodcastEpisode

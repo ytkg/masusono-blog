@@ -14,7 +14,7 @@ import markerIconUrl from "leaflet/dist/images/marker-icon.png"
 import markerIcon2xUrl from "leaflet/dist/images/marker-icon-2x.png"
 import markerShadowUrl from "leaflet/dist/images/marker-shadow.png"
 import PageContainer from "@/shared/ui/PageContainer"
-import { usePageMeta } from "@/hooks/usePageMeta"
+import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import { useShops } from "@/features/shops/hooks/useShops"
 import type { Shop } from "@/features/shops/model/shop"
 

@@ -20,10 +20,16 @@
               "@/App.tsx": "`@/app/App` を使用してください。",
               "@/utils/fetchJson": "`@/shared/api/fetchJson` を使用してください。",
               "@/utils/sx": "`@/shared/lib/sx` を使用してください。",
+              "@/components/Header": "`@/app/ui/Header` を使用してください。",
+              "@/components/Footer": "`@/app/ui/Footer` を使用してください。",
+              "@/components/ScrollRestoration": "`@/app/ui/ScrollRestoration` を使用してください。",
               "@/components/PageContainer": "`@/shared/ui/PageContainer` を使用してください。",
               "@/components/ContentCard": "`@/shared/ui/ContentCard` を使用してください。",
               "@/components/ContentCardSkeleton": "`@/shared/ui/ContentCardSkeleton` を使用してください。",
-              "@/components/FeatureLinkCard": "`@/shared/navigation/FeatureLinkCard` を使用してください。"
+              "@/components/FeatureLinkCard": "`@/shared/navigation/FeatureLinkCard` を使用してください。",
+              "@/hooks/usePageMeta": "`@/shared/hooks/usePageMeta` を使用してください。",
+              "@/hooks/useMetrics": "`@/features/apps/numbers/hooks/useMetrics` を使用してください。",
+              "@/types/metrics": "`@/features/apps/numbers/model/metrics` を使用してください。"
             }
           }
         }
@@ -48,10 +54,16 @@
                   "@/App.tsx": "`@/app/App` を使用してください。",
                   "@/utils/fetchJson": "`@/shared/api/fetchJson` を使用してください。",
                   "@/utils/sx": "`@/shared/lib/sx` を使用してください。",
+                  "@/components/Header": "`@/app/ui/Header` を使用してください。",
+                  "@/components/Footer": "`@/app/ui/Footer` を使用してください。",
+                  "@/components/ScrollRestoration": "`@/app/ui/ScrollRestoration` を使用してください。",
                   "@/components/PageContainer": "`@/shared/ui/PageContainer` を使用してください。",
                   "@/components/ContentCard": "`@/shared/ui/ContentCard` を使用してください。",
                   "@/components/ContentCardSkeleton": "`@/shared/ui/ContentCardSkeleton` を使用してください。",
                   "@/components/FeatureLinkCard": "`@/shared/navigation/FeatureLinkCard` を使用してください。",
+                  "@/hooks/usePageMeta": "`@/shared/hooks/usePageMeta` を使用してください。",
+                  "@/hooks/useMetrics": "`@/features/apps/numbers/hooks/useMetrics` を使用してください。",
+                  "@/types/metrics": "`@/features/apps/numbers/model/metrics` を使用してください。",
                   "@/app": "`src/pages` / `src/features` / `src/shared` から `src/app` を参照しないでください。"
                 },
                 "patterns": [

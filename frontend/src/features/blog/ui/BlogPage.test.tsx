@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react"
 import { type MockedFunction, vi } from "vitest"
 import Blog from "./BlogPage"
-import { usePageMeta } from "@/hooks/usePageMeta"
+import { usePageMeta } from "@/shared/hooks/usePageMeta"
 
-vi.mock("@/hooks/usePageMeta", () => ({
+vi.mock("@/shared/hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 

@@ -38,6 +38,13 @@
 - `src/features/apps/masudaRun` / `src/features/apps/numbers` は各アプリ固有実装のみを持つ。
 - `src/pages/Home.tsx` / `src/pages/Shops.tsx` は feature ページを呼び出す薄いルート層に限定する。
 
+## Phase 4 の責務整理（旧ディレクトリ縮小）
+
+- 旧トップレベルの `src/components` / `src/hooks` / `src/types` は撤去し、新規追加しない。
+- アプリ共通レイアウト部品は `src/app/ui` に置く（`Header`, `Footer`, `ScrollRestoration`）。
+- 全画面で使うページメタ hook は `src/shared/hooks/usePageMeta.ts` に置く。
+- ドメイン専用の hook / 型は各 feature 配下に置く（例: `src/features/apps/numbers/hooks/useMetrics.ts`, `src/features/apps/numbers/model/metrics.ts`）。
+
 ## 依存方向ルール（`app` / `shared`）
 
 - `src/app` は `src/pages`・`src/features`・`src/shared` に依存してよい。
@@ -64,8 +71,8 @@
 ## `shared` 対象外（現時点）
 
 - `src/pages/*`: ルート単位の画面責務を持つため `shared` 対象外。
-- `src/components/Header.tsx` / `src/components/Footer.tsx` / `src/components/ScrollRestoration.tsx`: アプリ全体レイアウトとルーティングに依存するため `app` 側責務。
-- `src/features/blog/hooks/useArticles.ts` / `src/features/podcast/hooks/usePodcasts.ts` / `src/features/shops/hooks/useShops.ts` / `src/hooks/useMetrics.ts`: APIエンドポイントとレスポンス型がドメイン依存のため `shared` 対象外。
+- `src/app/ui/Header.tsx` / `src/app/ui/Footer.tsx` / `src/app/ui/ScrollRestoration.tsx`: アプリ全体レイアウトとルーティングに依存するため `app` 側責務。
+- `src/features/blog/hooks/useArticles.ts` / `src/features/podcast/hooks/usePodcasts.ts` / `src/features/shops/hooks/useShops.ts` / `src/features/apps/numbers/hooks/useMetrics.ts`: APIエンドポイントとレスポンス型がドメイン依存のため `shared` 対象外。
 
 ## 次の移行バッチ（提案）
 

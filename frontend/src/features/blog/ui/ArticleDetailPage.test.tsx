@@ -3,14 +3,14 @@ import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import ArticleDetail from "./ArticleDetailPage"
 import { useArticle } from "@/features/blog/hooks/useArticle"
-import { usePageMeta } from "@/hooks/usePageMeta"
+import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import type { Article } from "@/features/blog/model/article"
 
 vi.mock("@/features/blog/hooks/useArticle", () => ({
   useArticle: vi.fn(),
 }))
 
-vi.mock("@/hooks/usePageMeta", () => ({
+vi.mock("@/shared/hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 

@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import HomePage from "./HomePage"
-import { usePageMeta } from "@/hooks/usePageMeta"
+import { usePageMeta } from "@/shared/hooks/usePageMeta"
 
-vi.mock("@/hooks/usePageMeta", () => ({
+vi.mock("@/shared/hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 

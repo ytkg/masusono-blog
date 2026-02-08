@@ -1,8 +1,8 @@
 import Box from "@mui/material/Box"
 import Container from "@mui/material/Container"
-import Footer from "@/components/Footer"
-import Header from "@/components/Header"
-import ScrollRestoration from "@/components/ScrollRestoration"
+import Footer from "@/app/ui/Footer"
+import Header from "@/app/ui/Header"
+import ScrollRestoration from "@/app/ui/ScrollRestoration"
 import GlobalPodcastMiniPlayer from "@/features/podcastPlayer/ui/GlobalPodcastMiniPlayer"
 import AppRoutes from "./AppRoutes"
 
