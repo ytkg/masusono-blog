@@ -25,9 +25,9 @@ RSpec.describe MetricsIndexUsecase do
 
     let(:shops) do
       [
-        { "category" => "居酒屋" },
-        { "category" => "居酒屋" },
-        { "category" => "ラーメン" }
+        { category: "居酒屋" },
+        { category: "居酒屋" },
+        { category: "ラーメン" }
       ]
     end
 

@@ -11,8 +11,8 @@ RSpec.describe Shop do
     end
 
     it do
-      expect(result).to all(include("name", "lat", "lng", "category", "url", "desc"))
-      expect(result).to all(include("lat" => be_a(Numeric), "lng" => be_a(Numeric)))
+      expect(result).to all(include(:name, :lat, :lng, :category, :url, :desc))
+      expect(result).to all(include(lat: be_a(Numeric), lng: be_a(Numeric)))
     end
   end
 end

@@ -14,7 +14,7 @@ RSpec.describe "Podcasts", type: :request do
     end
 
     before do
-      allow(Podcast).to receive(:all).and_return(podcasts)
+      allow(PodcastsIndexUsecase).to receive(:call).and_return(PodcastsIndexUsecase::Result.new(podcasts: podcasts))
     end
 
     it do

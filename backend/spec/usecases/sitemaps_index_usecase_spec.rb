@@ -8,21 +8,21 @@ RSpec.describe SitemapsIndexUsecase do
       [
         {
           id: "hello-world",
-          publishedDate: "2025-10-05T12:34:56+09:00",
+          publishedAt: "2025-10-05T12:34:56+09:00",
           title: "hello world",
           content: "<p>content</p>",
           author: "増田太郎"
         },
         {
           id: "broken-date",
-          publishedDate: "invalid-date",
+          publishedAt: "invalid-date",
           title: "broken date",
           content: "<p>content</p>",
           author: "増田太郎"
         },
         {
           id: nil,
-          publishedDate: "2025-10-05T00:00:00.000Z",
+          publishedAt: "2025-10-05T00:00:00.000Z",
           title: "ignored",
           content: "<p>content</p>",
           author: "増田太郎"

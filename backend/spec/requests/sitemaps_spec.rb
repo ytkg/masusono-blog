@@ -7,7 +7,7 @@ RSpec.describe "Sitemaps", type: :request do
         number = index + 1
         {
           id: "post-#{number}",
-          publishedDate: "2025-10-05T00:00:00.000Z",
+          publishedAt: "2025-10-05T00:00:00.000Z",
           title: "記事#{number}",
           content: "<p>本文#{number}</p>",
           author: "著者#{number}"

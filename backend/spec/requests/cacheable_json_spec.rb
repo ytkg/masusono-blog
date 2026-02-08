@@ -95,12 +95,12 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
         ShopsIndexUsecase::Result.new(
           shops: [
             {
-              "name" => "テスト居酒屋",
-              "lat" => 35.0,
-              "lng" => 139.0,
-              "category" => "居酒屋",
-              "url" => "https://example.com/shop",
-              "desc" => "テスト説明"
+              name: "テスト居酒屋",
+              lat: 35.0,
+              lng: 139.0,
+              category: "居酒屋",
+              url: "https://example.com/shop",
+              desc: "テスト説明"
             }
           ]
         )

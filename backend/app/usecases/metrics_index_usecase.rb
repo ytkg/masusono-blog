@@ -1,5 +1,6 @@
 class MetricsIndexUsecase
   include ActiveSupport::NumberHelper
+  include AuthorNameExtractor
 
   Result = Struct.new(:metrics, keyword_init: true)
   LAUNCH_DATE = Date.new(2025, 10, 5)
@@ -75,7 +76,7 @@ class MetricsIndexUsecase
       totals[:articles] += 1
       totals[:chars] += char_count
 
-      author_name = article[:author].to_s.strip
+      author_name = extract_normalized_author_name(article[:author])
       author_name = "不明" if author_name == ""
       totals[:authors][author_name][:articles] += 1
       totals[:authors][author_name][:chars] += char_count
@@ -86,7 +87,7 @@ class MetricsIndexUsecase
 
   def build_shops_block
     shops = Shop.all
-    categories = shops.group_by { |shop| normalize_shop_category(shop["category"]) }
+    categories = shops.group_by { |shop| normalize_shop_category(shop[:category]) }
     children = categories.sort_by { |name, _| name }.map do |name, items|
       { "label" => "#{name}の件数", "value" => format_count(items.size, "件") }
     end
