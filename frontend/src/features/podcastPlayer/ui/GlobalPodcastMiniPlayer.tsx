@@ -5,8 +5,8 @@ import { useLocation } from "react-router-dom"
 import CollapsedMiniPlayerThumbnail from "./CollapsedMiniPlayerThumbnail"
 import ExpandedMiniPlayerPanel from "./ExpandedMiniPlayerPanel"
 import { useCollapsedMiniPlayerDrag } from "./useCollapsedMiniPlayerDrag"
-import { usePodcastPlayer } from "../PodcastPlayerContext"
-import { shouldShowMiniPlayer } from "../miniPlayerVisibility"
+import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
+import { shouldShowMiniPlayer } from "@/features/podcastPlayer/miniPlayerVisibility"
 
 const INTERACTIVE_SELECTOR = [
   "button",

@@ -1,5 +1,5 @@
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
-import DrawerLauncher from "../components/DrawerLauncher"
+import DrawerLauncher from "@/features/apps/components/DrawerLauncher"
 import MasudaRunGame from "./components/MasudaRunGame"
 
 export default function MasudaRunApp() {

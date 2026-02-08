@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography"
-import PageContainer from "../components/PageContainer"
-import { usePageMeta } from "../hooks/usePageMeta"
-import PodcastEpisodesList from "../components/PodcastEpisodesList"
+import PageContainer from "@/components/PageContainer"
+import { usePageMeta } from "@/hooks/usePageMeta"
+import PodcastEpisodesList from "@/components/PodcastEpisodesList"
 
 export default function Podcast() {
   usePageMeta({

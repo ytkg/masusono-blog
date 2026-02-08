@@ -3,11 +3,11 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
 import Alert from "@mui/material/Alert"
-import type { PodcastEpisode } from "../types/podcast"
+import type { PodcastEpisode } from "@/types/podcast"
 import ContentCard from "./ContentCard"
 import ContentItemCard from "./ContentItemCard"
 import PodcastAudioPlayer from "./PodcastAudioPlayer"
-import { usePodcastPlayer } from "../features/podcastPlayer/PodcastPlayerContext"
+import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
 
 interface PodcastEpisodeCardProps {
   episode?: PodcastEpisode | null

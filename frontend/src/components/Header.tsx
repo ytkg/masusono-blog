@@ -3,7 +3,7 @@ import Box from "@mui/material/Box"
 import Toolbar from "@mui/material/Toolbar"
 import { Link as RouterLink } from "react-router-dom"
 
-import logo from "../assets/logo.png"
+import logo from "@/assets/logo.png"
 
 export default function Header() {
   return (

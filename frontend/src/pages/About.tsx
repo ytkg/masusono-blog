@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import PageContainer from "../components/PageContainer"
-import { usePageMeta } from "../hooks/usePageMeta"
+import PageContainer from "@/components/PageContainer"
+import { usePageMeta } from "@/hooks/usePageMeta"
 
 export default function About() {
   usePageMeta({

@@ -5,7 +5,7 @@ import MasudaRunApp from "./MasudaRunApp"
 
 const drawerSpy = vi.fn()
 
-vi.mock("../components/DrawerLauncher", () => ({
+vi.mock("@/features/apps/components/DrawerLauncher", () => ({
   default: ({ title, buttonAriaLabel, children }: { title: string; buttonAriaLabel: string; children: ReactNode }) => {
     drawerSpy({ title, buttonAriaLabel })
     return (

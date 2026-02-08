@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react"
 import { type MockedFunction, vi } from "vitest"
 import Podcast from "./Podcast"
-import { usePageMeta } from "../hooks/usePageMeta"
+import { usePageMeta } from "@/hooks/usePageMeta"
 
-vi.mock("../hooks/usePageMeta", () => ({
+vi.mock("@/hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 
-vi.mock("../components/PodcastEpisodesList", () => ({
+vi.mock("@/components/PodcastEpisodesList", () => ({
   default: () => <div data-testid="podcast-episodes-list" />,
 }))
 

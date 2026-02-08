@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { useArticles } from "./useArticles"
-import type { Article } from "../types/article"
+import type { Article } from "@/types/article"
 
 export function useArticle(id?: string | null, fallback?: Article | null) {
   const swr = useArticles()

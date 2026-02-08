@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography"
 import type { ReactNode } from "react"
 import { Link as RouterLink } from "react-router-dom"
 import type { SxProps, Theme } from "@mui/material/styles"
-import { mergeSx } from "../utils/sx"
+import { mergeSx } from "@/utils/sx"
 
 interface FeatureLinkCardProps {
   title: string

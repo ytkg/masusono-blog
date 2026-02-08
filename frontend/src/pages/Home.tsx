@@ -2,11 +2,11 @@ import { useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Stack from "@mui/material/Stack"
-import FeatureLinkCard from "../components/FeatureLinkCard"
-import UechanBirthdaySection from "../components/UechanBirthdaySection"
-import { usePageMeta } from "../hooks/usePageMeta"
-import MasudaRunApp from "../features/apps/masudaRun/MasudaRunApp"
-import NumbersApp from "../features/apps/numbers/NumbersApp"
+import FeatureLinkCard from "@/components/FeatureLinkCard"
+import UechanBirthdaySection from "@/components/UechanBirthdaySection"
+import { usePageMeta } from "@/hooks/usePageMeta"
+import MasudaRunApp from "@/features/apps/masudaRun/MasudaRunApp"
+import NumbersApp from "@/features/apps/numbers/NumbersApp"
 
 const featureLinks = [
   { label: "ブログ", description: "最新の記事やお知らせはこちら", to: "/blog" },

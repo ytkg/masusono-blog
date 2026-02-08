@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Alert from "@mui/material/Alert"
-import { useArticles } from "../hooks/useArticles"
+import { useArticles } from "@/hooks/useArticles"
 import ArticleCard from "./ArticleCard"
 import ContentCardSkeleton from "./ContentCardSkeleton"
 

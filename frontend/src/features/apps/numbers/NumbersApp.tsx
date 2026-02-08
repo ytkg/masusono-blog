@@ -1,5 +1,5 @@
 import NumbersIcon from "@mui/icons-material/Numbers"
-import DrawerLauncher from "../components/DrawerLauncher"
+import DrawerLauncher from "@/features/apps/components/DrawerLauncher"
 import NumbersPreview from "./components/NumbersPreview"
 
 export default function NumbersApp() {

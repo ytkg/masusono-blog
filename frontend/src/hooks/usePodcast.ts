@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import type { PodcastEpisode } from "../types/podcast"
+import type { PodcastEpisode } from "@/types/podcast"
 import { usePodcasts } from "./usePodcasts"
 
 export function usePodcast(id?: string | null, fallback?: PodcastEpisode | null) {

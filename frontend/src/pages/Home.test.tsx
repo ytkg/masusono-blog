@@ -2,17 +2,17 @@ import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import Home from "./Home"
-import { usePageMeta } from "../hooks/usePageMeta"
+import { usePageMeta } from "@/hooks/usePageMeta"
 
-vi.mock("../hooks/usePageMeta", () => ({
+vi.mock("@/hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 
-vi.mock("../features/apps/masudaRun/MasudaRunApp", () => ({
+vi.mock("@/features/apps/masudaRun/MasudaRunApp", () => ({
   default: () => <div data-testid="masuda-run-app" />,
 }))
 
-vi.mock("../features/apps/numbers/NumbersApp", () => ({
+vi.mock("@/features/apps/numbers/NumbersApp", () => ({
   default: () => <div data-testid="numbers-app" />,
 }))
 

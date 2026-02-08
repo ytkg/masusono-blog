@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography"
-import ArticlesList from "../components/ArticlesList"
-import PageContainer from "../components/PageContainer"
-import { usePageMeta } from "../hooks/usePageMeta"
+import ArticlesList from "@/components/ArticlesList"
+import PageContainer from "@/components/PageContainer"
+import { usePageMeta } from "@/hooks/usePageMeta"
 
 export default function Blog() {
   usePageMeta({

@@ -2,15 +2,15 @@ import { render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import ArticleDetail from "./ArticleDetail"
-import { useArticle } from "../hooks/useArticle"
-import { usePageMeta } from "../hooks/usePageMeta"
-import type { Article } from "../types/article"
+import { useArticle } from "@/hooks/useArticle"
+import { usePageMeta } from "@/hooks/usePageMeta"
+import type { Article } from "@/types/article"
 
-vi.mock("../hooks/useArticle", () => ({
+vi.mock("@/hooks/useArticle", () => ({
   useArticle: vi.fn(),
 }))
 
-vi.mock("../hooks/usePageMeta", () => ({
+vi.mock("@/hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 

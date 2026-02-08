@@ -2,11 +2,11 @@ import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import PodcastEpisodesList from "./PodcastEpisodesList"
-import { usePodcasts } from "../hooks/usePodcasts"
-import type { PodcastEpisode } from "../types/podcast"
-import { PodcastPlayerProvider } from "../features/podcastPlayer/PodcastPlayerContext"
+import { usePodcasts } from "@/hooks/usePodcasts"
+import type { PodcastEpisode } from "@/types/podcast"
+import { PodcastPlayerProvider } from "@/features/podcastPlayer/PodcastPlayerContext"
 
-vi.mock("../hooks/usePodcasts", () => ({
+vi.mock("@/hooks/usePodcasts", () => ({
   usePodcasts: vi.fn(),
 }))
 

@@ -13,10 +13,10 @@ import L from "leaflet"
 import markerIconUrl from "leaflet/dist/images/marker-icon.png"
 import markerIcon2xUrl from "leaflet/dist/images/marker-icon-2x.png"
 import markerShadowUrl from "leaflet/dist/images/marker-shadow.png"
-import PageContainer from "../components/PageContainer"
-import { usePageMeta } from "../hooks/usePageMeta"
-import { useShops } from "../hooks/useShops"
-import type { Shop } from "../types/shop"
+import PageContainer from "@/components/PageContainer"
+import { usePageMeta } from "@/hooks/usePageMeta"
+import { useShops } from "@/hooks/useShops"
+import type { Shop } from "@/types/shop"
 
 const DEFAULT_CATEGORY = "ALL" as const
 const createShopKey = (shop: Shop) => `${shop.name}-${shop.lat.toFixed(5)}-${shop.lng.toFixed(5)}`
