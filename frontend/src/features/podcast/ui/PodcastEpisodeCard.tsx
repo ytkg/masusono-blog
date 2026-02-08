@@ -81,6 +81,8 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
       return
     }
 
+    // 再生開始直後の1フレームだけミニプレイヤーが出るのを防ぐため、可視状態を先に同期する。
+    setEpisodeVisibility(episode.id, true)
     void playEpisode(episode)
   }
 
