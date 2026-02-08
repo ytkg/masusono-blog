@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import type { PodcastEpisode } from "@/types/podcast"
+import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { PodcastPlayerProvider } from "@/features/podcastPlayer/PodcastPlayerContext"
-import PodcastEpisodeCard from "@/components/PodcastEpisodeCard"
+import PodcastEpisodeCard from "@/features/podcast/ui/PodcastEpisodeCard"
 import GlobalPodcastMiniPlayer from "./GlobalPodcastMiniPlayer"
 
 const episode: PodcastEpisode = {

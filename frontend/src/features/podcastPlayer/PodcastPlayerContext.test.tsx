@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import type { PodcastEpisode } from "@/types/podcast"
+import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { PodcastPlayerProvider, usePodcastPlayer } from "./PodcastPlayerContext"
 
 const episode: PodcastEpisode = {

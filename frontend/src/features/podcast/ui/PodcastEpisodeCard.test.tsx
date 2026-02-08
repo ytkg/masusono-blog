@@ -1,7 +1,7 @@
 import { act, render } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { afterEach, describe, expect, it, type MockedFunction, vi } from "vitest"
-import type { PodcastEpisode } from "@/types/podcast"
+import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
 import PodcastEpisodeCard from "./PodcastEpisodeCard"
 

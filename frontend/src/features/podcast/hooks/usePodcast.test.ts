@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react"
 import { afterEach, describe, expect, it, type MockedFunction, vi } from "vitest"
-import type { PodcastEpisode } from "@/types/podcast"
+import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { usePodcast } from "./usePodcast"
 import { usePodcasts } from "./usePodcasts"
 

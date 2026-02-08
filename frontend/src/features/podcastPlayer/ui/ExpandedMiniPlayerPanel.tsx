@@ -1,6 +1,6 @@
 import { memo, type MouseEvent as ReactMouseEvent } from "react"
 import Box from "@mui/material/Box"
-import PodcastAudioPlayer from "@/components/PodcastAudioPlayer"
+import PodcastAudioPlayer from "@/features/podcast/ui/PodcastAudioPlayer"
 
 interface ExpandedMiniPlayerPanelProps {
   title: string

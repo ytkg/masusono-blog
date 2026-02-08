@@ -1,5 +1,5 @@
 import useSWR from "swr"
-import type { Article } from "@/types/article"
+import type { Article } from "@/features/blog/model/article"
 import { API_BASE } from "@/constants"
 import { fetchJson } from "@/shared/api/fetchJson"
 

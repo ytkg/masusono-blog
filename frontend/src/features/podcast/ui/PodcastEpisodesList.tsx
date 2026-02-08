@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Alert from "@mui/material/Alert"
-import { usePodcasts } from "@/hooks/usePodcasts"
+import { usePodcasts } from "@/features/podcast/hooks/usePodcasts"
 import ContentCardSkeleton from "@/shared/ui/ContentCardSkeleton"
 import PodcastEpisodeCard from "./PodcastEpisodeCard"
 

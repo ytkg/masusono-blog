@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react"
 import { afterEach, describe, expect, it, type MockedFunction, vi } from "vitest"
-import type { Article } from "@/types/article"
+import type { Article } from "@/features/blog/model/article"
 import { useArticle } from "./useArticle"
 import { useArticles } from "./useArticles"
 

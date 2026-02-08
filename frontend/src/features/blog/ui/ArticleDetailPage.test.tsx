@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
-import ArticleDetail from "./ArticleDetail"
-import { useArticle } from "@/hooks/useArticle"
+import ArticleDetail from "./ArticleDetailPage"
+import { useArticle } from "@/features/blog/hooks/useArticle"
 import { usePageMeta } from "@/hooks/usePageMeta"
-import type { Article } from "@/types/article"
+import type { Article } from "@/features/blog/model/article"
 
-vi.mock("@/hooks/useArticle", () => ({
+vi.mock("@/features/blog/hooks/useArticle", () => ({
   useArticle: vi.fn(),
 }))
 

@@ -2,9 +2,9 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
 import Alert from "@mui/material/Alert"
-import type { Article } from "@/types/article"
+import type { Article } from "@/features/blog/model/article"
 import ContentCard from "@/shared/ui/ContentCard"
-import ContentItemCard from "./ContentItemCard"
+import ContentItemCard from "@/shared/ui/ContentItemCard"
 
 interface ArticleCardProps {
   article?: Article | null
