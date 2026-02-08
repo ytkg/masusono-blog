@@ -11,6 +11,17 @@
 - 現行実装（controller/usecase/model）と request spec を基準に確認
 - 現行レスポンスとの差分: なし
 
+## キー記載順ポリシー
+
+可読性と保守性のため、JSON のキー記載順は次に統一する。
+
+1. 識別子: `id`
+2. 表示名: `title` / `name` / `label`
+3. 時系列情報: `publishedDate` / `lastmod`
+4. その他の属性: 本文、URL、座標、ネスト要素など
+
+注記: JSON オブジェクトのキー順は契約の本質ではないため、このポリシーは読みやすさのための規約。
+
 ## GET /articles.json
 
 - Response: `Array<Article>`
@@ -20,8 +31,8 @@
 | key | type | nullable | note |
 | --- | --- | --- | --- |
 | `id` | `String` | No | 記事ID |
-| `publishedDate` | `String` | No | 形式: `YYYY/MM/DD` |
 | `title` | `String` | No | 記事タイトル |
+| `publishedDate` | `String` | No | 形式: `YYYY/MM/DD` |
 | `content` | `String` | No | 本文（HTML） |
 | `author` | `String` | Yes | 著者名。未設定時は `null` |
 
@@ -94,9 +105,9 @@
 | key | type | nullable | note |
 | --- | --- | --- | --- |
 | `name` | `String` | No | 店名 |
+| `category` | `String` | No | カテゴリ |
 | `lat` | `Numeric` | No | 緯度 |
 | `lng` | `Numeric` | No | 経度 |
-| `category` | `String` | No | カテゴリ |
 | `url` | `String` | Yes | 外部URL |
 | `desc` | `String` | Yes | 説明 |
 

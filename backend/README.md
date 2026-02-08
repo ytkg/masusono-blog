@@ -63,6 +63,17 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 - 依存先（microCMS/HTTP）起因の障害は 5xx または 424 で返します。
 - エラーレスポンスでは `Cache-Control: no-store` を返し、失敗レスポンスをキャッシュしません。
 
+## APIレスポンス契約のキー記載順
+
+`backend/docs/api-response-contract.md` では、可読性のために次の順序でキーを記載します。
+
+1. 識別子（例: `id`）
+2. 表示名（例: `title` / `name` / `label`）
+3. 時系列情報（例: `publishedDate` / `lastmod`）
+4. その他の属性
+
+注記: JSON のキー順は本質的契約ではなく、上記はドキュメント表記の統一ルールです。
+
 ## microCMS ページング保護
 
 `Microcms::FetchContentsService` では、異常レスポンスや過大取得による過負荷を防ぐために以下のガードを入れています。
