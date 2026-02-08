@@ -74,6 +74,21 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 
 注記: JSON のキー順は本質的契約ではなく、上記はドキュメント表記の統一ルールです。
 
+## レスポンス整形責務
+
+- Model: 取得責務
+- Usecase: API契約に合わせた整形責務
+- Controller: `render` のみ
+- Serializer: 現在は導入しない
+
+この方針により、レスポンス契約の変更点は Usecase と request spec の差分として追跡します。
+
+## API変更時の手順
+
+1. `backend/docs/api-response-contract.md` を更新
+2. Usecase で整形ロジックを実装/更新
+3. request spec で契約（キー・型・件数・代表値）を固定
+
 ## microCMS ページング保護
 
 `Microcms::FetchContentsService` では、異常レスポンスや過大取得による過負荷を防ぐために以下のガードを入れています。
