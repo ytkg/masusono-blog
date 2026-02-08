@@ -7,7 +7,7 @@ import IconButton from "@mui/material/IconButton"
 import Typography from "@mui/material/Typography"
 import type { SxProps, Theme } from "@mui/material/styles"
 
-export interface DrawerLauncherProps {
+export interface AppsDrawerLauncherProps {
   title: string
   launcherLabel?: string
   buttonAriaLabel: string
@@ -17,7 +17,7 @@ export interface DrawerLauncherProps {
   paperSx?: SxProps<Theme>
 }
 
-export default function DrawerLauncher({
+export default function AppsDrawerLauncher({
   title,
   launcherLabel,
   buttonAriaLabel,
@@ -25,7 +25,7 @@ export default function DrawerLauncher({
   buttonSx,
   buttonIcon,
   paperSx,
-}: DrawerLauncherProps) {
+}: AppsDrawerLauncherProps) {
   const [open, setOpen] = useState(false)
   const titleId = useId()
   const iconBaseSx: SxProps<Theme> = {

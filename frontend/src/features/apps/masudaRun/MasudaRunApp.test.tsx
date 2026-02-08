@@ -5,7 +5,7 @@ import MasudaRunApp from "./MasudaRunApp"
 
 const drawerSpy = vi.fn()
 
-vi.mock("@/features/apps/components/DrawerLauncher", () => ({
+vi.mock("@/features/apps/ui/AppsDrawerLauncher", () => ({
   default: ({ title, buttonAriaLabel, children }: { title: string; buttonAriaLabel: string; children: ReactNode }) => {
     drawerSpy({ title, buttonAriaLabel })
     return (
@@ -25,7 +25,7 @@ describe("MasudaRunApp", () => {
     vi.clearAllMocks()
   })
 
-  it("DrawerLauncher にゲームを埋め込み、タイトルとラベルを渡す", () => {
+  it("AppsDrawerLauncher にゲームを埋め込み、タイトルとラベルを渡す", () => {
     render(<MasudaRunApp />)
 
     const drawer = screen.getByTestId("drawer")
