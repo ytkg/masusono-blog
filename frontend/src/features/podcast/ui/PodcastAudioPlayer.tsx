@@ -14,6 +14,9 @@ import {
   getMiniPlayerSeekSliderAriaLabel,
   MINI_PLAYER_ARIA_LABELS,
 } from "@/features/podcastPlayer/lib/miniPlayerA11y"
+import { useSeekSliderState } from "@/features/podcast/hooks/useSeekSliderState"
+
+const SEEK_SLIDER_STEP_SECONDS = 0.1
 
 interface PodcastAudioPlayerProps {
   title: string
@@ -52,6 +55,12 @@ function PodcastAudioPlayer({
   const seekSliderAriaLabel = isMini
     ? getMiniPlayerSeekSliderAriaLabel(title)
     : getEmbeddedPlayerSeekSliderAriaLabel(title)
+  const { displayedCurrentTime, sliderValue, handleSeekChange, handleSeekCommit } = useSeekSliderState({
+    canSeek,
+    currentTime,
+    duration,
+    onSeekTo,
+  })
 
   return (
     <Box
@@ -102,17 +111,22 @@ function PodcastAudioPlayer({
             <Forward10Icon />
           </IconButton>
           <Typography variant="caption" color="text.secondary" sx={{ ml: "auto", fontVariantNumeric: "tabular-nums" }}>
-            {`${formatTime(currentTime)} / ${formatTime(duration)}`}
+            {`${formatTime(displayedCurrentTime)} / ${formatTime(duration)}`}
           </Typography>
         </Box>
         <Slider
           size="small"
           min={0}
           max={duration > 0 ? duration : 0}
-          value={Math.min(currentTime, duration || 0)}
+          step={SEEK_SLIDER_STEP_SECONDS}
+          value={sliderValue}
+          onChange={(_event, value) => {
+            if (Array.isArray(value)) return
+            handleSeekChange(value)
+          }}
           onChangeCommitted={(_event, value) => {
             if (Array.isArray(value)) return
-            onSeekTo(value)
+            handleSeekCommit()
           }}
           aria-label={seekSliderAriaLabel}
           disabled={!canSeek}
