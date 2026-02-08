@@ -28,6 +28,16 @@
 - 複数の `pages` / `features` から参照される共通実装を提供する。
 - アプリ固有の起動処理やルーティング、個別ページ事情への依存は持たない。
 
+## Phase 3 の責務整理（home / shops / apps）
+
+- `src/features/home/ui` はホーム固有 UI を担当する。
+- `src/features/home/ui/HomePage.tsx` は composition を担当し、表示ブロックは `HomeHero` / `HomeAppLaunchers` / `HomeFeatureLinks` に分割する。
+- `src/features/home/ui/UechanBirthdaySection.tsx` はホーム専用表示として `home` 配下で管理する。
+- `src/features/shops` は推し店ドメインの型・取得・画面を自己完結させる（`model/shop`, `hooks/useShops`, `ui/ShopsPage`）。
+- `src/features/apps/ui/AppsDrawerLauncher.tsx` は apps 内の共通ランチャー UI として扱う。
+- `src/features/apps/masudaRun` / `src/features/apps/numbers` は各アプリ固有実装のみを持つ。
+- `src/pages/Home.tsx` / `src/pages/Shops.tsx` は feature ページを呼び出す薄いルート層に限定する。
+
 ## 依存方向ルール（`app` / `shared`）
 
 - `src/app` は `src/pages`・`src/features`・`src/shared` に依存してよい。
@@ -55,7 +65,7 @@
 
 - `src/pages/*`: ルート単位の画面責務を持つため `shared` 対象外。
 - `src/components/Header.tsx` / `src/components/Footer.tsx` / `src/components/ScrollRestoration.tsx`: アプリ全体レイアウトとルーティングに依存するため `app` 側責務。
-- `src/hooks/useArticles.ts` / `src/hooks/usePodcasts.ts` / `src/hooks/useShops.ts` / `src/hooks/useMetrics.ts`: APIエンドポイントとレスポンス型がドメイン依存のため `shared` 対象外。
+- `src/features/blog/hooks/useArticles.ts` / `src/features/podcast/hooks/usePodcasts.ts` / `src/features/shops/hooks/useShops.ts` / `src/hooks/useMetrics.ts`: APIエンドポイントとレスポンス型がドメイン依存のため `shared` 対象外。
 
 ## 次の移行バッチ（提案）
 

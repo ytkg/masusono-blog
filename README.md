@@ -64,10 +64,17 @@ npm start
 
 - `src/main.tsx`: DOMマウントのみを担当。
 - `src/app`: アプリ初期化と全体構成（`RootApp`, `App`, `AppLayout`, `AppRoutes`）。
-- `src/pages`: ルート単位の画面。
+- `src/pages`: ルート単位の薄い画面ラッパー（featureのページ実装を合成）。
 - `src/features`: 機能単位の実装。
 - `src/shared`: ドメイン非依存の共通実装。
 - `src/components`: アプリ共通レイアウト寄りのコンポーネント（例: `Header`, `Footer`, `ScrollRestoration`）。
+
+### `src/features` の現行内訳（Phase 3 更新）
+
+- `src/features/home/ui`: ホーム固有 UI（`HomePage`, `HomeHero`, `HomeAppLaunchers`, `HomeFeatureLinks`, `UechanBirthdaySection`）。
+- `src/features/shops`: 推し店ドメイン実装（`model/shop`, `hooks/useShops`, `ui/ShopsPage`）。
+- `src/features/apps/ui`: apps横断のランチャーUI（`AppsDrawerLauncher`）。
+- `src/features/apps/masudaRun` / `src/features/apps/numbers`: 各アプリ固有実装。
 
 ### `src/shared` の現行内訳
 
