@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography"
-import PageContainer from "@/components/PageContainer"
+import PageContainer from "@/shared/ui/PageContainer"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import PodcastEpisodesList from "@/components/PodcastEpisodesList"
 

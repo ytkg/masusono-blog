@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles"
 import type { SxProps, Theme } from "@mui/material/styles"
 import type { ReactNode } from "react"
 import { Link as RouterLink, type LinkProps as RouterLinkProps } from "react-router-dom"
-import { mergeSx } from "@/utils/sx"
+import { mergeSx } from "@/shared/lib/sx"
 import ContentCard from "./ContentCard"
 
 interface ContentItemCardProps {

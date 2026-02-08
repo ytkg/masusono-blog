@@ -2,7 +2,7 @@ import { Navigate, useLocation, useParams, Link as RouterLink } from "react-rout
 import Typography from "@mui/material/Typography"
 import Link from "@mui/material/Link"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import PageContainer from "@/components/PageContainer"
+import PageContainer from "@/shared/ui/PageContainer"
 import PodcastEpisodeCard from "@/components/PodcastEpisodeCard"
 import type { PodcastEpisode } from "@/types/podcast"
 import { usePodcast } from "@/hooks/usePodcast"

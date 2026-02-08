@@ -1,6 +1,6 @@
 import Typography from "@mui/material/Typography"
 import ArticlesList from "@/components/ArticlesList"
-import PageContainer from "@/components/PageContainer"
+import PageContainer from "@/shared/ui/PageContainer"
 import { usePageMeta } from "@/hooks/usePageMeta"
 
 export default function Blog() {
