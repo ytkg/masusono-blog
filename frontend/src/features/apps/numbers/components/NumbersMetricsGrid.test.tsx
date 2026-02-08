@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import NumbersMetricsGrid from "./NumbersMetricsGrid"
-import type { MetricBlock } from "../../../../types/metrics"
+import type { MetricBlock } from "@/types/metrics"
 
 const blocks: MetricBlock[] = [
   {

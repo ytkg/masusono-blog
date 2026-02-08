@@ -1,6 +1,6 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { useMetrics } from "../../../../hooks/useMetrics"
+import { useMetrics } from "@/hooks/useMetrics"
 import NumbersMetricsGrid from "./NumbersMetricsGrid"
 
 export default function NumbersPreview() {

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
-import type { PodcastEpisode } from "../../types/podcast"
+import type { PodcastEpisode } from "@/types/podcast"
 
 type PodcastPlayerStatus = "idle" | "loading" | "ready" | "error"
 
