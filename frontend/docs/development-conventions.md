@@ -16,6 +16,11 @@
 - アプリケーション全体の初期化を担う（例: エントリポイント、グローバル Provider、Router）。
 - 画面共通レイアウトや全体導線を組み立てる。
 - 機能実装は `features` / `pages` / `shared` を組み合わせる側に限定し、個別機能の詳細ロジックは持たない。
+- `src/main.tsx` は DOM マウントのみを担当し、起動ロジックは `src/app` に置く。
+- `src/app/RootApp.tsx` で `StrictMode` / `ThemeProvider` / `BrowserRouter` / Service Worker 初期化を扱う。
+- `src/app/App.tsx` はアプリ横断 Provider の合成のみを担当する。
+- `src/app/AppLayout.tsx` はヘッダー・フッター・共通レイアウトを担当する。
+- `src/app/AppRoutes.tsx` はルート定義のみを担当する。
 
 ## `src/shared` の責務
 
@@ -28,6 +33,7 @@
 - `src/app` は `src/pages`・`src/features`・`src/shared` に依存してよい。
 - `src/shared` は `src/app`・`src/pages`・`src/features` に依存しない。
 - `src/shared` 内の依存は `src/shared` 内で完結させる。
+- `src/pages`・`src/features`・`src/shared` から `src/app` を import しない。
 
 ## `shared` に置く候補の棚卸し（2026-02-08）
 
@@ -51,4 +57,4 @@
 
 ## 次の移行バッチ（提案）
 
-- 第3バッチ候補: `src/app` 実体化に伴う `app` / `shared` 依存境界の検証と整理。
+- 第4バッチ候補: 旧パス参照を防ぐため、import 境界ルールを lint で自動検証する。
