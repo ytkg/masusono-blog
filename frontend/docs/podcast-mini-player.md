@@ -10,7 +10,7 @@
 - 再生状態管理: `frontend/src/features/podcastPlayer/PodcastPlayerContext.tsx`
 - 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.ts`
 - UI本体: `frontend/src/features/podcastPlayer/ui/GlobalPodcastMiniPlayer.tsx`
-- 再生UI: `frontend/src/components/PodcastAudioPlayer.tsx`（`variant="mini"`）
+- 再生UI: `frontend/src/features/podcast/ui/PodcastAudioPlayer.tsx`（`variant="mini"`）
 
 ## 表示ルール
 
@@ -48,6 +48,26 @@
 - ドラッグ開始/終了は Pointer Events で処理する。
 - ドラッグ中の誤タップ展開を防ぐため、`3px` 超の移動をドラッグとして扱う。
 - ミニプレイヤーは `z-index` を `appBar + 1` として常に前面表示する。
+
+## a11y 仕様（Issue #65-C）
+
+### aria-label 一覧（ミニプレイヤー）
+
+- 縮小ボタン: `ミニプレイヤーを縮小`
+- 展開サムネイル: `ミニプレイヤーを展開`
+- 再生ボタン: `ミニプレイヤーで再生`
+- 一時停止ボタン: `ミニプレイヤーを一時停止`
+- 10秒戻し: `ミニプレイヤーで10秒戻る`
+- 10秒送り: `ミニプレイヤーで10秒進む`
+- シークバー: `ミニプレイヤーの再生位置: {エピソードタイトル}`
+
+### キーボード操作の期待動作
+
+- `Tab`: ミニプレイヤー内の操作要素へフォーカス移動できること。
+- `Enter` / `Space`: `ミニプレイヤーを縮小` を操作すると縮小されること。
+- `Enter` / `Space`: `ミニプレイヤーを展開` を操作すると展開されること。
+- `Enter` / `Space`: 再生・10秒戻し・10秒送りを操作できること。
+- `ArrowLeft` / `ArrowRight` / `Home` / `End`: シークバー操作ができること（MUI Slider 標準挙動）。
 
 ## 既知の制約
 

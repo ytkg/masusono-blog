@@ -1,6 +1,7 @@
-import { memo, type PointerEvent as ReactPointerEvent } from "react"
+import { memo, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react"
 import Box from "@mui/material/Box"
 import CardMedia from "@mui/material/CardMedia"
+import { MINI_PLAYER_ARIA_LABELS } from "@/features/podcastPlayer/lib/miniPlayerA11y"
 import {
   MINI_PLAYER_CARD_BORDER_RADIUS,
   MINI_PLAYER_CARD_BOX_SHADOW,
@@ -33,14 +34,21 @@ const thumbnailSx = {
 }
 
 function CollapsedMiniPlayerThumbnail({ title, onStartDrag, onExpand }: CollapsedMiniPlayerThumbnailProps) {
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return
+    event.preventDefault()
+    onExpand()
+  }
+
   return (
     <Box
       component="button"
       type="button"
       data-testid="global-podcast-mini-player-thumbnail"
-      aria-label="プレイヤーを展開"
+      aria-label={MINI_PLAYER_ARIA_LABELS.expand}
       onPointerDown={onStartDrag}
       onClick={onExpand}
+      onKeyDown={handleKeyDown}
       sx={thumbnailSx}
     >
       <CardMedia

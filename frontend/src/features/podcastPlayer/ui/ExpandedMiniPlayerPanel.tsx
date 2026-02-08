@@ -1,8 +1,9 @@
-import { memo } from "react"
+import { memo, type KeyboardEvent as ReactKeyboardEvent } from "react"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit"
 import PodcastAudioPlayer from "@/features/podcast/ui/PodcastAudioPlayer"
+import { MINI_PLAYER_ARIA_LABELS } from "@/features/podcastPlayer/lib/miniPlayerA11y"
 import {
   MINI_PLAYER_CARD_BORDER_RADIUS,
   MINI_PLAYER_CARD_BOX_SHADOW,
@@ -51,9 +52,21 @@ function ExpandedMiniPlayerPanel({
   onSeekTo,
   onCollapse,
 }: ExpandedMiniPlayerPanelProps) {
+  const handleCollapseKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return
+    event.preventDefault()
+    onCollapse()
+  }
+
   return (
     <Box sx={panelSx}>
-      <IconButton aria-label="プレイヤーを縮小" size="small" onClick={onCollapse} sx={collapseButtonSx}>
+      <IconButton
+        aria-label={MINI_PLAYER_ARIA_LABELS.collapse}
+        size="small"
+        onClick={onCollapse}
+        onKeyDown={handleCollapseKeyDown}
+        sx={collapseButtonSx}
+      >
         <FullscreenExitIcon sx={{ fontSize: MINI_PLAYER_COLLAPSE_ICON_SIZE_PX }} />
       </IconButton>
       <PodcastAudioPlayer

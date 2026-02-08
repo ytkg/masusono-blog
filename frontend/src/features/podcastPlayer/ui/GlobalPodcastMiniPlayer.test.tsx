@@ -95,9 +95,9 @@ describe("GlobalPodcastMiniPlayer", () => {
     fireEvent.click(within(miniPlayer).getByText("テストエピソード"))
     expect(within(miniPlayer).queryByTestId("global-podcast-mini-player-thumbnail")).not.toBeInTheDocument()
 
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "プレイヤーを縮小" }))
+    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
 
-    expect(within(miniPlayer).getByRole("button", { name: "プレイヤーを展開" })).toBeInTheDocument()
+    expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })).toBeInTheDocument()
     expect(within(miniPlayer).queryByRole("button", { name: "プレイヤーを上下に移動" })).not.toBeInTheDocument()
     expect(within(miniPlayer).getByTestId("global-podcast-mini-player-thumbnail")).toBeInTheDocument()
     expect(within(miniPlayer).getByAltText("テストエピソード")).toBeInTheDocument()
@@ -115,10 +115,10 @@ describe("GlobalPodcastMiniPlayer", () => {
     renderWithRouter()
 
     const miniPlayer = await navigateToBlogWithPlayback()
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "一時停止" }))
+    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを一時停止" }))
 
     expect(within(miniPlayer).queryByTestId("global-podcast-mini-player-thumbnail")).not.toBeInTheDocument()
-    expect(within(miniPlayer).getByRole("button", { name: "一時停止" })).toBeInTheDocument()
+    expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを一時停止" })).toBeInTheDocument()
   })
 
   it("縮小サムネイルのドラッグで位置を変更できる", async () => {
@@ -133,7 +133,7 @@ describe("GlobalPodcastMiniPlayer", () => {
     renderWithRouter()
 
     const miniPlayer = await navigateToBlogWithPlayback()
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "プレイヤーを縮小" }))
+    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
     const thumbnail = within(miniPlayer).getByTestId("global-podcast-mini-player-thumbnail")
 
     fireEvent.pointerDown(thumbnail, { pointerId: 1, button: 0, clientX: 40, clientY: 40 })
@@ -156,7 +156,7 @@ describe("GlobalPodcastMiniPlayer", () => {
     renderWithRouter()
 
     const miniPlayer = await navigateToBlogWithPlayback()
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "プレイヤーを縮小" }))
+    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
     const thumbnail = within(miniPlayer).getByTestId("global-podcast-mini-player-thumbnail")
 
     fireEvent.pointerDown(thumbnail, { pointerId: 1, button: 0, clientX: 40, clientY: 40 })
@@ -174,8 +174,29 @@ describe("GlobalPodcastMiniPlayer", () => {
     expect(miniPlayer.style.top).toBe("")
     expect(miniPlayer.style.left).toBe("")
 
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "プレイヤーを縮小" }))
+    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
     expect(miniPlayer.style.top).toBe(movedTop)
     expect(miniPlayer.style.left).toBe(movedLeft)
+  })
+
+  it("展開/縮小は Enter/Space キーでも操作できる", async () => {
+    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
+      this.dispatchEvent(new Event("play"))
+      return Promise.resolve()
+    })
+    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
+      this.dispatchEvent(new Event("pause"))
+    })
+
+    renderWithRouter()
+
+    const miniPlayer = await navigateToBlogWithPlayback()
+    const collapseButton = within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" })
+    fireEvent.keyDown(collapseButton, { key: "Enter" })
+    expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })).toBeInTheDocument()
+
+    const expandButton = within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })
+    fireEvent.keyDown(expandButton, { key: " " })
+    expect(within(miniPlayer).queryByTestId("global-podcast-mini-player-thumbnail")).not.toBeInTheDocument()
   })
 })

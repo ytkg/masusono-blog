@@ -8,6 +8,12 @@ import Forward10Icon from "@mui/icons-material/Forward10"
 import Replay10Icon from "@mui/icons-material/Replay10"
 import PauseIcon from "@mui/icons-material/Pause"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
+import {
+  EMBEDDED_PLAYER_ARIA_LABELS,
+  getEmbeddedPlayerSeekSliderAriaLabel,
+  getMiniPlayerSeekSliderAriaLabel,
+  MINI_PLAYER_ARIA_LABELS,
+} from "@/features/podcastPlayer/lib/miniPlayerA11y"
 
 interface PodcastAudioPlayerProps {
   title: string
@@ -42,6 +48,10 @@ function PodcastAudioPlayer({
 }: PodcastAudioPlayerProps) {
   const isMini = variant === "mini"
   const canSeek = !disableSeek && duration > 0
+  const labels = isMini ? MINI_PLAYER_ARIA_LABELS : EMBEDDED_PLAYER_ARIA_LABELS
+  const seekSliderAriaLabel = isMini
+    ? getMiniPlayerSeekSliderAriaLabel(title)
+    : getEmbeddedPlayerSeekSliderAriaLabel(title)
 
   return (
     <Box
@@ -76,11 +86,11 @@ function PodcastAudioPlayer({
           </Typography>
         ) : null}
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
-          <IconButton aria-label="10秒戻る" onClick={() => onSeekBy(-10)} size="small" disabled={!canSeek}>
+          <IconButton aria-label={labels.seekBackward10} onClick={() => onSeekBy(-10)} size="small" disabled={!canSeek}>
             <Replay10Icon />
           </IconButton>
           <IconButton
-            aria-label={isPlaying ? "一時停止" : "再生"}
+            aria-label={isPlaying ? labels.pause : labels.play}
             onClick={() => {
               void onTogglePlayback()
             }}
@@ -88,7 +98,7 @@ function PodcastAudioPlayer({
           >
             {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
           </IconButton>
-          <IconButton aria-label="10秒進む" onClick={() => onSeekBy(10)} size="small" disabled={!canSeek}>
+          <IconButton aria-label={labels.seekForward10} onClick={() => onSeekBy(10)} size="small" disabled={!canSeek}>
             <Forward10Icon />
           </IconButton>
           <Typography variant="caption" color="text.secondary" sx={{ ml: "auto", fontVariantNumeric: "tabular-nums" }}>
@@ -104,7 +114,7 @@ function PodcastAudioPlayer({
             if (Array.isArray(value)) return
             onSeekTo(value)
           }}
-          aria-label={`エピソード再生位置: ${title}`}
+          aria-label={seekSliderAriaLabel}
           disabled={!canSeek}
         />
       </Box>
