@@ -28,3 +28,28 @@
 - `src/app` は `src/pages`・`src/features`・`src/shared` に依存してよい。
 - `src/shared` は `src/app`・`src/pages`・`src/features` に依存しない。
 - `src/shared` 内の依存は `src/shared` 内で完結させる。
+
+## `shared` に置く候補の棚卸し（2026-02-08）
+
+- 判定基準は「ドメイン非依存」「複数箇所で再利用」「`app` への逆依存なし」。
+- ここでは棚卸しのみを行い、まだファイル移動は実施しない。
+
+| 対象 | 現在パス | `shared` 配置案 | 判定 | 根拠 |
+| --- | --- | --- | --- | --- |
+| `fetchJson` | `src/utils/fetchJson.ts` | `src/shared/api/fetchJson.ts` | 優先（高） | APIドメインに依存しない HTTP JSON 取得関数。`hooks` 4箇所で共通利用。 |
+| `mergeSx` | `src/utils/sx.ts` | `src/shared/lib/sx.ts` | 優先（高） | MUIの `sx` マージ処理。共通コンポーネント 4箇所で利用。 |
+| `PageContainer` | `src/components/PageContainer.tsx` | `src/shared/ui/PageContainer.tsx` | 優先（高） | ページ共通の余白レイアウト。`pages` 6箇所で利用。 |
+| `ContentCard` | `src/components/ContentCard.tsx` | `src/shared/ui/ContentCard.tsx` | 候補（中） | 表示ドメイン非依存のカード枠。複数カード系コンポーネントで利用。 |
+| `ContentCardSkeleton` | `src/components/ContentCardSkeleton.tsx` | `src/shared/ui/ContentCardSkeleton.tsx` | 候補（中） | `ContentCard` と対で再利用される汎用スケルトン。 |
+| `FeatureLinkCard` | `src/components/FeatureLinkCard.tsx` | `src/shared/ui/FeatureLinkCard.tsx` | 保留 | 汎用UIだが `react-router-dom` 依存があるため、`shared/ui` 直下か `shared/navigation` 配下かを要検討。 |
+
+## `shared` 対象外（現時点）
+
+- `src/pages/*`: ルート単位の画面責務を持つため `shared` 対象外。
+- `src/components/Header.tsx` / `src/components/Footer.tsx` / `src/components/ScrollRestoration.tsx`: アプリ全体レイアウトとルーティングに依存するため `app` 側責務。
+- `src/hooks/useArticles.ts` / `src/hooks/usePodcasts.ts` / `src/hooks/useShops.ts` / `src/hooks/useMetrics.ts`: APIエンドポイントとレスポンス型がドメイン依存のため `shared` 対象外。
+
+## 次の移行バッチ（提案）
+
+- 第1バッチ: `fetchJson` / `mergeSx` / `PageContainer` を `shared` へ移設。
+- 第2バッチ: `ContentCard` / `ContentCardSkeleton` / `FeatureLinkCard` を、ルーティング依存の整理後に移設。
