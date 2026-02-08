@@ -6,7 +6,12 @@ import charImgSrc from "@/assets/masuda_run.png"
 import obsShortSrc from "@/assets/other1.png"
 import obsTallSrc from "@/assets/other2.png"
 import { CFG, CHAR_H, CHAR_W, HIT_H, RESTART_DELAY_MS } from "@/features/apps/masudaRun/lib/constants"
-import { getStoredHighScore, createInitialWorld, persistHighScore, rectsIntersect } from "@/features/apps/masudaRun/lib/world"
+import {
+  getStoredHighScore,
+  createInitialWorld,
+  persistHighScore,
+  rectsIntersect,
+} from "@/features/apps/masudaRun/lib/world"
 import { drawCenterText, drawCloud } from "@/features/apps/masudaRun/lib/draw"
 import { getNow } from "@/features/apps/masudaRun/lib/time"
 import type { GameState, World } from "@/features/apps/masudaRun/lib/types"
