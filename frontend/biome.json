@@ -10,9 +10,63 @@
     "rules": {
       "a11y": {
         "useMediaCaption": "off"
+      },
+      "style": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "@/App": "`@/app/App` を使用してください。",
+              "@/App.tsx": "`@/app/App` を使用してください。",
+              "@/utils/fetchJson": "`@/shared/api/fetchJson` を使用してください。",
+              "@/utils/sx": "`@/shared/lib/sx` を使用してください。",
+              "@/components/PageContainer": "`@/shared/ui/PageContainer` を使用してください。",
+              "@/components/ContentCard": "`@/shared/ui/ContentCard` を使用してください。",
+              "@/components/ContentCardSkeleton": "`@/shared/ui/ContentCardSkeleton` を使用してください。",
+              "@/components/FeatureLinkCard": "`@/shared/navigation/FeatureLinkCard` を使用してください。"
+            }
+          }
+        }
       }
     }
   },
+  "overrides": [
+    {
+      "includes": [
+        "src/pages/**/*.{js,jsx,ts,tsx}",
+        "src/features/**/*.{js,jsx,ts,tsx}",
+        "src/shared/**/*.{js,jsx,ts,tsx}"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@/App": "`@/app/App` を使用してください。",
+                  "@/App.tsx": "`@/app/App` を使用してください。",
+                  "@/utils/fetchJson": "`@/shared/api/fetchJson` を使用してください。",
+                  "@/utils/sx": "`@/shared/lib/sx` を使用してください。",
+                  "@/components/PageContainer": "`@/shared/ui/PageContainer` を使用してください。",
+                  "@/components/ContentCard": "`@/shared/ui/ContentCard` を使用してください。",
+                  "@/components/ContentCardSkeleton": "`@/shared/ui/ContentCardSkeleton` を使用してください。",
+                  "@/components/FeatureLinkCard": "`@/shared/navigation/FeatureLinkCard` を使用してください。",
+                  "@/app": "`src/pages` / `src/features` / `src/shared` から `src/app` を参照しないでください。"
+                },
+                "patterns": [
+                  {
+                    "group": ["@/app/**"],
+                    "message": "`src/pages` / `src/features` / `src/shared` から `src/app` を参照しないでください。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "enabled": true,
     "actions": {

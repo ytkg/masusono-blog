@@ -34,6 +34,8 @@
 - `src/shared` は `src/app`・`src/pages`・`src/features` に依存しない。
 - `src/shared` 内の依存は `src/shared` 内で完結させる。
 - `src/pages`・`src/features`・`src/shared` から `src/app` を import しない。
+- 上記の import 境界は `frontend/biome.json` の `style.noRestrictedImports` で lint 強制する。
+- 旧パス（例: `@/utils/fetchJson`, `@/utils/sx`, `@/components/PageContainer` など）も lint で禁止する。
 
 ## `shared` に置く候補の棚卸し（2026-02-08）
 
