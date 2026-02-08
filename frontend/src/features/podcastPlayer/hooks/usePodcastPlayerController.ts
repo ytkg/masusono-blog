@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
+import { useCallback, useMemo, useReducer, useRef, useState } from "react"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
+import { usePodcastPlayerAudioEvents } from "@/features/podcastPlayer/hooks/usePodcastPlayerAudioEvents"
 import {
   initialPodcastPlayerState,
   podcastPlayerReducer,
@@ -22,24 +23,6 @@ export interface PodcastPlayerControllerValue {
   setEpisodeVisibility: (episodeId: string, visible: boolean) => void
 }
 
-function formatAudioError(audio: HTMLAudioElement) {
-  const mediaError = audio.error
-  if (!mediaError) return "音声の読み込みに失敗しました。"
-
-  switch (mediaError.code) {
-    case mediaError.MEDIA_ERR_ABORTED:
-      return "音声の読み込みが中断されました。"
-    case mediaError.MEDIA_ERR_NETWORK:
-      return "ネットワークエラーで音声を取得できませんでした。"
-    case mediaError.MEDIA_ERR_DECODE:
-      return "音声データの再生に失敗しました。"
-    case mediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-      return "この音声フォーマットは再生できません。"
-    default:
-      return "音声の読み込みに失敗しました。"
-  }
-}
-
 export function usePodcastPlayerController() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playerState, dispatch] = useReducer(podcastPlayerReducer, initialPodcastPlayerState)
@@ -49,56 +32,50 @@ export function usePodcastPlayerController() {
   const [visibleEpisodeIds, setVisibleEpisodeIds] = useState<Set<string>>(() => new Set())
   const { isPlaying, status, error } = playerState
 
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    const handleLoadedMetadata = () => {
-      setDuration(Number.isFinite(audio.duration) ? audio.duration : 0)
-    }
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime || 0)
-    }
-    const handlePlay = () => {
-      dispatch({ type: "PLAY_STARTED" })
-    }
-    const handlePause = () => {
-      dispatch({ type: "PLAY_PAUSED" })
-    }
-    const handleEnded = () => {
-      dispatch({ type: "PLAY_ENDED" })
-      setCurrentTime(Number.isFinite(audio.duration) ? audio.duration : 0)
-    }
-    const handleWaiting = () => {
-      dispatch({ type: "BUFFERING_STARTED" })
-    }
-    const handleCanPlay = () => {
-      dispatch({ type: "CAN_PLAY" })
-    }
-    const handleError = () => {
-      dispatch({ type: "AUDIO_ERROR", error: formatAudioError(audio) })
-    }
-
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata)
-    audio.addEventListener("timeupdate", handleTimeUpdate)
-    audio.addEventListener("play", handlePlay)
-    audio.addEventListener("pause", handlePause)
-    audio.addEventListener("ended", handleEnded)
-    audio.addEventListener("waiting", handleWaiting)
-    audio.addEventListener("canplay", handleCanPlay)
-    audio.addEventListener("error", handleError)
-
-    return () => {
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata)
-      audio.removeEventListener("timeupdate", handleTimeUpdate)
-      audio.removeEventListener("play", handlePlay)
-      audio.removeEventListener("pause", handlePause)
-      audio.removeEventListener("ended", handleEnded)
-      audio.removeEventListener("waiting", handleWaiting)
-      audio.removeEventListener("canplay", handleCanPlay)
-      audio.removeEventListener("error", handleError)
-    }
+  const handleLoadedMetadata = useCallback((nextDuration: number) => {
+    setDuration(nextDuration)
   }, [])
+
+  const handleTimeUpdate = useCallback((nextCurrentTime: number) => {
+    setCurrentTime(nextCurrentTime)
+  }, [])
+
+  const handlePlay = useCallback(() => {
+    dispatch({ type: "PLAY_STARTED" })
+  }, [])
+
+  const handlePause = useCallback(() => {
+    dispatch({ type: "PLAY_PAUSED" })
+  }, [])
+
+  const handleEnded = useCallback((endedAt: number) => {
+    dispatch({ type: "PLAY_ENDED" })
+    setCurrentTime(endedAt)
+  }, [])
+
+  const handleWaiting = useCallback(() => {
+    dispatch({ type: "BUFFERING_STARTED" })
+  }, [])
+
+  const handleCanPlay = useCallback(() => {
+    dispatch({ type: "CAN_PLAY" })
+  }, [])
+
+  const handleError = useCallback((message: string) => {
+    dispatch({ type: "AUDIO_ERROR", error: message })
+  }, [])
+
+  usePodcastPlayerAudioEvents({
+    audioRef,
+    onLoadedMetadata: handleLoadedMetadata,
+    onTimeUpdate: handleTimeUpdate,
+    onPlay: handlePlay,
+    onPause: handlePause,
+    onEnded: handleEnded,
+    onWaiting: handleWaiting,
+    onCanPlay: handleCanPlay,
+    onError: handleError,
+  })
 
   const playEpisode = useCallback(
     async (episode: PodcastEpisode) => {
