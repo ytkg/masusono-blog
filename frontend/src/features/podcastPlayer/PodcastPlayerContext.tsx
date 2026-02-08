@@ -1,7 +1,20 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
-
-type PodcastPlayerStatus = "idle" | "loading" | "ready" | "error"
+import {
+  initialPodcastPlayerState,
+  podcastPlayerReducer,
+  type PodcastPlayerStatus,
+} from "@/features/podcastPlayer/model/podcastPlayerState"
 
 interface PodcastPlayerContextValue {
   currentEpisode: PodcastEpisode | null
@@ -45,13 +58,12 @@ function formatAudioError(audio: HTMLAudioElement) {
 
 export function PodcastPlayerProvider({ children }: PodcastPlayerProviderProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
+  const [playerState, dispatch] = useReducer(podcastPlayerReducer, initialPodcastPlayerState)
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [status, setStatus] = useState<PodcastPlayerStatus>("idle")
-  const [error, setError] = useState<string | null>(null)
   const [visibleEpisodeIds, setVisibleEpisodeIds] = useState<Set<string>>(() => new Set())
+  const { isPlaying, status, error } = playerState
 
   useEffect(() => {
     const audio = audioRef.current
@@ -64,27 +76,23 @@ export function PodcastPlayerProvider({ children }: PodcastPlayerProviderProps) 
       setCurrentTime(audio.currentTime || 0)
     }
     const handlePlay = () => {
-      setIsPlaying(true)
-      setStatus("ready")
-      setError(null)
+      dispatch({ type: "PLAY_STARTED" })
     }
     const handlePause = () => {
-      setIsPlaying(false)
+      dispatch({ type: "PLAY_PAUSED" })
     }
     const handleEnded = () => {
-      setIsPlaying(false)
+      dispatch({ type: "PLAY_ENDED" })
       setCurrentTime(Number.isFinite(audio.duration) ? audio.duration : 0)
     }
     const handleWaiting = () => {
-      setStatus("loading")
+      dispatch({ type: "BUFFERING_STARTED" })
     }
     const handleCanPlay = () => {
-      setStatus("ready")
+      dispatch({ type: "CAN_PLAY" })
     }
     const handleError = () => {
-      setIsPlaying(false)
-      setStatus("error")
-      setError(formatAudioError(audio))
+      dispatch({ type: "AUDIO_ERROR", error: formatAudioError(audio) })
     }
 
     audio.addEventListener("loadedmetadata", handleLoadedMetadata)
@@ -118,8 +126,7 @@ export function PodcastPlayerProvider({ children }: PodcastPlayerProviderProps) 
         setCurrentEpisode(episode)
         setCurrentTime(0)
         setDuration(0)
-        setStatus("loading")
-        setError(null)
+        dispatch({ type: "PLAY_REQUESTED" })
         audio.src = episode.audioUrl
         audio.currentTime = 0
       }
@@ -127,9 +134,10 @@ export function PodcastPlayerProvider({ children }: PodcastPlayerProviderProps) 
       try {
         await audio.play()
       } catch (err) {
-        setStatus("error")
-        setIsPlaying(false)
-        setError(err instanceof Error ? err.message : "再生を開始できませんでした。")
+        dispatch({
+          type: "PLAY_FAILED",
+          error: err instanceof Error ? err.message : "再生を開始できませんでした。",
+        })
       }
     },
     [currentEpisode?.id],
@@ -143,9 +151,10 @@ export function PodcastPlayerProvider({ children }: PodcastPlayerProviderProps) 
       try {
         await audio.play()
       } catch (err) {
-        setStatus("error")
-        setIsPlaying(false)
-        setError(err instanceof Error ? err.message : "再生を開始できませんでした。")
+        dispatch({
+          type: "PLAY_FAILED",
+          error: err instanceof Error ? err.message : "再生を開始できませんでした。",
+        })
       }
       return
     }
@@ -183,12 +192,10 @@ export function PodcastPlayerProvider({ children }: PodcastPlayerProviderProps) 
       audio.load()
     }
     setCurrentEpisode(null)
-    setIsPlaying(false)
     setCurrentTime(0)
     setDuration(0)
-    setStatus("idle")
-    setError(null)
     setVisibleEpisodeIds(new Set())
+    dispatch({ type: "STOPPED" })
   }, [])
 
   const setEpisodeVisibility = useCallback((episodeId: string, visible: boolean) => {
