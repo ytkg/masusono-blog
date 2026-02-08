@@ -84,19 +84,18 @@ module Microcms
     end
 
     def parse_contents(body)
-      json = JSON.parse(body)
-      contents = json["contents"]
+      json = deep_symbolize(JSON.parse(body))
+      contents = json[:contents]
       return [] unless contents.is_a?(Array)
-
       contents
     end
 
     def parse_meta(body)
-      json = JSON.parse(body)
+      json = deep_symbolize(JSON.parse(body))
       {
-        total_count: json["totalCount"],
-        limit: json["limit"],
-        offset: json["offset"]
+        total_count: json[:totalCount],
+        limit: json[:limit],
+        offset: json[:offset]
       }
     rescue JSON::ParserError
       {}
@@ -160,6 +159,19 @@ module Microcms
       uri = URI(self.class::ENDPOINT)
       uri.query = URI.encode_www_form(limit: limit, offset: offset, orders: "-publishedAt")
       uri
+    end
+
+    def deep_symbolize(value)
+      case value
+      when Array
+        value.map { |element| deep_symbolize(element) }
+      when Hash
+        value.each_with_object({}) do |(key, child), result|
+          result[key.to_sym] = deep_symbolize(child)
+        end
+      else
+        value
+      end
     end
   end
 end

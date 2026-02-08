@@ -86,7 +86,7 @@ RSpec.describe Microcms::FetchContentsService do
       it do
         expect(result).to eq(
           [
-            { "id" => "first" }
+            { id: "first" }
           ]
         )
       end
@@ -103,7 +103,7 @@ RSpec.describe Microcms::FetchContentsService do
       end
 
       it do
-        expect(result.map { |content| content["id"] }).to eq(%w[first second])
+        expect(result.map { |content| content[:id] }).to eq(%w[first second])
       end
     end
 
@@ -112,7 +112,7 @@ RSpec.describe Microcms::FetchContentsService do
       let(:first_page_limit) { 0 }
 
       it do
-        expect(result.map { |content| content["id"] }).to eq(%w[first])
+        expect(result.map { |content| content[:id] }).to eq(%w[first])
         expect(logger).to have_received(:warn).with(include("invalid pagination meta"))
         expect(a_request(:get, endpoint).with(query: first_page_query, headers: request_headers)).to have_been_made.once
       end
@@ -126,7 +126,7 @@ RSpec.describe Microcms::FetchContentsService do
       end
 
       it do
-        expect(result.map { |content| content["id"] }).to eq(%w[first])
+        expect(result.map { |content| content[:id] }).to eq(%w[first])
         expect(logger).to have_received(:warn).with(include("max pages reached"))
         expect(a_request(:get, endpoint).with(query: first_page_query, headers: request_headers)).to have_been_made.once
       end
@@ -155,7 +155,7 @@ RSpec.describe Microcms::FetchContentsService do
       end
 
       it do
-        expect(result.map { |content| content["id"] }).to eq(%w[first second third])
+        expect(result.map { |content| content[:id] }).to eq(%w[first second third])
         expect(logger).to have_received(:warn).with(include("max total count reached"))
       end
     end

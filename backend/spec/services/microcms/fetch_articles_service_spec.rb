@@ -15,11 +15,11 @@ RSpec.describe Microcms::FetchArticlesService do
     let(:contents) do
       [
         {
-          "id" => "first",
-          "publishedAt" => "2025-10-05T00:00:00.000Z",
-          "title" => "first title",
-          "content" => "<p>first body</p>",
-          "author" => { "name" => "増田太郎" }
+          id: "first",
+          publishedAt: "2025-10-05T00:00:00.000Z",
+          title: "first title",
+          content: "<p>first body</p>",
+          author: { name: "増田太郎" }
         }
       ]
     end

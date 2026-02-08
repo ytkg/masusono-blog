@@ -15,13 +15,13 @@ RSpec.describe Microcms::FetchPodcastsService do
     let(:contents) do
       [
         {
-          "id" => "i4qq-26pty84",
-          "createdAt" => "2026-02-07T17:04:12.291Z",
-          "updatedAt" => "2026-02-07T17:04:15.788Z",
-          "publishedAt" => "2026-02-07T17:04:12.291Z",
-          "revisedAt" => "2026-02-07T17:04:15.788Z",
-          "title" => "プライベートとか普通とかの話",
-          "audioUrl" => "https://storage.googleapis.com/masusono-podcast/001.mp3"
+          id: "i4qq-26pty84",
+          createdAt: "2026-02-07T17:04:12.291Z",
+          updatedAt: "2026-02-07T17:04:15.788Z",
+          publishedAt: "2026-02-07T17:04:12.291Z",
+          revisedAt: "2026-02-07T17:04:15.788Z",
+          title: "プライベートとか普通とかの話",
+          audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3"
         }
       ]
     end
