@@ -6,7 +6,7 @@ class ApplicationController < ActionController::API
   private
 
   def set_default_cache_headers
-    return unless request.get?
+    return unless request.get? || request.head?
 
     expires_in DEFAULT_CACHE_MAX_AGE, public: true, must_revalidate: true
   end
