@@ -114,10 +114,16 @@ describe("PodcastEpisodeCard visibility", () => {
     expect(callback).toBeTruthy()
 
     act(() => {
-      callback?.([{ isIntersecting: true, intersectionRatio: 0.5 } as IntersectionObserverEntry], {} as IntersectionObserver)
+      callback?.(
+        [{ isIntersecting: true, intersectionRatio: 0.5 } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      )
     })
     act(() => {
-      callback?.([{ isIntersecting: false, intersectionRatio: 0 } as IntersectionObserverEntry], {} as IntersectionObserver)
+      callback?.(
+        [{ isIntersecting: false, intersectionRatio: 0 } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      )
     })
 
     expect(setEpisodeVisibility).toHaveBeenCalledWith("001", true)

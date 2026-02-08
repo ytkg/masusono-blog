@@ -114,7 +114,9 @@ describe("PodcastPlayerContext", () => {
       this.dispatchEvent(new Event("play"))
       return Promise.resolve()
     })
-    const pauseSpy = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
+    const pauseSpy = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (
+      this: HTMLMediaElement,
+    ) {
       pausedState.set(this, true)
       this.dispatchEvent(new Event("pause"))
     })
@@ -176,7 +178,9 @@ describe("PodcastPlayerContext", () => {
       this.dispatchEvent(new Event("play"))
       return Promise.resolve()
     })
-    const pauseSpy = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
+    const pauseSpy = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (
+      this: HTMLMediaElement,
+    ) {
       pausedState.set(this, true)
       this.dispatchEvent(new Event("pause"))
     })
