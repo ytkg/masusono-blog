@@ -7,7 +7,7 @@ vi.mock("../hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }))
 
-vi.mock("./PodcastEpisodesList", () => ({
+vi.mock("../components/PodcastEpisodesList", () => ({
   default: () => <div data-testid="podcast-episodes-list" />,
 }))
 
