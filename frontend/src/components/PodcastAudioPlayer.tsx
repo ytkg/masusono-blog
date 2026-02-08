@@ -123,7 +123,11 @@ export default function PodcastAudioPlayer({ title, audioUrl }: PodcastAudioPlay
             <IconButton aria-label="10秒進む" onClick={() => seekBy(10)} size="small">
               <Forward10Icon />
             </IconButton>
-            <Typography variant="caption" color="text.secondary" sx={{ ml: "auto", fontVariantNumeric: "tabular-nums" }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ ml: "auto", fontVariantNumeric: "tabular-nums" }}
+            >
               {`${formatTime(currentTime)} / ${formatTime(duration)}`}
             </Typography>
           </Box>
