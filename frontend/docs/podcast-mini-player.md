@@ -9,7 +9,7 @@
 
 - 再生状態管理: `frontend/src/features/podcastPlayer/PodcastPlayerContext.tsx`
 - 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.ts`
-- UI本体: `frontend/src/components/GlobalPodcastMiniPlayer.tsx`
+- UI本体: `frontend/src/features/podcastPlayer/ui/GlobalPodcastMiniPlayer.tsx`
 - 再生UI: `frontend/src/components/PodcastAudioPlayer.tsx`（`variant="mini"`）
 
 ## 表示ルール
@@ -57,4 +57,4 @@
 ## テスト
 
 - 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.test.ts`
-- ミニプレイヤー操作: `frontend/src/components/GlobalPodcastMiniPlayer.test.tsx`
+- ミニプレイヤー操作: `frontend/src/features/podcastPlayer/ui/GlobalPodcastMiniPlayer.test.tsx`
