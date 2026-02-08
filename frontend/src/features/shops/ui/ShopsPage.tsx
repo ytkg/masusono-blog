@@ -14,6 +14,7 @@ import markerIconUrl from "leaflet/dist/images/marker-icon.png"
 import markerIcon2xUrl from "leaflet/dist/images/marker-icon-2x.png"
 import markerShadowUrl from "leaflet/dist/images/marker-shadow.png"
 import PageContainer from "@/shared/ui/PageContainer"
+import ContentCardSkeletonList from "@/shared/ui/ContentCardSkeletonList"
 import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import { useShops } from "@/features/shops/hooks/useShops"
 import type { Shop } from "@/features/shops/model/shop"
@@ -147,6 +148,7 @@ function useLeafletMap({ mapContainerRef, shops, visibleShops, selectedKey, onSe
 export default function ShopsPage() {
   const { data, error, isLoading } = useShops()
   const shops = useMemo(() => data ?? [], [data])
+  const showLoadingSkeleton = isLoading && shops.length === 0
   const getKey = useCallback(createShopKey, [])
   const { category, setCategory, categories, filteredShops } = useShopFilter(shops)
   const [selected, setSelected] = useState<string | null>(null)
@@ -217,22 +219,18 @@ export default function ShopsPage() {
 
       {/* List: 独立スクロール領域（地図は固定） */}
       <Box sx={{ overflow: "auto", pr: 1, flex: 1, minHeight: 0, pb: 4 }}>
-        {isLoading && (
-          <Typography variant="body2" color="text.secondary">
-            読み込み中...
-          </Typography>
-        )}
-        {error && (
+        {showLoadingSkeleton && <ContentCardSkeletonList count={4} />}
+        {!showLoadingSkeleton && error && (
           <Typography variant="body2" color="text.secondary">
             データの取得に失敗しました。
           </Typography>
         )}
-        {!isLoading && !error && filteredShops.length === 0 && (
+        {!showLoadingSkeleton && !error && filteredShops.length === 0 && (
           <Typography variant="body2" color="text.secondary">
             表示する推し店がありません。
           </Typography>
         )}
-        {!isLoading && !error && filteredShops.length > 0 && (
+        {!showLoadingSkeleton && !error && filteredShops.length > 0 && (
           <Grid container spacing={2}>
             {filteredShops.map((s) => {
               const key = getKey(s)

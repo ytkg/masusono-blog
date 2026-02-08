@@ -3,22 +3,13 @@ import Typography from "@mui/material/Typography"
 import Alert from "@mui/material/Alert"
 import { useArticles } from "@/features/blog/hooks/useArticles"
 import ArticleCard from "./ArticleCard"
-import ContentCardSkeleton from "@/shared/ui/ContentCardSkeleton"
-
-const SKELETON_COUNT = 6
-const SKELETON_KEYS = Array.from({ length: SKELETON_COUNT }, (_, index) => `skeleton-${index}`)
+import ContentCardSkeletonList from "@/shared/ui/ContentCardSkeletonList"
 
 export default function ArticlesList() {
   const { data: articles, isLoading, error } = useArticles()
 
   if (isLoading && !articles) {
-    return (
-      <Box sx={{ display: "grid", gap: 2 }}>
-        {SKELETON_KEYS.map((key) => (
-          <ContentCardSkeleton key={key} />
-        ))}
-      </Box>
-    )
+    return <ContentCardSkeletonList count={6} itemProps={{ subtitleWidth: "32%", mediaHeight: 160 }} />
   }
 
   if (error && !articles) {

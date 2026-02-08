@@ -2,23 +2,14 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Alert from "@mui/material/Alert"
 import { usePodcasts } from "@/features/podcast/hooks/usePodcasts"
-import ContentCardSkeleton from "@/shared/ui/ContentCardSkeleton"
+import ContentCardSkeletonList from "@/shared/ui/ContentCardSkeletonList"
 import PodcastEpisodeCard from "./PodcastEpisodeCard"
-
-const SKELETON_COUNT = 3
-const SKELETON_KEYS = Array.from({ length: SKELETON_COUNT }, (_, index) => `podcast-skeleton-${index}`)
 
 export default function PodcastEpisodesList() {
   const { data: episodes, isLoading, error } = usePodcasts()
 
   if (isLoading && !episodes) {
-    return (
-      <Box sx={{ display: "grid", gap: 2 }}>
-        {SKELETON_KEYS.map((key) => (
-          <ContentCardSkeleton key={key} />
-        ))}
-      </Box>
-    )
+    return <ContentCardSkeletonList count={6} itemProps={{ subtitleWidth: "50%", mediaHeight: 40 }} />
   }
 
   if (error && !episodes) {

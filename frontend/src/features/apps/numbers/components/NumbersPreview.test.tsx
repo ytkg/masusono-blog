@@ -21,11 +21,11 @@ const createMetricsState = (override: Partial<ReturnType<typeof useMetrics>>) =>
   }) as ReturnType<typeof useMetrics>
 
 describe("NumbersPreview", () => {
-  it("読み込み中を表示する", () => {
+  it("ロード中はスケルトンを表示する", () => {
     useMetricsMock.mockReturnValue(createMetricsState({ isLoading: true }))
-    render(<NumbersPreview />)
+    const { container } = render(<NumbersPreview />)
 
-    expect(screen.getByText("読み込み中...")).toBeInTheDocument()
+    expect(container.querySelectorAll(".MuiSkeleton-root").length).toBeGreaterThan(0)
   })
 
   it("エラー時のメッセージを表示する", () => {

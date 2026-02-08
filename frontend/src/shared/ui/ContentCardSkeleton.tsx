@@ -2,7 +2,7 @@ import Skeleton from "@mui/material/Skeleton"
 import type { SxProps, Theme } from "@mui/material/styles"
 import ContentCard from "./ContentCard"
 
-interface ContentCardSkeletonProps {
+export interface ContentCardSkeletonProps {
   titleWidth?: number | string
   subtitleWidth?: number | string
   mediaHeight?: number
