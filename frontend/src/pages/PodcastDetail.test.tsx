@@ -5,6 +5,7 @@ import PodcastDetail from "./PodcastDetail"
 import { usePodcast } from "../hooks/usePodcast"
 import { usePageMeta } from "../hooks/usePageMeta"
 import type { PodcastEpisode } from "../types/podcast"
+import { PodcastPlayerProvider } from "../features/podcastPlayer/PodcastPlayerContext"
 
 vi.mock("../hooks/usePodcast", () => ({
   usePodcast: vi.fn(),
@@ -32,17 +33,23 @@ describe("PodcastDetail", () => {
     vi.clearAllMocks()
   })
 
+  const renderDetail = (initialEntries: Parameters<typeof MemoryRouter>[0]["initialEntries"]) =>
+    render(
+      <MemoryRouter initialEntries={initialEntries}>
+        <PodcastPlayerProvider>
+          <Routes>
+            <Route path="/" element={<PodcastDetail />} />
+            <Route path="/podcast" element={<div>ポッドキャスト一覧</div>} />
+            <Route path="/podcast/:episodeId" element={<PodcastDetail />} />
+          </Routes>
+        </PodcastPlayerProvider>
+      </MemoryRouter>,
+    )
+
   it("エピソードIDがない場合はポッドキャスト一覧にリダイレクトする", async () => {
     usePodcastMock.mockReturnValue(createUsePodcastResult())
 
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <Routes>
-          <Route path="/" element={<PodcastDetail />} />
-          <Route path="/podcast" element={<div>ポッドキャスト一覧</div>} />
-        </Routes>
-      </MemoryRouter>,
-    )
+    renderDetail(["/"])
 
     expect(await screen.findByText("ポッドキャスト一覧")).toBeInTheDocument()
   })
@@ -56,21 +63,12 @@ describe("PodcastDetail", () => {
     }
     usePodcastMock.mockReturnValue(createUsePodcastResult({ data: episode }))
 
-    render(
-      <MemoryRouter initialEntries={[{ pathname: "/podcast/001", state: { episode } }]}>
-        <Routes>
-          <Route path="/podcast/:episodeId" element={<PodcastDetail />} />
-        </Routes>
-      </MemoryRouter>,
-    )
+    renderDetail([{ pathname: "/podcast/001", state: { episode } }])
 
     expect(screen.getByRole("heading", { level: 2, name: "ポッドキャスト" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 1, name: "テストエピソード" })).toBeInTheDocument()
     expect(screen.getByText("2026/02/08 Episode 001")).toBeInTheDocument()
-    expect(screen.getByLabelText("エピソード音声: テストエピソード")).toHaveAttribute(
-      "src",
-      "https://storage.googleapis.com/masusono-podcast/001.mp3",
-    )
+    expect(screen.getByRole("button", { name: "再生" })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "エピソード一覧に戻る" })).toHaveAttribute("href", "/podcast")
     expect(usePageMetaMock).toHaveBeenCalled()
     const metaArgs = usePageMetaMock.mock.calls[0]?.[0]
@@ -81,13 +79,7 @@ describe("PodcastDetail", () => {
   it("エラーがある場合はエラーメッセージを表示する", () => {
     usePodcastMock.mockReturnValue(createUsePodcastResult({ error: new Error("取得失敗") }))
 
-    render(
-      <MemoryRouter initialEntries={["/podcast/xyz"]}>
-        <Routes>
-          <Route path="/podcast/:episodeId" element={<PodcastDetail />} />
-        </Routes>
-      </MemoryRouter>,
-    )
+    renderDetail(["/podcast/xyz"])
 
     expect(screen.getByRole("heading", { level: 2, name: "ポッドキャスト" })).toBeInTheDocument()
     expect(screen.getByText("取得失敗")).toBeInTheDocument()

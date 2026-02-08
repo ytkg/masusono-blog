@@ -1,0 +1,60 @@
+# Podcastミニプレイヤー仕様
+
+## 目的
+
+- ポッドキャスト再生中に別ページへ遷移しても、再生を継続できるようにする。
+- 再生操作（再生/停止、シーク）をページ横断で継続できるようにする。
+
+## 構成
+
+- 再生状態管理: `frontend/src/features/podcastPlayer/PodcastPlayerContext.tsx`
+- 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.ts`
+- UI本体: `frontend/src/components/GlobalPodcastMiniPlayer.tsx`
+- 再生UI: `frontend/src/components/PodcastAudioPlayer.tsx`（`variant="mini"`）
+
+## 表示ルール
+
+`shouldShowMiniPlayer()` の判定ルールは以下。
+
+1. `currentEpisode` がない場合は非表示。
+2. 現在パスが `/podcast` 以外なら表示。
+3. 現在パスが `/podcast` 配下で、再生中エピソードが画面内にある場合は非表示。
+4. 現在パスが `/podcast` 配下で、再生中エピソードが画面外の場合は表示。
+
+## 操作仕様
+
+### 展開状態
+
+- ミニプレイヤーの再生UIを表示する。
+- `button` / `slider` などの操作要素以外をタップすると縮小する。
+- 再生ボタン、10秒送り/戻し、シークバー操作では縮小しない。
+
+### 縮小状態
+
+- サムネイルのみ表示する。
+- 初回縮小時（未ドラッグ時）は右下に表示する。
+- サムネイルをドラッグして、縦横に移動できる。
+- 画面外に出ないように、上下左右に `8px` マージンで位置をクランプする。
+- サムネイルをタップすると展開する。
+
+### 位置保持
+
+- 縮小状態で移動した位置は保持する。
+- 一度展開して再度縮小した場合、直前の縮小位置に戻る。
+- 再生対象がなくなった場合（`currentEpisode === null`）、縮小状態と位置はリセットする。
+
+## 実装上の補足
+
+- ドラッグ開始/終了は Pointer Events で処理する。
+- ドラッグ中の誤タップ展開を防ぐため、`3px` 超の移動をドラッグとして扱う。
+- ミニプレイヤーは `z-index` を `appBar + 1` として常に前面表示する。
+
+## 既知の制約
+
+- 縮小位置はメモリ上の状態で保持し、リロード後には復元しない。
+- 位置保持はセッション内のみ有効。
+
+## テスト
+
+- 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.test.ts`
+- ミニプレイヤー操作: `frontend/src/components/GlobalPodcastMiniPlayer.test.tsx`
