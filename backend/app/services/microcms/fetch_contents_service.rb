@@ -3,6 +3,9 @@ require "json"
 
 module Microcms
   class FetchContentsService
+    DEFAULT_MAX_PAGES = 100
+    DEFAULT_MAX_TOTAL_COUNT = 10_000
+
     class FetchError < StandardError
       attr_reader :status, :body
 
@@ -31,18 +34,39 @@ module Microcms
       initial_response = response || self.response
       raise_on_error!(initial_response)
 
-      contents = parse_contents(initial_response.body)
+      contents = []
+      first_page_append_result = append_contents(contents, parse_contents(initial_response.body))
+      if first_page_append_result == :max_total_count_reached
+        log_pagination_warning("max total count reached on first page (max_total_count=#{max_total_count})")
+        return contents
+      end
+
       meta = parse_meta(initial_response.body)
       return contents unless pageable?(meta)
+      unless valid_pagination_meta?(meta)
+        log_pagination_warning("invalid pagination meta detected: #{meta.inspect}")
+        return contents
+      end
 
       total_count = meta[:total_count]
       limit = meta[:limit]
       offset = meta[:offset]
+      page_count = 1
       while offset + limit < total_count
+        if page_count >= max_pages
+          log_pagination_warning("max pages reached (max_pages=#{max_pages})")
+          break
+        end
+
         offset += limit
         res = fetch_response(limit: limit, offset: offset)
         raise_on_error!(res)
-        contents.concat(parse_contents(res.body))
+        append_result = append_contents(contents, parse_contents(res.body))
+        page_count += 1
+        if append_result == :max_total_count_reached
+          log_pagination_warning("max total count reached (max_total_count=#{max_total_count})")
+          break
+        end
       end
 
       contents
@@ -92,6 +116,44 @@ module Microcms
       meta[:total_count].is_a?(Integer) &&
         meta[:limit].is_a?(Integer) &&
         meta[:offset].is_a?(Integer)
+    end
+
+    def valid_pagination_meta?(meta)
+      meta[:total_count] >= 0 &&
+        meta[:limit] > 0 &&
+        meta[:offset] >= 0
+    end
+
+    def append_contents(contents, new_contents)
+      remaining = max_total_count - contents.size
+      return :max_total_count_reached if remaining <= 0
+
+      contents.concat(new_contents.first(remaining))
+      return :max_total_count_reached if new_contents.size > remaining
+
+      :ok
+    end
+
+    def max_pages
+      @max_pages ||= parse_positive_integer_env("MICROCMS_MAX_PAGES", DEFAULT_MAX_PAGES)
+    end
+
+    def max_total_count
+      @max_total_count ||= parse_positive_integer_env("MICROCMS_MAX_TOTAL_COUNT", DEFAULT_MAX_TOTAL_COUNT)
+    end
+
+    def parse_positive_integer_env(key, default)
+      raw = ENV[key]
+      return default if raw.nil? || raw.strip.empty?
+
+      parsed = Integer(raw, exception: false)
+      return default unless parsed&.positive?
+
+      parsed
+    end
+
+    def log_pagination_warning(message)
+      Rails.logger.warn("[Microcms::FetchContentsService] #{message}")
     end
 
     def microcms_uri(limit:, offset:)

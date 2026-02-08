@@ -5,6 +5,7 @@ RSpec.describe Microcms::FetchArticlesService do
     subject(:result) { described_class.execute }
 
     let(:endpoint) { described_class::MICROCMS_ARTICLES_ENDPOINT }
+    let(:logger) { instance_double(Logger, warn: nil) }
     let(:request_headers) do
       {
         "Accept" => "application/json",
@@ -14,30 +15,56 @@ RSpec.describe Microcms::FetchArticlesService do
     let(:first_page_query) { { "limit" => "100", "offset" => "0", "orders" => "-publishedAt" } }
     let(:first_page_status) { 200 }
     let(:first_page_response_headers) { { "Content-Type" => "application/json" } }
+    let(:first_page_contents) do
+      [
+        {
+          "id" => "first",
+          "publishedAt" => "2025-10-05T00:00:00.000Z",
+          "title" => "first title",
+          "content" => "<p>first body</p>",
+          "author" => { "name" => "増田太郎" }
+        }
+      ]
+    end
+    let(:first_page_limit) { 100 }
+    let(:first_page_offset) { 0 }
     let(:first_page_body) do
       {
-        contents: [
-          {
-            "id" => "first",
-            "publishedAt" => "2025-10-05T00:00:00.000Z",
-            "title" => "first title",
-            "content" => "<p>first body</p>",
-            "author" => { "name" => "増田太郎" }
-          }
-        ],
+        contents: first_page_contents,
         totalCount: first_page_total_count,
-        limit: 100,
-        offset: 0
+        limit: first_page_limit,
+        offset: first_page_offset
       }.to_json
     end
     let(:first_page_total_count) { 1 }
     let(:second_page_query) { nil }
     let(:second_page_status) { 200 }
     let(:second_page_response_headers) { { "Content-Type" => "application/json" } }
-    let(:second_page_body) { { contents: [] }.to_json }
+    let(:second_page_contents) { [] }
+    let(:second_page_body) do
+      {
+        contents: second_page_contents,
+        totalCount: first_page_total_count,
+        limit: first_page_limit,
+        offset: second_page_offset
+      }.to_json
+    end
+    let(:second_page_offset) { first_page_limit }
+
+    around do |example|
+      original_max_pages = ENV["MICROCMS_MAX_PAGES"]
+      original_max_total_count = ENV["MICROCMS_MAX_TOTAL_COUNT"]
+      ENV.delete("MICROCMS_MAX_PAGES")
+      ENV.delete("MICROCMS_MAX_TOTAL_COUNT")
+      example.run
+    ensure
+      ENV["MICROCMS_MAX_PAGES"] = original_max_pages
+      ENV["MICROCMS_MAX_TOTAL_COUNT"] = original_max_total_count
+    end
 
     before do
       allow(Rails.application.credentials).to receive(:dig).with(:microcms, :api_key).and_return("test-api-key")
+      allow(Rails).to receive(:logger).and_return(logger)
       stub_request(:get, endpoint)
         .with(query: first_page_query, headers: request_headers)
         .to_return(
@@ -94,6 +121,83 @@ RSpec.describe Microcms::FetchArticlesService do
 
       it do
         expect(result.map { |article| article["id"] }).to eq(%w[first second])
+      end
+    end
+
+    context "ページングメタのlimitが不正値の場合" do
+      let(:first_page_total_count) { 200 }
+      let(:first_page_limit) { 0 }
+
+      it do
+        expect(result.map { |article| article["id"] }).to eq(%w[first])
+        expect(logger).to have_received(:warn).with(include("invalid pagination meta"))
+        expect(a_request(:get, endpoint).with(query: first_page_query, headers: request_headers)).to have_been_made.once
+      end
+    end
+
+    context "取得ページ数が上限に達した場合" do
+      let(:first_page_total_count) { 101 }
+
+      before do
+        ENV["MICROCMS_MAX_PAGES"] = "1"
+      end
+
+      it do
+        expect(result.map { |article| article["id"] }).to eq(%w[first])
+        expect(logger).to have_received(:warn).with(include("max pages reached"))
+        expect(a_request(:get, endpoint).with(query: first_page_query, headers: request_headers)).to have_been_made.once
+      end
+    end
+
+    context "取得件数が上限に達した場合" do
+      let(:first_page_total_count) { 10 }
+      let(:first_page_limit) { 2 }
+      let(:first_page_contents) do
+        [
+          {
+            "id" => "first",
+            "publishedAt" => "2025-10-05T00:00:00.000Z",
+            "title" => "first title",
+            "content" => "<p>first body</p>",
+            "author" => { "name" => "増田太郎" }
+          },
+          {
+            "id" => "second",
+            "publishedAt" => "2025-10-05T00:00:00.000Z",
+            "title" => "second title",
+            "content" => "<p>second body</p>",
+            "author" => { "name" => "増田太郎" }
+          }
+        ]
+      end
+      let(:second_page_query) { { "limit" => "2", "offset" => "2", "orders" => "-publishedAt" } }
+      let(:second_page_offset) { 2 }
+      let(:second_page_contents) do
+        [
+          {
+            "id" => "third",
+            "publishedAt" => "2025-10-05T00:00:00.000Z",
+            "title" => "third title",
+            "content" => "<p>third body</p>",
+            "author" => { "name" => "増田太郎" }
+          },
+          {
+            "id" => "fourth",
+            "publishedAt" => "2025-10-05T00:00:00.000Z",
+            "title" => "fourth title",
+            "content" => "<p>fourth body</p>",
+            "author" => { "name" => "増田太郎" }
+          }
+        ]
+      end
+
+      before do
+        ENV["MICROCMS_MAX_TOTAL_COUNT"] = "3"
+      end
+
+      it do
+        expect(result.map { |article| article["id"] }).to eq(%w[first second third])
+        expect(logger).to have_received(:warn).with(include("max total count reached"))
       end
     end
 

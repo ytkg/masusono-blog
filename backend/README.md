@@ -35,6 +35,16 @@ docker compose up --build
 - `GET /shops.json`
 - `GET /sitemap.xml`
 
+## microCMS ページング保護
+
+`Microcms::FetchContentsService` では、異常レスポンスや過大取得による過負荷を防ぐために以下のガードを入れています。
+
+- 不正メタ（例: `limit <= 0`）を検知した場合は追加ページ取得を中断し、警告ログを出します
+- 最大ページ数: `MICROCMS_MAX_PAGES`（デフォルト: `100`）
+- 最大取得件数: `MICROCMS_MAX_TOTAL_COUNT`（デフォルト: `10000`）
+
+環境変数が未設定、空文字、または不正値の場合はデフォルト値を使います。
+
 ## テスト
 
 `backend/` で実行します:
