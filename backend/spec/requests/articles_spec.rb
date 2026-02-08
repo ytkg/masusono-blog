@@ -19,13 +19,21 @@ RSpec.describe "Articles", type: :request do
       allow(ArticlesIndexUsecase).to receive(:call).and_return({ articles: articles })
     end
 
+    it_behaves_like "array json contract",
+                    path: "/articles",
+                    expected_keys: %w[id title publishedDate content author]
+
     it do
       get "/articles"
 
-      expect(response).to have_http_status(:ok)
       payload = JSON.parse(response.body)
       expect(payload.size).to eq(120)
-      expect(payload).to all(include("id", "publishedDate", "title", "content", "author"))
+      first = payload.first
+      expect(first["id"]).to eq("post-1")
+      expect(first["title"]).to eq("記事1")
+      expect(first["publishedDate"]).to eq("2025/10/05")
+      expect(first["content"]).to eq("<p>本文1</p>")
+      expect(first["author"]).to eq("著者1")
     end
   end
 end
