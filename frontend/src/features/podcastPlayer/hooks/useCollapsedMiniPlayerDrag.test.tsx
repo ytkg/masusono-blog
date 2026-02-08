@@ -170,4 +170,34 @@ describe("useCollapsedMiniPlayerDrag", () => {
     expect(result.current.containerStyle?.left).toBe("122px")
     expect(result.current.containerStyle?.top).toBe("72px")
   })
+
+  it("resetPositionでカスタム位置を解除する", () => {
+    const { result } = renderHook(() => useCollapsedMiniPlayerDrag(true))
+    const player = document.createElement("div")
+    mockRect(player, { left: 100, top: 80, width: 70, height: 70 })
+    result.current.playerRef.current = player
+
+    act(() => {
+      result.current.startDrag(
+        createPointerDownEvent({
+          pointerId: 41,
+          clientX: 110,
+          clientY: 90,
+        }),
+      )
+    })
+    fireEvent.pointerMove(window, { pointerId: 41, clientX: 220, clientY: 180 })
+    fireEvent.pointerUp(window, { pointerId: 41 })
+
+    expect(result.current.isCustomCollapsedPosition).toBe(true)
+    expect(result.current.containerStyle?.left).not.toBeUndefined()
+    expect(result.current.containerStyle?.top).not.toBeUndefined()
+
+    act(() => {
+      result.current.resetPosition()
+    })
+
+    expect(result.current.isCustomCollapsedPosition).toBe(false)
+    expect(result.current.containerStyle).toBeUndefined()
+  })
 })

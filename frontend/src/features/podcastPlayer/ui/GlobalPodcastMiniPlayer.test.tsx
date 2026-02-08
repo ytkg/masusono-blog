@@ -105,52 +105,6 @@ describe("GlobalPodcastMiniPlayer", () => {
     expect(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを一時停止" })).toBeInTheDocument()
   })
 
-  it("縮小サムネイルのドラッグで位置を変更できる", async () => {
-    mockAudioPlaybackEvents()
-
-    renderWithRouter()
-
-    const miniPlayer = await navigateToBlogWithPlayback()
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
-    const thumbnail = within(miniPlayer).getByTestId("global-podcast-mini-player-thumbnail")
-
-    fireEvent.pointerDown(thumbnail, { pointerId: 1, button: 0, clientX: 40, clientY: 40 })
-    fireEvent.pointerMove(window, { pointerId: 1, clientX: 220, clientY: 180 })
-    fireEvent.pointerUp(window, { pointerId: 1, clientX: 220, clientY: 180 })
-
-    expect(miniPlayer.style.top).not.toBe("")
-    expect(miniPlayer.style.left).not.toBe("")
-  })
-
-  it("ドラッグ後に展開して再縮小すると同じ位置に戻る", async () => {
-    mockAudioPlaybackEvents()
-
-    renderWithRouter()
-
-    const miniPlayer = await navigateToBlogWithPlayback()
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
-    const thumbnail = within(miniPlayer).getByTestId("global-podcast-mini-player-thumbnail")
-
-    fireEvent.pointerDown(thumbnail, { pointerId: 1, button: 0, clientX: 40, clientY: 40 })
-    fireEvent.pointerMove(window, { pointerId: 1, clientX: 220, clientY: 180 })
-    fireEvent.pointerUp(window, { pointerId: 1, clientX: 220, clientY: 180 })
-    expect(miniPlayer.style.top).not.toBe("")
-    expect(miniPlayer.style.left).not.toBe("")
-    const movedTop = miniPlayer.style.top
-    const movedLeft = miniPlayer.style.left
-
-    fireEvent.click(thumbnail)
-    fireEvent.click(thumbnail)
-
-    expect(within(miniPlayer).queryByTestId("global-podcast-mini-player-thumbnail")).not.toBeInTheDocument()
-    expect(miniPlayer.style.top).toBe("")
-    expect(miniPlayer.style.left).toBe("")
-
-    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを縮小" }))
-    expect(miniPlayer.style.top).toBe(movedTop)
-    expect(miniPlayer.style.left).toBe(movedLeft)
-  })
-
   it("展開/縮小は Enter/Space キーでも操作できる", async () => {
     mockAudioPlaybackEvents()
 
