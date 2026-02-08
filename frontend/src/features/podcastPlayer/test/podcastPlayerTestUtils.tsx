@@ -1,11 +1,12 @@
 import { render } from "@testing-library/react"
 import type { ReactElement } from "react"
 import { MemoryRouter } from "react-router-dom"
+import type { MemoryRouterProps } from "react-router-dom"
 import { vi } from "vitest"
 import { PodcastPlayerProvider } from "@/features/podcastPlayer/PodcastPlayerContext"
 
 interface RenderWithPodcastPlayerRouterOptions {
-  initialEntries?: string[]
+  initialEntries?: MemoryRouterProps["initialEntries"]
 }
 
 export function renderWithPodcastPlayerProvider(ui: ReactElement) {

@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/react"
 import { Route, Routes } from "react-router-dom"
+import type { MemoryRouterProps } from "react-router-dom"
 import { type MockedFunction, vi } from "vitest"
 import PodcastDetail from "./PodcastDetailPage"
 import { usePodcast } from "@/features/podcast/hooks/usePodcast"
@@ -33,7 +34,7 @@ describe("PodcastDetail", () => {
     vi.clearAllMocks()
   })
 
-  const renderDetail = (initialEntries: string[]) =>
+  const renderDetail = (initialEntries: NonNullable<MemoryRouterProps["initialEntries"]>) =>
     renderWithPodcastPlayerRouter(
       <Routes>
         <Route path="/" element={<PodcastDetail />} />
