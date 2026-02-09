@@ -19,6 +19,14 @@ const ACTION_GROUP_SX = {
   alignItems: "center",
 } as const
 
+function formatTime(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "00:00"
+  const totalSeconds = Math.floor(seconds)
+  const minutes = Math.floor(totalSeconds / 60)
+  const secs = totalSeconds % 60
+  return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`
+}
+
 interface PodcastEpisodeCardProps {
   episode?: PodcastEpisode | null
   mode?: "list" | "detail"
@@ -27,7 +35,7 @@ interface PodcastEpisodeCardProps {
 }
 
 export default function PodcastEpisodeCard({ episode, mode = "list", loading, error }: PodcastEpisodeCardProps) {
-  const { currentEpisode, isPlaying, playEpisode, stop } = usePodcastPlayer()
+  const { currentEpisode, isPlaying, currentTime, playEpisode, stop } = usePodcastPlayer()
 
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
@@ -40,6 +48,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
 
   const isActiveEpisode = Boolean(isCurrentEpisode && isPlaying)
   const toggleIconLabel = isActiveEpisode ? MINI_PLAYER_ARIA_LABELS.pause : MINI_PLAYER_ARIA_LABELS.play
+  const displayTime = isCurrentEpisode ? currentTime : 0
 
   const handleToggle = () => {
     if (!episode) return
@@ -94,9 +103,21 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
             aria-pressed={isActiveEpisode}
             aria-live="polite"
             title={toggleIconLabel}
+            sx={{
+              bgcolor: isActiveEpisode ? "primary.main" : "action.selected",
+              color: isActiveEpisode ? "primary.contrastText" : "text.secondary",
+              "&:hover": {
+                bgcolor: isActiveEpisode ? "primary.dark" : "action.focus",
+              },
+              width: 44,
+              height: 44,
+            }}
           >
             {isActiveEpisode ? <PauseIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
           </IconButton>
+          <Typography variant="body2" sx={{ fontVariantNumeric: "tabular-nums", ml: 1 }}>
+            {formatTime(displayTime)}
+          </Typography>
         </Box>
       </ContentItemCard>
     </Box>

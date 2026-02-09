@@ -66,6 +66,7 @@ describe("PodcastEpisodeCard", () => {
     fireEvent.click(button)
 
     expect(playEpisode).toHaveBeenCalledWith(episode)
+    expect(screen.getByText("00:00")).toBeInTheDocument()
   })
 
   it("再生中のエピソードではボタンが停止になり stop を呼ぶ", () => {
@@ -74,6 +75,7 @@ describe("PodcastEpisodeCard", () => {
       createPlayerMock({
         currentEpisode: { ...episode },
         isPlaying: true,
+        currentTime: 75,
         stop,
       }),
     )
@@ -90,6 +92,7 @@ describe("PodcastEpisodeCard", () => {
     fireEvent.click(button)
 
     expect(stop).toHaveBeenCalled()
+    expect(screen.getByText("01:15")).toBeInTheDocument()
   })
 
   it("detailモードでも操作ボタンが表示される", () => {
