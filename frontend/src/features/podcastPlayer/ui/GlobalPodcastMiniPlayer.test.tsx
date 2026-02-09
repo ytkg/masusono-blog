@@ -54,6 +54,10 @@ async function navigateToBlogWithPlayback() {
   fireEvent.click(within(card).getByRole("button", { name: playButtonLabel }))
 
   await waitFor(() => {
+    expect(within(card).getByRole("button", { name: stopButtonLabel })).toBeInTheDocument()
+  })
+
+  await waitFor(() => {
     expect(screen.getByTestId("global-podcast-mini-player")).toBeInTheDocument()
   })
 

@@ -24,7 +24,7 @@ interface PodcastEpisodeCardProps {
 }
 
 export default function PodcastEpisodeCard({ episode, mode = "list", loading, error }: PodcastEpisodeCardProps) {
-  const { currentEpisode, playEpisode, stop } = usePodcastPlayer()
+  const { currentEpisode, isPlaying, playEpisode, stop } = usePodcastPlayer()
 
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
@@ -35,14 +35,17 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
   const episodeId = episode?.id
   const isCurrentEpisode = Boolean(episodeId && currentEpisode?.id === episodeId)
 
-  const handlePlayClick = () => {
-    if (!episode) return
-    void playEpisode(episode)
-  }
+  const isActiveEpisode = Boolean(isCurrentEpisode && isPlaying)
+  const actionLabel = isActiveEpisode ? "停止" : "再生"
+  const buttonAriaLabel = `${actionLabel}: ${episode?.title ?? ""}`
 
-  const handleStopClick = () => {
-    if (!isCurrentEpisode) return
-    stop()
+  const handleToggle = () => {
+    if (!episode) return
+    if (isActiveEpisode) {
+      stop()
+      return
+    }
+    void playEpisode(episode)
   }
 
   if (isLoading) {
@@ -82,17 +85,15 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
         metaParts={[episode.publishedDate, `Episode ${episode.id}`]}
       >
         <Box sx={ACTION_GROUP_SX} data-testid="podcast-episode-card-actions">
-          <Button variant="contained" size="small" onClick={handlePlayClick} aria-label={`再生: ${episode.title}`}>
-            再生
-          </Button>
           <Button
-            variant="outlined"
+            variant={isActiveEpisode ? "outlined" : "contained"}
             size="small"
-            onClick={handleStopClick}
-            disabled={!isCurrentEpisode}
-            aria-label={`停止: ${episode.title}`}
+            onClick={handleToggle}
+            aria-label={buttonAriaLabel}
+            aria-pressed={isActiveEpisode}
+            aria-live="polite"
           >
-            停止
+            {actionLabel}
           </Button>
         </Box>
       </ContentItemCard>

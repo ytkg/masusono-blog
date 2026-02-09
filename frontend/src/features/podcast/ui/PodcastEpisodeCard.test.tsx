@@ -43,9 +43,15 @@ describe("PodcastEpisodeCard", () => {
     vi.clearAllMocks()
   })
 
-  it("非再生中エピソードの再生ボタンで playEpisode を呼ぶ", () => {
+  it("非再生中エピソードのボタンで playEpisode を呼び、状態が再生に切り替わる", () => {
     const playEpisode = vi.fn()
-    usePodcastPlayerMock.mockReturnValue(createPlayerMock({ currentEpisode: { ...episode, id: "other" }, playEpisode }))
+    usePodcastPlayerMock.mockReturnValue(
+      createPlayerMock({
+        currentEpisode: { ...episode, id: "other" },
+        isPlaying: false,
+        playEpisode,
+      }),
+    )
 
     render(
       <MemoryRouter>
@@ -53,15 +59,23 @@ describe("PodcastEpisodeCard", () => {
       </MemoryRouter>,
     )
 
-    fireEvent.click(screen.getByRole("button", { name: playButtonLabel }))
+    const button = screen.getByRole("button", { name: playButtonLabel })
+    expect(button).toHaveAttribute("aria-pressed", "false")
+
+    fireEvent.click(button)
 
     expect(playEpisode).toHaveBeenCalledWith(episode)
-    expect(screen.getByRole("button", { name: stopButtonLabel })).toBeDisabled()
   })
 
-  it("再生中のエピソードでは停止ボタンで stop を呼ぶ", () => {
+  it("再生中のエピソードではボタンが停止になり stop を呼ぶ", () => {
     const stop = vi.fn()
-    usePodcastPlayerMock.mockReturnValue(createPlayerMock({ currentEpisode: { ...episode }, stop }))
+    usePodcastPlayerMock.mockReturnValue(
+      createPlayerMock({
+        currentEpisode: { ...episode },
+        isPlaying: true,
+        stop,
+      }),
+    )
 
     render(
       <MemoryRouter>
@@ -69,15 +83,15 @@ describe("PodcastEpisodeCard", () => {
       </MemoryRouter>,
     )
 
-    const stopButton = screen.getByRole("button", { name: stopButtonLabel })
-    expect(stopButton).not.toBeDisabled()
+    const button = screen.getByRole("button", { name: stopButtonLabel })
+    expect(button).toHaveAttribute("aria-pressed", "true")
 
-    fireEvent.click(stopButton)
+    fireEvent.click(button)
 
     expect(stop).toHaveBeenCalled()
   })
 
-  it("詳細モードでも操作ボタンが表示される", () => {
+  it("detailモードでも操作ボタンが表示される", () => {
     usePodcastPlayerMock.mockReturnValue(createPlayerMock())
 
     render(
