@@ -8,8 +8,11 @@
 ## 構成
 
 - 再生状態管理: `frontend/src/features/podcastPlayer/PodcastPlayerContext.tsx`
-- 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.ts`
+- 表示判定ロジック: `frontend/src/features/podcastPlayer/miniPlayerVisibility.ts`
+- 表示判定hook: `frontend/src/features/podcastPlayer/hooks/useMiniPlayerVisibility.ts`
 - UI本体: `frontend/src/features/podcastPlayer/ui/GlobalPodcastMiniPlayer.tsx`
+- UI状態管理: `frontend/src/features/podcastPlayer/hooks/useGlobalPodcastMiniPlayerUi.ts`
+- FLIPアニメーション: `frontend/src/features/podcastPlayer/hooks/useMiniPlayerFlipAnimation.ts`
 - 閉じる状態管理: `frontend/src/features/podcastPlayer/hooks/useMiniPlayerDismissal.ts`
 - 再生UI: `frontend/src/features/podcast/ui/PodcastAudioPlayer.tsx`（`variant="mini"`）
 
