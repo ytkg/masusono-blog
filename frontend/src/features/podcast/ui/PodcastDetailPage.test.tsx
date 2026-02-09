@@ -7,6 +7,7 @@ import { usePodcast } from "@/features/podcast/hooks/usePodcast"
 import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { renderWithPodcastPlayerRouter } from "@/features/podcastPlayer/test/podcastPlayerTestUtils"
+import { MINI_PLAYER_ARIA_LABELS } from "@/features/podcastPlayer/lib/miniPlayerA11y"
 
 vi.mock("@/features/podcast/hooks/usePodcast", () => ({
   usePodcast: vi.fn(),
@@ -66,7 +67,7 @@ describe("PodcastDetail", () => {
     expect(screen.getByRole("heading", { level: 2, name: "ポッドキャスト" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 1, name: "テストエピソード" })).toBeInTheDocument()
     expect(screen.getByText("2026/02/08 Episode 001")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: `再生: ${episode.title}` })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: MINI_PLAYER_ARIA_LABELS.play })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "エピソード一覧に戻る" })).toHaveAttribute("href", "/podcast")
     expect(usePageMetaMock).toHaveBeenCalled()
     const metaArgs = usePageMetaMock.mock.calls[0]?.[0]

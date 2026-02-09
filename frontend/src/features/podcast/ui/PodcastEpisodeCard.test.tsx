@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom"
 import { afterEach, describe, expect, it, type MockedFunction, vi } from "vitest"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
+import { MINI_PLAYER_ARIA_LABELS } from "@/features/podcastPlayer/lib/miniPlayerA11y"
 import PodcastEpisodeCard from "./PodcastEpisodeCard"
 
 vi.mock("@/features/podcastPlayer/PodcastPlayerContext", () => ({
@@ -17,8 +18,8 @@ const episode: PodcastEpisode = {
   publishedDate: "2026/02/08",
   audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3",
 }
-const playButtonLabel = `再生: ${episode.title}`
-const stopButtonLabel = `停止: ${episode.title}`
+const playButtonLabel = MINI_PLAYER_ARIA_LABELS.play
+const stopButtonLabel = MINI_PLAYER_ARIA_LABELS.pause
 
 function createPlayerMock(overrides: Partial<ReturnType<typeof usePodcastPlayer>> = {}) {
   return {

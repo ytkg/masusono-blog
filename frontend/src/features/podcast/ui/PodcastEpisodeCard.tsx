@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
+import IconButton from "@mui/material/IconButton"
 import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
 import Alert from "@mui/material/Alert"
@@ -7,6 +7,9 @@ import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import ContentCard from "@/shared/ui/ContentCard"
 import ContentItemCard from "@/shared/ui/ContentItemCard"
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
+import { MINI_PLAYER_ARIA_LABELS } from "@/features/podcastPlayer/lib/miniPlayerA11y"
+import PauseIcon from "@mui/icons-material/Pause"
+import PlayArrowIcon from "@mui/icons-material/PlayArrow"
 
 const ACTION_GROUP_SX = {
   mt: 1,
@@ -36,8 +39,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
   const isCurrentEpisode = Boolean(episodeId && currentEpisode?.id === episodeId)
 
   const isActiveEpisode = Boolean(isCurrentEpisode && isPlaying)
-  const actionLabel = isActiveEpisode ? "停止" : "再生"
-  const buttonAriaLabel = `${actionLabel}: ${episode?.title ?? ""}`
+  const toggleIconLabel = isActiveEpisode ? MINI_PLAYER_ARIA_LABELS.pause : MINI_PLAYER_ARIA_LABELS.play
 
   const handleToggle = () => {
     if (!episode) return
@@ -85,16 +87,16 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
         metaParts={[episode.publishedDate, `Episode ${episode.id}`]}
       >
         <Box sx={ACTION_GROUP_SX} data-testid="podcast-episode-card-actions">
-          <Button
-            variant={isActiveEpisode ? "outlined" : "contained"}
-            size="small"
+          <IconButton
+            color="primary"
             onClick={handleToggle}
-            aria-label={buttonAriaLabel}
+            aria-label={toggleIconLabel}
             aria-pressed={isActiveEpisode}
             aria-live="polite"
+            title={toggleIconLabel}
           >
-            {actionLabel}
-          </Button>
+            {isActiveEpisode ? <PauseIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+          </IconButton>
         </Box>
       </ContentItemCard>
     </Box>

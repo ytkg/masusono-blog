@@ -4,6 +4,7 @@ import PodcastEpisodesList from "./PodcastEpisodesList"
 import { usePodcasts } from "@/features/podcast/hooks/usePodcasts"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { renderWithPodcastPlayerRouter } from "@/features/podcastPlayer/test/podcastPlayerTestUtils"
+import { MINI_PLAYER_ARIA_LABELS } from "@/features/podcastPlayer/lib/miniPlayerA11y"
 
 vi.mock("@/features/podcast/hooks/usePodcasts", () => ({
   usePodcasts: vi.fn(),
@@ -68,6 +69,6 @@ describe("PodcastEpisodesList", () => {
     expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "プライベートとか普通とかの話" })).toHaveAttribute("href", "/podcast/001")
     expect(screen.getByText("2026/02/07 Episode 001")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: `再生: ${episodes[0].title}` })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: MINI_PLAYER_ARIA_LABELS.play })).toBeInTheDocument()
   })
 })
