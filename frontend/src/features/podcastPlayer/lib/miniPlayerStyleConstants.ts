@@ -2,14 +2,14 @@ export const MINI_PLAYER_EDGE_MARGIN_PX = 8
 export const MINI_PLAYER_DRAG_FALLBACK_SIZE_PX = 72
 export const MINI_PLAYER_DRAG_THRESHOLD_PX = 3
 
-export const MINI_PLAYER_CONTAINER_RIGHT = { xs: 8, sm: 12 } as const
-export const MINI_PLAYER_CONTAINER_LEFT_EXPANDED = { xs: 8, sm: "auto" } as const
+export const MINI_PLAYER_CONTAINER_RIGHT = { xs: 16, sm: 24 } as const
+export const MINI_PLAYER_CONTAINER_LEFT_EXPANDED = { xs: 16, sm: "auto" } as const
 export const MINI_PLAYER_CONTAINER_BOTTOM = {
   xs: "calc(96px + env(safe-area-inset-bottom))",
   sm: 108,
 } as const
-export const MINI_PLAYER_CONTAINER_WIDTH_EXPANDED = { xs: "calc(100% - 16px)", sm: 380 } as const
-export const MINI_PLAYER_CONTAINER_MAX_WIDTH_COLLAPSED = "calc(100% - 16px)"
+export const MINI_PLAYER_CONTAINER_WIDTH_EXPANDED = { xs: "calc(100% - 32px)", sm: 380 } as const
+export const MINI_PLAYER_CONTAINER_MAX_WIDTH_COLLAPSED = "calc(100% - 32px)"
 export const MINI_PLAYER_CONTAINER_Z_INDEX_OFFSET = 1
 
 export const MINI_PLAYER_CARD_PADDING = 0.75

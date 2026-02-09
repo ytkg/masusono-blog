@@ -85,7 +85,7 @@ export default function AppsDrawerLauncher({
         aria-labelledby={titleId}
         PaperProps={{ sx: paperCombinedSx }}
       >
-        <Box sx={{ height: "100%", display: "flex", flexDirection: "column", gap: 3, p: { xs: 3, sm: 4 } }}>
+        <Box sx={{ height: "100%", display: "flex", flexDirection: "column", gap: 3, p: { xs: 2, sm: 3 } }}>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Typography id={titleId} variant="h5" component="h2" sx={{ fontWeight: 600 }}>
               {title}
