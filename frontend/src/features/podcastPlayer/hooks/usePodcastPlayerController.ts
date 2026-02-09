@@ -151,15 +151,11 @@ export function usePodcastPlayerController() {
 
   const stop = useCallback(() => {
     const audio = audioRef.current
-    if (audio) {
-      audio.pause()
-      audio.removeAttribute("src")
-      audio.load()
-    }
-    setCurrentEpisode(null)
-    setCurrentTime(0)
-    setDuration(0)
-    dispatch({ type: "STOPPED" })
+    if (!audio) return
+
+    audio.pause()
+    setCurrentTime(audio.currentTime || 0)
+    dispatch({ type: "PLAY_PAUSED" })
   }, [])
 
   const value = useMemo<PodcastPlayerControllerValue>(

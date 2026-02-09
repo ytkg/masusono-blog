@@ -146,27 +146,31 @@ describe("PodcastPlayerContext", () => {
     })
   })
 
-  it("stopで再生状態を初期化する", async () => {
+  it("stopで再生を一時停止し、位置を保持する", async () => {
     const { pauseSpy } = mockToggleableAudioPlayback()
-    const loadSpy = vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {})
-
-    renderProvider()
+    const { audio } = renderProvider()
+    Object.defineProperty(audio, "duration", { value: 120, writable: true, configurable: true })
 
     fireEvent.click(screen.getByRole("button", { name: "play-episode" }))
     await waitFor(() => {
       expect(screen.getByTestId("current-episode")).toHaveTextContent("001")
+      expect(screen.getByTestId("is-playing")).toHaveTextContent("true")
+    })
+
+    fireEvent.click(screen.getByRole("button", { name: "seek-over" }))
+    await waitFor(() => {
+      expect(screen.getByTestId("current-time")).toHaveTextContent("120")
     })
 
     fireEvent.click(screen.getByRole("button", { name: "stop" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("current-episode")).toHaveTextContent("")
+      expect(screen.getByTestId("current-episode")).toHaveTextContent("001")
       expect(screen.getByTestId("is-playing")).toHaveTextContent("false")
-      expect(screen.getByTestId("status")).toHaveTextContent("idle")
-      expect(screen.getByTestId("current-time")).toHaveTextContent("0")
+      expect(screen.getByTestId("status")).toHaveTextContent("ready")
+      expect(screen.getByTestId("current-time")).toHaveTextContent("120")
     })
     expect(pauseSpy).toHaveBeenCalled()
-    expect(loadSpy).toHaveBeenCalled()
   })
 
   it("Provider外でusePodcastPlayerを呼ぶとエラーを投げる", () => {
