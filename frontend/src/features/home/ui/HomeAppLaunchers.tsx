@@ -2,7 +2,6 @@ import Box from "@mui/material/Box"
 import MasudaRunApp from "@/features/apps/masudaRun/MasudaRunApp"
 import NumbersApp from "@/features/apps/numbers/NumbersApp"
 import SettingsApp from "@/features/apps/settings/SettingsApp"
-import LocationApp from "@/features/apps/location/LocationApp"
 
 export default function HomeAppLaunchers() {
   return (
@@ -10,7 +9,6 @@ export default function HomeAppLaunchers() {
       <MasudaRunApp />
       <NumbersApp />
       <SettingsApp />
-      <LocationApp />
     </Box>
   )
 }
