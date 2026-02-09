@@ -50,11 +50,8 @@ RSpec.describe MetricsIndexUsecase do
       it do
         expect(blocks.first).to eq(
           {
-            "kind" => "single",
-            "metric" => {
-              "label" => "増田とその他！始動から（2025/10/05〜）",
-              "value" => "5 日"
-            }
+            "label" => "増田とその他！始動から（2025/10/05〜）",
+            "value" => "5 日"
           }
         )
       end
@@ -62,14 +59,14 @@ RSpec.describe MetricsIndexUsecase do
 
     describe "ブログ" do
       let(:blog_block) { blocks.find { |block| block["label"] == "ブログ" } }
-      let(:groups) { blog_block["groups"] }
+      let(:children) { blog_block["children"] }
 
       it do
         expect(blog_block).not_to be_nil
       end
 
       it do
-        total_articles = groups.find { |group| group["label"] == "総記事数" }
+        total_articles = children.find { |child| child["label"] == "総記事数" }
 
         expect(total_articles["value"]).to eq("2 本")
         expect(total_articles["children"]).to include(
@@ -79,7 +76,7 @@ RSpec.describe MetricsIndexUsecase do
       end
 
       it do
-        total_chars = groups.find { |group| group["label"] == "総文字数" }
+        total_chars = children.find { |child| child["label"] == "総文字数" }
 
         expect(total_chars["value"]).to eq("5 字")
         expect(total_chars["children"]).to include(
@@ -97,7 +94,7 @@ RSpec.describe MetricsIndexUsecase do
       end
 
       it do
-        total_shops = shops_block["groups"].first
+        total_shops = shops_block["children"].first
 
         expect(total_shops["value"]).to eq("3 件")
         expect(total_shops["children"]).to include(
@@ -108,14 +105,14 @@ RSpec.describe MetricsIndexUsecase do
     end
 
     describe "ポッドキャスト" do
-      let(:podcast_block) { blocks.find { |block| block.dig("metric", "label") == "ポッドキャスト総本数" } }
+      let(:podcast_block) { blocks.find { |block| block["label"] == "ポッドキャスト総本数" } }
 
       it do
         expect(podcast_block).not_to be_nil
       end
 
       it do
-        expect(podcast_block.dig("metric", "value")).to eq("1 本")
+        expect(podcast_block["value"]).to eq("1 本")
       end
     end
   end

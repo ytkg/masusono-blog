@@ -3,7 +3,7 @@ import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Typography from "@mui/material/Typography"
-import type { Metric, MetricBlock, MetricGroup } from "@/features/apps/numbers/model/metrics"
+import type { MetricBlock } from "@/features/apps/numbers/model/metrics"
 
 type NumbersMetricsGridProps = {
   blocks: MetricBlock[]
@@ -15,82 +15,70 @@ const blocksGridSx = {
   gap: 2,
 }
 
-const groupGridSx = {
+const childRowsGridSx = {
   display: "grid",
   gridTemplateColumns: "1fr auto",
   columnGap: 2,
   rowGap: 1.25,
 }
 
-const labelIndentSx = {
-  parent: { pl: 2 },
-  child: { pl: 4 },
-} as const
+const indentSx = [{ pl: 2 }, { pl: 4 }, { pl: 6 }] as const
 const valueSx = { fontWeight: 700, fontSize: "22px", textAlign: "right" as const, justifySelf: "end" as const }
 const labelTextSx = { fontSize: "14px" }
 
-type GroupRow = {
+type MetricRow = {
   id: string
   label: string
-  value: string
-  indent: "parent" | "child"
+  value: string | null
+  depth: number
 }
 
-const buildGroupRows = (groups: MetricGroup[]): GroupRow[] =>
-  groups.flatMap((group, groupIndex) => [
-    {
-      id: `group-${groupIndex}`,
-      label: group.label,
-      value: group.value,
-      indent: "parent" as const,
-    },
-    ...group.children.map((child, childIndex) => ({
-      id: `group-${groupIndex}-child-${childIndex}`,
-      label: child.label,
-      value: child.value,
-      indent: "child" as const,
-    })),
-  ])
+const flattenMetricRows = (blocks: MetricBlock[], depth = 0, prefix = ""): MetricRow[] =>
+  blocks.flatMap((block, index) => {
+    const id = `${prefix}-${index}`
+    const node: MetricRow = { id, label: block.label, value: block.value, depth }
+    const children = block.children ? flattenMetricRows(block.children, depth + 1, id) : []
+    return [node, ...children]
+  })
 
-function SingleMetricCard({ metric }: { metric: Metric }) {
+function MetricRowList({ rows }: { rows: MetricRow[] }) {
   return (
-    <Card variant="outlined" sx={{ height: "100%", gridColumn: { xs: "auto", sm: "1 / -1" } }}>
-      <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1, py: 1.5 }}>
-        <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
-          {metric.label}
-        </Typography>
-        <Typography variant="h4" sx={valueSx}>
-          {metric.value}
-        </Typography>
-      </CardContent>
-    </Card>
+    <Box sx={childRowsGridSx}>
+      {rows.map((row) => (
+        <Fragment key={row.id}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ ...labelTextSx, ...(indentSx[row.depth] ?? indentSx[indentSx.length - 1]) }}
+          >
+            {row.label}
+          </Typography>
+          <Typography variant="h4" sx={valueSx}>
+            {row.value ?? "—"}
+          </Typography>
+        </Fragment>
+      ))}
+    </Box>
   )
 }
 
-function GroupMetricCard({ label, groups }: { label: string; groups: MetricGroup[] }) {
-  const rows = buildGroupRows(groups)
+function MetricCard({ block }: { block: MetricBlock }) {
+  const rows = flattenMetricRows(block.children ?? [])
+  const hasRows = rows.length > 0
+  const showValue = !hasRows || Boolean(block.value)
+
   return (
     <Card variant="outlined" sx={{ gridColumn: { xs: "auto", sm: "1 / -1" } }}>
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.25, py: 1.5 }}>
         <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
-          {label}
+          {block.label}
         </Typography>
-        <Box sx={groupGridSx}>
-          {rows.map((row) => (
-            <Fragment key={row.id}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ ...labelTextSx, ...labelIndentSx[row.indent] }}
-              >
-                {row.label}
-              </Typography>
-              <Typography variant="h4" sx={valueSx}>
-                {row.value}
-              </Typography>
-            </Fragment>
-          ))}
-        </Box>
+        {showValue && (
+          <Typography variant="h4" sx={valueSx}>
+            {block.value ?? "—"}
+          </Typography>
+        )}
+        {hasRows && <MetricRowList rows={rows} />}
       </CardContent>
     </Card>
   )
@@ -99,12 +87,9 @@ function GroupMetricCard({ label, groups }: { label: string; groups: MetricGroup
 export default function NumbersMetricsGrid({ blocks }: NumbersMetricsGridProps) {
   return (
     <Box sx={blocksGridSx}>
-      {blocks.map((block) => {
-        if (block.kind === "group") {
-          return <GroupMetricCard key={block.label} label={block.label} groups={block.groups} />
-        }
-        return <SingleMetricCard key={block.metric.label} metric={block.metric} />
-      })}
+      {blocks.map((block) => (
+        <MetricCard key={block.label} block={block} />
+      ))}
     </Box>
   )
 }

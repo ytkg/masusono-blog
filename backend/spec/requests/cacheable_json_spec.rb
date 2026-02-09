@@ -72,11 +72,8 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
           metrics: {
             "blocks" => [
               {
-                "kind" => "single",
-                "metric" => {
-                  "label" => "ポッドキャスト総本数",
-                  "value" => "1 本"
-                }
+                "label" => "ポッドキャスト総本数",
+                "value" => "1 本"
               }
             ]
           }

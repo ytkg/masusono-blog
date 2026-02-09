@@ -38,11 +38,11 @@ describe("NumbersPreview", () => {
   it("取得したメトリクスを描画する", () => {
     const response: MetricsResponse = {
       blocks: [
-        { kind: "single", metric: { label: "公開からの日数", value: "10 日" } },
+        { label: "公開からの日数", value: "10 日" },
         {
-          kind: "group",
           label: "ブログ",
-          groups: [
+          value: null,
+          children: [
             {
               label: "総記事数",
               value: "3 本",

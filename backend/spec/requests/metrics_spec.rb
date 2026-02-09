@@ -6,16 +6,13 @@ RSpec.describe "Metrics", type: :request do
       {
         "blocks" => [
           {
-            "kind" => "single",
-            "metric" => {
-              "label" => "ポッドキャスト総本数",
-              "value" => "1 本"
-            }
+            "label" => "ポッドキャスト総本数",
+            "value" => "1 本"
           },
           {
-            "kind" => "group",
             "label" => "ブログ",
-            "groups" => [
+            "value" => nil,
+            "children" => [
               {
                 "label" => "総記事数",
                 "value" => "2 本",
@@ -41,10 +38,9 @@ RSpec.describe "Metrics", type: :request do
       expect(payload.keys).to eq([ "blocks" ])
       expect(payload["blocks"]).to be_an(Array)
       expect(payload["blocks"].size).to eq(2)
-      expect(payload["blocks"].first["kind"]).to eq("single")
-      expect(payload["blocks"].first.dig("metric", "label")).to eq("ポッドキャスト総本数")
-      expect(payload["blocks"].second["kind"]).to eq("group")
-      expect(payload["blocks"].second["groups"]).to be_an(Array)
+      expect(payload["blocks"].first["value"]).to eq("1 本")
+      expect(payload["blocks"].second["label"]).to eq("ブログ")
+      expect(payload["blocks"].second["children"]).to be_an(Array)
     end
   end
 end

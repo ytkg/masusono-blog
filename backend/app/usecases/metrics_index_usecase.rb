@@ -27,36 +27,24 @@ class MetricsIndexUsecase
     end
     {
       "blocks" => [
+        build_block(label: "増田とその他！始動から（#{LAUNCH_DATE.strftime('%Y/%m/%d')}〜）", value: "#{days_since_launch} 日"),
         {
-          "kind" => "single",
-          "metric" => {
-            "label" => "増田とその他！始動から（#{LAUNCH_DATE.strftime('%Y/%m/%d')}〜）",
-            "value" => "#{days_since_launch} 日"
-          }
-        },
-        {
-          "kind" => "group",
           "label" => "ブログ",
-          "groups" => [
-            {
-              "label" => "総記事数",
-              "value" => format_count(totals[:articles], "本"),
-              "children" => author_article_children
-            },
-            {
-              "label" => "総文字数",
-              "value" => format_count(totals[:chars], "字"),
-              "children" => author_char_children
-            }
+          "value" => nil,
+          "children" => [
+            build_block(
+              label: "総記事数",
+              value: format_count(totals[:articles], "本"),
+              children: author_article_children
+            ),
+            build_block(
+              label: "総文字数",
+              value: format_count(totals[:chars], "字"),
+              children: author_char_children
+            )
           ]
         },
-        {
-          "kind" => "single",
-          "metric" => {
-            "label" => "ポッドキャスト総本数",
-            "value" => format_count(podcast_total, "本")
-          }
-        },
+        build_block(label: "ポッドキャスト総本数", value: format_count(podcast_total, "本")),
         build_shops_block
       ]
     }
@@ -92,16 +80,18 @@ class MetricsIndexUsecase
     end
 
     {
-      "kind" => "group",
       "label" => "推し店",
-      "groups" => [
-        {
-          "label" => "総件数",
-          "value" => format_count(shops.size, "件"),
-          "children" => children
-        }
+      "value" => nil,
+      "children" => [
+        build_block(label: "総件数", value: format_count(shops.size, "件"), children: children)
       ]
     }
+  end
+
+  def build_block(label:, value:, children: nil)
+    block = { "label" => label, "value" => value }
+    block["children"] = children if children
+    block
   end
 
   def normalize_shop_category(category)

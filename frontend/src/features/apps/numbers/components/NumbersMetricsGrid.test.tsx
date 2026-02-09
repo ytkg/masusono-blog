@@ -4,13 +4,13 @@ import type { MetricBlock } from "@/features/apps/numbers/model/metrics"
 
 const blocks: MetricBlock[] = [
   {
-    kind: "single",
-    metric: { label: "公開からの日数", value: "10 日" },
+    label: "公開からの日数",
+    value: "10 日",
   },
   {
-    kind: "group",
     label: "ブログ",
-    groups: [
+    value: null,
+    children: [
       {
         label: "総記事数",
         value: "3 本",
@@ -32,7 +32,7 @@ const blocks: MetricBlock[] = [
 ]
 
 describe("NumbersMetricsGrid", () => {
-  it("single と group の指標を描画する", () => {
+  it("単一ブロックと階層ブロックを描画する", () => {
     render(<NumbersMetricsGrid blocks={blocks} />)
 
     expect(screen.getByText("公開からの日数")).toBeInTheDocument()

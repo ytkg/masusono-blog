@@ -68,34 +68,75 @@
 
 ### MetricBlock
 
-`MetricBlock` は次の2種類。
+`MetricBlock` は `kind` を持たず、共通の構造 `label`/`value` に対して `children` の有無で階層が決まる。
 
-1. `single` block
+| key | type | nullable | note |
+| --- | --- | --- | --- |
+| `label` | `String` | No | 表示用タイトル |
+| `value` | `String` | Yes | メトリクス値。数値, 日付, `null` など |
+| `children` | `Array<MetricBlock>` | Yes | 子ブロック。存在するとネスト階層が上がる（最大3階層） |
+
+`children` を持たないブロックは単一表示、持つブロックはグループとして扱われる。
+
+例:
 
 ```json
 {
-  "kind": "single",
-  "metric": {
-    "label": "string",
-    "value": "string"
-  }
+  "label": "全体",
+  "value": "123",
+  "children": [
+    {
+      "label": "カテゴリA",
+      "value": "80",
+      "children": [
+        {
+          "label": "詳細1",
+          "value": "50"
+        },
+        {
+          "label": "詳細2",
+          "value": "30"
+        }
+      ]
+    },
+    {
+      "label": "カテゴリB",
+      "value": "43"
+    }
+  ]
 }
 ```
 
-2. `group` block
+最大3階層の `children` に対応しています。さらに深い階層が必要な場合は実装側で相談ください。
 
 ```json
 {
-  "kind": "group",
-  "label": "string",
-  "groups": [
+  "blocks": [
     {
-      "label": "string",
-      "value": "string",
+      "label": "直近",
+      "value": "12"
+    },
+    {
+      "label": "カテゴリ別",
+      "value": null,
       "children": [
         {
-          "label": "string",
-          "value": "string"
+          "label": "無料",
+          "value": "7"
+        },
+        {
+          "label": "有料",
+          "value": "5",
+          "children": [
+            {
+              "label": "会員",
+              "value": "3"
+            },
+            {
+              "label": "非会員",
+              "value": "2"
+            }
+          ]
         }
       ]
     }
