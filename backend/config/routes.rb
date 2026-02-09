@@ -10,6 +10,9 @@ Rails.application.routes.draw do
   resources :metrics, only: :index
   resources :podcasts, only: :index
   resources :shops, only: :index
+  namespace :masuda_run do
+    resources :rankings, only: :index
+  end
 
   # Defines the root path route ("/")
   # root "posts#index"

@@ -5,6 +5,8 @@ import Button from "@mui/material/Button"
 import charImgSrc from "@/assets/masuda_run.png"
 import obsShortSrc from "@/assets/other1.png"
 import obsTallSrc from "@/assets/other2.png"
+import { useMasudaRunRankings } from "@/features/apps/masudaRun/hooks/useMasudaRunRankings"
+import MasudaRunRankings from "@/features/apps/masudaRun/components/MasudaRunRankings"
 import { CFG, CHAR_H, CHAR_W, HIT_H, RESTART_DELAY_MS } from "@/features/apps/masudaRun/lib/constants"
 import {
   getStoredHighScore,
@@ -27,6 +29,7 @@ export default function MasudaRunGame() {
   const suppressClickRef = useRef(false)
   const restartReadyAtRef = useRef(0)
   const [restartReadyAt, setRestartReadyAt] = useState(0)
+  const { data: rankings, error: rankingsError, isLoading: rankingsLoading } = useMasudaRunRankings()
 
   const world = useRef<World>(createInitialWorld())
 
@@ -384,6 +387,7 @@ export default function MasudaRunGame() {
       <Typography variant="body2" color="text.secondary">
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
+      <MasudaRunRankings rankings={rankings} isLoading={rankingsLoading} hasError={Boolean(rankingsError)} />
     </Box>
   )
 }
