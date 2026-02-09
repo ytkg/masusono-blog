@@ -6,6 +6,7 @@ import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import HomeHero from "./HomeHero"
 import HomeAppLaunchers from "./HomeAppLaunchers"
 import HomeFeatureLinks from "./HomeFeatureLinks"
+import { ensureUserIdCookie } from "@/utils/userId"
 
 export default function HomePage() {
   const [now, setNow] = useState(() => new Date())
@@ -13,6 +14,9 @@ export default function HomePage() {
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 1000)
     return () => window.clearInterval(id)
+  }, [])
+  useEffect(() => {
+    ensureUserIdCookie()
   }, [])
 
   const formatted = now.toLocaleString("ja-JP", {
