@@ -3,6 +3,7 @@ import Box from "@mui/material/Box"
 import "leaflet/dist/leaflet.css"
 import { useLeafletMap } from "@/features/shops/hooks/useLeafletMap"
 import type { Shop } from "@/features/shops/model/shop"
+import { SHOPS_PAGE_LAYOUT } from "@/features/shops/ui/shopsPageStyleConstants"
 
 type ShopsMapProps = {
   shops: Shop[]
@@ -27,7 +28,13 @@ export function ShopsMap({ shops, visibleShops, selectedKey, onSelect, getKey }:
   return (
     <Box
       ref={mapContainerRef}
-      sx={{ height: { xs: 186, sm: 240 }, border: "1px solid", borderColor: "divider", borderRadius: 1, mb: 1 }}
+      sx={{
+        height: SHOPS_PAGE_LAYOUT.mapHeight,
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: SHOPS_PAGE_LAYOUT.mapBorderRadius,
+        mb: SHOPS_PAGE_LAYOUT.sectionSpacing,
+      }}
     />
   )
 }

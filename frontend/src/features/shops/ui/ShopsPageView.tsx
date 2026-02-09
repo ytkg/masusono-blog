@@ -4,6 +4,7 @@ import type { Shop } from "@/features/shops/model/shop"
 import { ShopCategoryFilter } from "@/features/shops/ui/ShopCategoryFilter"
 import { ShopsList } from "@/features/shops/ui/ShopsList"
 import { ShopsMap } from "@/features/shops/ui/ShopsMap"
+import { SHOPS_PAGE_LAYOUT } from "@/features/shops/ui/shopsPageStyleConstants"
 
 type ShopsPageViewProps = {
   shops: Shop[]
@@ -12,7 +13,7 @@ type ShopsPageViewProps = {
   category: string
   categories: string[]
   isLoading: boolean
-  hasError: boolean
+  errorMessage: string | null
   getKey: (shop: Shop) => string
   onSelect: (key: string) => void
   onCategoryChange: (category: string) => void
@@ -25,7 +26,7 @@ export function ShopsPageView({
   category,
   categories,
   isLoading,
-  hasError,
+  errorMessage,
   getKey,
   onSelect,
   onCategoryChange,
@@ -33,18 +34,25 @@ export function ShopsPageView({
   return (
     <PageContainer
       sx={{
-        height: "calc(100dvh - 112px)",
+        height: `calc(100dvh - ${SHOPS_PAGE_LAYOUT.viewportHeightOffset}px)`,
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
       }}
     >
-      <Typography variant="h5" component="h1" sx={{ mb: 1 }}>
+      <Typography variant="h5" component="h1" sx={{ mb: SHOPS_PAGE_LAYOUT.sectionSpacing }}>
         推し店
       </Typography>
       <ShopsMap shops={shops} visibleShops={filteredShops} selectedKey={selected} onSelect={onSelect} getKey={getKey} />
       <ShopCategoryFilter category={category} categories={categories} onChange={onCategoryChange} />
-      <ShopsList shops={filteredShops} isLoading={isLoading} hasError={hasError} getKey={getKey} onSelect={onSelect} />
+      <ShopsList
+        shops={filteredShops}
+        selectedKey={selected}
+        isLoading={isLoading}
+        errorMessage={errorMessage}
+        getKey={getKey}
+        onSelect={onSelect}
+      />
     </PageContainer>
   )
 }

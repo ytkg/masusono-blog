@@ -75,3 +75,21 @@
 
 - 次工程（Issue #66-2 以降）では、上記仕様を満たす範囲で責務分離・hook分割を行う。
 - 仕様変更が必要になった場合は、このドキュメントを先に更新してから実装を変更する。
+
+## 責務境界（Issue #66 完了後）
+
+- `frontend/src/features/shops/ui/ShopsPage.tsx`
+  - 画面メタ設定とコンテナ呼び出しのみを担当する。
+- `frontend/src/features/shops/ui/ShopsPageContainer.tsx`
+  - データ取得、絞り込み、選択状態遷移、Viewへの受け渡しを担当する。
+- `frontend/src/features/shops/ui/ShopsPageView.tsx`
+  - 地図・絞り込みUI・一覧UIの画面構成のみを担当する。
+- `frontend/src/features/shops/hooks/useLeafletMap.ts`
+  - 地図初期化/破棄、マーカー同期、座標ガードを担当する。
+- `frontend/src/features/shops/lib/shopSelection.ts`
+  - 安定ID生成と選択補正ルール（純関数）を担当する。
+
+## エラー表示方針（Issue #66-C）
+
+- `useShops` は UI向けの `errorMessage` と開発向けの `rawError` を分離して返す。
+- 一覧表示は `errorMessage` のみを表示し、開発向け詳細はUIに露出しない。

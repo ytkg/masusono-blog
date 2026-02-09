@@ -14,8 +14,7 @@ function createShopIdResolver(shops: Shop[]) {
 }
 
 export function ShopsPageContainer() {
-  const { data, error, isLoading } = useShops()
-  const shops = useMemo(() => data ?? [], [data])
+  const { shops, rawError, isLoading, errorMessage } = useShops()
   const { category, setCategory, categories, filteredShops } = useShopFilter(shops)
   const [selected, setSelected] = useState<string | null>(null)
   const getKey = useMemo(() => createShopIdResolver(shops), [shops])
@@ -40,7 +39,7 @@ export function ShopsPageContainer() {
       category={category}
       categories={categories}
       isLoading={isLoading}
-      hasError={Boolean(error)}
+      errorMessage={rawError ? errorMessage : null}
       getKey={getKey}
       onSelect={handleSelect}
       onCategoryChange={setCategory}

@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
 import { DEFAULT_CATEGORY } from "@/features/shops/hooks/useShopFilter"
+import { SHOPS_PAGE_LAYOUT } from "@/features/shops/ui/shopsPageStyleConstants"
 
 type ShopCategoryFilterProps = {
   category: string
@@ -10,7 +11,15 @@ type ShopCategoryFilterProps = {
 
 export function ShopCategoryFilter({ category, categories, onChange }: ShopCategoryFilterProps) {
   return (
-    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1, mb: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        gap: SHOPS_PAGE_LAYOUT.cardMetaGap,
+        flexWrap: "wrap",
+        mt: SHOPS_PAGE_LAYOUT.sectionSpacing,
+        mb: SHOPS_PAGE_LAYOUT.sectionSpacing,
+      }}
+    >
       <Chip
         label="すべて"
         variant={category === DEFAULT_CATEGORY ? "filled" : "outlined"}

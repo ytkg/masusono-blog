@@ -8,20 +8,26 @@ import Typography from "@mui/material/Typography"
 import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import ContentCardSkeletonList from "@/shared/ui/ContentCardSkeletonList"
 import type { Shop } from "@/features/shops/model/shop"
+import { SHOPS_PAGE_LAYOUT } from "@/features/shops/ui/shopsPageStyleConstants"
 
 type ShopsListProps = {
   shops: Shop[]
+  selectedKey: string | null
   isLoading: boolean
-  hasError: boolean
+  errorMessage: string | null
   getKey: (shop: Shop) => string
   onSelect: (key: string) => void
 }
 
 type ShopsListState = "loading" | "error" | "empty" | "loaded"
 
-function getShopsListState({ shops, isLoading, hasError }: Pick<ShopsListProps, "shops" | "isLoading" | "hasError">): ShopsListState {
+function getShopsListState({
+  shops,
+  isLoading,
+  errorMessage,
+}: Pick<ShopsListProps, "shops" | "isLoading" | "errorMessage">): ShopsListState {
   if (isLoading && shops.length === 0) return "loading"
-  if (hasError) return "error"
+  if (errorMessage) return "error"
   if (shops.length === 0) return "empty"
   return "loaded"
 }
@@ -34,17 +40,43 @@ function ShopsStateMessage({ message }: { message: string }) {
   )
 }
 
-function ShopsCardsGrid({ shops, getKey, onSelect }: Pick<ShopsListProps, "shops" | "getKey" | "onSelect">) {
+function ShopsCardsGrid({
+  shops,
+  selectedKey,
+  getKey,
+  onSelect,
+}: Pick<ShopsListProps, "shops" | "selectedKey" | "getKey" | "onSelect">) {
   return (
     <Grid container spacing={2}>
       {shops.map((shop) => {
         const key = getKey(shop)
+        const isSelected = selectedKey === key
 
         return (
           <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card variant="outlined" sx={{ borderColor: "divider", cursor: "pointer" }} onClick={() => onSelect(key)}>
-              <CardContent sx={{ px: 1.25, py: 1, "&:last-child": { pb: 1.5 } }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+            <Card
+              variant="outlined"
+              sx={{ borderColor: isSelected ? "primary.main" : "divider", cursor: "pointer" }}
+              onClick={() => onSelect(key)}
+              role="button"
+              aria-pressed={isSelected}
+              aria-label={`${shop.name} を選択`}
+            >
+              <CardContent
+                sx={{
+                  px: SHOPS_PAGE_LAYOUT.cardContentPaddingX,
+                  py: SHOPS_PAGE_LAYOUT.cardContentPaddingY,
+                  "&:last-child": { pb: SHOPS_PAGE_LAYOUT.cardContentLastPaddingBottom },
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: SHOPS_PAGE_LAYOUT.cardMetaGap,
+                  }}
+                >
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                     {shop.name}
                   </Typography>
@@ -55,13 +87,20 @@ function ShopsCardsGrid({ shops, getKey, onSelect }: Pick<ShopsListProps, "shops
                       target="_blank"
                       rel="noreferrer"
                       size="small"
-                      aria-label="open"
+                      aria-label={`${shop.name} の外部サイトを新しいタブで開く`}
                     >
                       <OpenInNewIcon fontSize="small" />
                     </IconButton>
                   )}
                 </Box>
-                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 0.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: SHOPS_PAGE_LAYOUT.cardMetaGap,
+                    flexWrap: "wrap",
+                    mb: SHOPS_PAGE_LAYOUT.cardCategoryMarginBottom,
+                  }}
+                >
                   <Chip size="small" label={shop.category} />
                 </Box>
                 {shop.desc && (
@@ -78,15 +117,25 @@ function ShopsCardsGrid({ shops, getKey, onSelect }: Pick<ShopsListProps, "shops
   )
 }
 
-export function ShopsList({ shops, isLoading, hasError, getKey, onSelect }: ShopsListProps) {
-  const state = getShopsListState({ shops, isLoading, hasError })
+export function ShopsList({ shops, selectedKey, isLoading, errorMessage, getKey, onSelect }: ShopsListProps) {
+  const state = getShopsListState({ shops, isLoading, errorMessage })
 
   return (
-    <Box sx={{ overflow: "auto", pr: 1, flex: 1, minHeight: 0, pb: 4 }}>
+    <Box
+      sx={{
+        overflow: "auto",
+        pr: SHOPS_PAGE_LAYOUT.listRightPadding,
+        flex: 1,
+        minHeight: 0,
+        pb: SHOPS_PAGE_LAYOUT.listBottomPadding,
+      }}
+    >
       {state === "loading" && <ContentCardSkeletonList count={4} />}
-      {state === "error" && <ShopsStateMessage message="データの取得に失敗しました。" />}
+      {state === "error" && <ShopsStateMessage message={errorMessage ?? "データの取得に失敗しました。"} />}
       {state === "empty" && <ShopsStateMessage message="表示する推し店がありません。" />}
-      {state === "loaded" && <ShopsCardsGrid shops={shops} getKey={getKey} onSelect={onSelect} />}
+      {state === "loaded" && (
+        <ShopsCardsGrid shops={shops} selectedKey={selectedKey} getKey={getKey} onSelect={onSelect} />
+      )}
     </Box>
   )
 }
