@@ -6,16 +6,16 @@ RSpec.describe MasudaRun::RankingsIndexUsecase do
   let(:rankings) do
     [
       {
-        id: "b",
-        user_id: "bob",
-        score: 2000,
-        createdAt: "2026-02-01T10:00:00.000Z"
-      },
-      {
         id: "c",
         user_id: "carol",
         score: 2000,
         createdAt: "2026-02-02T10:00:00.000Z"
+      },
+      {
+        id: "b",
+        user_id: "bob",
+        score: 2000,
+        createdAt: "2026-02-01T10:00:00.000Z"
       },
       {
         id: "a",
@@ -30,25 +30,25 @@ RSpec.describe MasudaRun::RankingsIndexUsecase do
     allow(MasudaRunRanking).to receive(:all).and_return(rankings)
   end
 
-  it "スコア降順・同点は日付降順で並べ、rankedAtを整形する" do
+  it "取得順にrankを付け、rankedAtを整形する" do
     expect(result).to eq(
       [
-        {
-          userId: "alice",
-          score: 3000,
-          rankedAt: "2026/01/31",
-          rank: 1
-        },
         {
           userId: "carol",
           score: 2000,
           rankedAt: "2026/02/02",
-          rank: 2
+          rank: 1
         },
         {
           userId: "bob",
           score: 2000,
           rankedAt: "2026/02/01",
+          rank: 2
+        },
+        {
+          userId: "alice",
+          score: 3000,
+          rankedAt: "2026/01/31",
           rank: 3
         }
       ]
