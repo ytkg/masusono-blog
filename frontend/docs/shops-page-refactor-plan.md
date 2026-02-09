@@ -44,7 +44,10 @@
 
 ## 選択同期ルール（固定）
 
-選択IDは `createShopKey(shop)`（`name-lat(小数5桁)-lng(小数5桁)`）を使用する。
+選択IDは `name-category-lat(小数5桁)-lng(小数5桁)#連番` 形式の安定IDを使用する。
+
+- 同一情報の店舗が複数件ある場合でも `#1`, `#2` の連番で衝突を回避する。
+- ID解決は `frontend/src/features/shops/lib/shopSelection.ts` の純関数で行う。
 
 1. 初期表示（選択未設定）
 - `filteredShops` が1件以上ある場合、先頭店舗を選択する。

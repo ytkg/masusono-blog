@@ -2,29 +2,35 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useShops } from "@/features/shops/hooks/useShops"
 import { usePreventBodyScroll } from "@/features/shops/hooks/usePreventBodyScroll"
 import { useShopFilter } from "@/features/shops/hooks/useShopFilter"
+import { attachStableShopIds, createShopBaseId, resolveSelectedShopId } from "@/features/shops/lib/shopSelection"
 import type { Shop } from "@/features/shops/model/shop"
 import { ShopsPageView } from "@/features/shops/ui/ShopsPageView"
 
-const createShopKey = (shop: Shop) => `${shop.name}-${shop.lat.toFixed(5)}-${shop.lng.toFixed(5)}`
+function createShopIdResolver(shops: Shop[]) {
+  const shopsWithId = attachStableShopIds(shops)
+  const idByShop = new Map<Shop, string>(shopsWithId.map(({ id, shop }) => [shop, id]))
+
+  return (shop: Shop) => idByShop.get(shop) ?? `${createShopBaseId(shop)}#1`
+}
 
 export function ShopsPageContainer() {
   const { data, error, isLoading } = useShops()
   const shops = useMemo(() => data ?? [], [data])
   const { category, setCategory, categories, filteredShops } = useShopFilter(shops)
   const [selected, setSelected] = useState<string | null>(null)
-  const getKey = useCallback(createShopKey, [])
+  const getKey = useMemo(() => createShopIdResolver(shops), [shops])
 
   usePreventBodyScroll()
 
-  useEffect(() => {
-    if (filteredShops.length === 0) {
-      if (selected !== null) setSelected(null)
-      return
-    }
+  const filteredShopIds = useMemo(() => filteredShops.map(getKey), [filteredShops, getKey])
 
-    const exists = filteredShops.some((shop) => getKey(shop) === selected)
-    if (!exists) setSelected(getKey(filteredShops[0]))
-  }, [filteredShops, selected, getKey])
+  useEffect(() => {
+    setSelected((currentSelected) => resolveSelectedShopId(currentSelected, filteredShopIds))
+  }, [filteredShopIds])
+
+  const handleSelect = useCallback((shopId: string) => {
+    setSelected(shopId)
+  }, [])
 
   return (
     <ShopsPageView
@@ -36,7 +42,7 @@ export function ShopsPageContainer() {
       isLoading={isLoading}
       hasError={Boolean(error)}
       getKey={getKey}
-      onSelect={setSelected}
+      onSelect={handleSelect}
       onCategoryChange={setCategory}
     />
   )
