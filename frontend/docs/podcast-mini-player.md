@@ -3,13 +3,14 @@
 ## 目的
 
 - ポッドキャスト再生中に別ページへ遷移しても、再生を継続できるようにする。
-- 再生操作（再生/停止、シーク）をページ横断で継続できるようにする。
+- 再生操作（再生/一時停止、シーク）をページ横断で継続できるようにする。
 
 ## 構成
 
 - 再生状態管理: `frontend/src/features/podcastPlayer/PodcastPlayerContext.tsx`
 - 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.ts`
 - UI本体: `frontend/src/features/podcastPlayer/ui/GlobalPodcastMiniPlayer.tsx`
+- 閉じる状態管理: `frontend/src/features/podcastPlayer/hooks/useMiniPlayerDismissal.ts`
 - 再生UI: `frontend/src/features/podcast/ui/PodcastAudioPlayer.tsx`（`variant="mini"`）
 
 ## 表示ルール
@@ -26,8 +27,9 @@
 ### 展開状態
 
 - ミニプレイヤーの再生UIを表示する。
-- `button` / `slider` などの操作要素以外をタップすると縮小する。
-- 再生ボタン、10秒送り/戻し、シークバー操作では縮小しない。
+- 左下の縮小ボタンで縮小状態へ遷移する。
+- 左上の閉じるボタンでミニプレイヤーを閉じ、再生を一時停止する（再生位置は保持）。
+- 閉じた後でも、ポッドキャストページの再生ボタンから続き再生できる。
 - シークバーはドラッグ中 (`onChange`) に即時シークする。
 - シークバーのドラッグ終了 (`onChangeCommitted`) では位置確定のみ行い、追加シークはしない。
 
@@ -64,6 +66,7 @@
 ### aria-label 一覧（ミニプレイヤー）
 
 - 縮小ボタン: `ミニプレイヤーを縮小`
+- 閉じるボタン: `ミニプレイヤーを閉じる`
 - 展開サムネイル: `ミニプレイヤーを展開`
 - 再生ボタン: `ミニプレイヤーで再生`
 - 一時停止ボタン: `ミニプレイヤーを一時停止`
@@ -75,6 +78,7 @@
 
 - `Tab`: ミニプレイヤー内の操作要素へフォーカス移動できること。
 - `Enter` / `Space`: `ミニプレイヤーを縮小` を操作すると縮小されること。
+- `Enter` / `Space`: `ミニプレイヤーを閉じる` を操作すると閉じて一時停止されること。
 - `Enter` / `Space`: `ミニプレイヤーを展開` を操作すると展開されること。
 - `Enter` / `Space`: 再生・10秒戻し・10秒送りを操作できること。
 - `ArrowLeft` / `ArrowRight` / `Home` / `End`: シークバー操作ができること（MUI Slider 標準挙動）。
