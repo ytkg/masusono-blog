@@ -25,7 +25,14 @@ type UseLeafletMapOptions = {
 }
 
 function isValidLatLng(shop: Shop) {
-  return Number.isFinite(shop.lat) && Number.isFinite(shop.lng) && shop.lat >= -90 && shop.lat <= 90 && shop.lng >= -180 && shop.lng <= 180
+  return (
+    Number.isFinite(shop.lat) &&
+    Number.isFinite(shop.lng) &&
+    shop.lat >= -90 &&
+    shop.lat <= 90 &&
+    shop.lng >= -180 &&
+    shop.lng <= 180
+  )
 }
 
 function toValidShops(shops: Shop[]) {
