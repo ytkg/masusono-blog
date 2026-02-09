@@ -35,7 +35,7 @@ interface PodcastEpisodeCardProps {
 }
 
 export default function PodcastEpisodeCard({ episode, mode = "list", loading, error }: PodcastEpisodeCardProps) {
-  const { currentEpisode, isPlaying, currentTime, playEpisode, stop } = usePodcastPlayer()
+  const { currentEpisode, isPlaying, playEpisode, stop, episodeDurations } = usePodcastPlayer()
 
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
@@ -48,7 +48,8 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
 
   const isActiveEpisode = Boolean(isCurrentEpisode && isPlaying)
   const toggleIconLabel = isActiveEpisode ? MINI_PLAYER_ARIA_LABELS.pause : MINI_PLAYER_ARIA_LABELS.play
-  const displayTime = isCurrentEpisode ? currentTime : 0
+  const episodeLength = episode ? episodeDurations[episode.id] ?? 0 : 0
+  const lengthLabel = episodeLength > 0 ? formatTime(episodeLength) : "--:--"
 
   const handleToggle = () => {
     if (!episode) return
@@ -116,7 +117,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
             {isActiveEpisode ? <PauseIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
           </IconButton>
           <Typography variant="body2" sx={{ fontVariantNumeric: "tabular-nums", ml: 1 }}>
-            {formatTime(displayTime)}
+            {lengthLabel}
           </Typography>
         </Box>
       </ContentItemCard>

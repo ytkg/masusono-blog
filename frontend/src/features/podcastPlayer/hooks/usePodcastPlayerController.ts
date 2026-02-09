@@ -14,6 +14,7 @@ export interface PodcastPlayerControllerValue {
   duration: number
   status: PodcastPlayerStatus
   error: string | null
+  episodeDurations: Record<string, number>
   playEpisode: (episode: PodcastEpisode) => Promise<void>
   togglePlayPause: () => Promise<void>
   pause: () => void
@@ -28,11 +29,21 @@ export function usePodcastPlayerController() {
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [episodeDurations, setEpisodeDurations] = useState<Record<string, number>>({})
   const { isPlaying, status, error } = playerState
 
-  const handleLoadedMetadata = useCallback((nextDuration: number) => {
-    setDuration(nextDuration)
-  }, [])
+  const handleLoadedMetadata = useCallback(
+    (nextDuration: number) => {
+      setDuration(nextDuration)
+      if (currentEpisode?.id) {
+        setEpisodeDurations((prev) => ({
+          ...prev,
+          [currentEpisode.id as string]: nextDuration,
+        }))
+      }
+    },
+    [currentEpisode?.id],
+  )
 
   const handleTimeUpdate = useCallback((nextCurrentTime: number) => {
     setCurrentTime(nextCurrentTime)
@@ -172,6 +183,7 @@ export function usePodcastPlayerController() {
       seekTo,
       seekBy,
       stop,
+      episodeDurations,
     }),
     [
       currentEpisode,
@@ -186,6 +198,7 @@ export function usePodcastPlayerController() {
       seekTo,
       seekBy,
       stop,
+      episodeDurations,
     ],
   )
 

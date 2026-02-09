@@ -35,6 +35,7 @@ function createPlayerMock(overrides: Partial<ReturnType<typeof usePodcastPlayer>
     seekTo: vi.fn(),
     seekBy: vi.fn(),
     stop: vi.fn(),
+    episodeDurations: {},
     ...overrides,
   } as ReturnType<typeof usePodcastPlayer>
 }
@@ -66,7 +67,7 @@ describe("PodcastEpisodeCard", () => {
     fireEvent.click(button)
 
     expect(playEpisode).toHaveBeenCalledWith(episode)
-    expect(screen.getByText("00:00")).toBeInTheDocument()
+    expect(screen.getByText("--:--")).toBeInTheDocument()
   })
 
   it("再生中のエピソードではボタンが停止になり stop を呼ぶ", () => {
@@ -76,6 +77,7 @@ describe("PodcastEpisodeCard", () => {
         currentEpisode: { ...episode },
         isPlaying: true,
         currentTime: 75,
+        episodeDurations: { [episode.id]: 120 },
         stop,
       }),
     )
@@ -92,7 +94,7 @@ describe("PodcastEpisodeCard", () => {
     fireEvent.click(button)
 
     expect(stop).toHaveBeenCalled()
-    expect(screen.getByText("01:15")).toBeInTheDocument()
+    expect(screen.getByText("02:00")).toBeInTheDocument()
   })
 
   it("detailモードでも操作ボタンが表示される", () => {
