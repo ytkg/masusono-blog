@@ -9,14 +9,6 @@ vi.mock("@/features/podcastPlayer/PodcastPlayerContext", () => ({
   usePodcastPlayer: vi.fn(),
 }))
 
-vi.mock("./PodcastAudioPlayer", () => ({
-  default: ({ onTogglePlayback }: { onTogglePlayback: () => void }) => (
-    <button type="button" onClick={onTogglePlayback}>
-      playback-toggle
-    </button>
-  ),
-}))
-
 const usePodcastPlayerMock = usePodcastPlayer as unknown as MockedFunction<typeof usePodcastPlayer>
 
 const episode: PodcastEpisode = {
@@ -25,6 +17,8 @@ const episode: PodcastEpisode = {
   publishedDate: "2026/02/08",
   audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3",
 }
+const playButtonLabel = `再生: ${episode.title}`
+const stopButtonLabel = `停止: ${episode.title}`
 
 function createPlayerMock(overrides: Partial<ReturnType<typeof usePodcastPlayer>> = {}) {
   return {
@@ -49,10 +43,9 @@ describe("PodcastEpisodeCard", () => {
     vi.clearAllMocks()
   })
 
-  it("再生中でないエピソードの操作で playEpisode を呼ぶ", () => {
+  it("非再生中エピソードの再生ボタンで playEpisode を呼ぶ", () => {
     const playEpisode = vi.fn()
-    const togglePlayPause = vi.fn()
-    usePodcastPlayerMock.mockReturnValue(createPlayerMock({ playEpisode, togglePlayPause }))
+    usePodcastPlayerMock.mockReturnValue(createPlayerMock({ currentEpisode: { ...episode, id: "other" }, playEpisode }))
 
     render(
       <MemoryRouter>
@@ -60,22 +53,15 @@ describe("PodcastEpisodeCard", () => {
       </MemoryRouter>,
     )
 
-    fireEvent.click(screen.getByRole("button", { name: "playback-toggle" }))
+    fireEvent.click(screen.getByRole("button", { name: playButtonLabel }))
 
     expect(playEpisode).toHaveBeenCalledWith(episode)
-    expect(togglePlayPause).not.toHaveBeenCalled()
+    expect(screen.getByRole("button", { name: stopButtonLabel })).toBeDisabled()
   })
 
-  it("現在のエピソード操作で togglePlayPause を呼ぶ", () => {
-    const playEpisode = vi.fn()
-    const togglePlayPause = vi.fn()
-    usePodcastPlayerMock.mockReturnValue(
-      createPlayerMock({
-        currentEpisode: { ...episode },
-        playEpisode,
-        togglePlayPause,
-      }),
-    )
+  it("再生中のエピソードでは停止ボタンで stop を呼ぶ", () => {
+    const stop = vi.fn()
+    usePodcastPlayerMock.mockReturnValue(createPlayerMock({ currentEpisode: { ...episode }, stop }))
 
     render(
       <MemoryRouter>
@@ -83,9 +69,23 @@ describe("PodcastEpisodeCard", () => {
       </MemoryRouter>,
     )
 
-    fireEvent.click(screen.getByRole("button", { name: "playback-toggle" }))
+    const stopButton = screen.getByRole("button", { name: stopButtonLabel })
+    expect(stopButton).not.toBeDisabled()
 
-    expect(togglePlayPause).toHaveBeenCalled()
-    expect(playEpisode).not.toHaveBeenCalled()
+    fireEvent.click(stopButton)
+
+    expect(stop).toHaveBeenCalled()
+  })
+
+  it("詳細モードでも操作ボタンが表示される", () => {
+    usePodcastPlayerMock.mockReturnValue(createPlayerMock())
+
+    render(
+      <MemoryRouter>
+        <PodcastEpisodeCard episode={episode} mode="detail" />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByTestId("podcast-episode-card-actions")).toBeInTheDocument()
   })
 })

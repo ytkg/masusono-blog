@@ -21,9 +21,9 @@
 `shouldShowMiniPlayer()` の判定ルールは以下。
 
 1. `currentEpisode` がない場合は非表示。
-2. 現在パスが `/podcast` 以外なら表示。
-3. 現在パスが `/podcast` 配下で、再生中エピソードが画面内にある場合は非表示。
-4. 現在パスが `/podcast` 配下で、再生中エピソードが画面外の場合は表示。
+2. `currentEpisode` がある場合は常に表示。
+
+（`pathname` の参照や `visibleEpisodeId` を使った可視判定は廃止され、再生中であれば常にグローバルミニプレイヤーが表示されます。）
 
 ## 操作仕様
 
@@ -95,3 +95,8 @@
 
 - 表示判定: `frontend/src/features/podcastPlayer/miniPlayerVisibility.test.ts`
 - ミニプレイヤー操作: `frontend/src/features/podcastPlayer/ui/GlobalPodcastMiniPlayer.test.tsx`
+## ポッドキャストページのエピソードカード
+
+- 個別の埋め込みプレイヤーは廃止し、「再生」「停止」のボタン操作のみを提供する。
+- 「再生」ボタンは `playEpisode(episode)` を呼び出し、「停止」ボタンは再生対象のときのみ有効にして `stop()` を呼ぶ。
+- 詳細な再生制御（シークや10秒送り/戻し、一時停止）はグローバルミニプレイヤーに集約される。

@@ -68,6 +68,6 @@ describe("PodcastEpisodesList", () => {
     expect(screen.getByRole("heading", { level: 2, name: "プライベートとか普通とかの話" })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "プライベートとか普通とかの話" })).toHaveAttribute("href", "/podcast/001")
     expect(screen.getByText("2026/02/07 Episode 001")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "再生" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: `再生: ${episodes[0].title}` })).toBeInTheDocument()
   })
 })

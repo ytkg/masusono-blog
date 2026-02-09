@@ -66,7 +66,7 @@ describe("PodcastDetail", () => {
     expect(screen.getByRole("heading", { level: 2, name: "ポッドキャスト" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 1, name: "テストエピソード" })).toBeInTheDocument()
     expect(screen.getByText("2026/02/08 Episode 001")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "再生" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: `再生: ${episode.title}` })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "エピソード一覧に戻る" })).toHaveAttribute("href", "/podcast")
     expect(usePageMetaMock).toHaveBeenCalled()
     const metaArgs = usePageMetaMock.mock.calls[0]?.[0]

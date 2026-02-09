@@ -1,12 +1,20 @@
 import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
 import Alert from "@mui/material/Alert"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import ContentCard from "@/shared/ui/ContentCard"
 import ContentItemCard from "@/shared/ui/ContentItemCard"
-import PodcastAudioPlayer from "./PodcastAudioPlayer"
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
+
+const ACTION_GROUP_SX = {
+  mt: 1,
+  display: "flex",
+  gap: 1,
+  flexWrap: "wrap",
+  alignItems: "center",
+} as const
 
 interface PodcastEpisodeCardProps {
   episode?: PodcastEpisode | null
@@ -16,8 +24,7 @@ interface PodcastEpisodeCardProps {
 }
 
 export default function PodcastEpisodeCard({ episode, mode = "list", loading, error }: PodcastEpisodeCardProps) {
-  const { currentEpisode, isPlaying, currentTime, duration, playEpisode, togglePlayPause, seekTo, seekBy } =
-    usePodcastPlayer()
+  const { currentEpisode, playEpisode, stop } = usePodcastPlayer()
 
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
@@ -28,25 +35,14 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
   const episodeId = episode?.id
   const isCurrentEpisode = Boolean(episodeId && currentEpisode?.id === episodeId)
 
-  const handleTogglePlayback = () => {
+  const handlePlayClick = () => {
     if (!episode) return
-
-    if (isCurrentEpisode) {
-      void togglePlayPause()
-      return
-    }
-
     void playEpisode(episode)
   }
 
-  const handleSeekBy = (deltaSeconds: number) => {
+  const handleStopClick = () => {
     if (!isCurrentEpisode) return
-    seekBy(deltaSeconds)
-  }
-
-  const handleSeekTo = (value: number) => {
-    if (!isCurrentEpisode) return
-    seekTo(value)
+    stop()
   }
 
   if (isLoading) {
@@ -85,16 +81,20 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
         titleState={linkState}
         metaParts={[episode.publishedDate, `Episode ${episode.id}`]}
       >
-        <PodcastAudioPlayer
-          title={episode.title}
-          isPlaying={isCurrentEpisode ? isPlaying : false}
-          currentTime={isCurrentEpisode ? currentTime : 0}
-          duration={isCurrentEpisode ? duration : 0}
-          onTogglePlayback={handleTogglePlayback}
-          onSeekBy={handleSeekBy}
-          onSeekTo={handleSeekTo}
-          disableSeek={!isCurrentEpisode}
-        />
+        <Box sx={ACTION_GROUP_SX} data-testid="podcast-episode-card-actions">
+          <Button variant="contained" size="small" onClick={handlePlayClick} aria-label={`再生: ${episode.title}`}>
+            再生
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleStopClick}
+            disabled={!isCurrentEpisode}
+            aria-label={`停止: ${episode.title}`}
+          >
+            停止
+          </Button>
+        </Box>
       </ContentItemCard>
     </Box>
   )

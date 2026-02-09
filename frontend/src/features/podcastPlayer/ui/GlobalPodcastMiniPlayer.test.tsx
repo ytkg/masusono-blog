@@ -15,6 +15,8 @@ const episode: PodcastEpisode = {
   publishedDate: "2026/02/08",
   audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3",
 }
+const playButtonLabel = `再生: ${episode.title}`
+const stopButtonLabel = `停止: ${episode.title}`
 
 function PodcastPage() {
   return (
@@ -49,7 +51,7 @@ function renderWithRouter() {
 
 async function navigateToBlogWithPlayback() {
   const card = screen.getByTestId("podcast-episode-card-001")
-  fireEvent.click(within(card).getByRole("button", { name: "再生" }))
+  fireEvent.click(within(card).getByRole("button", { name: playButtonLabel }))
 
   await waitFor(() => {
     expect(screen.getByTestId("global-podcast-mini-player")).toBeInTheDocument()
@@ -148,11 +150,11 @@ describe("GlobalPodcastMiniPlayer", () => {
 
     fireEvent.click(screen.getByRole("link", { name: "ポッドキャストへ" }))
     const card = await screen.findByTestId("podcast-episode-card-001")
-    const playButton = within(card).getByRole("button", { name: "再生" })
+    const playButton = within(card).getByRole("button", { name: playButtonLabel })
     fireEvent.click(playButton)
 
     await waitFor(() => {
-      expect(within(card).getByRole("button", { name: "一時停止" })).toBeInTheDocument()
+      expect(within(card).getByRole("button", { name: stopButtonLabel })).toBeInTheDocument()
     })
   })
 })
