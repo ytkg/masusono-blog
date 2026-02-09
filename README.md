@@ -41,6 +41,11 @@ npm ci
 npm start
 ```
 
+### 用語定義
+
+- 本プロジェクトで「アプリ」は、`frontend/src/features/apps` 配下の個別ミニアプリを指します（例: `NumbersApp`, `MasudaRunApp`）。
+- `frontend/src/app` はフロントエンド全体の初期化と構成を担う層であり、上記の「アプリ」とは区別します。
+
 ### API接続先
 
 `frontend/src/constants.ts` で固定管理しています。
