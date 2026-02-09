@@ -19,14 +19,6 @@ const ACTION_GROUP_SX = {
   alignItems: "center",
 } as const
 
-function formatTime(seconds: number) {
-  if (!Number.isFinite(seconds) || seconds <= 0) return "00:00"
-  const totalSeconds = Math.floor(seconds)
-  const minutes = Math.floor(totalSeconds / 60)
-  const secs = totalSeconds % 60
-  return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`
-}
-
 interface PodcastEpisodeCardProps {
   episode?: PodcastEpisode | null
   mode?: "list" | "detail"
@@ -35,7 +27,7 @@ interface PodcastEpisodeCardProps {
 }
 
 export default function PodcastEpisodeCard({ episode, mode = "list", loading, error }: PodcastEpisodeCardProps) {
-  const { currentEpisode, isPlaying, playEpisode, stop, episodeDurations } = usePodcastPlayer()
+  const { currentEpisode, isPlaying, playEpisode, stop } = usePodcastPlayer()
 
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
@@ -48,9 +40,6 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
 
   const isActiveEpisode = Boolean(isCurrentEpisode && isPlaying)
   const toggleIconLabel = isActiveEpisode ? MINI_PLAYER_ARIA_LABELS.pause : MINI_PLAYER_ARIA_LABELS.play
-  const episodeLength = episode ? episodeDurations[episode.id] ?? 0 : 0
-  const lengthLabel = episodeLength > 0 ? formatTime(episodeLength) : "--:--"
-
   const handleToggle = () => {
     if (!episode) return
     if (isActiveEpisode) {
@@ -110,15 +99,12 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
               "&:hover": {
                 bgcolor: isActiveEpisode ? "primary.dark" : "action.focus",
               },
-              width: 44,
-              height: 44,
+              width: 36,
+              height: 36,
             }}
           >
-            {isActiveEpisode ? <PauseIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+            {isActiveEpisode ? <PauseIcon fontSize="inherit" /> : <PlayArrowIcon fontSize="inherit" />}
           </IconButton>
-          <Typography variant="body2" sx={{ fontVariantNumeric: "tabular-nums", ml: 1 }}>
-            {lengthLabel}
-          </Typography>
         </Box>
       </ContentItemCard>
     </Box>

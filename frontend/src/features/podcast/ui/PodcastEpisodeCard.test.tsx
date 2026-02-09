@@ -67,7 +67,6 @@ describe("PodcastEpisodeCard", () => {
     fireEvent.click(button)
 
     expect(playEpisode).toHaveBeenCalledWith(episode)
-    expect(screen.getByText("--:--")).toBeInTheDocument()
   })
 
   it("再生中のエピソードではボタンが停止になり stop を呼ぶ", () => {
@@ -94,7 +93,6 @@ describe("PodcastEpisodeCard", () => {
     fireEvent.click(button)
 
     expect(stop).toHaveBeenCalled()
-    expect(screen.getByText("02:00")).toBeInTheDocument()
   })
 
   it("detailモードでも操作ボタンが表示される", () => {
