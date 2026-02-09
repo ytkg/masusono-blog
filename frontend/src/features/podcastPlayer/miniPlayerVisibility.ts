@@ -9,9 +9,7 @@ export interface MiniPlayerVisibilityResult {
   reason: MiniPlayerVisibilityReason
 }
 
-export function getMiniPlayerVisibility({
-  currentEpisodeId,
-}: MiniPlayerVisibilityParams): MiniPlayerVisibilityResult {
+export function getMiniPlayerVisibility({ currentEpisodeId }: MiniPlayerVisibilityParams): MiniPlayerVisibilityResult {
   if (!currentEpisodeId) {
     return { isVisible: false, reason: "NO_CURRENT_EPISODE" }
   }

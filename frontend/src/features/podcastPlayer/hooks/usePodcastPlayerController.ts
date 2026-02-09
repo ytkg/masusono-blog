@@ -30,12 +30,9 @@ export function usePodcastPlayerController() {
   const [duration, setDuration] = useState(0)
   const { isPlaying, status, error } = playerState
 
-  const handleLoadedMetadata = useCallback(
-    (nextDuration: number) => {
-      setDuration(nextDuration)
-    },
-    [],
-  )
+  const handleLoadedMetadata = useCallback((nextDuration: number) => {
+    setDuration(nextDuration)
+  }, [])
 
   const handleTimeUpdate = useCallback((nextCurrentTime: number) => {
     setCurrentTime(nextCurrentTime)

@@ -35,7 +35,6 @@ function createPlayerMock(overrides: Partial<ReturnType<typeof usePodcastPlayer>
     seekTo: vi.fn(),
     seekBy: vi.fn(),
     stop: vi.fn(),
-    episodeDurations: {},
     ...overrides,
   } as ReturnType<typeof usePodcastPlayer>
 }
@@ -76,7 +75,6 @@ describe("PodcastEpisodeCard", () => {
         currentEpisode: { ...episode },
         isPlaying: true,
         currentTime: 75,
-        episodeDurations: { [episode.id]: 120 },
         stop,
       }),
     )
