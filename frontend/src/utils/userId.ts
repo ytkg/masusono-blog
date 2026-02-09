@@ -8,6 +8,7 @@ function getCookie(name: string): string | null {
 
 function setCookie(name: string, value: string, maxAgeSeconds: number) {
   const secure = location.protocol === "https:" ? "; Secure" : ""
+  // biome-ignore lint/suspicious/noDocumentCookie: Cookie-based user id is required for this app.
   document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Lax${secure}`
 }
 
