@@ -43,9 +43,6 @@ function Probe() {
       <button type="button" onClick={() => player.seekTo(999)}>
         seek-over
       </button>
-      <button type="button" onClick={() => player.setEpisodeVisibility(episode.id, true)}>
-        visible-on
-      </button>
       <button type="button" onClick={() => player.stop()}>
         stop
       </button>
@@ -55,7 +52,6 @@ function Probe() {
       <output data-testid="status">{player.status}</output>
       <output data-testid="error">{player.error ?? ""}</output>
       <output data-testid="current-time">{String(player.currentTime)}</output>
-      <output data-testid="visible-episode-id">{player.visibleEpisodeId ?? ""}</output>
     </div>
   )
 }
@@ -150,7 +146,7 @@ describe("PodcastPlayerContext", () => {
     })
   })
 
-  it("stopで再生状態と可視IDを初期化する", async () => {
+  it("stopで再生状態を初期化する", async () => {
     const { pauseSpy } = mockToggleableAudioPlayback()
     const loadSpy = vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {})
 
@@ -160,8 +156,6 @@ describe("PodcastPlayerContext", () => {
     await waitFor(() => {
       expect(screen.getByTestId("current-episode")).toHaveTextContent("001")
     })
-    fireEvent.click(screen.getByRole("button", { name: "visible-on" }))
-    expect(screen.getByTestId("visible-episode-id")).toHaveTextContent("001")
 
     fireEvent.click(screen.getByRole("button", { name: "stop" }))
 
@@ -170,7 +164,6 @@ describe("PodcastPlayerContext", () => {
       expect(screen.getByTestId("is-playing")).toHaveTextContent("false")
       expect(screen.getByTestId("status")).toHaveTextContent("idle")
       expect(screen.getByTestId("current-time")).toHaveTextContent("0")
-      expect(screen.getByTestId("visible-episode-id")).toHaveTextContent("")
     })
     expect(pauseSpy).toHaveBeenCalled()
     expect(loadSpy).toHaveBeenCalled()

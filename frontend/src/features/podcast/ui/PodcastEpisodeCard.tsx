@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
@@ -17,18 +16,8 @@ interface PodcastEpisodeCardProps {
 }
 
 export default function PodcastEpisodeCard({ episode, mode = "list", loading, error }: PodcastEpisodeCardProps) {
-  const cardRef = useRef<HTMLDivElement | null>(null)
-  const {
-    currentEpisode,
-    isPlaying,
-    currentTime,
-    duration,
-    playEpisode,
-    togglePlayPause,
-    seekTo,
-    seekBy,
-    setEpisodeVisibility,
-  } = usePodcastPlayer()
+  const { currentEpisode, isPlaying, currentTime, duration, playEpisode, togglePlayPause, seekTo, seekBy } =
+    usePodcastPlayer()
 
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
@@ -39,40 +28,6 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
   const episodeId = episode?.id
   const isCurrentEpisode = Boolean(episodeId && currentEpisode?.id === episodeId)
 
-  useEffect(() => {
-    if (!episodeId) return
-
-    if (!isCurrentEpisode) {
-      setEpisodeVisibility(episodeId, false)
-      return
-    }
-
-    const target = cardRef.current
-    if (!target) return
-
-    if (typeof IntersectionObserver === "undefined") {
-      setEpisodeVisibility(episodeId, true)
-      return () => {
-        setEpisodeVisibility(episodeId, false)
-      }
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0]
-        setEpisodeVisibility(episodeId, Boolean(entry?.isIntersecting && entry.intersectionRatio > 0))
-      },
-      { threshold: [0, 0.1, 0.5, 1] },
-    )
-
-    observer.observe(target)
-
-    return () => {
-      observer.disconnect()
-      setEpisodeVisibility(episodeId, false)
-    }
-  }, [episodeId, isCurrentEpisode, setEpisodeVisibility])
-
   const handleTogglePlayback = () => {
     if (!episode) return
 
@@ -81,8 +36,6 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
       return
     }
 
-    // 再生開始直後の1フレームだけミニプレイヤーが出るのを防ぐため、可視状態を先に同期する。
-    setEpisodeVisibility(episode.id, true)
     void playEpisode(episode)
   }
 
@@ -123,7 +76,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
   }
 
   return (
-    <Box ref={cardRef} data-testid={`podcast-episode-card-${episode.id}`}>
+    <Box data-testid={`podcast-episode-card-${episode.id}`}>
       <ContentItemCard
         title={episode.title}
         titleVariant={titleVariant}

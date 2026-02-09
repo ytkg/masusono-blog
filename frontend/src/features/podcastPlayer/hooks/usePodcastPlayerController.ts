@@ -14,14 +14,12 @@ export interface PodcastPlayerControllerValue {
   duration: number
   status: PodcastPlayerStatus
   error: string | null
-  visibleEpisodeId: string | null
   playEpisode: (episode: PodcastEpisode) => Promise<void>
   togglePlayPause: () => Promise<void>
   pause: () => void
   seekTo: (seconds: number) => void
   seekBy: (deltaSeconds: number) => void
   stop: () => void
-  setEpisodeVisibility: (episodeId: string, visible: boolean) => void
 }
 
 export function usePodcastPlayerController() {
@@ -30,7 +28,6 @@ export function usePodcastPlayerController() {
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [visibleEpisodeId, setVisibleEpisodeId] = useState<string | null>(null)
   const { isPlaying, status, error } = playerState
 
   const handleLoadedMetadata = useCallback((nextDuration: number) => {
@@ -162,19 +159,7 @@ export function usePodcastPlayerController() {
     setCurrentEpisode(null)
     setCurrentTime(0)
     setDuration(0)
-    setVisibleEpisodeId(null)
     dispatch({ type: "STOPPED" })
-  }, [])
-
-  const setEpisodeVisibility = useCallback((episodeId: string, visible: boolean) => {
-    if (!episodeId) return
-
-    setVisibleEpisodeId((prev) => {
-      if (visible) {
-        return prev === episodeId ? prev : episodeId
-      }
-      return prev === episodeId ? null : prev
-    })
   }, [])
 
   const value = useMemo<PodcastPlayerControllerValue>(
@@ -185,14 +170,12 @@ export function usePodcastPlayerController() {
       duration,
       status,
       error,
-      visibleEpisodeId,
       playEpisode,
       togglePlayPause,
       pause,
       seekTo,
       seekBy,
       stop,
-      setEpisodeVisibility,
     }),
     [
       currentEpisode,
@@ -201,14 +184,12 @@ export function usePodcastPlayerController() {
       duration,
       status,
       error,
-      visibleEpisodeId,
       playEpisode,
       togglePlayPause,
       pause,
       seekTo,
       seekBy,
       stop,
-      setEpisodeVisibility,
     ],
   )
 

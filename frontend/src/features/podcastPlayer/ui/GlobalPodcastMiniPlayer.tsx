@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box"
-import { useLocation } from "react-router-dom"
 import CollapsedMiniPlayerThumbnail from "./CollapsedMiniPlayerThumbnail"
 import ExpandedMiniPlayerPanel from "./ExpandedMiniPlayerPanel"
 import { useMiniPlayerFlipAnimation } from "@/features/podcastPlayer/hooks/useMiniPlayerFlipAnimation"
@@ -9,8 +8,7 @@ import { useMiniPlayerVisibility } from "@/features/podcastPlayer/hooks/useMiniP
 import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
 
 export default function GlobalPodcastMiniPlayer() {
-  const location = useLocation()
-  const { currentEpisode, isPlaying, currentTime, duration, visibleEpisodeId, togglePlayPause, pause, seekBy, seekTo } =
+  const { currentEpisode, isPlaying, currentTime, duration, togglePlayPause, pause, seekBy, seekTo } =
     usePodcastPlayer()
   const { isCollapsed, playerRef, containerStyle, containerSx, startDrag, expand, collapse } =
     useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode: currentEpisode != null })
@@ -27,9 +25,7 @@ export default function GlobalPodcastMiniPlayer() {
   })
 
   const miniPlayerVisibility = useMiniPlayerVisibility({
-    pathname: location.pathname,
     currentEpisodeId: currentEpisode?.id ?? null,
-    visibleEpisodeId,
   })
 
   const isVisible = miniPlayerVisibility.isVisible && !isDismissed

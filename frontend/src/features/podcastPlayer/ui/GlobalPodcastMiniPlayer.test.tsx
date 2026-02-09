@@ -51,10 +51,8 @@ async function navigateToBlogWithPlayback() {
   const card = screen.getByTestId("podcast-episode-card-001")
   fireEvent.click(within(card).getByRole("button", { name: "再生" }))
 
-  expect(screen.queryByTestId("global-podcast-mini-player")).not.toBeInTheDocument()
-
   await waitFor(() => {
-    expect(screen.queryByTestId("global-podcast-mini-player")).not.toBeInTheDocument()
+    expect(screen.getByTestId("global-podcast-mini-player")).toBeInTheDocument()
   })
 
   fireEvent.click(screen.getByRole("link", { name: "ブログへ" }))
