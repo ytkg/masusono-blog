@@ -1,10 +1,10 @@
-import Typography from "@mui/material/Typography"
 import PageContainer from "@/shared/ui/PageContainer"
 import type { Shop } from "@/features/shops/model/shop"
 import { ShopCategoryFilter } from "@/features/shops/ui/ShopCategoryFilter"
 import { ShopsList } from "@/features/shops/ui/ShopsList"
 import { ShopsMap } from "@/features/shops/ui/ShopsMap"
 import { SHOPS_PAGE_LAYOUT } from "@/features/shops/ui/shopsPageStyleConstants"
+import SectionHeading from "@/shared/ui/SectionHeading"
 
 type ShopsPageViewProps = {
   shops: Shop[]
@@ -40,9 +40,9 @@ export function ShopsPageView({
         overflow: "hidden",
       }}
     >
-      <Typography variant="h5" component="h1" sx={{ mb: SHOPS_PAGE_LAYOUT.sectionSpacing }}>
+      <SectionHeading component="h1" sx={{ mb: SHOPS_PAGE_LAYOUT.sectionSpacing }}>
         推し店
-      </Typography>
+      </SectionHeading>
       <ShopsMap shops={shops} visibleShops={filteredShops} selectedKey={selected} onSelect={onSelect} getKey={getKey} />
       <ShopCategoryFilter category={category} categories={categories} onChange={onCategoryChange} />
       <ShopsList

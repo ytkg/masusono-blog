@@ -1,5 +1,4 @@
 import { Navigate, useLocation, useParams, Link as RouterLink } from "react-router-dom"
-import Typography from "@mui/material/Typography"
 import Link from "@mui/material/Link"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import PageContainer from "@/shared/ui/PageContainer"
@@ -7,6 +6,7 @@ import PodcastEpisodeCard from "@/features/podcast/ui/PodcastEpisodeCard"
 import type { PodcastEpisode } from "@/features/podcast/model/podcast"
 import { usePodcast } from "@/features/podcast/hooks/usePodcast"
 import { usePageMeta } from "@/shared/hooks/usePageMeta"
+import SectionHeading from "@/shared/ui/SectionHeading"
 
 type LocationState = {
   episode?: PodcastEpisode
@@ -34,9 +34,7 @@ export default function PodcastDetail() {
 
   return (
     <PageContainer component="article">
-      <Typography variant="h5" component="h2" gutterBottom>
-        ポッドキャスト
-      </Typography>
+      <SectionHeading component="h2">ポッドキャスト</SectionHeading>
       <PodcastEpisodeCard episode={episode ?? undefined} mode="detail" loading={isLoading} error={error} />
       <Link
         component={RouterLink}

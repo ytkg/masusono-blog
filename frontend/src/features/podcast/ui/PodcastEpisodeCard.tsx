@@ -32,7 +32,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
   const isLoading = Boolean(loading)
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
   const headingLevel = mode === "detail" ? "h1" : "h2"
-  const titleVariant = "h5"
+  const titleVariant = "h6"
   const linkTo = mode === "list" && episode ? `/podcast/${episode.id}` : undefined
   const linkState = mode === "list" && episode ? { episode } : undefined
   const episodeId = episode?.id
@@ -83,7 +83,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list", loading, er
         titleComponent={headingLevel}
         titleTo={linkTo}
         titleState={linkState}
-        metaParts={[episode.publishedDate, `Episode ${episode.id}`]}
+        metaParts={[episode.publishedDate, `エピソード${episode.id}`]}
       >
         <Box sx={ACTION_GROUP_SX} data-testid="podcast-episode-card-actions">
           <IconButton

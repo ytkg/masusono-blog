@@ -21,7 +21,7 @@ export default function ArticleCard({ article, mode = "list", loading, error }: 
   const hasBody = Boolean(html.trim())
   const errorMessage = error instanceof Error ? error.message : error != null ? String(error) : null
   const headingLevel = mode === "detail" ? "h1" : "h3"
-  const titleVariant = "h5"
+  const titleVariant = "h6"
   const linkTo = mode === "list" && article ? `/blog/${article.id}` : undefined
   const linkState = mode === "list" && article ? { article } : undefined
 

@@ -1,4 +1,4 @@
-import Typography from "@mui/material/Typography"
+import SectionHeading from "@/shared/ui/SectionHeading"
 import ArticlesList from "@/features/blog/ui/ArticlesList"
 import PageContainer from "@/shared/ui/PageContainer"
 import { usePageMeta } from "@/shared/hooks/usePageMeta"
@@ -12,9 +12,7 @@ export default function Blog() {
 
   return (
     <PageContainer id="blog">
-      <Typography variant="h5" component="h1" gutterBottom>
-        ブログ
-      </Typography>
+      <SectionHeading component="h1">ブログ</SectionHeading>
       <ArticlesList />
     </PageContainer>
   )

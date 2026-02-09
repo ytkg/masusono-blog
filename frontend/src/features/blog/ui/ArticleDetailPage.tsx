@@ -1,12 +1,12 @@
 import { Navigate, useLocation, useParams, Link as RouterLink } from "react-router-dom"
 import PageContainer from "@/shared/ui/PageContainer"
 import ArticleCard from "@/features/blog/ui/ArticleCard"
-import Typography from "@mui/material/Typography"
 import Link from "@mui/material/Link"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import type { Article } from "@/features/blog/model/article"
 import { useArticle } from "@/features/blog/hooks/useArticle"
 import { usePageMeta } from "@/shared/hooks/usePageMeta"
+import SectionHeading from "@/shared/ui/SectionHeading"
 
 type LocationState = {
   article?: Article
@@ -41,9 +41,7 @@ export default function ArticleDetail() {
 
   return (
     <PageContainer component="article">
-      <Typography variant="h5" component="h2" gutterBottom>
-        ブログ
-      </Typography>
+      <SectionHeading component="h2">ブログ</SectionHeading>
       <ArticleCard article={article ?? undefined} mode="detail" loading={isLoading} error={error} />
       <Link
         component={RouterLink}

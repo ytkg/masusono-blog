@@ -1,4 +1,4 @@
-import Typography from "@mui/material/Typography"
+import SectionHeading from "@/shared/ui/SectionHeading"
 import PageContainer from "@/shared/ui/PageContainer"
 import { usePageMeta } from "@/shared/hooks/usePageMeta"
 import PodcastEpisodesList from "@/features/podcast/ui/PodcastEpisodesList"
@@ -12,9 +12,7 @@ export default function Podcast() {
 
   return (
     <PageContainer id="podcast">
-      <Typography variant="h5" component="h1" gutterBottom>
-        ポッドキャスト
-      </Typography>
+      <SectionHeading component="h1">ポッドキャスト</SectionHeading>
       <PodcastEpisodesList />
     </PageContainer>
   )
