@@ -24,6 +24,53 @@ type UseLeafletMapOptions = {
   getKey: (shop: Shop) => string
 }
 
+function isValidLatLng(shop: Shop) {
+  return Number.isFinite(shop.lat) && Number.isFinite(shop.lng) && shop.lat >= -90 && shop.lat <= 90 && shop.lng >= -180 && shop.lng <= 180
+}
+
+function toValidShops(shops: Shop[]) {
+  return shops.filter(isValidLatLng)
+}
+
+function clearMarkers(markersRef: MutableRefObject<Record<string, L.Marker>>) {
+  Object.values(markersRef.current).forEach((marker) => {
+    marker.off()
+    marker.remove()
+  })
+  markersRef.current = {}
+}
+
+function syncSelectedTooltip(markersRef: MutableRefObject<Record<string, L.Marker>>, selectedKey: string | null) {
+  Object.entries(markersRef.current).forEach(([key, marker]) => {
+    if (selectedKey && key === selectedKey) marker.openTooltip()
+    else marker.closeTooltip()
+  })
+}
+
+function rebuildMarkers({
+  map,
+  markersRef,
+  shops,
+  onSelect,
+  getKey,
+}: {
+  map: L.Map
+  markersRef: MutableRefObject<Record<string, L.Marker>>
+  shops: Shop[]
+  onSelect: (key: string) => void
+  getKey: (shop: Shop) => string
+}) {
+  clearMarkers(markersRef)
+
+  toValidShops(shops).forEach((shop) => {
+    const key = getKey(shop)
+    const marker = L.marker([shop.lat, shop.lng], { icon: DEFAULT_MARKER_ICON }).addTo(map)
+    marker.on("click", () => onSelect(key))
+    marker.bindTooltip(shop.name)
+    markersRef.current[key] = marker
+  })
+}
+
 export function useLeafletMap({
   mapContainerRef,
   shops,
@@ -54,6 +101,7 @@ export function useLeafletMap({
 
     return () => {
       resizeObserver.disconnect()
+      clearMarkers(markersRef)
       map.remove()
       mapRef.current = null
     }
@@ -61,9 +109,10 @@ export function useLeafletMap({
 
   useEffect(() => {
     const map = mapRef.current
-    if (!mapReady || !map || shops.length === 0) return
+    const validShops = toValidShops(shops)
+    if (!mapReady || !map || validShops.length === 0) return
 
-    const bounds = L.latLngBounds(shops.map((shop) => [shop.lat, shop.lng]))
+    const bounds = L.latLngBounds(validShops.map((shop) => [shop.lat, shop.lng]))
     if (bounds.isValid()) map.fitBounds(bounds.pad(0.2))
   }, [mapReady, shops])
 
@@ -71,25 +120,17 @@ export function useLeafletMap({
     const map = mapRef.current
     if (!map) return
 
-    Object.values(markersRef.current).forEach((marker) => {
-      marker.remove()
-    })
-    markersRef.current = {}
-
-    visibleShops.forEach((shop) => {
-      const key = getKey(shop)
-      const marker = L.marker([shop.lat, shop.lng], { icon: DEFAULT_MARKER_ICON }).addTo(map)
-      marker.on("click", () => onSelect(key))
-      marker.bindTooltip(shop.name)
-      markersRef.current[key] = marker
+    rebuildMarkers({
+      map,
+      markersRef,
+      shops: visibleShops,
+      onSelect,
+      getKey,
     })
   }, [visibleShops, onSelect, getKey])
 
   useEffect(() => {
-    Object.entries(markersRef.current).forEach(([key, marker]) => {
-      if (selectedKey && key === selectedKey) marker.openTooltip()
-      else marker.closeTooltip()
-    })
+    syncSelectedTooltip(markersRef, selectedKey)
   }, [selectedKey])
 
   useEffect(() => {
@@ -97,7 +138,7 @@ export function useLeafletMap({
     if (!map || !selectedKey) return
 
     const targetShop = visibleShops.find((shop) => getKey(shop) === selectedKey)
-    if (!targetShop) return
+    if (!targetShop || !isValidLatLng(targetShop)) return
 
     map.setView([targetShop.lat, targetShop.lng], Math.max(14, map.getZoom()), { animate: true })
   }, [selectedKey, visibleShops, getKey])
