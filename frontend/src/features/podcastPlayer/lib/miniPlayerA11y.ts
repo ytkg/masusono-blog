@@ -1,6 +1,7 @@
 export const MINI_PLAYER_ARIA_LABELS = {
   expand: "ミニプレイヤーを展開",
   collapse: "ミニプレイヤーを縮小",
+  close: "ミニプレイヤーを閉じる",
   play: "ミニプレイヤーで再生",
   pause: "ミニプレイヤーを一時停止",
   seekBackward10: "ミニプレイヤーで10秒戻る",

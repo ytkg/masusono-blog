@@ -17,6 +17,7 @@ export interface PodcastPlayerControllerValue {
   visibleEpisodeId: string | null
   playEpisode: (episode: PodcastEpisode) => Promise<void>
   togglePlayPause: () => Promise<void>
+  pause: () => void
   seekTo: (seconds: number) => void
   seekBy: (deltaSeconds: number) => void
   stop: () => void
@@ -123,6 +124,12 @@ export function usePodcastPlayerController() {
     audio.pause()
   }, [currentEpisode])
 
+  const pause = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.pause()
+  }, [])
+
   const seekTo = useCallback(
     (seconds: number) => {
       const audio = audioRef.current
@@ -181,6 +188,7 @@ export function usePodcastPlayerController() {
       visibleEpisodeId,
       playEpisode,
       togglePlayPause,
+      pause,
       seekTo,
       seekBy,
       stop,
@@ -196,6 +204,7 @@ export function usePodcastPlayerController() {
       visibleEpisodeId,
       playEpisode,
       togglePlayPause,
+      pause,
       seekTo,
       seekBy,
       stop,

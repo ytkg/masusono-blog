@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import { useLocation } from "react-router-dom"
 import CollapsedMiniPlayerThumbnail from "./CollapsedMiniPlayerThumbnail"
@@ -9,8 +10,9 @@ import { usePodcastPlayer } from "@/features/podcastPlayer/PodcastPlayerContext"
 
 export default function GlobalPodcastMiniPlayer() {
   const location = useLocation()
-  const { currentEpisode, isPlaying, currentTime, duration, visibleEpisodeId, togglePlayPause, seekBy, seekTo } =
+  const { currentEpisode, isPlaying, currentTime, duration, visibleEpisodeId, togglePlayPause, pause, seekBy, seekTo } =
     usePodcastPlayer()
+  const [isDismissed, setIsDismissed] = useState(false)
   const { isCollapsed, playerRef, containerStyle, containerSx, startDrag, expand, collapse } =
     useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode: currentEpisode != null })
   const { collapseWithAnimation, expandWithAnimation, animationSx } = useMiniPlayerFlipAnimation({
@@ -26,7 +28,24 @@ export default function GlobalPodcastMiniPlayer() {
     visibleEpisodeId,
   })
 
-  const isVisible = miniPlayerVisibility.isVisible
+  useEffect(() => {
+    if (!currentEpisode) {
+      setIsDismissed(false)
+    }
+  }, [currentEpisode])
+
+  useEffect(() => {
+    if (isPlaying) {
+      setIsDismissed(false)
+    }
+  }, [isPlaying])
+
+  const handleClose = () => {
+    pause()
+    setIsDismissed(true)
+  }
+
+  const isVisible = miniPlayerVisibility.isVisible && !isDismissed
 
   if (!isVisible || !currentEpisode) return null
 
@@ -54,6 +73,7 @@ export default function GlobalPodcastMiniPlayer() {
           onSeekBy={seekBy}
           onSeekTo={seekTo}
           onCollapse={collapseWithAnimation}
+          onClose={handleClose}
         />
       )}
     </Box>

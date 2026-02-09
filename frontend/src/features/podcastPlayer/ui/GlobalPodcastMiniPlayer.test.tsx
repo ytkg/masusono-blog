@@ -26,7 +26,12 @@ function PodcastPage() {
 }
 
 function BlogPage() {
-  return <div>ブログページ</div>
+  return (
+    <>
+      <div>ブログページ</div>
+      <Link to="/podcast">ポッドキャストへ</Link>
+    </>
+  )
 }
 
 function renderWithRouter() {
@@ -128,5 +133,28 @@ describe("GlobalPodcastMiniPlayer", () => {
     const expandButton = within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを展開" })
     fireEvent.keyDown(expandButton, { key: " " })
     expect(within(miniPlayer).queryByTestId("global-podcast-mini-player-thumbnail")).not.toBeInTheDocument()
+  })
+
+  it("閉じるボタンでミニプレイヤーを閉じて一時停止し、ポッドキャストページで再開できる", async () => {
+    const { pauseSpy } = mockAudioPlaybackEvents()
+
+    renderWithRouter()
+
+    const miniPlayer = await navigateToBlogWithPlayback()
+    fireEvent.click(within(miniPlayer).getByRole("button", { name: "ミニプレイヤーを閉じる" }))
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("global-podcast-mini-player")).not.toBeInTheDocument()
+    })
+    expect(pauseSpy).toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole("link", { name: "ポッドキャストへ" }))
+    const card = await screen.findByTestId("podcast-episode-card-001")
+    const playButton = within(card).getByRole("button", { name: "再生" })
+    fireEvent.click(playButton)
+
+    await waitFor(() => {
+      expect(within(card).getByRole("button", { name: "一時停止" })).toBeInTheDocument()
+    })
   })
 })

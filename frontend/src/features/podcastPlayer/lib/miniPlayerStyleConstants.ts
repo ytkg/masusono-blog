@@ -20,6 +20,10 @@ export const MINI_PLAYER_THUMBNAIL_SIZE = { xs: 56, sm: 64 } as const
 export const MINI_PLAYER_THUMBNAIL_IMAGE_BORDER_RADIUS = 1
 
 export const MINI_PLAYER_COLLAPSE_BUTTON_LEFT = { xs: 6, sm: 8 } as const
-export const MINI_PLAYER_COLLAPSE_BUTTON_TOP = { xs: 6, sm: 8 } as const
+export const MINI_PLAYER_COLLAPSE_BUTTON_BOTTOM = { xs: 6, sm: 8 } as const
 export const MINI_PLAYER_COLLAPSE_BUTTON_SIZE_PX = 32
 export const MINI_PLAYER_COLLAPSE_ICON_SIZE_PX = 28
+
+export const MINI_PLAYER_CLOSE_BUTTON_LEFT = { xs: 6, sm: 8 } as const
+export const MINI_PLAYER_CLOSE_BUTTON_TOP = { xs: 6, sm: 8 } as const
+export const MINI_PLAYER_CLOSE_ICON_SIZE_PX = 20
