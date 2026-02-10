@@ -25,6 +25,8 @@ export default function MasudaRunGame() {
   const reqRef = useRef<number | null>(null)
   const [state, setState] = useState<GameState>("ready")
   const scoreRef = useRef(0)
+  const scoreDisplayRef = useRef(0)
+  const [score, setScore] = useState(0)
   const [high, setHigh] = useState<number>(() => getStoredHighScore())
   const suppressClickRef = useRef(false)
   const restartReadyAtRef = useRef(0)
@@ -65,6 +67,8 @@ export default function MasudaRunGame() {
     if (state === "gameover" && now < restartReadyAtRef.current) return
     world.current = createInitialWorld()
     scoreRef.current = 0
+    scoreDisplayRef.current = 0
+    setScore(0)
     restartReadyAtRef.current = 0
     setRestartReadyAt(0)
     setState("playing")
@@ -265,17 +269,16 @@ export default function MasudaRunGame() {
       }
 
       const sc = Math.floor(scoreRef.current)
-      ctx.fillStyle = "#000"
-      ctx.font = '16px "Noto Sans JP", sans-serif'
-      ctx.fillText(`SCORE ${sc.toString().padStart(5, "0")}`, 10, 18)
-      const hsc = Math.max(high, sc)
-      if (hsc) ctx.fillText(`HI ${hsc.toString().padStart(5, "0")}`, W - 100, 18)
+      if (scoreDisplayRef.current !== sc) {
+        scoreDisplayRef.current = sc
+        setScore(sc)
+      }
 
       if (state === "ready") {
-        ctx.font = '16px "Noto Sans JP", sans-serif'
+        ctx.font = '24px "Noto Sans JP", sans-serif'
         drawCenterText(ctx, W, H, "増田RUN - スペース/タップで開始")
       } else if (state === "gameover") {
-        ctx.font = '16px "Noto Sans JP", sans-serif'
+        ctx.font = '24px "Noto Sans JP", sans-serif'
         drawCenterText(ctx, W, H, "GAME OVER  -  スペース/タップで再開")
       }
     },
@@ -341,12 +344,28 @@ export default function MasudaRunGame() {
   const containerSx = {
     display: "flex",
     flexDirection: "column",
-    gap: 2,
+    gap: 1,
     width: "100%",
   }
 
   return (
     <Box sx={containerSx}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 1,
+          pb: 0.25,
+        }}
+      >
+        <Typography variant="body2" sx={{ fontSize: 16 }}>
+          スコア {score.toString().padStart(5, "0")}
+        </Typography>
+        <Typography variant="body2" sx={{ fontSize: 16 }}>
+          ハイスコア {Math.max(high, score).toString().padStart(5, "0")}
+        </Typography>
+      </Box>
       <Box
         ref={canvasWrapRef}
         sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, overflow: "hidden", width: "100%" }}
