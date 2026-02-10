@@ -8,6 +8,13 @@ import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import type { MasudaRunRanking } from "@/features/apps/masudaRun/model/ranking"
 
+const TOP_RANKINGS_LIMIT = 10
+const containerSx = { border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 } as const
+const titleSx = { mb: 1 } as const
+const monoSx = { fontVariantNumeric: "tabular-nums" } as const
+
+const formatScore = (score: number) => Math.floor(score).toLocaleString("ja-JP")
+
 type Props = {
   rankings?: MasudaRunRanking[]
   isLoading: boolean
@@ -15,12 +22,11 @@ type Props = {
 }
 
 export default function MasudaRunRankings({ rankings, isLoading, hasError }: Props) {
-  const topRankings = rankings?.slice(0, 10) ?? []
-  const formatScore = (score: number) => Math.floor(score).toLocaleString("ja-JP")
+  const topRankings = rankings?.slice(0, TOP_RANKINGS_LIMIT) ?? []
 
   return (
-    <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }}>
-      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+    <Box sx={containerSx}>
+      <Typography variant="subtitle1" sx={titleSx}>
         ランキング
       </Typography>
       {isLoading && topRankings.length === 0 && (
@@ -54,10 +60,10 @@ export default function MasudaRunRankings({ rankings, isLoading, hasError }: Pro
                 <TableRow key={`${ranking.rank}-${ranking.userId}-${ranking.score}`} hover>
                   <TableCell>{ranking.rank}</TableCell>
                   <TableCell>{ranking.userId}</TableCell>
-                  <TableCell align="right" sx={{ fontVariantNumeric: "tabular-nums" }}>
+                  <TableCell align="right" sx={monoSx}>
                     {formatScore(ranking.score)}
                   </TableCell>
-                  <TableCell align="right" sx={{ fontVariantNumeric: "tabular-nums" }}>
+                  <TableCell align="right" sx={monoSx}>
                     {ranking.rankedAt}
                   </TableCell>
                 </TableRow>
