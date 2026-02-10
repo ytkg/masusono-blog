@@ -46,15 +46,7 @@ type Params = {
   refs: LoopRefs
 }
 
-export const useMasudaRunLoop = ({
-  state,
-  high,
-  setHigh,
-  setScore,
-  setState,
-  setRestartReadyAt,
-  refs,
-}: Params) => {
+export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, setRestartReadyAt, refs }: Params) => {
   const {
     scoreRef,
     scoreDisplayRef,

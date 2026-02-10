@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react"
+import { useCallback, useRef, useState, type CSSProperties } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
@@ -102,34 +102,19 @@ export default function MasudaRunGame() {
   useMasudaRunRestartCooldown(state, restartReadyAt, restartReadyAtRef, setRestartReadyAt)
 
   const inputHandlers = useMasudaRunInput({ state, canvasRef, startOrRestart, doJump, suppressClickRef })
-  const loopRefs = useMemo(
-    () => ({
-      scoreRef,
-      scoreDisplayRef,
-      restartReadyAtRef,
-      worldRef: world,
-      canvasRef,
-      canvasWrapRef,
-      scaleRef,
-      imgRef,
-      obsShortRef,
-      obsTallRef,
-      reqRef,
-    }),
-    [
-      canvasRef,
-      canvasWrapRef,
-      imgRef,
-      obsShortRef,
-      obsTallRef,
-      reqRef,
-      restartReadyAtRef,
-      scaleRef,
-      scoreDisplayRef,
-      scoreRef,
-      world,
-    ],
-  )
+  const loopRefs = {
+    scoreRef,
+    scoreDisplayRef,
+    restartReadyAtRef,
+    worldRef: world,
+    canvasRef,
+    canvasWrapRef,
+    scaleRef,
+    imgRef,
+    obsShortRef,
+    obsTallRef,
+    reqRef,
+  }
 
   useMasudaRunLoop({
     state,
@@ -161,13 +146,7 @@ export default function MasudaRunGame() {
         </Typography>
       </Box>
       <Box ref={canvasWrapRef} sx={canvasWrapSx}>
-        <canvas
-          ref={canvasRef}
-          width={CFG.BASE_W}
-          height={CFG.BASE_H}
-          tabIndex={0}
-          style={canvasStyle}
-        />
+        <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={canvasStyle} />
       </Box>
       <Box sx={{ width: "100%" }}>
         <Button

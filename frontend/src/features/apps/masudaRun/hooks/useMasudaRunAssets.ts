@@ -30,7 +30,9 @@ export const useMasudaRunAssets = ({ imgRef, obsShortRef, obsTallRef, sources }:
       initImageRef(obsTallRef, sources.tall),
     ]
     return () => {
-      cleanups.forEach((cleanup) => cleanup())
+      for (const cleanup of cleanups) {
+        cleanup()
+      }
     }
   }, [imgRef, obsShortRef, obsTallRef, sources.player, sources.short, sources.tall])
 }

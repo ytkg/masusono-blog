@@ -1,11 +1,7 @@
 import { CFG } from "./constants"
 import type { MutableRefObject } from "react"
 
-export const resizeCanvas = (
-  wrap: HTMLDivElement,
-  canvas: HTMLCanvasElement,
-  scaleRef: MutableRefObject<number>,
-) => {
+export const resizeCanvas = (wrap: HTMLDivElement, canvas: HTMLCanvasElement, scaleRef: MutableRefObject<number>) => {
   const cssW = wrap.clientWidth || CFG.BASE_W
   const cssH = Math.round((CFG.BASE_H / CFG.BASE_W) * cssW)
   const dpr = Math.max(1, window.devicePixelRatio || 1)
