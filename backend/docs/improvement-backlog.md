@@ -10,7 +10,7 @@
 ## 0. まず効く（Quick Win）
 
 - [ ] CI のテスト実行を `bin/rails db:test:prepare test` から `~/.rbenv/shims/bundle exec rspec` ベースに統一する
-- [ ] `README.md` の実行コマンドを `rbenv` 前提で統一する（`bundle` の誤実行を防ぐ）
+- [x] `README.md` の実行コマンドを Docker 前提で統一する（ホスト依存の誤実行を防ぐ）
 - [ ] `bin/ci` を整備し、ローカルで CI 相当を 1 コマンドで再現できるようにする
 - [ ] PR テンプレートを追加し、確認観点（影響範囲・ロールバック手順）を固定化する
 - [ ] エラーレスポンスに `request_id` を含め、問い合わせ時の調査を短縮する

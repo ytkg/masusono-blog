@@ -16,10 +16,7 @@ docker compose up --build
 
 ```bash
 cd backend
-bundle install
-npm install
-bundle exec rails s
-npm run dev
+docker compose up --build
 ```
 
 補足:
@@ -165,9 +162,9 @@ docker compose run --rm backend bundle exec rspec
 `backend/` で実行します:
 
 ```bash
-npm run lint
-npm run format:check
-npm run format
+docker compose run --rm backend npm run lint
+docker compose run --rm backend npm run format:check
+docker compose run --rm backend npm run format
 ```
 
 ## Cloud Run へのデプロイ
