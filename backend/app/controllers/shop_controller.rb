@@ -1,6 +1,6 @@
 class ShopController < WebController
   def index
-    result = ShopsIndexUsecase.call
-    render inertia: "Shops", props: { shops: result[:shops] }
+    result = ShopIndexUsecase.call
+    render inertia: "Shops", props: result[:props], status: result[:status]
   end
 end

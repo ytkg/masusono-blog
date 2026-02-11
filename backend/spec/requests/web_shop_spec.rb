@@ -18,7 +18,9 @@ RSpec.describe "WebShop", type: :request do
     end
 
     before do
-      allow(ShopsIndexUsecase).to receive(:call).and_return({ shops: shops })
+      allow(ShopIndexUsecase).to receive(:call).and_return(
+        { props: { shops: shops }, status: :ok }
+      )
     end
 
     it "Inertiaページを返す" do

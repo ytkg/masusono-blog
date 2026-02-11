@@ -32,26 +32,29 @@ RSpec.describe App::MasudaRun::RankingsIndexUsecase do
 
   it "取得順にrankを付け、rankedAtを整形する" do
     expect(result).to eq(
-      [
-        {
-          userId: "carol",
-          score: 2000,
-          rankedAt: "2026/02/02",
-          rank: 1
-        },
-        {
-          userId: "bob",
-          score: 2000,
-          rankedAt: "2026/02/01",
-          rank: 2
-        },
-        {
-          userId: "alice",
-          score: 3000,
-          rankedAt: "2026/01/31",
-          rank: 3
-        }
-      ]
+      {
+        json: [
+          {
+            userId: "carol",
+            score: 2000,
+            rankedAt: "2026/02/02",
+            rank: 1
+          },
+          {
+            userId: "bob",
+            score: 2000,
+            rankedAt: "2026/02/01",
+            rank: 2
+          },
+          {
+            userId: "alice",
+            score: 3000,
+            rankedAt: "2026/01/31",
+            rank: 3
+          }
+        ],
+        status: :ok
+      }
     )
   end
 end

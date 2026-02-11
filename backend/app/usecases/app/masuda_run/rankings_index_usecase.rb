@@ -7,9 +7,11 @@ module App
 
       def call
         ranked = MasudaRunRanking.all.map { |ranking| build_ranking(ranking) }
-        ranked.map.with_index(1) do |ranking, index|
+        rankings = ranked.map.with_index(1) do |ranking, index|
           build_response(ranking, index)
         end
+
+        { json: rankings, status: :ok }
       end
 
       private

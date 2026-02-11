@@ -5,14 +5,15 @@ RSpec.describe "App::Numbers", type: :request do
     before do
       allow(App::Numbers::MetricsIndexUsecase).to receive(:call).and_return(
         {
-          metrics: {
+          json: {
             "blocks" => [
               {
                 "label" => "ポッドキャスト総本数",
                 "value" => "1 本"
               }
             ]
-          }
+          },
+          status: :ok
         }
       )
     end

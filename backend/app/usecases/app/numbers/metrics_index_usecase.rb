@@ -36,7 +36,7 @@ module App
       end
 
       def call
-        { metrics: build_metrics(fetch_source_data) }
+        { json: build_metrics(fetch_source_data), status: :ok }
       end
 
       private

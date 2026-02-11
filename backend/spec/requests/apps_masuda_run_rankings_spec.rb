@@ -4,14 +4,17 @@ RSpec.describe "App::MasudaRun::Rankings", type: :request do
   describe "GET /app/masuda_run/rankings.json" do
     before do
       allow(App::MasudaRun::RankingsIndexUsecase).to receive(:call).and_return(
-        [
-          {
-            userId: "alice",
-            score: 1000,
-            rankedAt: "2026/02/11",
-            rank: 1
-          }
-        ]
+        {
+          json: [
+            {
+              userId: "alice",
+              score: 1000,
+              rankedAt: "2026/02/11",
+              rank: 1
+            }
+          ],
+          status: :ok
+        }
       )
     end
 

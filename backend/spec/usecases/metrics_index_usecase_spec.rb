@@ -44,10 +44,11 @@ RSpec.describe App::Numbers::MetricsIndexUsecase do
       allow(Podcast).to receive(:all).and_return(podcasts)
     end
 
-    let(:blocks) { result[:metrics][:blocks] }
+    let(:blocks) { result[:json][:blocks] }
 
     describe "起算日" do
       it do
+        expect(result[:status]).to eq(:ok)
         expect(blocks.first).to eq(
           {
             label: "増田とその他！始動から（2025/10/05〜）",

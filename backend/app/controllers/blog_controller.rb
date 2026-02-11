@@ -1,16 +1,11 @@
 class BlogController < WebController
   def index
-    result = ArticlesIndexUsecase.call
-    render inertia: "Blog", props: { articles: result[:articles] }
+    result = BlogIndexUsecase.call
+    render inertia: "Blog", props: result[:props], status: result[:status]
   end
 
   def show
-    article = ArticlesShowUsecase.call(article_id: params[:article_id])
-
-    if article
-      render inertia: "BlogDetail", props: { article: article }
-    else
-      render inertia: "BlogDetail", props: { article: nil }, status: :not_found
-    end
+    result = BlogShowUsecase.call(article_id: params[:article_id])
+    render inertia: "BlogDetail", props: result[:props], status: result[:status]
   end
 end

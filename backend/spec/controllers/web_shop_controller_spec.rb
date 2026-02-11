@@ -5,18 +5,21 @@ RSpec.describe ShopController, type: :controller do
 
   describe "WebShopController GET #index" do
     it "Shop の Inertia ページを返す" do
-      allow(ShopsIndexUsecase).to receive(:call).and_return(
+      allow(ShopIndexUsecase).to receive(:call).and_return(
         {
-          shops: [
-            {
-              name: "テスト居酒屋",
-              category: "居酒屋",
-              lat: 35.0,
-              lng: 139.0,
-              url: "https://example.com/shop",
-              desc: "説明"
-            }
-          ]
+          props: {
+            shops: [
+              {
+                name: "テスト居酒屋",
+                category: "居酒屋",
+                lat: 35.0,
+                lng: 139.0,
+                url: "https://example.com/shop",
+                desc: "説明"
+              }
+            ]
+          },
+          status: :ok
         }
       )
 

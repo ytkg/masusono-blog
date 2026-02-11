@@ -16,7 +16,11 @@ class SitemapsIndexUsecase
   end
 
   def call
-    { xml: build_sitemap_xml(Article.all), content_type: CONTENT_TYPE }
+    {
+      plain: build_sitemap_xml(Article.all),
+      content_type: CONTENT_TYPE,
+      status: :ok
+    }
   end
 
   private

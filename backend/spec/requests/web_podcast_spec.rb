@@ -16,7 +16,9 @@ RSpec.describe "WebPodcast", type: :request do
     end
 
     before do
-      allow(PodcastsIndexUsecase).to receive(:call).and_return({ podcasts: episodes })
+      allow(PodcastIndexUsecase).to receive(:call).and_return(
+        { props: { episodes: episodes }, status: :ok }
+      )
     end
 
     it "Inertiaページを返す" do
@@ -40,7 +42,9 @@ RSpec.describe "WebPodcast", type: :request do
     end
 
     it "存在する場合は詳細Inertiaページを返す" do
-      allow(PodcastsShowUsecase).to receive(:call).with(episode_id: "001").and_return(episode)
+      allow(PodcastShowUsecase).to receive(:call).with(episode_id: "001").and_return(
+        { props: { episode: episode }, status: :ok }
+      )
 
       get "/podcast/001", headers: html_headers
 
@@ -51,7 +55,9 @@ RSpec.describe "WebPodcast", type: :request do
     end
 
     it "存在しない場合は404のInertiaページを返す" do
-      allow(PodcastsShowUsecase).to receive(:call).with(episode_id: "999").and_return(nil)
+      allow(PodcastShowUsecase).to receive(:call).with(episode_id: "999").and_return(
+        { props: { episode: nil }, status: :not_found }
+      )
 
       get "/podcast/999", headers: html_headers
 

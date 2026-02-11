@@ -1,11 +1,11 @@
-class ShopsIndexUsecase
+class ShopIndexUsecase
   def self.call
     new.call
   end
 
   def call
     shops = Shop.all.map { |shop| build_shop(shop) }
-    { shops: shops }
+    { props: { shops: shops }, status: :ok }
   end
 
   private

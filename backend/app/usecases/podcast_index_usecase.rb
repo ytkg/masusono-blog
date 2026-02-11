@@ -1,11 +1,11 @@
-class PodcastsIndexUsecase
+class PodcastIndexUsecase
   def self.call
     new.call
   end
 
   def call
-    podcasts = Podcast.all.map { |podcast| build_podcast(podcast) }
-    { podcasts: podcasts }
+    episodes = Podcast.all.map { |podcast| build_podcast(podcast) }
+    { props: { episodes: episodes }, status: :ok }
   end
 
   private

@@ -1,16 +1,11 @@
 class PodcastController < WebController
   def index
-    result = PodcastsIndexUsecase.call
-    render inertia: "Podcast", props: { episodes: result[:podcasts] }
+    result = PodcastIndexUsecase.call
+    render inertia: "Podcast", props: result[:props], status: result[:status]
   end
 
   def show
-    episode = PodcastsShowUsecase.call(episode_id: params[:episode_id])
-
-    if episode
-      render inertia: "PodcastDetail", props: { episode: episode }
-    else
-      render inertia: "PodcastDetail", props: { episode: nil }, status: :not_found
-    end
+    result = PodcastShowUsecase.call(episode_id: params[:episode_id])
+    render inertia: "PodcastDetail", props: result[:props], status: result[:status]
   end
 end

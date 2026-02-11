@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ShopsIndexUsecase do
+RSpec.describe ShopIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
@@ -22,7 +22,7 @@ RSpec.describe ShopsIndexUsecase do
     end
 
     it do
-      expect(result[:shops]).to eq(
+      expect(result[:props][:shops]).to eq(
         [
           {
             name: "テスト居酒屋",
@@ -37,7 +37,8 @@ RSpec.describe ShopsIndexUsecase do
     end
 
     it "キー順は name, category, lat, lng, url, desc" do
-      expect(result[:shops].map(&:keys)).to all(eq(%i[name category lat lng url desc]))
+      expect(result[:status]).to eq(:ok)
+      expect(result[:props][:shops].map(&:keys)).to all(eq(%i[name category lat lng url desc]))
     end
   end
 end

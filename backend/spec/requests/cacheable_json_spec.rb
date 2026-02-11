@@ -26,14 +26,15 @@ RSpec.describe "Cacheable endpoints", type: :request do
     before do
       allow(App::Numbers::MetricsIndexUsecase).to receive(:call).and_return(
         {
-          metrics: {
+          json: {
             "blocks" => [
               {
                 "label" => "ポッドキャスト総本数",
                 "value" => "1 本"
               }
             ]
-          }
+          },
+          status: :ok
         }
       )
     end
@@ -46,14 +47,17 @@ RSpec.describe "Cacheable endpoints", type: :request do
   describe "GET /app/masuda_run/rankings.json" do
     before do
       allow(App::MasudaRun::RankingsIndexUsecase).to receive(:call).and_return(
-        [
-          {
-            userId: "alice",
-            score: 1000,
-            rankedAt: "2026/02/11",
-            rank: 1
-          }
-        ]
+        {
+          json: [
+            {
+              userId: "alice",
+              score: 1000,
+              rankedAt: "2026/02/11",
+              rank: 1
+            }
+          ],
+          status: :ok
+        }
       )
     end
 
@@ -66,7 +70,7 @@ RSpec.describe "Cacheable endpoints", type: :request do
     before do
       allow(SitemapsIndexUsecase).to receive(:call).and_return(
         {
-          xml: <<~XML,
+          plain: <<~XML,
             <?xml version="1.0" encoding="UTF-8"?>
             <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
               <url>
@@ -74,7 +78,8 @@ RSpec.describe "Cacheable endpoints", type: :request do
               </url>
             </urlset>
           XML
-          content_type: "application/xml; charset=utf-8"
+          content_type: "application/xml; charset=utf-8",
+          status: :ok
         }
       )
     end
@@ -88,23 +93,25 @@ RSpec.describe "Cacheable endpoints", type: :request do
     before do
       allow(SitemapsIndexUsecase).to receive(:call).and_return(
         {
-          xml: <<~XML,
+          plain: <<~XML,
             <?xml version="1.0" encoding="UTF-8"?>
             <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
               <url><loc>https://masusono.com/</loc></url>
             </urlset>
           XML
-          content_type: "application/xml; charset=utf-8"
+          content_type: "application/xml; charset=utf-8",
+          status: :ok
         },
         {
-          xml: <<~XML,
+          plain: <<~XML,
             <?xml version="1.0" encoding="UTF-8"?>
             <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
               <url><loc>https://masusono.com/</loc></url>
               <url><loc>https://masusono.com/blog</loc></url>
             </urlset>
           XML
-          content_type: "application/xml; charset=utf-8"
+          content_type: "application/xml; charset=utf-8",
+          status: :ok
         }
       )
     end

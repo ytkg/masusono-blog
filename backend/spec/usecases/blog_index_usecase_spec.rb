@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ArticlesIndexUsecase do
+RSpec.describe BlogIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
@@ -28,7 +28,7 @@ RSpec.describe ArticlesIndexUsecase do
     end
 
     it do
-      expect(result[:articles]).to eq(
+      expect(result[:props][:articles]).to eq(
         [
           {
             id: "first",
@@ -49,7 +49,8 @@ RSpec.describe ArticlesIndexUsecase do
     end
 
     it "キー順は id, title, publishedDate, content, author" do
-      expect(result[:articles].map(&:keys)).to all(eq(%i[id title publishedDate content author]))
+      expect(result[:status]).to eq(:ok)
+      expect(result[:props][:articles].map(&:keys)).to all(eq(%i[id title publishedDate content author]))
     end
   end
 end

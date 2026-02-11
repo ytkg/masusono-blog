@@ -77,7 +77,7 @@
 ## 5. アーキテクチャ・設計
 
 - [ ] Usecase の入出力を型付きで管理する方針（dry-struct 等）を検討する
-- [ ] controller は `render` 専任、整形は usecase に寄せる方針を全画面に適用する
+- [x] controller は `render` 専任、整形は usecase に寄せる方針を全画面に適用する
 - [ ] microCMS クライアント層を共通化し、重複したエラーマッピングを整理する
 - [ ] API 契約変更時のバージョニングルールを決める
 - [ ] ドメイン単位（Blog/Podcast/Shop）にディレクトリ再編を検討する

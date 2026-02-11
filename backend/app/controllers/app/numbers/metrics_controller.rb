@@ -2,7 +2,8 @@ module App
   module Numbers
     class MetricsController < ApplicationController
       def index
-        render json: MetricsIndexUsecase.call[:metrics]
+        result = MetricsIndexUsecase.call
+        render json: result[:json], status: result[:status]
       end
     end
   end

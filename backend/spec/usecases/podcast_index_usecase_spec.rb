@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe PodcastsIndexUsecase do
+RSpec.describe PodcastIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
@@ -32,7 +32,7 @@ RSpec.describe PodcastsIndexUsecase do
     end
 
     it do
-      expect(result[:podcasts]).to eq(
+      expect(result[:props][:episodes]).to eq(
         [
           {
             id: "001",
@@ -57,7 +57,8 @@ RSpec.describe PodcastsIndexUsecase do
     end
 
     it "キー順は id, title, publishedDate, audioUrl" do
-      expect(result[:podcasts].map(&:keys)).to all(eq(%i[id title publishedDate audioUrl]))
+      expect(result[:status]).to eq(:ok)
+      expect(result[:props][:episodes].map(&:keys)).to all(eq(%i[id title publishedDate audioUrl]))
     end
   end
 end

@@ -1,4 +1,4 @@
-class ArticlesIndexUsecase
+class BlogIndexUsecase
   include AuthorNameExtractor
 
   def self.call
@@ -7,7 +7,7 @@ class ArticlesIndexUsecase
 
   def call
     articles = Article.all.map { |article| build_article(article) }
-    { articles: articles }
+    { props: { articles: articles }, status: :ok }
   end
 
   private
