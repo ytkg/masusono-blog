@@ -13,9 +13,23 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   layout "application"
 
+  inertia_share app: -> { inertia_shared_app },
+                flash: -> { inertia_shared_flash }
+
   private
 
   def inertia_render(result)
     render inertia: result.except(:status), status: result[:status]
+  end
+
+  def inertia_shared_app
+    { name: "増田とその他！" }
+  end
+
+  def inertia_shared_flash
+    {
+      notice: flash[:notice],
+      alert: flash[:alert]
+    }
   end
 end

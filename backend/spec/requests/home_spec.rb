@@ -11,6 +11,8 @@ RSpec.describe "WebHome", type: :request do
       expect(response.media_type).to eq("text/html")
       expect(response.body).to include("data-page=")
       expect(response.body).to include("&quot;component&quot;:&quot;home/show&quot;")
+      expect(response.body).to include("&quot;app&quot;")
+      expect(response.body).to include("&quot;flash&quot;")
     end
   end
 

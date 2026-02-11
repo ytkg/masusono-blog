@@ -297,7 +297,7 @@ curl -i https://<host>/sitemap.xml
   - 対応案:
     - `createInertiaApp` の `resolve` を async 化し、遅延読み込みへ変更する
 
-- [ ] 共有 props（`inertia_share`）を `ApplicationController` に集約する
+- [x] 共有 props（`inertia_share`）を `ApplicationController` に集約する
   - 現状:
     - `ApplicationController` で共通共有データ定義がない
   - 期待効果:
@@ -345,6 +345,6 @@ curl -i https://<host>/sitemap.xml
 
 - [x] Asset versioning
 - [ ] Lazy import 化
-- [ ] `inertia_share` 基盤
+- [x] `inertia_share` 基盤
 - [ ] Deferred / Optional props
 - [ ] prefetch とテスト改善
