@@ -272,3 +272,79 @@ curl -i https://<host>/sitemap.xml
 
 - ランキングを高頻度で更新すると、Inertia 再訪問による負荷が増える
 - リアルタイム性が必要な場合は、該当機能のみ別方式（SSE 等）を検討する
+
+## 13. Inertia Rails 改善候補（`llms-full.txt` 照合）
+
+- 作成日: 2026-02-11
+- 参照: `https://inertia-rails.dev/llms-full.txt`
+- 目的: 現状実装とのギャップを整理し、着手順を明確にする
+
+### 13.1 優先度 High
+
+- [x] Asset versioning を有効化する
+  - 現状:
+    - `config/initializers/inertia_rails.rb` に `version` 設定がない
+  - 期待効果:
+    - デプロイ後の古いフロント資産参照（キャッシュ食い違い）を抑止
+  - 対応案:
+    - `inertia_config(version: ...)` を設定し、Vite 側のビルドバージョンに連動させる
+
+- [ ] ページ解決を lazy import 化する（初期JS削減）
+  - 現状:
+    - `app/frontend/entrypoints/inertia.jsx` で `import.meta.glob(..., { eager: true })`
+  - 期待効果:
+    - 初回ロードを軽量化し、遷移時に必要ページのみ読み込む
+  - 対応案:
+    - `createInertiaApp` の `resolve` を async 化し、遅延読み込みへ変更する
+
+- [ ] 共有 props（`inertia_share`）を `ApplicationController` に集約する
+  - 現状:
+    - `ApplicationController` で共通共有データ定義がない
+  - 期待効果:
+    - ページ間の共通データ注入を統一し、重複実装を削減
+  - 対応案:
+    - flash、共通メタ、必要な環境情報のみをサーバー側で共有する
+
+### 13.2 優先度 Medium
+
+- [ ] 重い props を Deferred / Optional 化する
+  - 現状:
+    - `BlogIndexUsecase` などで外部取得由来データを同期で組み立て
+  - 期待効果:
+    - 初回表示を優先し、重いデータは後段読み込みに分離できる
+  - 対応案:
+    - `InertiaRails.optional` / `InertiaRails.defer` と partial reload を併用する
+
+- [ ] `Link` の prefetch を導線単位で導入する
+  - 現状:
+    - グローバルナビや一覧導線で `prefetch` 未設定
+  - 期待効果:
+    - 体感遷移速度を改善
+  - 対応案:
+    - 高頻度遷移導線のみ段階導入し、外部API負荷を計測しながら調整する
+
+- [ ] request spec を Inertia 構造検証寄りに寄せる
+  - 現状:
+    - `response.body` の文字列一致中心
+  - 期待効果:
+    - マークアップ変更に強いテストへ改善
+  - 対応案:
+    - component 名と props の検証を中心にしたテストへ移行する
+
+### 13.3 優先度 Low
+
+- [ ] 履歴暗号化（history encryption）の適用を検討する
+  - 現状:
+    - `render inertia:` 時に暗号化フラグ未利用
+  - 期待効果:
+    - 履歴経由で保持される情報の露出リスクを低減
+  - 対応案:
+    - センシティブな props を扱う画面から限定適用する
+
+### 13.4 推奨着手順
+
+- [x] Asset versioning
+- [ ] Lazy import 化
+- [ ] `inertia_share` 基盤
+- [ ] Deferred / Optional props
+- [ ] prefetch とテスト改善
