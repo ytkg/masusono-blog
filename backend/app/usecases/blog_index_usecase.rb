@@ -7,7 +7,7 @@ class BlogIndexUsecase
 
   def call
     articles = Article.all.map { |article| build_article(article) }
-    { props: { articles: articles }, status: :ok }
+    { articles: articles }
   end
 
   private

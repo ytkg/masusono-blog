@@ -19,7 +19,7 @@ RSpec.describe "WebShop", type: :request do
 
     before do
       allow(ShopIndexUsecase).to receive(:call).and_return(
-        { props: { shops: shops }, status: :ok }
+        { shops: shops, status: :ok }
       )
     end
 

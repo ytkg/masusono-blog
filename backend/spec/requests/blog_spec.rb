@@ -18,7 +18,7 @@ RSpec.describe "WebBlog", type: :request do
 
     before do
       allow(BlogIndexUsecase).to receive(:call).and_return(
-        { props: { articles: articles }, status: :ok }
+        { articles: articles }
       )
     end
 
@@ -46,7 +46,7 @@ RSpec.describe "WebBlog", type: :request do
 
     it "存在する場合は詳細Inertiaページを返す" do
       allow(BlogShowUsecase).to receive(:call).with(article_id: "article-1").and_return(
-        { props: { article: article }, status: :ok }
+        { article: article, status: :ok }
       )
 
       get "/blog/article-1", headers: html_headers
@@ -59,7 +59,7 @@ RSpec.describe "WebBlog", type: :request do
 
     it "存在しない場合は404のInertiaページを返す" do
       allow(BlogShowUsecase).to receive(:call).with(article_id: "missing").and_return(
-        { props: { article: nil }, status: :not_found }
+        { article: nil, status: :not_found }
       )
 
       get "/blog/missing", headers: html_headers

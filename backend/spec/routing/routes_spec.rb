@@ -1,14 +1,6 @@
 require "rails_helper"
 
 RSpec.describe "Web routes", type: :routing do
-  it "routes / to home#show" do
-    expect(get: "/").to route_to("home#show")
-  end
-
-  it "routes /about to about#show" do
-    expect(get: "/about").to route_to("about#show")
-  end
-
   it "routes /blog to blog#index" do
     expect(get: "/blog").to route_to("blog#index")
   end

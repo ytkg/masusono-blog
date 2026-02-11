@@ -1,6 +1,6 @@
-class ShopController < WebController
+class ShopController < ApplicationController
   def index
     result = ShopIndexUsecase.call
-    render inertia: true, props: result[:props], status: result[:status]
+    inertia_render(result)
   end
 end

@@ -7,16 +7,14 @@ RSpec.describe PodcastController, type: :controller do
     it "Podcast の Inertia ページを返す" do
       allow(PodcastIndexUsecase).to receive(:call).and_return(
         {
-          props: {
-            episodes: [
-              {
-                id: "001",
-                title: "テスト回",
-                publishedDate: "2026/02/10",
-                audioUrl: "https://example.com/001.mp3"
-              }
-            ]
-          },
+          episodes: [
+            {
+              id: "001",
+              title: "テスト回",
+              publishedDate: "2026/02/10",
+              audioUrl: "https://example.com/001.mp3"
+            }
+          ],
           status: :ok
         }
       )
@@ -42,7 +40,7 @@ RSpec.describe PodcastController, type: :controller do
 
     it "存在する回なら PodcastDetail を返す" do
       allow(PodcastShowUsecase).to receive(:call).with(episode_id: "001").and_return(
-        { props: { episode: episode }, status: :ok }
+        { episode: episode, status: :ok }
       )
 
       get :show, params: { episode_id: "001" }
@@ -55,7 +53,7 @@ RSpec.describe PodcastController, type: :controller do
 
     it "存在しない回なら 404 を返す" do
       allow(PodcastShowUsecase).to receive(:call).with(episode_id: "999").and_return(
-        { props: { episode: nil }, status: :not_found }
+        { episode: nil, status: :not_found }
       )
 
       get :show, params: { episode_id: "999" }

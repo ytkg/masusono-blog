@@ -1,11 +1,11 @@
-class PodcastController < WebController
+class PodcastController < ApplicationController
   def index
     result = PodcastIndexUsecase.call
-    render inertia: true, props: result[:props], status: result[:status]
+    inertia_render(result)
   end
 
   def show
     result = PodcastShowUsecase.call(episode_id: params[:episode_id])
-    render inertia: true, props: result[:props], status: result[:status]
+    inertia_render(result)
   end
 end

@@ -13,7 +13,7 @@ class PodcastShowUsecase
 
     audio_url = podcast[:audioUrl]
 
-    { props: { episode: build_episode(podcast, audio_url) }, status: :ok }
+    { episode: build_episode(podcast, audio_url), status: :ok }
   end
 
   private
@@ -33,6 +33,6 @@ class PodcastShowUsecase
   end
 
   def not_found_result
-    { props: { episode: nil }, status: :not_found }
+    { episode: nil, status: :not_found }
   end
 end

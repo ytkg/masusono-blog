@@ -28,7 +28,7 @@ RSpec.describe BlogIndexUsecase do
     end
 
     it do
-      expect(result[:props][:articles]).to eq(
+      expect(result[:articles]).to eq(
         [
           {
             id: "first",
@@ -49,8 +49,7 @@ RSpec.describe BlogIndexUsecase do
     end
 
     it "キー順は id, title, publishedDate, content, author" do
-      expect(result[:status]).to eq(:ok)
-      expect(result[:props][:articles].map(&:keys)).to all(eq(%i[id title publishedDate content author]))
+      expect(result[:articles].map(&:keys)).to all(eq(%i[id title publishedDate content author]))
     end
   end
 end

@@ -5,7 +5,7 @@ class PodcastIndexUsecase
 
   def call
     episodes = Podcast.all.map { |podcast| build_podcast(podcast) }
-    { props: { episodes: episodes }, status: :ok }
+    { episodes: episodes, status: :ok }
   end
 
   private

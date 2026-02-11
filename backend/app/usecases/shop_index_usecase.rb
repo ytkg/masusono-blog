@@ -5,7 +5,7 @@ class ShopIndexUsecase
 
   def call
     shops = Shop.all.map { |shop| build_shop(shop) }
-    { props: { shops: shops }, status: :ok }
+    { shops: shops, status: :ok }
   end
 
   private
