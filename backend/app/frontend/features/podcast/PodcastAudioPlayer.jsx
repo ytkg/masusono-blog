@@ -8,7 +8,6 @@ import Forward10Icon from "@mui/icons-material/Forward10"
 import Replay10Icon from "@mui/icons-material/Replay10"
 import PauseIcon from "@mui/icons-material/Pause"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
-import logo from "../../assets/logo.png"
 import {
   EMBEDDED_PLAYER_ARIA_LABELS,
   getEmbeddedPlayerSeekSliderAriaLabel,
@@ -18,6 +17,7 @@ import {
 import { useSeekSliderState } from "./useSeekSliderState"
 
 const SEEK_SLIDER_STEP_SECONDS = 0.1
+const PODCAST_ARTWORK_IMAGE = "/icons/icon-192.png"
 
 function formatTime(value) {
   if (!Number.isFinite(value) || value <= 0) return "00:00"
@@ -66,7 +66,7 @@ function PodcastAudioPlayer({
     >
       <CardMedia
         component="img"
-        image={logo}
+        image={PODCAST_ARTWORK_IMAGE}
         alt="Podcast artwork"
         sx={{
           width: isMini ? { xs: 44, sm: 52 } : { xs: 64, sm: 96 },
