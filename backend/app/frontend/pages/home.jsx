@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
-import HomeHero from "../../features/home/HomeHero"
-import UechanBirthdaySection from "../../features/home/UechanBirthdaySection"
-import HomeFeatureLinks from "../../features/home/HomeFeatureLinks"
-import HomeAppLaunchers from "../../features/home/HomeAppLaunchers"
-import { ensureUserIdCookie } from "../../utils/userId"
-import SeoHead from "../../shared/SeoHead"
+import HomeHero from "../features/home/HomeHero"
+import UechanBirthdaySection from "../features/home/UechanBirthdaySection"
+import HomeFeatureLinks from "../features/home/HomeFeatureLinks"
+import HomeAppLaunchers from "../features/home/HomeAppLaunchers"
+import { ensureUserIdCookie } from "../utils/userId"
+import SeoHead from "../shared/SeoHead"
 
 export default function Home() {
   const [now, setNow] = useState(() => new Date())

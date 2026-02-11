@@ -5,8 +5,8 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up", to: "rails/health#show", as: :rails_health_check
 
-  inertia "/" => "home/show", as: :root
-  inertia "about" => "about/show"
+  inertia "/" => :home, as: :root
+  inertia "about" => :about
   get "blog", to: "blog#index"
   get "blog/:article_id", to: "blog#show", as: :blog_article
   get "podcast", to: "podcast#index"

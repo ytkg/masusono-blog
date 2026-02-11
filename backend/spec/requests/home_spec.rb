@@ -10,7 +10,7 @@ RSpec.describe "WebHome", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("home/show")
+      expect(page["component"]).to eq("home")
       expect(page["props"]).to include("app", "flash")
     end
   end
@@ -22,7 +22,7 @@ RSpec.describe "WebHome", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("about/show")
+      expect(page["component"]).to eq("about")
     end
   end
 end
