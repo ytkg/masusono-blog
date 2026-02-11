@@ -11,15 +11,9 @@ RSpec.describe Microcms::FetchContentsService do
     end
     let(:endpoint) { service_class::ENDPOINT }
     let(:logger) { instance_double(Logger, warn: nil) }
-    let(:request_headers) do
-      {
-        "Accept" => "application/json",
-        "X-API-KEY" => "test-api-key"
-      }
-    end
     let(:first_page_query) { { "limit" => "100", "offset" => "0", "orders" => "-publishedAt" } }
     let(:first_page_status) { 200 }
-    let(:first_page_response_headers) { { "Content-Type" => "application/json" } }
+    let(:first_page_response_headers) { json_response_headers }
     let(:first_page_contents) do
       [
         { "id" => "first" }
@@ -29,25 +23,25 @@ RSpec.describe Microcms::FetchContentsService do
     let(:first_page_limit) { 100 }
     let(:first_page_offset) { 0 }
     let(:first_page_body) do
-      {
+      microcms_response_body(
         contents: first_page_contents,
-        totalCount: first_page_total_count,
+        total_count: first_page_total_count,
         limit: first_page_limit,
         offset: first_page_offset
-      }.to_json
+      )
     end
     let(:second_page_query) { nil }
     let(:second_page_status) { 200 }
-    let(:second_page_response_headers) { { "Content-Type" => "application/json" } }
+    let(:second_page_response_headers) { json_response_headers }
     let(:second_page_contents) { [] }
     let(:second_page_offset) { first_page_limit }
     let(:second_page_body) do
-      {
+      microcms_response_body(
         contents: second_page_contents,
-        totalCount: first_page_total_count,
+        total_count: first_page_total_count,
         limit: first_page_limit,
         offset: second_page_offset
-      }.to_json
+      )
     end
 
     around do |example|
@@ -62,10 +56,10 @@ RSpec.describe Microcms::FetchContentsService do
     end
 
     before do
-      allow(Rails.application.credentials).to receive(:dig).with(:microcms, :api_key).and_return("test-api-key")
+      stub_microcms_api_key
       allow(Rails).to receive(:logger).and_return(logger)
       stub_request(:get, endpoint)
-        .with(query: first_page_query, headers: request_headers)
+        .with(query: first_page_query, headers: microcms_request_headers)
         .to_return(
           status: first_page_status,
           body: first_page_body,
@@ -74,7 +68,7 @@ RSpec.describe Microcms::FetchContentsService do
       next unless second_page_query
 
       stub_request(:get, endpoint)
-        .with(query: second_page_query, headers: request_headers)
+        .with(query: second_page_query, headers: microcms_request_headers)
         .to_return(
           status: second_page_status,
           body: second_page_body,
@@ -114,7 +108,7 @@ RSpec.describe Microcms::FetchContentsService do
       it do
         expect(result.map { |content| content[:id] }).to eq(%w[first])
         expect(logger).to have_received(:warn).with(include("invalid pagination meta"))
-        expect(a_request(:get, endpoint).with(query: first_page_query, headers: request_headers)).to have_been_made.once
+        expect(a_request(:get, endpoint).with(query: first_page_query, headers: microcms_request_headers)).to have_been_made.once
       end
     end
 
@@ -128,7 +122,7 @@ RSpec.describe Microcms::FetchContentsService do
       it do
         expect(result.map { |content| content[:id] }).to eq(%w[first])
         expect(logger).to have_received(:warn).with(include("max pages reached"))
-        expect(a_request(:get, endpoint).with(query: first_page_query, headers: request_headers)).to have_been_made.once
+        expect(a_request(:get, endpoint).with(query: first_page_query, headers: microcms_request_headers)).to have_been_made.once
       end
     end
 
