@@ -40,28 +40,13 @@
 - [x] Home の `HomeAppLaunchers` / `AppsDrawerLauncher` 移植
 - [x] `MasudaRun` 本体（キャンバスゲーム）移植
 
-## 4. 残タスク（優先度順）
+## 4. 残タスク（2026-02-11 時点）
 
-### P0: リリース整備（先に終わらせる）
-
-- [ ] `/shop` -> `/shops` の最終切替
-  - 画面URLを `/shops` に戻し、`/shop` は 301 リダイレクトへ変更
-  - `sitemap` / canonical / 内部リンク / 手動確認チェックリストを同時更新
-- [ ] `sitemap.xml` の配置方針を確定
-  - 現状は `SitemapsController`
-  - 命名を Web 側へ寄せるか現状維持かを決める
-
-### P1: 運用・監視
-
-- [ ] 監視メトリクス定義（エラー率・レイテンシ）
-  - 監視対象: `/up`, 主要画面, `/app/numbers/metrics.json`, `/app/masuda_run/rankings.json`, `/sitemap.xml`
-  - しきい値と通知先（Slack/メール等）を確定
-
-### P2: 後片付け
-
-- [ ] 旧 `frontend` 資産の扱いを決定
-  - 削除するか、アーカイブとして残すか
-  - CI/README/Runbook の参照先を `backend` 中心に統一
+- [x] `/shop` は単数URLのまま維持する（`/shops` へは戻さない）
+- [x] `sitemap.xml` は `SitemapsController`（ネームスペースなし）で配信
+- [ ] 監視（Cloud Monitoring）は保留
+  - 現時点では導入しない
+  - 必要時に `/up` + 主要導線 + `/app/*.json` + `/sitemap.xml` を対象に再検討
 
 ## 4.1 厳しめ棚卸し（2026-02-10）
 
@@ -79,7 +64,7 @@
 - [x] `ensureUserIdCookie` の同等処理を移植
 - [x] OGP/Twitter メタの更新処理を同等化
 
-### PWA 差分（進行中）
+### PWA 差分（完了）
 
 - [x] `manifest.webmanifest` の配信
 - [x] Service Worker（`/service-worker.js`）登録（最小構成）
@@ -105,22 +90,21 @@
 - `sitemap.xml` は `SitemapsController` で配信
 - ドキュメント上の機能セクション名は単数で統一:
   - `Shop`（旧: `Shops`）
-- 画面URLは段階移行中のみ `/shop` を利用し、完全切替後に `/shops` へ戻す
+- 画面URLは `/shop` を正式採用する
 - API エンドポイント名を変更する場合は別タスクで扱う
   - 互換性影響があるため、移行完了後に判断する
 
 ## 7. 直近の実装順（提案）
 
-1. `/shop` -> `/shops` の最終切替を実施
-2. 監視メトリクス（エラー率/レイテンシ）を確定
-3. `sitemap.xml` のコントローラー配置方針を確定
-4. 旧 `frontend` 資産の扱いを確定
+1. 監視導入が必要になった時点で Cloud Monitoring を設定
+2. 運用上の確認項目（手動スモーク）のみ維持
+3. 大きな機能追加時に本ドキュメントを更新
 
-## 8. 意思決定メモ（未確定）
+## 8. 意思決定メモ（確定）
 
-- [ ] `sitemap.xml` の配置（`Api` 名前空間維持 or 移動）
-- [ ] `/shop` から `/shops` 切替のタイミング（告知有無含む）
-- [ ] 旧 `frontend` ディレクトリの最終扱い（削除/保管）
+- [x] `sitemap.xml` の配置: `SitemapsController`（ネームスペースなし）
+- [x] URL 方針: `/shop` を維持
+- [x] 旧 `frontend` ディレクトリの扱い: 削除済み
 
 ## 9. PWA 実機確認チェックリスト
 
