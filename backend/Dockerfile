@@ -19,7 +19,7 @@ ARG INSTALL_DEV_TOOLS=0
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
     if [ "$INSTALL_DEV_TOOLS" = "1" ]; then \
-      apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config; \
+      apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config nodejs npm; \
     fi && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives

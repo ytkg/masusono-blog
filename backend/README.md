@@ -10,6 +10,54 @@ masusono-blog の Rails API バックエンドです。
 docker compose up --build
 ```
 
+## Inertia ページ開発（`/about` PoC）
+
+`/about` は Inertia Rails で返すようにしています。開発時は Rails に加えて Vite を起動してください。
+
+```bash
+cd backend
+bundle install
+npm install
+bundle exec rails s
+npm run dev
+```
+
+補足:
+- API エンドポイント（`/articles.json` など）は従来どおり利用できます。
+
+### Docker での起動
+
+`compose.yml` には Rails (`backend`) と Vite (`vite`) の 2 サービスを定義しています。
+依存インストールは `vite` サービスのみが担当し、`backend` は依存準備完了を待ってから起動します。
+Rails 側は起動前に `tmp/pids/server.pid` を削除して重複起動エラーを回避します。
+
+```bash
+cd backend
+docker compose up --build
+```
+
+- Rails: `http://localhost:3000`
+- Vite dev server: `http://localhost:3036`
+
+`/about` は Rails 経由で表示し、JS は Vite から配信されます。
+初回起動時は `vite` コンテナで `npm install` が実行されるため、立ち上がりに時間がかかる場合があります。
+`npm install` で権限エラーが出た場合は、`node_modules_cache` ボリュームを再作成してください。
+
+```bash
+cd backend
+docker compose down -v
+docker compose up --build
+```
+
+`ENOSPC: no space left on device` が出る場合は Docker のディスク不足です。以下を実行して空き容量を作ってから再実行してください。
+
+```bash
+docker system prune -af --volumes
+docker builder prune -af
+cd backend
+docker compose up --build
+```
+
 ## APIエンドポイント
 
 - `GET /articles.json`

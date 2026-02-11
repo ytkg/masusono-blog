@@ -5,13 +5,23 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up", to: "rails/health#show", as: :rails_health_check
 
-  get "sitemap.xml", to: "sitemaps#index"
-  resources :articles, only: :index
-  resources :metrics, only: :index
-  resources :podcasts, only: :index
-  resources :shops, only: :index
-  namespace :masuda_run do
-    resources :rankings, only: :index
+  root "home#show"
+  get "about", to: "about#show"
+  get "blog", to: "blog#index"
+  get "blog/:article_id", to: "blog#show", as: :blog_article
+  get "podcast", to: "podcast#index"
+  get "podcast/:episode_id", to: "podcast#show", as: :podcast_episode
+  get "shop", to: "shop#index"
+
+  scope module: :api do
+    get "sitemap.xml", to: "sitemaps#index"
+    resources :articles, only: :index
+    resources :metrics, only: :index
+    resources :podcasts, only: :index
+    resources :shops, only: :index
+    namespace :masuda_run do
+      resources :rankings, only: :index
+    end
   end
 
   # Defines the root path route ("/")
