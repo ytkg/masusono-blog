@@ -23,8 +23,8 @@ This agent must execute the following steps **before starting any task**, regard
 - Only after the pre-task action is fully completed, the agent may proceed with the user’s instruction.
 - All responses must be written in **concise and polite Japanese** unless the user requests otherwise.
 - For backend code changes, always run both lint and tests before reporting completion:
-  - `RUBOCOP_CACHE_ROOT=tmp/rubocop_cache ~/.rbenv/shims/bundle exec rubocop`
-  - `~/.rbenv/shims/bundle exec rspec`
+  - `docker compose run --rm backend bundle exec rubocop`
+  - `docker compose run --rm backend bundle exec rspec`
 
 ---
 
@@ -45,6 +45,7 @@ This agent must execute the following steps **before starting any task**, regard
 - Ruby version is pinned to 4.0.1 in `backend/.ruby-version` and `backend/Gemfile`.
 - Running `bundle exec rubocop` on host may fail if host Ruby/Bundler differs (e.g. lockfile requires Bundler 4.0.6 while system Ruby is 2.6.x).
 - Prefer RuboCop in container from `backend/`: `docker compose run --rm backend bundle exec rubocop`.
+- Prefer RSpec in container from `backend/`: `docker compose run --rm backend bundle exec rspec`.
 - For auto-fix, run: `docker compose run --rm backend bundle exec rubocop -A`.
 - If images are stale or missing gems, retry with build: `docker compose run --rm --build backend bundle exec rubocop`.
 - In sandboxed agent environments, Docker daemon access may require escalation approval.

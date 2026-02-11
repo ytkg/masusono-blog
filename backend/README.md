@@ -139,6 +139,7 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 ## 運用メモ
 
 - Cloud Run オリジン到達率削減メモ: `backend/docs/cache-origin-reduction-plan.md`
+- 改善バックログ（候補一覧）: `backend/docs/improvement-backlog.md`
 
 ## microCMS ページング保護
 
@@ -150,12 +151,13 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 
 環境変数が未設定、空文字、または不正値の場合はデフォルト値を使います。
 
-## テスト
+## バックエンドのLint/テスト
 
 `backend/` で実行します:
 
 ```bash
-bundle exec rspec
+docker compose run --rm backend bundle exec rubocop
+docker compose run --rm backend bundle exec rspec
 ```
 
 ## フロントエンドのLint/Format
