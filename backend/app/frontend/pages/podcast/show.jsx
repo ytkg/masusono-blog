@@ -1,10 +1,10 @@
 import { Link } from "@inertiajs/react"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import MuiLink from "@mui/material/Link"
-import PageContainer from "../shared/PageContainer"
-import SectionHeading from "../shared/SectionHeading"
-import PodcastEpisodeCard from "../features/podcast/PodcastEpisodeCard"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../../shared/PageContainer"
+import SectionHeading from "../../shared/SectionHeading"
+import PodcastEpisodeCard from "../../features/podcast/PodcastEpisodeCard"
+import SeoHead from "../../shared/SeoHead"
 
 export default function PodcastDetail({ episode }) {
   const canonical = episode?.id ? `/podcast/${episode.id}` : "/podcast"

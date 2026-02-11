@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import PageContainer from "../shared/PageContainer"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../../shared/PageContainer"
+import SeoHead from "../../shared/SeoHead"
 
 export default function About() {
   return (

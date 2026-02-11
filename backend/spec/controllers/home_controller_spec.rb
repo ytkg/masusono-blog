@@ -12,7 +12,7 @@ RSpec.describe HomeController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;Home&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;home/show&quot;")
     end
   end
 end

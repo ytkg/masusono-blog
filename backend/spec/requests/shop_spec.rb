@@ -28,7 +28,7 @@ RSpec.describe "WebShop", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;Shops&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;shop/index&quot;")
       expect(response.body).to include("テスト居酒屋")
     end
   end

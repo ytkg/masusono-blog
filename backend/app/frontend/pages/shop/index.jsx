@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react"
-import PageContainer from "../shared/PageContainer"
-import SectionHeading from "../shared/SectionHeading"
-import ShopsList from "../features/shops/ShopsList"
-import ShopCategoryFilter, { DEFAULT_CATEGORY } from "../features/shops/ShopCategoryFilter"
-import ShopsMap from "../features/shops/ShopsMap"
-import { SHOPS_PAGE_LAYOUT } from "../features/shops/shopsPageStyleConstants"
-import { attachStableShopIds, createShopBaseId, resolveSelectedShopId } from "../features/shops/shopSelection"
-import { usePreventBodyScroll } from "../features/shops/usePreventBodyScroll"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../../shared/PageContainer"
+import SectionHeading from "../../shared/SectionHeading"
+import ShopsList from "../../features/shops/ShopsList"
+import ShopCategoryFilter, { DEFAULT_CATEGORY } from "../../features/shops/ShopCategoryFilter"
+import ShopsMap from "../../features/shops/ShopsMap"
+import { SHOPS_PAGE_LAYOUT } from "../../features/shops/shopsPageStyleConstants"
+import { attachStableShopIds, createShopBaseId, resolveSelectedShopId } from "../../features/shops/shopSelection"
+import { usePreventBodyScroll } from "../../features/shops/usePreventBodyScroll"
+import SeoHead from "../../shared/SeoHead"
 
 function createShopIdResolver(shops) {
   const shopsWithId = attachStableShopIds(shops)

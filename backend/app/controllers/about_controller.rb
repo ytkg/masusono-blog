@@ -1,5 +1,5 @@
 class AboutController < WebController
   def show
-    render inertia: "About"
+    render inertia: true
   end
 end

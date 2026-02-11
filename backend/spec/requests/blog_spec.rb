@@ -28,7 +28,7 @@ RSpec.describe "WebBlog", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
       expect(response.body).to include("data-page=")
-      expect(response.body).to include("&quot;component&quot;:&quot;Blog&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;blog/index&quot;")
       expect(response.body).to include("記事1")
     end
   end
@@ -53,7 +53,7 @@ RSpec.describe "WebBlog", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;BlogDetail&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;blog/show&quot;")
       expect(response.body).to include("記事1")
     end
 
@@ -66,7 +66,7 @@ RSpec.describe "WebBlog", type: :request do
 
       expect(response).to have_http_status(:not_found)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;BlogDetail&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;blog/show&quot;")
     end
   end
 end

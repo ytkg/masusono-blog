@@ -1,5 +1,5 @@
 class HomeController < WebController
   def show
-    render inertia: "Home"
+    render inertia: true
   end
 end

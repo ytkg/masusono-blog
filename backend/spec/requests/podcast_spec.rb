@@ -26,7 +26,7 @@ RSpec.describe "WebPodcast", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;Podcast&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;podcast/index&quot;")
       expect(response.body).to include("テスト回")
     end
   end
@@ -50,7 +50,7 @@ RSpec.describe "WebPodcast", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;PodcastDetail&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;podcast/show&quot;")
       expect(response.body).to include("テスト回")
     end
 
@@ -63,7 +63,7 @@ RSpec.describe "WebPodcast", type: :request do
 
       expect(response).to have_http_status(:not_found)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;PodcastDetail&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;podcast/show&quot;")
     end
   end
 end

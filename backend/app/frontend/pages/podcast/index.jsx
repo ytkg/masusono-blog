@@ -1,7 +1,7 @@
-import PageContainer from "../shared/PageContainer"
-import SectionHeading from "../shared/SectionHeading"
-import PodcastEpisodesList from "../features/podcast/PodcastEpisodesList"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../../shared/PageContainer"
+import SectionHeading from "../../shared/SectionHeading"
+import PodcastEpisodesList from "../../features/podcast/PodcastEpisodesList"
+import SeoHead from "../../shared/SeoHead"
 
 export default function Podcast({ episodes }) {
   return (

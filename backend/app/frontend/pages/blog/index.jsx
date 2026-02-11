@@ -1,7 +1,7 @@
-import PageContainer from "../shared/PageContainer"
-import SectionHeading from "../shared/SectionHeading"
-import ArticlesList from "../features/blog/ArticlesList"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../../shared/PageContainer"
+import SectionHeading from "../../shared/SectionHeading"
+import ArticlesList from "../../features/blog/ArticlesList"
+import SeoHead from "../../shared/SeoHead"
 
 export default function Blog({ articles }) {
   return (

@@ -9,7 +9,7 @@ RSpec.describe AboutController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;About&quot;")
+      expect(response.body).to include("&quot;component&quot;:&quot;about/show&quot;")
     end
   end
 end

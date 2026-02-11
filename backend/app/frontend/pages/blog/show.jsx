@@ -1,10 +1,10 @@
 import { Link } from "@inertiajs/react"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import MuiLink from "@mui/material/Link"
-import PageContainer from "../shared/PageContainer"
-import SectionHeading from "../shared/SectionHeading"
-import ArticleCard from "../features/blog/ArticleCard"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../../shared/PageContainer"
+import SectionHeading from "../../shared/SectionHeading"
+import ArticleCard from "../../features/blog/ArticleCard"
+import SeoHead from "../../shared/SeoHead"
 
 function extractMetaDescription(content) {
   const plainText =
