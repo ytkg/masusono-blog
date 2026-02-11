@@ -23,8 +23,9 @@ RSpec.describe PodcastController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;podcast/index&quot;")
-      expect(response.body).to include("テスト回")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("podcast/index")
+      expect(inertia.props.dig("episodes", 0, "title")).to eq("テスト回")
     end
   end
 
@@ -47,8 +48,9 @@ RSpec.describe PodcastController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;podcast/show&quot;")
-      expect(response.body).to include("テスト回")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("podcast/show")
+      expect(inertia.props.dig("episode", "title")).to eq("テスト回")
     end
 
     it "存在しない回なら 404 を返す" do
@@ -60,7 +62,9 @@ RSpec.describe PodcastController, type: :controller do
 
       expect(response).to have_http_status(:not_found)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;podcast/show&quot;")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("podcast/show")
+      expect(inertia.props.dig("episode")).to be_nil
     end
   end
 end

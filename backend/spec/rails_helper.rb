@@ -4,6 +4,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 
 require "spec_helper"
 require "rspec/rails"
+require "inertia_rails/rspec"
 
 Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |file| require file }
 

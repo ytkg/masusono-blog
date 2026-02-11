@@ -6,23 +6,23 @@ RSpec.describe "WebHome", type: :request do
   describe "GET /" do
     it "Inertiaページを返す" do
       get "/", headers: html_headers
-      page = inertia_page
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("home")
-      expect(page["props"]).to include("app", "flash")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component(:home)
+      expect(inertia.props).to include("app", "flash")
     end
   end
 
   describe "GET /about" do
     it "Inertiaページを返す" do
       get "/about", headers: html_headers
-      page = inertia_page
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("about")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component(:about)
     end
   end
 end

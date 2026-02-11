@@ -25,12 +25,12 @@ RSpec.describe "WebShop", type: :request do
 
     it "Inertiaページを返す" do
       get "/shop", headers: html_headers
-      page = inertia_page
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("shop/index")
-      expect(page.dig("props", "shops", 0, "name")).to eq("テスト居酒屋")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("shop/index")
+      expect(inertia.props.dig("shops", 0, "name")).to eq("テスト居酒屋")
     end
   end
 end

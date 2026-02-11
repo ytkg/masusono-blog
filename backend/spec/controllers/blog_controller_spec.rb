@@ -23,8 +23,9 @@ RSpec.describe BlogController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;blog/index&quot;")
-      expect(response.body).to include("記事1")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("blog/index")
+      expect(inertia.props.dig("articles", 0, "title")).to eq("記事1")
     end
   end
 
@@ -48,8 +49,9 @@ RSpec.describe BlogController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;blog/show&quot;")
-      expect(response.body).to include("記事1")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("blog/show")
+      expect(inertia.props.dig("article", "title")).to eq("記事1")
     end
 
     it "存在しない記事なら 404 を返す" do
@@ -61,7 +63,9 @@ RSpec.describe BlogController, type: :controller do
 
       expect(response).to have_http_status(:not_found)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;blog/show&quot;")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("blog/show")
+      expect(inertia.props.dig("article")).to be_nil
     end
   end
 end

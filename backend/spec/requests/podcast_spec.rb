@@ -23,12 +23,12 @@ RSpec.describe "WebPodcast", type: :request do
 
     it "Inertiaページを返す" do
       get "/podcast", headers: html_headers
-      page = inertia_page
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("podcast/index")
-      expect(page.dig("props", "episodes", 0, "title")).to eq("テスト回")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("podcast/index")
+      expect(inertia.props.dig("episodes", 0, "title")).to eq("テスト回")
     end
   end
 
@@ -48,12 +48,12 @@ RSpec.describe "WebPodcast", type: :request do
       )
 
       get "/podcast/001", headers: html_headers
-      page = inertia_page
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("podcast/show")
-      expect(page.dig("props", "episode", "title")).to eq("テスト回")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("podcast/show")
+      expect(inertia.props.dig("episode", "title")).to eq("テスト回")
     end
 
     it "存在しない場合は404のInertiaページを返す" do
@@ -62,12 +62,12 @@ RSpec.describe "WebPodcast", type: :request do
       )
 
       get "/podcast/999", headers: html_headers
-      page = inertia_page
 
       expect(response).to have_http_status(:not_found)
       expect(response.media_type).to eq("text/html")
-      expect(page["component"]).to eq("podcast/show")
-      expect(page.dig("props", "episode")).to be_nil
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("podcast/show")
+      expect(inertia.props.dig("episode")).to be_nil
     end
   end
 end
