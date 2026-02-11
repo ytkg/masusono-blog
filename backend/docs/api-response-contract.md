@@ -56,9 +56,5 @@
 
 ## Cache contract
 
-GET API では次のキャッシュ方針を維持する。
-
-- `Cache-Control: public, max-age=3600, must-revalidate`
-- `ETag`
-- `If-None-Match` 一致時は `304 Not Modified`
-- エラー時は `Cache-Control: no-store` かつ `ETag` なし
+共通の GET キャッシュ契約は持たない。
+エラー時は `Cache-Control: no-store` とし、失敗レスポンスをキャッシュさせない。

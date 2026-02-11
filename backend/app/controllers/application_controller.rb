@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::API
-  DEFAULT_CACHE_MAX_AGE = 1.hour
   UPSTREAM_CLIENT_ERROR_STATUS = 424
 
   ERROR_MESSAGE_BY_CODE = {
@@ -11,17 +10,10 @@ class ApplicationController < ActionController::API
     "upstream_error" => "Upstream service request failed."
   }.freeze
 
-  before_action :set_default_cache_headers
   rescue_from Microcms::FetchContentsService::FetchError, with: :render_microcms_fetch_error
   rescue_from Faraday::Error, with: :render_faraday_error
 
   private
-
-  def set_default_cache_headers
-    return unless request.get? || request.head?
-
-    expires_in DEFAULT_CACHE_MAX_AGE, public: true, must_revalidate: true
-  end
 
   def render_microcms_fetch_error(error)
     status, code = map_microcms_status(error.status)

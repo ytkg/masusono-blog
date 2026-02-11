@@ -66,18 +66,8 @@ docker compose up --build
 
 ## キャッシュ方針（GET API）
 
-`ApplicationController` 配下の GET レスポンスには、共通で以下を付与します。
-
-- `Cache-Control: public, max-age=3600, must-revalidate`
-- `ETag`
-
-`If-None-Match` が一致した場合は `304 Not Modified` を返します。  
-このため、GET の API エンドポイントを追加しても同じ方針が自動適用されます。
-
-現在この方針が適用されるエンドポイント:
-- `GET /app/numbers/metrics.json`（Numbersアプリ用メトリクス）
-- `GET /app/masuda_run/rankings.json`（増田RUNランキング）
-- `GET /sitemap.xml`（サイトマップXML）
+現在は `ApplicationController` での共通キャッシュヘッダ付与は行っていません。
+エンドポイント単位で必要になった場合のみ、個別にキャッシュ方針を定義します。
 
 ## APIエラーレスポンス仕様
 
