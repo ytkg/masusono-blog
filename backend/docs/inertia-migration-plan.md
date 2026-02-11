@@ -254,3 +254,32 @@ curl -i https://<host>/sitemap.xml
 - [x] 実施環境（URL / ブラウザ / OS / 日時）を記録した
 - [x] NG項目があれば再現手順とログを記録した
 - [x] 最終判定（Go / No-Go）を記録した
+
+## 12. 完全に非API化する設計メモ
+
+### 12.1 方針
+
+- `*.json` エンドポイントは原則廃止する
+- 画面データは Inertia の `props` で返す
+- 画面内の再取得は Inertia の再訪問（`router.reload`）で行う
+
+### 12.2 対象（2026-02-11 時点）
+
+- 廃止候補:
+  - `/metrics.json`
+  - `/masuda_run/rankings.json`
+- 維持対象:
+  - `/sitemap.xml`（公開サイト向け配信のため）
+
+### 12.3 実装手順（案）
+
+1. `HomeController#show` で `metrics` / `rankings` を `props` に追加
+2. `Home.jsx` 側を `props` 利用へ変更し、必要時のみ `router.reload` で更新
+3. `config/routes.rb` から `metrics` / `masuda_run/rankings` ルートを削除
+4. `Api::MetricsController` / `Api::MasudaRun::RankingsController` を削除
+5. request spec を非API構成に合わせて整理
+
+### 12.4 注意点
+
+- ランキングを高頻度で更新すると、Inertia 再訪問による負荷が増える
+- リアルタイム性が必要な場合は、該当機能のみ別方式（SSE 等）を検討する
