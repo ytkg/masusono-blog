@@ -8,7 +8,8 @@ import { useMiniPlayerVisibility } from "../hooks/useMiniPlayerVisibility"
 import { usePodcastPlayer } from "../PodcastPlayerContext"
 
 export default function GlobalPodcastMiniPlayer() {
-  const { currentEpisode, isPlaying, currentTime, duration, togglePlayPause, pause, seekBy, seekTo } = usePodcastPlayer()
+  const { currentEpisode, isPlaying, currentTime, duration, togglePlayPause, pause, seekBy, seekTo } =
+    usePodcastPlayer()
   const { isCollapsed, playerRef, containerStyle, containerSx, startDrag, expand, collapse } =
     useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode: currentEpisode != null })
   const { isDismissed, dismiss } = useMiniPlayerDismissal({
@@ -40,7 +41,11 @@ export default function GlobalPodcastMiniPlayer() {
       sx={[containerSx, animationSx]}
     >
       {isCollapsed ? (
-        <CollapsedMiniPlayerThumbnail title={currentEpisode.title} onStartDrag={startDrag} onExpand={expandWithAnimation} />
+        <CollapsedMiniPlayerThumbnail
+          title={currentEpisode.title}
+          onStartDrag={startDrag}
+          onExpand={expandWithAnimation}
+        />
       ) : (
         <ExpandedMiniPlayerPanel
           title={currentEpisode.title}

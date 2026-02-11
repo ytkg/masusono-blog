@@ -153,7 +153,20 @@ export function usePodcastPlayerController() {
       seekBy,
       stop,
     }),
-    [currentEpisode, isPlaying, currentTime, duration, status, error, playEpisode, togglePlayPause, pause, seekTo, seekBy, stop],
+    [
+      currentEpisode,
+      isPlaying,
+      currentTime,
+      duration,
+      status,
+      error,
+      playEpisode,
+      togglePlayPause,
+      pause,
+      seekTo,
+      seekBy,
+      stop,
+    ],
   )
 
   return {

@@ -11,14 +11,8 @@ import {
 
 export function useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode }) {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const {
-    playerRef,
-    containerStyle,
-    isCustomCollapsedPosition,
-    startDrag,
-    shouldExpandAfterClick,
-    resetPosition,
-  } = useCollapsedMiniPlayerDrag(isCollapsed)
+  const { playerRef, containerStyle, isCustomCollapsedPosition, startDrag, shouldExpandAfterClick, resetPosition } =
+    useCollapsedMiniPlayerDrag(isCollapsed)
 
   useEffect(() => {
     if (!hasCurrentEpisode) {

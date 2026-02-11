@@ -25,7 +25,10 @@ export default function Shops({ shops }) {
   usePreventBodyScroll()
 
   const categories = useMemo(
-    () => Array.from(new Set(normalizedShops.map((shop) => shop.category).filter((v) => typeof v === "string" && v.length > 0))),
+    () =>
+      Array.from(
+        new Set(normalizedShops.map((shop) => shop.category).filter((v) => typeof v === "string" && v.length > 0)),
+      ),
     [normalizedShops],
   )
 

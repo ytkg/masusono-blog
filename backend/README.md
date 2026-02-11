@@ -154,6 +154,16 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 bundle exec rspec
 ```
 
+## フロントエンドのLint/Format
+
+`backend/` で実行します:
+
+```bash
+npm run lint
+npm run format:check
+npm run format
+```
+
 ## Cloud Run へのデプロイ
 
 `backend/` でデプロイスクリプトを実行します:

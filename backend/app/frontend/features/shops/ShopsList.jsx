@@ -10,7 +10,15 @@ import { SHOPS_PAGE_LAYOUT } from "./shopsPageStyleConstants"
 
 export default function ShopsList({ shops, selectedKey, getKey, onSelect }) {
   return (
-    <Box sx={{ overflow: "auto", pr: SHOPS_PAGE_LAYOUT.listRightPadding, flex: 1, minHeight: 0, pb: SHOPS_PAGE_LAYOUT.listBottomPadding }}>
+    <Box
+      sx={{
+        overflow: "auto",
+        pr: SHOPS_PAGE_LAYOUT.listRightPadding,
+        flex: 1,
+        minHeight: 0,
+        pb: SHOPS_PAGE_LAYOUT.listBottomPadding,
+      }}
+    >
       {!shops?.length ? (
         <Typography variant="body2" color="text.secondary">
           表示する推し店がありません。

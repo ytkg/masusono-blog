@@ -3,12 +3,15 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "lint": "eslint app/frontend --ext .js,.jsx",
+    "format": "prettier --write \"app/frontend/**/*.{js,jsx,css,md,json}\"",
+    "format:check": "prettier --check \"app/frontend/**/*.{js,jsx,css,md,json}\""
   },
   "dependencies": {
-    "@inertiajs/react": "^2.2.15",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@inertiajs/react": "^2.2.15",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "leaflet": "^1.9.4",
@@ -16,7 +19,13 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.0",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1",
     "vite": "^7.1.10",
     "vite-plugin-ruby": "^5.1.1"
   }

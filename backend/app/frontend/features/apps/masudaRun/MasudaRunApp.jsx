@@ -32,7 +32,12 @@ export default function MasudaRunApp() {
   }
 
   return (
-    <AppsDrawerLauncher title="増田RUN" buttonAriaLabel="増田RUNを開く" buttonIcon={<DirectionsRunIcon />} onOpen={loadRankings}>
+    <AppsDrawerLauncher
+      title="増田RUN"
+      buttonAriaLabel="増田RUNを開く"
+      buttonIcon={<DirectionsRunIcon />}
+      onOpen={loadRankings}
+    >
       <MasudaRunGame rankings={rankings} rankingsLoading={isLoading} rankingsError={hasError} />
     </AppsDrawerLauncher>
   )
