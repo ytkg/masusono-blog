@@ -24,12 +24,12 @@ RSpec.describe "WebBlog", type: :request do
 
     it "Inertiaページを返す" do
       get "/blog", headers: html_headers
+      page = inertia_page
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("data-page=")
-      expect(response.body).to include("&quot;component&quot;:&quot;blog/index&quot;")
-      expect(response.body).to include("記事1")
+      expect(page["component"]).to eq("blog/index")
+      expect(page.dig("props", "articles", 0, "title")).to eq("記事1")
     end
   end
 
@@ -50,11 +50,12 @@ RSpec.describe "WebBlog", type: :request do
       )
 
       get "/blog/article-1", headers: html_headers
+      page = inertia_page
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;blog/show&quot;")
-      expect(response.body).to include("記事1")
+      expect(page["component"]).to eq("blog/show")
+      expect(page.dig("props", "article", "title")).to eq("記事1")
     end
 
     it "存在しない場合は404のInertiaページを返す" do
@@ -63,10 +64,12 @@ RSpec.describe "WebBlog", type: :request do
       )
 
       get "/blog/missing", headers: html_headers
+      page = inertia_page
 
       expect(response).to have_http_status(:not_found)
       expect(response.media_type).to eq("text/html")
-      expect(response.body).to include("&quot;component&quot;:&quot;blog/show&quot;")
+      expect(page["component"]).to eq("blog/show")
+      expect(page.dig("props", "article")).to be_nil
     end
   end
 end

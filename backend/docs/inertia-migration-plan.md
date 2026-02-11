@@ -323,7 +323,7 @@ curl -i https://<host>/sitemap.xml
   - 対応案:
     - 高頻度遷移導線のみ段階導入し、外部API負荷を計測しながら調整する
 
-- [ ] request spec を Inertia 構造検証寄りに寄せる
+- [x] request spec を Inertia 構造検証寄りに寄せる
   - 現状:
     - `response.body` の文字列一致中心
   - 期待効果:
@@ -347,4 +347,4 @@ curl -i https://<host>/sitemap.xml
 - [ ] Lazy import 化
 - [x] `inertia_share` 基盤
 - [ ] Deferred / Optional props
-- [ ] prefetch とテスト改善
+- [x] prefetch とテスト改善
