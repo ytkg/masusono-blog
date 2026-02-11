@@ -5,7 +5,9 @@ const ROOT_PATH = "/"
 const ROOT_CACHE_TTL_MS = 24 * 60 * 60 * 1000
 const SW_CACHED_AT_HEADER = "x-sw-cached-at"
 const ORIGIN_WARMUP_PATH = "/up"
-const ORIGIN_WARMUP_QUERY = "sw_warm=1"
+const ORIGIN_WARMUP_PARAM_KEY = "sw_warm"
+const ORIGIN_WARMUP_PARAM_VALUE = "1"
+const ORIGIN_WARMUP_QUERY = `${ORIGIN_WARMUP_PARAM_KEY}=${ORIGIN_WARMUP_PARAM_VALUE}`
 const ORIGIN_WARMUP_COOLDOWN_MS = 10 * 60 * 1000
 const PRECACHE_URLS = [
   OFFLINE_URL,
@@ -17,6 +19,10 @@ const PRECACHE_URLS = [
   "/icons/icon-512.png",
 ]
 let lastOriginWarmupAt = 0
+
+function isSuccessfulBasicResponse(response) {
+  return response && response.status === 200 && response.type === "basic"
+}
 
 async function cacheResponseWithTimestamp(cache, request, response) {
   const headers = new Headers(response.headers)
@@ -46,7 +52,7 @@ async function handleRootNavigation(request) {
 
   try {
     const networkResponse = await fetch(request)
-    if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
+    if (isSuccessfulBasicResponse(networkResponse)) {
       await cacheResponseWithTimestamp(cache, request, networkResponse)
     }
     return networkResponse
@@ -76,74 +82,100 @@ async function warmOriginInBackground() {
   }
 }
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .then(() => self.skipWaiting()),
-  )
-})
+async function getOfflineFallbackResponse() {
+  const cache = await caches.open(CACHE_NAME)
+  const response = await cache.match(OFFLINE_URL)
+  return response || Response.error()
+}
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map((key) => caches.delete(key))),
-      )
-      .then(() => self.clients.claim()),
+function isPwaAssetPath(pathname) {
+  return (
+    pathname === "/manifest.webmanifest" ||
+    pathname.startsWith("/icons/") ||
+    pathname.startsWith("/favicon")
   )
-})
+}
 
-self.addEventListener("fetch", (event) => {
+function isOriginWarmupRequest(requestUrl) {
+  return (
+    requestUrl.pathname === ORIGIN_WARMUP_PATH &&
+    requestUrl.searchParams.get(ORIGIN_WARMUP_PARAM_KEY) === ORIGIN_WARMUP_PARAM_VALUE
+  )
+}
+
+async function handleNavigationRequest(event, isSameOrigin, requestUrl) {
+  if (isSameOrigin && requestUrl.pathname === ROOT_PATH) {
+    event.waitUntil(warmOriginInBackground())
+    return handleRootNavigation(event.request)
+  }
+
+  try {
+    return await fetch(event.request)
+  } catch (_error) {
+    return getOfflineFallbackResponse()
+  }
+}
+
+async function handlePwaAssetRequest(request) {
+  try {
+    const networkResponse = await fetch(request)
+    if (isSuccessfulBasicResponse(networkResponse)) {
+      const cache = await caches.open(CACHE_NAME)
+      await cache.put(request, networkResponse.clone())
+    }
+    return networkResponse
+  } catch (_error) {
+    const cached = await caches.match(request)
+    return cached || Response.error()
+  }
+}
+
+async function onInstall() {
+  const cache = await caches.open(CACHE_NAME)
+  await cache.addAll(PRECACHE_URLS)
+  await self.skipWaiting()
+}
+
+async function onActivate() {
+  const keys = await caches.keys()
+  const staleKeys = keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+  await Promise.all(staleKeys.map((key) => caches.delete(key)))
+  await self.clients.claim()
+}
+
+function onFetch(event) {
   if (event.request.method !== "GET") return
 
-  const requestUrl = new URL(event.request.url)
+  const request = event.request
+  const requestUrl = new URL(request.url)
   const isSameOrigin = requestUrl.origin === self.location.origin
 
-  if (event.request.mode === "navigate") {
-    if (isSameOrigin && requestUrl.pathname === ROOT_PATH) {
-      event.respondWith(handleRootNavigation(event.request))
-      event.waitUntil(warmOriginInBackground())
-      return
-    }
-
-    event.respondWith(
-      fetch(event.request).catch(() =>
-        caches.open(CACHE_NAME).then((cache) => cache.match(OFFLINE_URL).then((response) => response || Response.error())),
-      ),
-    )
+  if (request.mode === "navigate") {
+    event.respondWith(handleNavigationRequest(event, isSameOrigin, requestUrl))
     return
   }
 
   if (!isSameOrigin) return
 
-  if (requestUrl.pathname === ORIGIN_WARMUP_PATH && requestUrl.searchParams.get("sw_warm") === "1") {
-    event.respondWith(fetch(event.request, { cache: "no-store" }))
+  if (isOriginWarmupRequest(requestUrl)) {
+    event.respondWith(fetch(request, { cache: "no-store" }))
     return
   }
 
-  const isPwaAsset =
-    requestUrl.pathname === "/manifest.webmanifest" ||
-    requestUrl.pathname.startsWith("/icons/") ||
-    requestUrl.pathname.startsWith("/favicon")
-
-  if (isPwaAsset) {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== "basic") {
-            return networkResponse
-          }
-          const copy = networkResponse.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy))
-          return networkResponse
-        })
-        .catch(() => caches.match(event.request).then((cached) => cached || Response.error())),
-    )
+  if (isPwaAssetPath(requestUrl.pathname)) {
+    event.respondWith(handlePwaAssetRequest(request))
     return
   }
 
-  event.respondWith(fetch(event.request))
+  event.respondWith(fetch(request))
+}
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(onInstall())
 })
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(onActivate())
+})
+
+self.addEventListener("fetch", onFetch)
