@@ -20,9 +20,7 @@ RSpec.describe "Sitemaps", type: :request do
     end
 
     it do
-      get "/articles"
-      expect(response).to have_http_status(:ok)
-      article_count = JSON.parse(response.body).size
+      article_count = articles.size
 
       get "/sitemap.xml"
 

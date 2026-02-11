@@ -50,9 +50,8 @@ This agent must execute the following steps **before starting any task**, regard
 - In sandboxed agent environments, Docker daemon access may require escalation approval.
 - Compose sets `INSTALL_DEV_TOOLS=1` so native gems can compile during `bundle install`.
 - Cloud Run expects the app to listen on `$PORT` (default 8080); `backend/Dockerfile` uses `${PORT:-8080}`.
-- Current focus is API replacement; frontend is hosted separately (not served by Rails).
-- For frontend API calls, prefer explicit JSON endpoints (`/articles.json`, `/metrics.json`, `/shops.json`, `/podcasts.json`).
-- `/articles` returns article summaries from microCMS (expects credentials `microcms.api_key`; endpoint is hardcoded).
+- Current focus is Inertia Rails app consolidation in `backend`.
+- For frontend API calls, use only active endpoints (`/metrics.json`, `/masuda_run/rankings.json`) when必要.
 - microCMS fetch uses Faraday.
 - `/sitemap.xml` is generated from static routes plus microCMS articles.
 - CORS is handled by rack-cors; allowed origins include localhost:5173 and masusono.com/static.

@@ -15,10 +15,7 @@ Rails.application.routes.draw do
 
   scope module: :api do
     get "sitemap.xml", to: "sitemaps#index"
-    resources :articles, only: :index
     resources :metrics, only: :index
-    resources :podcasts, only: :index
-    resources :shops, only: :index
     namespace :masuda_run do
       resources :rankings, only: :index
     end

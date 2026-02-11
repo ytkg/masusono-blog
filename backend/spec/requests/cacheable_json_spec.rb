@@ -22,49 +22,6 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
     expect_cache_control(response.headers["Cache-Control"], max_age:)
   end
 
-  describe "GET /articles.json" do
-    before do
-      allow(ArticlesIndexUsecase).to receive(:call).and_return(
-        {
-          articles: [
-            {
-              id: "first",
-              publishedDate: "2025/10/05",
-              title: "first title",
-              content: "<p>first body</p>",
-              author: "増田太郎"
-            }
-          ]
-        }
-      )
-    end
-
-    it do
-      expect_cacheable_json("/articles.json", max_age: 3600)
-    end
-  end
-
-  describe "GET /podcasts.json" do
-    before do
-      allow(PodcastsIndexUsecase).to receive(:call).and_return(
-        {
-          podcasts: [
-            {
-              id: "001",
-              title: "テスト回",
-              publishedDate: "2026/02/07",
-              audioUrl: "https://example.com/podcast/001.mp3"
-            }
-          ]
-        }
-      )
-    end
-
-    it do
-      expect_cacheable_json("/podcasts.json", max_age: 3600)
-    end
-  end
-
   describe "GET /metrics.json" do
     before do
       allow(MetricsIndexUsecase).to receive(:call).and_return(
@@ -86,42 +43,78 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
     end
   end
 
-  describe "GET /shops.json" do
+  describe "GET /masuda_run/rankings.json" do
     before do
-      allow(ShopsIndexUsecase).to receive(:call).and_return(
+      allow(MasudaRun::RankingsIndexUsecase).to receive(:call).and_return(
+        [
+          {
+            userId: "alice",
+            score: 1000,
+            rankedAt: "2026/02/11",
+            rank: 1
+          }
+        ]
+      )
+    end
+
+    it do
+      expect_cacheable_json("/masuda_run/rankings.json", max_age: 3600)
+    end
+  end
+
+  describe "GET /sitemap.xml" do
+    before do
+      allow(SitemapsIndexUsecase).to receive(:call).and_return(
         {
-          shops: [
-            {
-              name: "テスト居酒屋",
-              lat: 35.0,
-              lng: 139.0,
-              category: "居酒屋",
-              url: "https://example.com/shop",
-              desc: "テスト説明"
-            }
-          ]
+          xml: <<~XML,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+              <url>
+                <loc>https://masusono.com/</loc>
+              </url>
+            </urlset>
+          XML
+          content_type: "application/xml; charset=utf-8"
         }
       )
     end
 
     it do
-      expect_cacheable_json("/shops.json", max_age: 3600)
+      expect_cacheable_json("/sitemap.xml", max_age: 3600)
     end
   end
 
   describe "ETag invalidation" do
     before do
-      allow(ArticlesIndexUsecase).to receive(:call).and_return(
-        { articles: [ { id: "first", title: "first title" } ] },
-        { articles: [ { id: "first", title: "updated title" } ] }
+      allow(MetricsIndexUsecase).to receive(:call).and_return(
+        {
+          metrics: {
+            "blocks" => [
+              {
+                "label" => "ポッドキャスト総本数",
+                "value" => "1 本"
+              }
+            ]
+          }
+        },
+        {
+          metrics: {
+            "blocks" => [
+              {
+                "label" => "ポッドキャスト総本数",
+                "value" => "2 本"
+              }
+            ]
+          }
+        }
       )
     end
 
     it "レスポンス内容が変わった場合は304ではなく200を返す" do
-      get "/articles.json"
+      get "/metrics.json"
       first_etag = response.headers["ETag"]
 
-      get "/articles.json", headers: { "If-None-Match" => first_etag }
+      get "/metrics.json", headers: { "If-None-Match" => first_etag }
 
       expect(response).to have_http_status(:ok)
       expect(response.headers["ETag"]).to be_present

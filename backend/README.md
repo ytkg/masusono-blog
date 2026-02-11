@@ -23,7 +23,7 @@ npm run dev
 ```
 
 補足:
-- API エンドポイント（`/articles.json` など）は従来どおり利用できます。
+- 画面データは主に Inertia のサーバーサイド props で返します。
 
 ### Docker での起動
 
@@ -60,10 +60,8 @@ docker compose up --build
 
 ## APIエンドポイント
 
-- `GET /articles.json`
 - `GET /metrics.json`
-- `GET /podcasts.json`
-- `GET /shops.json`
+- `GET /masuda_run/rankings.json`
 - `GET /sitemap.xml`
 
 ## キャッシュ方針（GET API）
@@ -77,10 +75,8 @@ docker compose up --build
 このため、GET の API エンドポイントを追加しても同じ方針が自動適用されます。
 
 現在この方針が適用されるエンドポイント:
-- `GET /articles.json`
-- `GET /podcasts.json`
 - `GET /metrics.json`
-- `GET /shops.json`
+- `GET /masuda_run/rankings.json`
 - `GET /sitemap.xml`
 
 ## APIエラーレスポンス仕様

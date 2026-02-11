@@ -14,7 +14,7 @@
 
 - 方針: 段階移行（Strangler Fig）
 - 方針詳細:
-  - 既存 API（`*.json`）は当面維持
+  - 必要最小限の API（`metrics`, `masuda_run/rankings`, `sitemap.xml`）のみ維持
   - 画面は Inertia に順次寄せる
   - 小さくリリースし、ロールバック可能な単位で進める
 
@@ -54,7 +54,7 @@
 ### P1: 運用・監視
 
 - [ ] 監視メトリクス定義（エラー率・レイテンシ）
-  - 監視対象: `/up`, 主要画面, `*.json`, `sitemap.xml`
+  - 監視対象: `/up`, 主要画面, `/metrics.json`, `/masuda_run/rankings.json`, `/sitemap.xml`
   - しきい値と通知先（Slack/メール等）を確定
 
 ### P2: 後片付け
@@ -73,7 +73,7 @@
 
 - [x] `/shops` の画面互換差分は許容（既知・対応不要）
   - 旧SPAは `/shops` が画面URL
-  - 現状は `/shop` が画面、`/shops` は JSON API（`resources :shops`）
+  - 現状は `/shop` が画面（旧 `/shops` JSON API は削除済み）
 - [x] sitemap の `/shops` 出力差分は許容（既知・対応不要）
 - [x] ScrollRestoration の同等処理を移植
 - [x] `ensureUserIdCookie` の同等処理を移植
@@ -98,7 +98,7 @@
 
 ## 6. API と命名の扱い
 
-- API は当面維持（`/articles.json`, `/podcasts.json`, `/shops.json` など）
+- API は最小構成のみ維持（`/metrics.json`, `/masuda_run/rankings.json`）
 - API コントローラー（`app/controllers/api/*`）は段階移行のための暫定実装
   - 最終的には削除予定（Inertia 画面への完全切替完了後）
 - ドキュメント上の機能セクション名は単数で統一:
@@ -162,7 +162,7 @@
 4. ヘルスチェックと主要導線を確認する
    - `/up`
    - `/`, `/about`, `/blog`, `/podcast`, `/shop`
-   - `/articles.json`, `/podcasts.json`, `/metrics.json`, `/shops.json`, `/sitemap.xml`
+   - `/metrics.json`, `/masuda_run/rankings.json`, `/sitemap.xml`
 5. 障害チャネルに「切り戻し完了」と「影響範囲」を共有する
 
 ### 10.4 確認コマンド（例）
@@ -173,10 +173,8 @@ curl -i https://<host>/
 curl -i https://<host>/blog
 curl -i https://<host>/podcast
 curl -i https://<host>/shop
-curl -i https://<host>/articles.json
-curl -i https://<host>/podcasts.json
 curl -i https://<host>/metrics.json
-curl -i https://<host>/shops.json
+curl -i https://<host>/masuda_run/rankings.json
 curl -i https://<host>/sitemap.xml
 ```
 
@@ -233,10 +231,8 @@ curl -i https://<host>/sitemap.xml
 
 ### 11.6 API / 契約
 
-- [x] `/articles.json` が 200 + JSON を返す
-- [x] `/podcasts.json` が 200 + JSON を返す
 - [x] `/metrics.json` が 200 + JSON を返す
-- [x] `/shops.json` が 200 + JSON を返す
+- [x] `/masuda_run/rankings.json` が 200 + JSON を返す
 - [x] `/sitemap.xml` が 200 + XML を返す
 
 ### 11.7 SEO / メタ
