@@ -30,6 +30,16 @@ jobs:
           bundler-cache: true
           working-directory: backend
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
