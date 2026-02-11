@@ -52,7 +52,7 @@ This agent must execute the following steps **before starting any task**, regard
 - Compose sets `INSTALL_DEV_TOOLS=1` so native gems can compile during `bundle install`.
 - Cloud Run expects the app to listen on `$PORT` (default 8080); `backend/Dockerfile` uses `${PORT:-8080}`.
 - Current focus is Inertia Rails app consolidation in `backend`.
-- Frontend data loading is props-first via Inertia; avoid adding new JSON endpoints unless unavoidable.
+- Frontend data loading may use either Inertia props or dedicated JSON endpoints; choose based on freshness, performance, and operational simplicity.
 - microCMS fetch uses Faraday.
 - `/sitemap.xml` is generated from static routes plus microCMS articles.
 - CORS is handled by rack-cors; allowed origins include localhost:5173 and masusono.com/static.
