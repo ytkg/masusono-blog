@@ -30,7 +30,13 @@ export default function ContentItemCard({
   return (
     <ContentCard sx={sx}>
       <Typography variant={titleVariant} component={titleComponent} gutterBottom sx={[{ fontWeight: 700 }, titleSx]}>
-        {titleTo ? <ContentItemTitleLink href={titleTo}>{title}</ContentItemTitleLink> : title}
+        {titleTo ? (
+          <ContentItemTitleLink href={titleTo} prefetch>
+            {title}
+          </ContentItemTitleLink>
+        ) : (
+          title
+        )}
       </Typography>
       {resolvedMeta ? (
         <Typography variant="body2" color="text.secondary" sx={[{ mb: 2 }, metaSx]}>

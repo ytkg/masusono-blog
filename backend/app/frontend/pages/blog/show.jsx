@@ -32,6 +32,7 @@ export default function BlogDetail({ article }) {
         <MuiLink
           component={Link}
           href="/blog"
+          prefetch
           color="inherit"
           underline="hover"
           sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mt: 3 }}

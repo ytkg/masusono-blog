@@ -20,6 +20,7 @@ export default function Header() {
         <Box
           component={Link}
           href="/"
+          prefetch
           sx={{
             display: "inline-flex",
             alignItems: "flex-end",

@@ -57,6 +57,7 @@ export default function Footer() {
             icon={tab.icon}
             component={Link}
             href={tab.href}
+            prefetch
           />
         ))}
       </BottomNavigation>

@@ -22,6 +22,7 @@ export default function PodcastDetail({ episode }) {
         <MuiLink
           component={Link}
           href="/podcast"
+          prefetch
           color="inherit"
           underline="hover"
           sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mt: 3 }}

@@ -7,6 +7,7 @@ export default function FeatureLinkCard({ title, description, href, children, sx
     <Paper
       component={Link}
       href={href}
+      prefetch
       variant="outlined"
       sx={[
         {

@@ -315,7 +315,7 @@ curl -i https://<host>/sitemap.xml
   - 対応案:
     - `InertiaRails.optional` / `InertiaRails.defer` と partial reload を併用する
 
-- [ ] `Link` の prefetch を導線単位で導入する
+- [x] `Link` の prefetch を導線単位で導入する
   - 現状:
     - グローバルナビや一覧導線で `prefetch` 未設定
   - 期待効果:
