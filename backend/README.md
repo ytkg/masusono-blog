@@ -136,6 +136,10 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 2. Usecase で整形ロジックを実装/更新
 3. request spec で契約（キー・型・件数・代表値）を固定
 
+## 運用メモ
+
+- Cloud Run オリジン到達率削減メモ: `backend/docs/cache-origin-reduction-plan.md`
+
 ## microCMS ページング保護
 
 `Microcms::FetchContentsService` では、異常レスポンスや過大取得による過負荷を防ぐために以下のガードを入れています。
