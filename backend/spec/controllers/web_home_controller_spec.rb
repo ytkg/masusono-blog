@@ -5,6 +5,9 @@ RSpec.describe HomeController, type: :controller do
 
   describe "WebHomeController GET #show" do
     it "Home の Inertia ページを返す" do
+      expect(App::Numbers::MetricsIndexUsecase).not_to receive(:call)
+      expect(App::MasudaRun::RankingsIndexUsecase).not_to receive(:call)
+
       get :show
 
       expect(response).to have_http_status(:ok)

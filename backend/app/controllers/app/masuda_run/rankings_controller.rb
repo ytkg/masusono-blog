@@ -1,9 +1,8 @@
-module Api
+module App
   module MasudaRun
     class RankingsController < ApplicationController
       def index
-        rankings = ::MasudaRun::RankingsIndexUsecase.call
-        render json: rankings
+        render json: RankingsIndexUsecase.call
       end
     end
   end

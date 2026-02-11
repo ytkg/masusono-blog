@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MasudaRun::RankingsIndexUsecase do
+RSpec.describe App::MasudaRun::RankingsIndexUsecase do
   subject(:result) { described_class.call }
 
   let(:rankings) do

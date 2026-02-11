@@ -11,6 +11,7 @@ export default function AppsDrawerLauncher({
   launcherLabel,
   buttonAriaLabel,
   children,
+  onOpen,
   buttonSx,
   buttonIcon,
   paperSx,
@@ -50,6 +51,11 @@ export default function AppsDrawerLauncher({
   const paperCombinedSx = paperSx ? [paperBaseSx, paperSx] : paperBaseSx
   const launcherLabelText = launcherLabel ?? title
 
+  const handleOpen = () => {
+    onOpen?.()
+    setOpen(true)
+  }
+
   return (
     <Box
       sx={{
@@ -60,7 +66,7 @@ export default function AppsDrawerLauncher({
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5 }}>
-        <IconButton aria-label={buttonAriaLabel} onClick={() => setOpen(true)} sx={iconSx}>
+        <IconButton aria-label={buttonAriaLabel} onClick={handleOpen} sx={iconSx}>
           {buttonIcon ?? <AppsIcon />}
         </IconButton>
         <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", width: "100%" }}>

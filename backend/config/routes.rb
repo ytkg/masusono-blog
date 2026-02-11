@@ -13,13 +13,16 @@ Rails.application.routes.draw do
   get "podcast/:episode_id", to: "podcast#show", as: :podcast_episode
   get "shop", to: "shop#index"
 
-  scope module: :api do
-    get "sitemap.xml", to: "sitemaps#index"
-    resources :metrics, only: :index
+  scope module: :app, path: :app do
+    namespace :numbers do
+      resources :metrics, only: :index
+    end
     namespace :masuda_run do
       resources :rankings, only: :index
     end
   end
+
+  get "sitemap.xml", to: "sitemaps#index"
 
   # Defines the root path route ("/")
   # root "posts#index"

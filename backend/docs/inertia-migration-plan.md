@@ -14,7 +14,7 @@
 
 - 方針: 段階移行（Strangler Fig）
 - 方針詳細:
-  - 必要最小限の API（`metrics`, `masuda_run/rankings`, `sitemap.xml`）のみ維持
+  - 画面分離のための BFF エンドポイント（`/app/*`）と `sitemap.xml` を維持
   - 画面は Inertia に順次寄せる
   - 小さくリリースし、ロールバック可能な単位で進める
 
@@ -47,14 +47,14 @@
 - [ ] `/shop` -> `/shops` の最終切替
   - 画面URLを `/shops` に戻し、`/shop` は 301 リダイレクトへ変更
   - `sitemap` / canonical / 内部リンク / 手動確認チェックリストを同時更新
-- [ ] API コントローラーの段階的削除計画を確定
-  - 利用中エンドポイントの棚卸し
-  - 廃止対象と廃止時期（告知含む）を決める
+- [ ] `sitemap.xml` の配置方針を確定
+  - 現状は `SitemapsController`
+  - 命名を Web 側へ寄せるか現状維持かを決める
 
 ### P1: 運用・監視
 
 - [ ] 監視メトリクス定義（エラー率・レイテンシ）
-  - 監視対象: `/up`, 主要画面, `/metrics.json`, `/masuda_run/rankings.json`, `/sitemap.xml`
+  - 監視対象: `/up`, 主要画面, `/app/numbers/metrics.json`, `/app/masuda_run/rankings.json`, `/sitemap.xml`
   - しきい値と通知先（Slack/メール等）を確定
 
 ### P2: 後片付け
@@ -98,9 +98,11 @@
 
 ## 6. API と命名の扱い
 
-- API は最小構成のみ維持（`/metrics.json`, `/masuda_run/rankings.json`）
-- API コントローラー（`app/controllers/api/*`）は段階移行のための暫定実装
-  - 最終的には削除予定（Inertia 画面への完全切替完了後）
+- ページ組み替え耐性のため、アプリ単位 BFF エンドポイントを維持
+  - `GET /app/numbers/metrics.json`
+  - `GET /app/masuda_run/rankings.json`
+- `GET /sitemap.xml` は公開配信のため維持
+- `sitemap.xml` は `SitemapsController` で配信
 - ドキュメント上の機能セクション名は単数で統一:
   - `Shop`（旧: `Shops`）
 - 画面URLは段階移行中のみ `/shop` を利用し、完全切替後に `/shops` へ戻す
@@ -111,12 +113,12 @@
 
 1. `/shop` -> `/shops` の最終切替を実施
 2. 監視メトリクス（エラー率/レイテンシ）を確定
-3. API コントローラーの削除計画を確定
+3. `sitemap.xml` のコントローラー配置方針を確定
 4. 旧 `frontend` 資産の扱いを確定
 
 ## 8. 意思決定メモ（未確定）
 
-- [ ] API を最終的にどこまで公開維持するか
+- [ ] `sitemap.xml` の配置（`Api` 名前空間維持 or 移動）
 - [ ] `/shop` から `/shops` 切替のタイミング（告知有無含む）
 - [ ] 旧 `frontend` ディレクトリの最終扱い（削除/保管）
 
@@ -162,7 +164,7 @@
 4. ヘルスチェックと主要導線を確認する
    - `/up`
    - `/`, `/about`, `/blog`, `/podcast`, `/shop`
-   - `/metrics.json`, `/masuda_run/rankings.json`, `/sitemap.xml`
+   - `/app/numbers/metrics.json`, `/app/masuda_run/rankings.json`, `/sitemap.xml`
 5. 障害チャネルに「切り戻し完了」と「影響範囲」を共有する
 
 ### 10.4 確認コマンド（例）
@@ -173,8 +175,8 @@ curl -i https://<host>/
 curl -i https://<host>/blog
 curl -i https://<host>/podcast
 curl -i https://<host>/shop
-curl -i https://<host>/metrics.json
-curl -i https://<host>/masuda_run/rankings.json
+curl -i https://<host>/app/numbers/metrics.json
+curl -i https://<host>/app/masuda_run/rankings.json
 curl -i https://<host>/sitemap.xml
 ```
 
@@ -231,8 +233,8 @@ curl -i https://<host>/sitemap.xml
 
 ### 11.6 API / 契約
 
-- [x] `/metrics.json` が 200 + JSON を返す
-- [x] `/masuda_run/rankings.json` が 200 + JSON を返す
+- [x] `/app/numbers/metrics.json` が 200 + JSON を返す
+- [x] `/app/masuda_run/rankings.json` が 200 + JSON を返す
 - [x] `/sitemap.xml` が 200 + XML を返す
 
 ### 11.7 SEO / メタ
@@ -265,19 +267,22 @@ curl -i https://<host>/sitemap.xml
 
 ### 12.2 対象（2026-02-11 時点）
 
-- 廃止候補:
+- 廃止済み:
   - `/metrics.json`
   - `/masuda_run/rankings.json`
-- 維持対象:
+- 置換済み:
+  - `/app/numbers/metrics.json`
+  - `/app/masuda_run/rankings.json`
+- 維持:
   - `/sitemap.xml`（公開サイト向け配信のため）
 
-### 12.3 実装手順（案）
+### 12.3 実装結果
 
-1. `HomeController#show` で `metrics` / `rankings` を `props` に追加
-2. `Home.jsx` 側を `props` 利用へ変更し、必要時のみ `router.reload` で更新
-3. `config/routes.rb` から `metrics` / `masuda_run/rankings` ルートを削除
-4. `Api::MetricsController` / `Api::MasudaRun::RankingsController` を削除
-5. request spec を非API構成に合わせて整理
+1. `metrics` / `masuda_run/rankings` の旧JSON APIを削除
+2. `HomeController#show` から該当データ取得を除外
+3. `GET /app/numbers/metrics.json` / `GET /app/masuda_run/rankings.json` を追加
+4. Home 内ミニアプリは「ドロワー起動時に `/app/*` を取得」へ変更
+5. request spec / 契約ドキュメントを新エンドポイントに更新
 
 ### 12.4 注意点
 

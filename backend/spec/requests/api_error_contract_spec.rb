@@ -17,9 +17,9 @@ RSpec.describe "API error contract", type: :request do
   end
 
   [
-    { path: "/metrics", usecase: MetricsIndexUsecase },
-    { path: "/sitemap.xml", usecase: SitemapsIndexUsecase },
-    { path: "/masuda_run/rankings", usecase: MasudaRun::RankingsIndexUsecase }
+    { path: "/app/numbers/metrics.json", usecase: App::Numbers::MetricsIndexUsecase },
+    { path: "/app/masuda_run/rankings.json", usecase: App::MasudaRun::RankingsIndexUsecase },
+    { path: "/sitemap.xml", usecase: SitemapsIndexUsecase }
   ].each do |target|
     describe "GET #{target[:path]}" do
       let(:path) { target[:path] }

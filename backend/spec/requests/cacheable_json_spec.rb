@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Cacheable JSON endpoints", type: :request do
+RSpec.describe "Cacheable endpoints", type: :request do
   def expect_cache_control(value, max_age:)
     directives = value.to_s.split(",").map(&:strip)
     expect(directives).to include("public", "must-revalidate", "max-age=#{max_age}")
@@ -22,9 +22,9 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
     expect_cache_control(response.headers["Cache-Control"], max_age:)
   end
 
-  describe "GET /metrics.json" do
+  describe "GET /app/numbers/metrics.json" do
     before do
-      allow(MetricsIndexUsecase).to receive(:call).and_return(
+      allow(App::Numbers::MetricsIndexUsecase).to receive(:call).and_return(
         {
           metrics: {
             "blocks" => [
@@ -39,13 +39,13 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
     end
 
     it do
-      expect_cacheable_json("/metrics.json", max_age: 3600)
+      expect_cacheable_json("/app/numbers/metrics.json", max_age: 3600)
     end
   end
 
-  describe "GET /masuda_run/rankings.json" do
+  describe "GET /app/masuda_run/rankings.json" do
     before do
-      allow(MasudaRun::RankingsIndexUsecase).to receive(:call).and_return(
+      allow(App::MasudaRun::RankingsIndexUsecase).to receive(:call).and_return(
         [
           {
             userId: "alice",
@@ -58,7 +58,7 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
     end
 
     it do
-      expect_cacheable_json("/masuda_run/rankings.json", max_age: 3600)
+      expect_cacheable_json("/app/masuda_run/rankings.json", max_age: 3600)
     end
   end
 
@@ -86,35 +86,34 @@ RSpec.describe "Cacheable JSON endpoints", type: :request do
 
   describe "ETag invalidation" do
     before do
-      allow(MetricsIndexUsecase).to receive(:call).and_return(
+      allow(SitemapsIndexUsecase).to receive(:call).and_return(
         {
-          metrics: {
-            "blocks" => [
-              {
-                "label" => "ポッドキャスト総本数",
-                "value" => "1 本"
-              }
-            ]
-          }
+          xml: <<~XML,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+              <url><loc>https://masusono.com/</loc></url>
+            </urlset>
+          XML
+          content_type: "application/xml; charset=utf-8"
         },
         {
-          metrics: {
-            "blocks" => [
-              {
-                "label" => "ポッドキャスト総本数",
-                "value" => "2 本"
-              }
-            ]
-          }
+          xml: <<~XML,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+              <url><loc>https://masusono.com/</loc></url>
+              <url><loc>https://masusono.com/blog</loc></url>
+            </urlset>
+          XML
+          content_type: "application/xml; charset=utf-8"
         }
       )
     end
 
     it "レスポンス内容が変わった場合は304ではなく200を返す" do
-      get "/metrics.json"
+      get "/sitemap.xml"
       first_etag = response.headers["ETag"]
 
-      get "/metrics.json", headers: { "If-None-Match" => first_etag }
+      get "/sitemap.xml", headers: { "If-None-Match" => first_etag }
 
       expect(response).to have_http_status(:ok)
       expect(response.headers["ETag"]).to be_present

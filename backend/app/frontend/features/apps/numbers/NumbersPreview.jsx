@@ -1,13 +1,11 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import NumbersMetricsGrid from "./NumbersMetricsGrid"
-import { useMetrics } from "./useMetrics"
 
-export default function NumbersPreview() {
-  const { data, error, isLoading } = useMetrics()
-  const metricBlocks = data?.blocks ?? []
+export default function NumbersPreview({ metrics, isLoading, hasError }) {
+  const metricBlocks = metrics?.blocks ?? []
 
-  if (isLoading && !data) {
+  if (isLoading && metricBlocks.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
         読み込み中...
@@ -15,10 +13,18 @@ export default function NumbersPreview() {
     )
   }
 
-  if (error) {
+  if (hasError) {
     return (
       <Typography variant="body2" color="text.secondary">
         データの取得に失敗しました。
+      </Typography>
+    )
+  }
+
+  if (metricBlocks.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        データがありません。
       </Typography>
     )
   }

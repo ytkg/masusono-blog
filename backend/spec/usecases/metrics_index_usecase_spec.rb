@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MetricsIndexUsecase do
+RSpec.describe App::Numbers::MetricsIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 

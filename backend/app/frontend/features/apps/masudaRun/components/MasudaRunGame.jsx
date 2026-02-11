@@ -5,7 +5,6 @@ import Button from "@mui/material/Button"
 import charImgSrc from "../../../../assets/masuda_run.png"
 import obsShortSrc from "../../../../assets/other1.png"
 import obsTallSrc from "../../../../assets/other2.png"
-import { useMasudaRunRankings } from "../hooks/useMasudaRunRankings"
 import { useMasudaRunAssets } from "../hooks/useMasudaRunAssets"
 import { useMasudaRunInput } from "../hooks/useMasudaRunInput"
 import { useMasudaRunLoop } from "../hooks/useMasudaRunLoop"
@@ -47,7 +46,7 @@ const BUTTON_LABELS = {
   gameover: "リスタート",
 }
 
-export default function MasudaRunGame() {
+export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError }) {
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
   const scaleRef = useRef(1)
@@ -60,7 +59,6 @@ export default function MasudaRunGame() {
   const suppressClickRef = useRef(false)
   const restartReadyAtRef = useRef(0)
   const [restartReadyAt, setRestartReadyAt] = useState(0)
-  const { data: rankings, error: rankingsError, isLoading: rankingsLoading } = useMasudaRunRankings()
 
   const world = useRef(createInitialWorld())
 
@@ -172,7 +170,7 @@ export default function MasudaRunGame() {
       <Typography variant="body2" color="text.secondary">
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
-      <MasudaRunRankings rankings={rankings} isLoading={rankingsLoading} hasError={Boolean(rankingsError)} />
+      <MasudaRunRankings rankings={rankings} isLoading={rankingsLoading} hasError={rankingsError} />
     </Box>
   )
 }

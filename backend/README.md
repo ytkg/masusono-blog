@@ -58,11 +58,14 @@ cd backend
 docker compose up --build
 ```
 
-## APIエンドポイント
+## エンドポイント
 
-- `GET /metrics.json`
-- `GET /masuda_run/rankings.json`
+- `GET /app/numbers/metrics.json`
+  - Numbersアプリ用メトリクス（`blocks`）を返す
+- `GET /app/masuda_run/rankings.json`
+  - 増田RUNアプリ用ランキング配列を返す
 - `GET /sitemap.xml`
+  - 公開用サイトマップXMLを返す
 
 ## キャッシュ方針（GET API）
 
@@ -75,9 +78,9 @@ docker compose up --build
 このため、GET の API エンドポイントを追加しても同じ方針が自動適用されます。
 
 現在この方針が適用されるエンドポイント:
-- `GET /metrics.json`
-- `GET /masuda_run/rankings.json`
-- `GET /sitemap.xml`
+- `GET /app/numbers/metrics.json`（Numbersアプリ用メトリクス）
+- `GET /app/masuda_run/rankings.json`（増田RUNランキング）
+- `GET /sitemap.xml`（サイトマップXML）
 
 ## APIエラーレスポンス仕様
 
