@@ -17,6 +17,7 @@ export default function MasudaRunApp() {
     setIsLoading(true)
     try {
       const response = await fetch(RANKINGS_ENDPOINT, {
+        cache: "no-store",
         headers: { Accept: "application/json" },
       })
 

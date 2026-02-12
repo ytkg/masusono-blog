@@ -17,6 +17,7 @@ export default function NumbersApp() {
     setIsLoading(true)
     try {
       const response = await fetch(NUMBERS_ENDPOINT, {
+        cache: "no-store",
         headers: { Accept: "application/json" },
       })
 

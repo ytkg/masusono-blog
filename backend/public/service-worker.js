@@ -1,8 +1,8 @@
 const CACHE_PREFIX = "masusono-cache-"
-const CACHE_NAME = `${CACHE_PREFIX}v5`
+const CACHE_NAME = `${CACHE_PREFIX}v6`
 const OFFLINE_URL = "/offline.html"
 const ROOT_PATH = "/"
-const ROOT_CACHE_TTL_MS = 24 * 60 * 60 * 1000
+const NAVIGATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000
 const SW_CACHED_AT_HEADER = "x-sw-cached-at"
 const ORIGIN_WARMUP_PATH = "/up"
 const ORIGIN_WARMUP_PARAM_KEY = "sw_warm"
@@ -43,10 +43,10 @@ function isFreshCachedResponse(cachedResponse, ttlMs) {
   return Date.now() - cachedAt <= ttlMs
 }
 
-async function handleRootNavigation(request) {
+async function handleCachedNavigation(request) {
   const cache = await caches.open(CACHE_NAME)
   const cached = await cache.match(request)
-  if (isFreshCachedResponse(cached, ROOT_CACHE_TTL_MS)) {
+  if (isFreshCachedResponse(cached, NAVIGATION_CACHE_TTL_MS)) {
     return cached
   }
 
@@ -103,10 +103,20 @@ function isOriginWarmupRequest(requestUrl) {
   )
 }
 
+function isApiJsonPath(pathname) {
+  return pathname.startsWith("/api/") && pathname.endsWith(".json")
+}
+
 async function handleNavigationRequest(event, isSameOrigin, requestUrl) {
-  if (isSameOrigin && requestUrl.pathname === ROOT_PATH) {
-    event.waitUntil(warmOriginInBackground())
-    return handleRootNavigation(event.request)
+  if (isSameOrigin && isApiJsonPath(requestUrl.pathname)) {
+    return fetch(event.request, { cache: "no-store" })
+  }
+
+  if (isSameOrigin) {
+    if (requestUrl.pathname === ROOT_PATH) {
+      event.waitUntil(warmOriginInBackground())
+    }
+    return handleCachedNavigation(event.request)
   }
 
   try {
@@ -164,6 +174,11 @@ function onFetch(event) {
 
   if (isPwaAssetPath(requestUrl.pathname)) {
     event.respondWith(handlePwaAssetRequest(request))
+    return
+  }
+
+  if (isApiJsonPath(requestUrl.pathname)) {
+    event.respondWith(fetch(request, { cache: "no-store" }))
     return
   }
 

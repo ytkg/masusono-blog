@@ -3,7 +3,7 @@ import useSWR from "swr"
 const EPISODES_ENDPOINT = "/api/podcast/episodes.json"
 
 const fetcher = async (url) => {
-  const response = await fetch(url, { headers: { Accept: "application/json" } })
+  const response = await fetch(url, { cache: "no-store", headers: { Accept: "application/json" } })
   if (!response.ok) {
     throw new Error(`Request failed with ${response.status}`)
   }
