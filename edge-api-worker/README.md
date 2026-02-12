@@ -1,13 +1,15 @@
 # edge-api-worker
 
-Hono を使って Cloud Run オリジンへのプロキシと Cache API キャッシュを行う Cloudflare Worker です。
+Cloud Run オリジンへのプロキシと `/api/**/*.json` 向けキャッシュ制御を行う Cloudflare Worker です。
 
 ## 役割
 
-- `GET *.json` は Cache API に保存
-- キャッシュヒット時は即返却し、裏で再検証
-- `GET *.json` の `Cache-Control` は Worker 側設定で上書き
-- それ以外のリクエストはオリジンへそのまま転送
+- `GET /api/**/*.json` のみをキャッシュ対象にする
+- キャッシュヒット時は即返却し、`60s` 間隔で裏更新を試行する
+- `max_stale=24h` を超えたキャッシュしかない場合は同期でオリジン取得する
+- `Authorization` / `Cookie` / ユーザー文脈ヘッダ付きはバイパスする
+- `4xx/5xx`・非 JSON・`1MB` 超レスポンスはキャッシュしない
+- それ以外のパスはオリジンへ透過プロキシする
 
 ## 事前準備
 
@@ -32,3 +34,10 @@ npm run deploy
 ## 主な環境変数
 
 - `ORIGIN_API_BASE`: Cloud Run 等のオリジンベースURL
+
+## 主要な固定値
+
+- `max_stale`: `24h`
+- `revalidate_interval`: `60s`
+- オリジンタイムアウト: `10s`
+- キャッシュ対象サイズ上限: `1MB`

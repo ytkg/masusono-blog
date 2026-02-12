@@ -1,8 +1,28 @@
 class ApiController < ApplicationController
+  before_action :skip_session_for_api
+  after_action :set_success_cache_control_for_get_json
+
   rescue_from Microcms::FetchContentsService::FetchError, with: :render_microcms_fetch_error
   rescue_from Faraday::Error, with: :render_faraday_error
 
   private
+
+  def skip_session_for_api
+    request.session_options[:skip] = true
+  end
+
+  def protect_against_forgery?
+    false
+  end
+
+  def set_success_cache_control_for_get_json
+    return unless request.get?
+    return unless response.status == 200
+    return unless response.media_type == "application/json"
+    return if response.headers["Cache-Control"] == "no-store"
+
+    response.headers["Cache-Control"] = "public, max-age=0, must-revalidate"
+  end
 
   def render_microcms_fetch_error(error)
     status, code = map_microcms_status(error.status)
