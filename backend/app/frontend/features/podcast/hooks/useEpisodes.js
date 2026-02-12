@@ -1,17 +1,10 @@
 import useSWR from "swr"
+import { fetchJson } from "../../../shared/lib/fetchJson"
 
 const EPISODES_ENDPOINT = "/api/podcast/episodes.json"
 
-const fetcher = async (url) => {
-  const response = await fetch(url, { cache: "no-store", headers: { Accept: "application/json" } })
-  if (!response.ok) {
-    throw new Error(`Request failed with ${response.status}`)
-  }
-  return response.json()
-}
-
 export default function useEpisodes() {
-  const { data, error, isLoading } = useSWR(EPISODES_ENDPOINT, fetcher)
+  const { data, error, isLoading } = useSWR(EPISODES_ENDPOINT, fetchJson)
   const episodes = Array.isArray(data?.episodes) ? data.episodes : []
 
   return {

@@ -2,34 +2,19 @@ import { useState } from "react"
 import NumbersIcon from "@mui/icons-material/Numbers"
 import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
 import NumbersPreview from "./NumbersPreview"
-
-const NUMBERS_ENDPOINT = "/api/app/numbers/metrics.json"
+import useMetrics from "./hooks/useMetrics"
 
 export default function NumbersApp() {
-  const [metrics, setMetrics] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasError, setHasError] = useState(false)
+  const [enabled, setEnabled] = useState(false)
+  const { metrics, isLoading, hasError, refresh } = useMetrics(enabled)
 
   const loadMetrics = async () => {
-    if (isLoading) return
-
-    setHasError(false)
-    setIsLoading(true)
-    try {
-      const response = await fetch(NUMBERS_ENDPOINT, {
-        cache: "no-store",
-        headers: { Accept: "application/json" },
-      })
-
-      if (!response.ok) throw new Error(`failed to fetch ${NUMBERS_ENDPOINT}`)
-
-      const json = await response.json()
-      setMetrics(json)
-    } catch (_error) {
-      setHasError(true)
-    } finally {
-      setIsLoading(false)
+    if (!enabled) {
+      setEnabled(true)
+      return
     }
+
+    await refresh()
   }
 
   return (

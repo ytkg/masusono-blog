@@ -2,34 +2,19 @@ import { useState } from "react"
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
 import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
 import MasudaRunGame from "./components/MasudaRunGame"
-
-const RANKINGS_ENDPOINT = "/api/app/masuda_run/rankings.json"
+import useRankings from "./hooks/useRankings"
 
 export default function MasudaRunApp() {
-  const [rankings, setRankings] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasError, setHasError] = useState(false)
+  const [enabled, setEnabled] = useState(false)
+  const { rankings, rankingsLoading, rankingsError, refreshRankings } = useRankings(enabled)
 
   const loadRankings = async () => {
-    if (isLoading) return
-
-    setHasError(false)
-    setIsLoading(true)
-    try {
-      const response = await fetch(RANKINGS_ENDPOINT, {
-        cache: "no-store",
-        headers: { Accept: "application/json" },
-      })
-
-      if (!response.ok) throw new Error(`failed to fetch ${RANKINGS_ENDPOINT}`)
-
-      const json = await response.json()
-      setRankings(json)
-    } catch (_error) {
-      setHasError(true)
-    } finally {
-      setIsLoading(false)
+    if (!enabled) {
+      setEnabled(true)
+      return
     }
+
+    await refreshRankings()
   }
 
   return (
@@ -39,7 +24,7 @@ export default function MasudaRunApp() {
       buttonIcon={<DirectionsRunIcon />}
       onOpen={loadRankings}
     >
-      <MasudaRunGame rankings={rankings} rankingsLoading={isLoading} rankingsError={hasError} />
+      <MasudaRunGame rankings={rankings} rankingsLoading={rankingsLoading} rankingsError={rankingsError} />
     </AppsDrawerLauncher>
   )
 }
