@@ -7,6 +7,9 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore frontend dependencies.
+/node_modules
+
 # Ignore all environment files.
 /.env*
 
@@ -30,4 +33,3 @@
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
-
