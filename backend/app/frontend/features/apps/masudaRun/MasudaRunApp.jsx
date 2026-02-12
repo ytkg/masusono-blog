@@ -3,7 +3,7 @@ import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
 import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
 import MasudaRunGame from "./components/MasudaRunGame"
 
-const RANKINGS_ENDPOINT = "/app/masuda_run/rankings.json"
+const RANKINGS_ENDPOINT = "/api/app/masuda_run/rankings.json"
 
 export default function MasudaRunApp() {
   const [rankings, setRankings] = useState(null)

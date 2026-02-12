@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe "App::Numbers", type: :request do
-  describe "GET /app/numbers/metrics.json" do
+RSpec.describe "Api::App::Numbers", type: :request do
+  describe "GET /api/app/numbers/metrics.json" do
     before do
-      allow(App::Numbers::MetricsIndexUsecase).to receive(:call).and_return(
+      allow(Api::App::Numbers::MetricsIndexUsecase).to receive(:call).and_return(
         {
           json: {
             "blocks" => [
@@ -19,7 +19,7 @@ RSpec.describe "App::Numbers", type: :request do
     end
 
     it "JSONを返す" do
-      get "/app/numbers/metrics.json"
+      get "/api/app/numbers/metrics.json"
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/json")

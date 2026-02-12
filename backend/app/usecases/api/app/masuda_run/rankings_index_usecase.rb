@@ -1,12 +1,13 @@
-module App
-  module MasudaRun
-    class RankingsIndexUsecase
+module Api
+  module App
+    module MasudaRun
+      class RankingsIndexUsecase
       def self.call
         new.call
       end
 
       def call
-        ranked = MasudaRunRanking.all.map { |ranking| build_ranking(ranking) }
+        ranked = ::MasudaRunRanking.all.map { |ranking| build_ranking(ranking) }
         rankings = ranked.map.with_index(1) do |ranking, index|
           build_response(ranking, index)
         end
@@ -28,6 +29,7 @@ module App
 
       def build_response(ranking, index)
         ranking.merge(rank: index)
+      end
       end
     end
   end

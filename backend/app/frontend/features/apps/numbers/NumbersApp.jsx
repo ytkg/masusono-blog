@@ -3,7 +3,7 @@ import NumbersIcon from "@mui/icons-material/Numbers"
 import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
 import NumbersPreview from "./NumbersPreview"
 
-const NUMBERS_ENDPOINT = "/app/numbers/metrics.json"
+const NUMBERS_ENDPOINT = "/api/app/numbers/metrics.json"
 
 export default function NumbersApp() {
   const [metrics, setMetrics] = useState(null)

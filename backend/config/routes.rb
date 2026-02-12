@@ -22,13 +22,13 @@ Rails.application.routes.draw do
     namespace :shop do
       resources :shops, only: :index, defaults: { format: :json }
     end
-  end
-  scope module: :app, path: :app do
-    namespace :numbers do
-      resources :metrics, only: :index
-    end
-    namespace :masuda_run do
-      resources :rankings, only: :index
+    namespace :app do
+      namespace :numbers do
+        resources :metrics, only: :index
+      end
+      namespace :masuda_run do
+        resources :rankings, only: :index
+      end
     end
   end
 

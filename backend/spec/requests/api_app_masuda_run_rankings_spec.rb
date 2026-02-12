@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe "App::MasudaRun::Rankings", type: :request do
-  describe "GET /app/masuda_run/rankings.json" do
+RSpec.describe "Api::App::MasudaRun::Rankings", type: :request do
+  describe "GET /api/app/masuda_run/rankings.json" do
     before do
-      allow(App::MasudaRun::RankingsIndexUsecase).to receive(:call).and_return(
+      allow(Api::App::MasudaRun::RankingsIndexUsecase).to receive(:call).and_return(
         {
           json: [
             {
@@ -19,7 +19,7 @@ RSpec.describe "App::MasudaRun::Rankings", type: :request do
     end
 
     it "JSONを返す" do
-      get "/app/masuda_run/rankings.json"
+      get "/api/app/masuda_run/rankings.json"
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/json")

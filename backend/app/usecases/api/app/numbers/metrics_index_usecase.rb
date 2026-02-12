@@ -1,6 +1,7 @@
-module App
-  module Numbers
-    class MetricsIndexUsecase
+module Api
+  module App
+    module Numbers
+      class MetricsIndexUsecase
       include ActiveSupport::NumberHelper
       include AuthorNameExtractor
 
@@ -61,9 +62,9 @@ module App
 
       def fetch_source_data
         {
-          articles: Article.all,
-          shops: Shop.all,
-          podcasts: Podcast.all
+          articles: ::Article.all,
+          shops: ::Shop.all,
+          podcasts: ::Podcast.all
         }
       end
 
@@ -223,6 +224,7 @@ module App
 
       def html_sanitizer
         @html_sanitizer ||= Rails::Html::FullSanitizer.new
+      end
       end
     end
   end
