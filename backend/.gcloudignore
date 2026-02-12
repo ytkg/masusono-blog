@@ -1,0 +1,17 @@
+# Cloud Run source deploy ignore rules
+# Ref: https://cloud.google.com/sdk/gcloud/reference/topic/gcloudignore
+
+.git
+.gitignore
+
+# Local development dependencies and caches
+node_modules/
+tmp/
+log/
+
+# Local secrets
+config/master.key
+config/credentials/*.key
+
+# Local editor/OS artifacts
+.DS_Store
