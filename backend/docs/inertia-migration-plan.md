@@ -275,76 +275,70 @@ curl -i https://<host>/sitemap.xml
 
 ## 13. Inertia Rails 改善候補（`llms-full.txt` 照合）
 
-- 作成日: 2026-02-11
+- 再確認日: 2026-02-12
 - 参照: `https://inertia-rails.dev/llms-full.txt`
-- 目的: 現状実装とのギャップを整理し、着手順を明確にする
+- 目的: 現状実装との差分を更新し、次に触る候補を絞る
 
 ### 13.1 優先度 High
 
 - [x] Asset versioning を有効化する
   - 現状:
-    - `config/initializers/inertia_rails.rb` に `version` 設定がない
+    - `config/initializers/inertia_rails.rb` で `config.version = -> { ViteRuby.digest }` を設定済み
   - 期待効果:
     - デプロイ後の古いフロント資産参照（キャッシュ食い違い）を抑止
-  - 対応案:
-    - `inertia_config(version: ...)` を設定し、Vite 側のビルドバージョンに連動させる
-
-- [ ] ページ解決を lazy import 化する（初期JS削減）
-  - 現状:
-    - `app/frontend/entrypoints/inertia.jsx` で `import.meta.glob(..., { eager: true })`
-  - 期待効果:
-    - 初回ロードを軽量化し、遷移時に必要ページのみ読み込む
-  - 対応案:
-    - `createInertiaApp` の `resolve` を async 化し、遅延読み込みへ変更する
 
 - [x] 共有 props（`inertia_share`）を `ApplicationController` に集約する
   - 現状:
-    - `ApplicationController` で共通共有データ定義がない
+    - `ApplicationController` で `app` / `flash` を共有済み
   - 期待効果:
     - ページ間の共通データ注入を統一し、重複実装を削減
-  - 対応案:
-    - flash、共通メタ、必要な環境情報のみをサーバー側で共有する
 
 ### 13.2 優先度 Medium
 
-- [ ] 重い props を Deferred / Optional 化する
+- [ ] 重い props を Deferred / Optional 化する（必要になったら）
   - 現状:
-    - `BlogIndexUsecase` などで外部取得由来データを同期で組み立て
+    - Blog/Podcast/Shop は API + SWR でクライアント取得へ寄せており、ページ props は薄い
   - 期待効果:
     - 初回表示を優先し、重いデータは後段読み込みに分離できる
   - 対応案:
-    - `InertiaRails.optional` / `InertiaRails.defer` と partial reload を併用する
+    - サーバー側で重い props を返す画面を新設した場合のみ `InertiaRails.optional` / `InertiaRails.defer` を適用する
+
+- [ ] ページ解決の lazy import 化を検討する（バンドル計測ベース）
+  - 現状:
+    - `app/frontend/entrypoints/inertia.jsx` は `import.meta.glob(..., { eager: true })`
+    - `llms-full.txt` のサンプルも eager 記載で、現状は公式例と整合
+  - 期待効果:
+    - 初回JSサイズの削減（ただし分割数・遷移時待ちとのトレードオフあり）
+  - 対応案:
+    - まず bundle analyze を実施し、しきい値超過時のみ async resolve へ変更する
 
 - [x] `Link` の prefetch を導線単位で導入する
   - 現状:
-    - グローバルナビや一覧導線で `prefetch` 未設定
+    - Header/Footer/一覧カード/詳細戻り導線に `prefetch` を適用済み
   - 期待効果:
     - 体感遷移速度を改善
-  - 対応案:
-    - 高頻度遷移導線のみ段階導入し、外部API負荷を計測しながら調整する
 
 - [x] request spec を Inertia 構造検証寄りに寄せる
   - 現状:
-    - `response.body` の文字列一致中心
+    - `be_inertia_response` / `render_component` / `inertia.props` 検証へ移行済み
   - 期待効果:
     - マークアップ変更に強いテストへ改善
-  - 対応案:
-    - component 名と props の検証を中心にしたテストへ移行する
 
 ### 13.3 優先度 Low
 
 - [ ] 履歴暗号化（history encryption）の適用を検討する
   - 現状:
-    - `render inertia:` 時に暗号化フラグ未利用
+    - `render inertia:` 時に暗号化オプションは未利用
   - 期待効果:
     - 履歴経由で保持される情報の露出リスクを低減
   - 対応案:
-    - センシティブな props を扱う画面から限定適用する
+    - 認証導入やセンシティブ props 追加時に限定適用する
 
 ### 13.4 推奨着手順
 
 - [x] Asset versioning
-- [ ] Lazy import 化
 - [x] `inertia_share` 基盤
-- [ ] Deferred / Optional props
 - [x] prefetch とテスト改善
+- [ ] bundle analyze 実施（lazy import 要否判断）
+- [ ] Deferred / Optional props（サーバー側重いpropsが出たら）
+- [ ] history encryption（認証/機微データ導入時）
