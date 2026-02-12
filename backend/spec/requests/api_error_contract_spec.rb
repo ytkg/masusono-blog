@@ -17,6 +17,9 @@ RSpec.describe "API error contract", type: :request do
   end
 
   [
+    { path: "/api/blog/articles.json", usecase: Api::Blog::ArticlesIndexUsecase },
+    { path: "/api/podcast/episodes.json", usecase: Api::Podcast::EpisodesIndexUsecase },
+    { path: "/api/shop/shops.json", usecase: Api::Shop::ShopsIndexUsecase },
     { path: "/app/numbers/metrics.json", usecase: App::Numbers::MetricsIndexUsecase },
     { path: "/app/masuda_run/rankings.json", usecase: App::MasudaRun::RankingsIndexUsecase },
     { path: "/sitemap.xml", usecase: SitemapsIndexUsecase }

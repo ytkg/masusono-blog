@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BlogIndexUsecase do
+RSpec.describe Api::Blog::ArticlesIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 

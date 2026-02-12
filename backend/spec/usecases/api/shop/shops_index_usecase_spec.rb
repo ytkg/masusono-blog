@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ShopIndexUsecase do
+RSpec.describe Api::Shop::ShopsIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 

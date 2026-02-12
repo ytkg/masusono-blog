@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe PodcastIndexUsecase do
+RSpec.describe Api::Podcast::EpisodesIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 

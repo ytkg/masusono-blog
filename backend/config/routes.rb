@@ -7,12 +7,22 @@ Rails.application.routes.draw do
 
   inertia "/" => :home, as: :root
   inertia "about" => :about
-  get "blog", to: "blog#index"
-  get "blog/:article_id", to: "blog#show", as: :blog_article
-  get "podcast", to: "podcast#index"
-  get "podcast/:episode_id", to: "podcast#show", as: :podcast_episode
-  get "shop", to: "shop#index"
-
+  inertia :blog
+  inertia "blog/:article_id" => :blog_detail
+  inertia :podcast
+  inertia :shop
+  inertia "podcast/:episode_id" => :podcast_detail
+  namespace :api do
+    namespace :blog do
+      resources :articles, only: :index, defaults: { format: :json }
+    end
+    namespace :podcast do
+      resources :episodes, only: :index, defaults: { format: :json }
+    end
+    namespace :shop do
+      resources :shops, only: :index, defaults: { format: :json }
+    end
+  end
   scope module: :app, path: :app do
     namespace :numbers do
       resources :metrics, only: :index
