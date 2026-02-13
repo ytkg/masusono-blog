@@ -57,9 +57,9 @@ docker compose up --build
 
 ## エンドポイント
 
-- `GET /app/numbers/metrics.json`
+- `GET /api/app/numbers/metrics.json`
   - Numbersアプリ用メトリクス（`blocks`）を返す
-- `GET /app/masuda_run/rankings.json`
+- `GET /api/app/masuda_run/rankings.json`
   - 増田RUNアプリ用ランキング配列を返す
 - `GET /sitemap.xml`
   - 公開用サイトマップXMLを返す
