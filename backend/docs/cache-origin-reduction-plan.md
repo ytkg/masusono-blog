@@ -45,7 +45,7 @@
 - Cloud CDN 前段化の対象パス:
   - `/`（HTML）
   - `/assets/*`（静的）
-  - `/app/*.json`（API）
+  - `/api/**/*.json`（API）
 - API の許容鮮度:
   - Numbers / Rankings を何秒キャッシュできるか
 - 認証付きエンドポイントの有無:
