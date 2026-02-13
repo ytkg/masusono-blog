@@ -20,6 +20,27 @@ const PRECACHE_URLS = [
 ]
 let lastOriginWarmupAt = 0
 
+function normalizePathname(pathname) {
+  if (pathname === "/") return pathname
+  return pathname.endsWith("/") ? pathname.slice(0, -1) : pathname
+}
+
+function isTargetPagePath(pathname) {
+  const normalizedPath = normalizePathname(pathname)
+  return (
+    normalizedPath === "/" ||
+    normalizedPath === "/blog" ||
+    normalizedPath.startsWith("/blog/") ||
+    normalizedPath === "/podcast" ||
+    normalizedPath.startsWith("/podcast/") ||
+    normalizedPath === "/shop"
+  )
+}
+
+function isInertiaRequest(request) {
+  return request.headers.get("X-Inertia") === "true"
+}
+
 function isSuccessfulBasicResponse(response) {
   return response && response.status === 200 && response.type === "basic"
 }
@@ -59,6 +80,37 @@ async function handleCachedNavigation(request) {
   } catch (_error) {
     if (cached) return cached
 
+    const offline = await cache.match(OFFLINE_URL)
+    return offline || Response.error()
+  }
+}
+
+async function fetchAndCacheIfSuccessful(request) {
+  const networkResponse = await fetch(request)
+  if (isSuccessfulBasicResponse(networkResponse)) {
+    const cache = await caches.open(CACHE_NAME)
+    await cacheResponseWithTimestamp(cache, request, networkResponse)
+  }
+  return networkResponse
+}
+
+async function handleCachedInertiaRequest(event) {
+  const cache = await caches.open(CACHE_NAME)
+  const cached = await cache.match(event.request)
+  if (cached) {
+    if (!isFreshCachedResponse(cached, NAVIGATION_CACHE_TTL_MS)) {
+      event.waitUntil(
+        fetchAndCacheIfSuccessful(event.request).catch(() => {
+          // no-op: background refresh failure should not block response
+        }),
+      )
+    }
+    return cached
+  }
+
+  try {
+    return await fetchAndCacheIfSuccessful(event.request)
+  } catch (_error) {
     const offline = await cache.match(OFFLINE_URL)
     return offline || Response.error()
   }
@@ -174,6 +226,11 @@ function onFetch(event) {
 
   if (isPwaAssetPath(requestUrl.pathname)) {
     event.respondWith(handlePwaAssetRequest(request))
+    return
+  }
+
+  if (isInertiaRequest(request) && isTargetPagePath(requestUrl.pathname)) {
+    event.respondWith(handleCachedInertiaRequest(event))
     return
   }
 
