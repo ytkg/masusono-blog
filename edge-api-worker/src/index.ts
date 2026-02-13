@@ -314,16 +314,46 @@ async function proxyRequest(
   const timeout = setTimeout(() => controller.abort(), timeoutMs)
 
   try {
-    return await fetch(upstreamUrl.toString(), {
+    const upstreamResponse = await fetch(upstreamUrl.toString(), {
       method: request.method,
       headers: requestHeaders ?? request.headers,
       body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
       redirect: "manual",
       signal: controller.signal,
     })
+
+    return rewriteRedirectLocation(upstreamResponse, incomingUrl, upstreamUrl)
   } finally {
     clearTimeout(timeout)
   }
+}
+
+function rewriteRedirectLocation(response: Response, incomingUrl: URL, upstreamUrl: URL): Response {
+  const location = response.headers.get("location")
+  if (!location) return response
+
+  let parsedLocation: URL
+  try {
+    parsedLocation = new URL(location, upstreamUrl.toString())
+  } catch {
+    return response
+  }
+
+  if (parsedLocation.host !== upstreamUrl.host) {
+    return response
+  }
+
+  parsedLocation.protocol = incomingUrl.protocol
+  parsedLocation.host = incomingUrl.host
+
+  const headers = new Headers(response.headers)
+  headers.set("location", parsedLocation.toString())
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
 }
 
 async function logEvent(params: {
