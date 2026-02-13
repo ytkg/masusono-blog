@@ -40,6 +40,8 @@ RSpec.describe SitemapsIndexUsecase do
       expect(result[:status]).to eq(:ok)
       expect(result[:content_type]).to eq("application/xml; charset=utf-8")
       expect(xml).to include("<loc>https://masusono.com/</loc>")
+      expect(xml).to include("<loc>https://masusono.com/shop</loc>")
+      expect(xml).not_to include("<loc>https://masusono.com/shops</loc>")
       expect(xml).to include("<loc>https://masusono.com/blog/hello-world</loc>")
       expect(xml).to include("<lastmod>2025-10-05T03:34:56Z</lastmod>")
       expect(xml).to include("<loc>https://masusono.com/blog/broken-date</loc>")
