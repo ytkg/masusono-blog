@@ -1,159 +1,53 @@
-# 改善バックログ（候補）
+# 改善バックログ（2026-02-13 更新）
 
-- 最終更新: 2026-02-11
-- 目的: `backend` の改善候補を一覧化し、実施判断をしやすくする
-- 使い方:
-  - 実施する項目だけチェックを入れる
-  - 実施しない項目は削除せず、理由を追記して残す
-  - 迷う項目は「検証タスク化」して先に小さく試す
+- 最終更新: 2026-02-13
+- 目的: `backend` の改善候補を「実装事実ベース」で優先度管理する
+- 調査範囲: `README.md`, `AGENTS.md`, `.github/workflows/ci.yml`, `.github/dependabot.yml`, `config/routes.rb`, `app/controllers/**/*.rb`, `spec/requests/**/*.rb`, `docs/*.md`
 
-## 0. まず効く（Quick Win）
+## 0. 監査サマリー（今回反映した事実）
 
-- [ ] CI のテスト実行を `bin/rails db:test:prepare test` から `~/.rbenv/shims/bundle exec rspec` ベースに統一する
-- [x] `README.md` の実行コマンドを Docker 前提で統一する（ホスト依存の誤実行を防ぐ）
-- [ ] `bin/ci` を整備し、ローカルで CI 相当を 1 コマンドで再現できるようにする
-- [ ] PR テンプレートを追加し、確認観点（影響範囲・ロールバック手順）を固定化する
-- [ ] エラーレスポンスに `request_id` を含め、問い合わせ時の調査を短縮する
-- [x] 主要 GET のキャッシュヒット率を可視化するログ項目を追加する
-- [ ] `docs/api-response-contract.md` に代表レスポンス例を追記する
-- [ ] 404/500 ページの表示内容を運用向けに見直す（問い合わせ導線の追加）
-- [x] `RuboCop` 実行コマンドを `README.md` と `AGENTS.md` で完全一致させる
-- [ ] `Docker` 初回起動のボトルネック（`npm install`）を計測し、改善前後を記録する
+- [x] API エラーフォーマットの統一は実装済み（`error.code`, `error.message`, `no-store`）
+- [x] API request spec は主要エンドポイントをカバー済み（`spec/requests` 11件）
+- [x] Dependabot は Bundler/GitHub Actions の更新が有効
+- [ ] `README.md` / 一部 `docs/*.md` の API パスが実装と不一致（`/app/...` と `/api/app/...` が混在）
+- [ ] CI の test ジョブが `bin/rails ... test` のままで、現行運用（RSpec中心）と乖離
+- [ ] Frontend のテスト基盤（Vitest/Playwright）が未導入
+- [ ] PR テンプレートが未作成
 
-## 1. 品質・テスト
+## 1. P0（今週着手）
 
-- [ ] request spec で全公開ルート（`/`, `/about`, `/blog`, `/podcast`, `/shop`）の正常系を固定する
-- [ ] request spec で公開ルートの異常系（upstream timeout/5xx）を追加する
-- [ ] `spec/support` に JSON レスポンス検証ヘルパーを用意し重複を削減する
-- [ ] API 契約テストで「不要キーが混ざっていない」検証を追加する
-- [ ] `sitemap.xml` の URL 重複/不正日付検知テストを追加する
-- [ ] microCMS 連携のリトライ境界条件（429/408/5xx）をサービススペックで固定する
-- [x] `webmock` の共通 stub を整理し、外部依存テストの可読性を改善する
-- [ ] フロント（Inertia）にユニットテスト基盤（Vitest）を導入する
-- [ ] フロントの主要コンポーネントにスナップショットではなく振る舞いテストを追加する
-- [ ] E2E（Playwright）で主要導線だけ先に自動化する
-- [ ] `SimpleCov` を導入し、最低カバレッジ閾値を設定する
-- [ ] flaky test の検知ルール（再実行回数・隔離方針）を決める
+- [ ] ドキュメントの API パスを実装に合わせて統一する（`/api/app/numbers/metrics.json`, `/api/app/masuda_run/rankings.json`）
+- [ ] `README.md` / `docs/inertia-migration-plan.md` / `docs/api-response-contract.md` の相互整合性チェックを追加する
+- [ ] CI test を `bundle exec rspec` ベースへ移行し、`bin/rails ... test` 依存を解消する
+- [ ] CI に frontend lint/format check（`npm run lint`, `npm run format:check`）を追加する
+- [ ] エラーレスポンスへ `request_id` を含める（問い合わせ時の調査性向上）
 
-## 2. 監視・運用
+## 2. P1（次スプリント）
 
-- [ ] `/up` 以外に業務導線ヘルスチェック（`/`, `/blog`, `/sitemap.xml`）を追加する
-- [ ] Cloud Monitoring のアラート条件（5xx率、p95、再起動回数）を定義する
-- [ ] 構造化ログ（JSON）を標準化し、`request_id`, `path`, `status`, `duration_ms` を統一する
-- [ ] エラーコード別ダッシュボードを作成する（`upstream_timeout` など）
-- [ ] 外部 API 失敗時の通知閾値（連続失敗回数）を明文化する
-- [ ] デプロイ後チェックリストを `docs/` に追加する
-- [ ] 障害対応 runbook（一次切り分け手順）を作成する
-- [ ] ロールバック基準を数値化する（例: 5分平均 5xx > 2%）
-- [ ] Cloud Run の同時実行数・CPU 割当の見直し計画を作る
-- [ ] 監査ログ（デプロイ実行者・時刻・バージョン）を残す運用にする
+- [ ] Dependabot に npm エコシステム更新を追加する（`package.json` 対象）
+- [ ] PR テンプレートを作成し、影響範囲/検証項目/ロールバック手順を必須化する
+- [ ] `docs/` の目次ページを追加し、運用ドキュメントへの導線を一本化する
+- [ ] `bin/ci` を整備し、ローカルで CI 相当（rubocop + rspec + frontend lint）を1コマンド化する
+- [ ] `sitemap.xml` の URL 重複・不正日付の検知テストを追加する
 
-## 3. パフォーマンス・キャッシュ
+## 3. P2（品質と運用の底上げ）
 
-- [ ] エンドポイント別に `Cache-Control` を見直し、TTL を表形式で管理する
-- [ ] `stale-while-revalidate` の適用可否を API ごとに判定する
-- [ ] `sitemap.xml` 生成結果の短期キャッシュ（メモリ or 低頻度再生成）を検討する
-- [ ] microCMS 応答の ETag/Last-Modified 利用可否を検証する
-- [ ] Home 初期表示に必要なデータ量を計測し、転送量を削減する
-- [ ] Vite ビルド成果物の長期キャッシュ戦略を明文化する
-- [ ] 画像配信の最適化（WebP/AVIF、適切サイズ）を導入する
-- [ ] CDN 前段化時のパス設計（HTML/API/静的）を確定する
-- [ ] Cloud Run コールドスタート計測を定期実施し、閾値超過で通知する
-- [ ] DB 導入時を見据えた N+1 検知基盤（Bullet 等）を準備する
+- [ ] フロント単体テスト基盤（Vitest）を導入し、主要 hooks/components に振る舞いテストを追加する
+- [ ] 主要導線の E2E（Playwright）を最小セットで導入する（`/`, `/blog`, `/podcast`, `/shop`）
+- [ ] 構造化ログ（JSON）を標準化し、`request_id`, `path`, `status`, `duration_ms` を必須化する
+- [ ] Cloud Monitoring の最低限アラート（5xx率, p95）を定義する
+- [ ] デプロイ後スモークチェック手順を `docs/` に明文化する
 
-## 4. セキュリティ
+## 4. セキュリティ・ガバナンス
 
-- [ ] セキュリティヘッダ（CSP, HSTS, X-Content-Type-Options）の方針を定義する
-- [ ] CSP を report-only から段階適用できるように設計する
-- [ ] 依存パッケージ更新の自動 PR（Dependabot or Renovate）を設定する
-- [ ] `bundler-audit` と `npm audit` の運用基準（fail条件）を明文化する
-- [ ] CORS 設定の許可 origin を環境ごとに管理する
-- [ ] `RAILS_MASTER_KEY` の取り扱いを運用手順として明記する
+- [ ] セキュリティヘッダ方針（CSP, HSTS, X-Content-Type-Options）を定義し段階適用する
+- [ ] `bundler-audit` / `npm audit` の fail 条件を CI 運用として明文化する
+- [ ] CORS 設定の許可 origin を環境変数化し、環境差分をコード外管理する
 - [ ] microCMS API キーのローテーション手順を文書化する
-- [ ] レート制限（Rack::Attack など）導入可否を検討する
-- [ ] 重要レスポンスに機微情報が出ていないかログ監査を実施する
-- [ ] SAST/Secret scan を CI に追加する
+- [ ] SAST/Secret scan（CodeQL/Gitleaks等）の導入可否を決定する
 
-## 5. アーキテクチャ・設計
+## 5. バックログ運用ルール
 
-- [ ] Usecase の入出力を型付きで管理する方針（dry-struct 等）を検討する
-- [x] controller は `render` 専任、整形は usecase に寄せる方針を全画面に適用する
-- [ ] microCMS クライアント層を共通化し、重複したエラーマッピングを整理する
-- [ ] API 契約変更時のバージョニングルールを決める
-- [ ] ドメイン単位（Blog/Podcast/Shop）にディレクトリ再編を検討する
-- [ ] `app/services` と `app/usecases` の責務境界を `docs/` に明記する
-- [ ] 例外ハンドリング方針（どこで rescue するか）を統一する
-- [ ] 非同期処理（Solid Queue）を使う候補処理を棚卸しする
-- [ ] 将来の DB 導入時に備えた repository 層導入可否を評価する
-- [ ] sitemap 生成ロジックの再利用ポイントを整理する
-
-## 6. フロントエンド（Inertia/React）
-
-- [ ] `app/frontend` の機能単位で import 依存を可視化し循環参照を防ぐ
-- [ ] 共通 UI コンポーネントの責務を整理し、重複スタイルを削減する
-- [ ] CLS/LCP 計測を導入し、Web Vitals を追跡する
-- [ ] 画像読み込みの遅延戦略（lazy/eager）をページごとに最適化する
-- [ ] SEO メタ設定の生成ルールを共通化する
-- [ ] 404 表示ページを Inertia 側で統一デザインにする
-- [ ] Podcast ミニプレイヤーのアクセシビリティ（キーボード操作）を改善する
-- [ ] 色コントラスト・フォーカス表示を WCAG 観点で点検する
-- [ ] iOS/Android PWA 実機確認を定期タスク化する
-- [ ] Service Worker 更新戦略（破壊的変更時の移行）を文書化する
-
-## 7. 開発体験（DX）
-
-- [ ] `make` or `just` で共通コマンドを短縮する（`lint`, `test`, `dev`）
-- [ ] 初回セットアップスクリプト（依存導入・環境変数確認）を用意する
-- [ ] `.env.example` を整備し、必須環境変数を可視化する
-- [ ] ローカルでの Ruby/Bundler ミスマッチを検知して警告する
-- [ ] pre-commit フック（lint/format）を任意導入できるようにする
-- [ ] Docker 開発時のボリュームキャッシュ戦略を最適化する
-- [ ] `npm`/`bundle` のキャッシュ破損時の復旧手順を `README.md` に追加する
-- [ ] VS Code Dev Container 対応を検討する
-- [ ] 変更影響が大きいファイル群のオーナー情報を定義する
-- [ ] `docs/` の目次ページを作成し、迷子を防ぐ
-
-## 8. CI/CD
-
-- [ ] CI で Ruby と Node のジョブを並列化し、合計時間を短縮する
-- [ ] CI に front lint（`npm run lint`）と format check を追加する
-- [ ] CI で rspec 実行結果をテストレポートとして保存する
-- [ ] 変更ファイルに応じたジョブ実行最適化（path filter）を入れる
-- [ ] main ブランチ保護ルール（必須チェック）を明確化する
-- [ ] デプロイ前 smoke test を自動実行する
-- [ ] デプロイ時に git SHA をレスポンスヘッダへ埋め込む
-- [ ] GitHub Actions の失敗通知先を標準化する
-- [ ] 月次で CI 失敗原因を振り返る仕組みを作る
-- [ ] リリースノート自動生成を導入する
-
-## 9. データ・外部連携（microCMS）
-
-- [ ] microCMS のスキーマ変更検知をテストに組み込む
-- [ ] API レスポンス欠損時のフォールバック表示を定義する
-- [ ] 記事・Podcast の整形ルール（日付/空文字/未公開）を厳密化する
-- [ ] 外部依存障害時の暫定キャッシュ（最後に成功したデータ）を検討する
-- [ ] microCMS 側の rate limit を前提にした再試行ポリシーを確定する
-- [ ] タイムアウト値を環境変数化し、環境別に調整可能にする
-- [ ] 異常データ検知時の通知（件名・項目）を定義する
-- [ ] contentId 重複や欠落を検知するバッチ/チェックを作る
-- [ ] 取得件数の急増を検知するしきい値監視を追加する
-- [ ] 障害時の代替配信手段（簡易メンテページ）を整備する
-
-## 10. ドキュメント整備
-
-- [ ] `docs/architecture.md` を追加し、全体構成を 1 枚で説明できるようにする
-- [ ] API 契約変更のレビュー手順（誰が承認するか）を明文化する
-- [ ] 運用ドキュメントに「よくある障害と復旧手順」を追記する
-- [ ] 新規参加者向けオンボーディング手順を作成する
-- [ ] 命名規約（URL, controller, usecase, component）を統一する
-- [ ] ドキュメント更新漏れを防ぐ PR チェック項目を追加する
-- [ ] 非機能要件（SLO/性能目標/可用性目標）を文章化する
-- [ ] 「やらないことリスト」を明記し、スコープを守る
-- [ ] 半年ごとに docs 棚卸しを行う運用を決める
-- [ ] このバックログを四半期ごとに優先度見直しする
-
-## 11. 取り掛かり順（提案）
-
-1. Quick Win から 3 つ選ぶ（CI、エラー追跡、ドキュメント整備）
-2. 監視・運用を最低限入れる（アラートと runbook）
-3. その後に性能改善（CDN/キャッシュ）へ進む
+- [ ] 各項目に owner（担当）と target date（期限）を付与する
+- [ ] 実施しない項目は削除せず、理由を1行で追記する
+- [ ] 毎週1回、P0/P1 のみを見直す（P2 は隔週）
