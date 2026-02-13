@@ -84,8 +84,8 @@
 ## 6. API と命名の扱い
 
 - ページ組み替え耐性のため、アプリ単位 BFF エンドポイントを維持
-  - `GET /app/numbers/metrics.json`
-  - `GET /app/masuda_run/rankings.json`
+  - `GET /api/app/numbers/metrics.json`
+  - `GET /api/app/masuda_run/rankings.json`
 - `GET /sitemap.xml` は公開配信のため維持
 - `sitemap.xml` は `SitemapsController` で配信
 - ドキュメント上の機能セクション名は単数で統一:
@@ -148,7 +148,7 @@
 4. ヘルスチェックと主要導線を確認する
    - `/up`
    - `/`, `/about`, `/blog`, `/podcast`, `/shop`
-   - `/app/numbers/metrics.json`, `/app/masuda_run/rankings.json`, `/sitemap.xml`
+   - `/api/app/numbers/metrics.json`, `/api/app/masuda_run/rankings.json`, `/sitemap.xml`
 5. 障害チャネルに「切り戻し完了」と「影響範囲」を共有する
 
 ### 10.4 確認コマンド（例）
@@ -159,8 +159,8 @@ curl -i https://<host>/
 curl -i https://<host>/blog
 curl -i https://<host>/podcast
 curl -i https://<host>/shop
-curl -i https://<host>/app/numbers/metrics.json
-curl -i https://<host>/app/masuda_run/rankings.json
+curl -i https://<host>/api/app/numbers/metrics.json
+curl -i https://<host>/api/app/masuda_run/rankings.json
 curl -i https://<host>/sitemap.xml
 ```
 
@@ -217,8 +217,8 @@ curl -i https://<host>/sitemap.xml
 
 ### 11.6 API / 契約
 
-- [x] `/app/numbers/metrics.json` が 200 + JSON を返す
-- [x] `/app/masuda_run/rankings.json` が 200 + JSON を返す
+- [x] `/api/app/numbers/metrics.json` が 200 + JSON を返す
+- [x] `/api/app/masuda_run/rankings.json` が 200 + JSON を返す
 - [x] `/sitemap.xml` が 200 + XML を返す
 
 ### 11.7 SEO / メタ
@@ -255,8 +255,8 @@ curl -i https://<host>/sitemap.xml
   - `/metrics.json`
   - `/masuda_run/rankings.json`
 - 置換済み:
-  - `/app/numbers/metrics.json`
-  - `/app/masuda_run/rankings.json`
+  - `/api/app/numbers/metrics.json`
+  - `/api/app/masuda_run/rankings.json`
 - 維持:
   - `/sitemap.xml`（公開サイト向け配信のため）
 
@@ -264,7 +264,7 @@ curl -i https://<host>/sitemap.xml
 
 1. `metrics` / `masuda_run/rankings` の旧JSON APIを削除
 2. `HomeController#show` から該当データ取得を除外
-3. `GET /app/numbers/metrics.json` / `GET /app/masuda_run/rankings.json` を追加
+3. `GET /api/app/numbers/metrics.json` / `GET /api/app/masuda_run/rankings.json` を追加
 4. Home 内ミニアプリは「ドロワー起動時に `/app/*` を取得」へ変更
 5. request spec / 契約ドキュメントを新エンドポイントに更新
 

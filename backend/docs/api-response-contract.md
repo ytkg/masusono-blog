@@ -2,10 +2,10 @@
 
 この文書は現行 backend API のレスポンス契約の正本です。
 
-- 対象: `GET /app/numbers/metrics.json`, `GET /app/masuda_run/rankings.json`, `GET /sitemap.xml`
+- 対象: `GET /api/app/numbers/metrics.json`, `GET /api/app/masuda_run/rankings.json`, `GET /sitemap.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
-## GET /app/numbers/metrics.json
+## GET /api/app/numbers/metrics.json
 
 - Response: `Metrics`
 
@@ -23,7 +23,7 @@
 | `value` | `String` | Yes | メトリクス値 |
 | `children` | `Array<MetricBlock>` | Yes | 子ブロック |
 
-## GET /app/masuda_run/rankings.json
+## GET /api/app/masuda_run/rankings.json
 
 - Response: `Array<Ranking>`
 
