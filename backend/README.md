@@ -123,6 +123,26 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 2. Usecase で整形ロジックを実装/更新
 3. request spec で契約（キー・型・件数・代表値）を固定
 
+## ドキュメント相互整合性チェック（APIパス）
+
+次の3ファイルで API パスをそろえる:
+
+- `README.md`
+- `docs/inertia-migration-plan.md`
+- `docs/api-response-contract.md`
+
+確認コマンド（`backend/` で実行）:
+
+```bash
+git grep -nE "(/api/app/numbers/metrics\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md
+git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md || true
+```
+
+判定:
+
+- 1本目のコマンドは3ファイルすべてにヒットすること
+- 2本目のコマンドはヒットしないこと
+
 ## 運用メモ
 
 - Cloud Run オリジン到達率削減メモ: `backend/docs/cache-origin-reduction-plan.md`

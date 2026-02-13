@@ -94,6 +94,21 @@
 - API エンドポイント名を変更する場合は別タスクで扱う
   - 互換性影響があるため、移行完了後に判断する
 
+### 6.1 README / API契約書 との整合性チェック
+
+APIパスは次の3ファイルで一致させる。
+
+- `README.md`
+- `docs/inertia-migration-plan.md`
+- `docs/api-response-contract.md`
+
+確認コマンド（`backend/` で実行）:
+
+```bash
+git grep -nE "(/api/app/numbers/metrics\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md
+git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md || true
+```
+
 ## 7. 直近の実装順（提案）
 
 1. 監視導入が必要になった時点で Cloud Monitoring を設定

@@ -58,3 +58,18 @@
 
 共通の GET キャッシュ契約は持たない。
 エラー時は `Cache-Control: no-store` とし、失敗レスポンスをキャッシュさせない。
+
+## README / Inertia移行計画 との整合性チェック
+
+APIパスは次の3ファイルで一致させる。
+
+- `README.md`
+- `docs/inertia-migration-plan.md`
+- `docs/api-response-contract.md`
+
+確認コマンド（`backend/` で実行）:
+
+```bash
+git grep -nE "(/api/app/numbers/metrics\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md
+git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md || true
+```

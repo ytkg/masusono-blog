@@ -9,15 +9,15 @@
 - [x] API エラーフォーマットの統一は実装済み（`error.code`, `error.message`, `no-store`）
 - [x] API request spec は主要エンドポイントをカバー済み（`spec/requests` 11件）
 - [x] Dependabot は Bundler/GitHub Actions の更新が有効
-- [ ] `README.md` / 一部 `docs/*.md` の API パスが実装と不一致（`/app/...` と `/api/app/...` が混在）
+- [x] `README.md` / 一部 `docs/*.md` の API パスが実装と不一致（`/app/...` と `/api/app/...` が混在）
 - [ ] CI の test ジョブが `bin/rails ... test` のままで、現行運用（RSpec中心）と乖離
 - [ ] Frontend のテスト基盤（Vitest/Playwright）が未導入
 - [ ] PR テンプレートが未作成
 
 ## 1. P0（今週着手）
 
-- [ ] ドキュメントの API パスを実装に合わせて統一する（`/api/app/numbers/metrics.json`, `/api/app/masuda_run/rankings.json`）
-- [ ] `README.md` / `docs/inertia-migration-plan.md` / `docs/api-response-contract.md` の相互整合性チェックを追加する
+- [x] ドキュメントの API パスを実装に合わせて統一する（`/api/app/numbers/metrics.json`, `/api/app/masuda_run/rankings.json`）
+- [x] `README.md` / `docs/inertia-migration-plan.md` / `docs/api-response-contract.md` の相互整合性チェックを追加する
 - [ ] CI test を `bundle exec rspec` ベースへ移行し、`bin/rails ... test` 依存を解消する
 - [ ] CI に frontend lint/format check（`npm run lint`, `npm run format:check`）を追加する
 - [ ] エラーレスポンスへ `request_id` を含める（問い合わせ時の調査性向上）
