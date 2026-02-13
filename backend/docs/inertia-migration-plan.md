@@ -14,7 +14,7 @@
 
 - 方針: 段階移行（Strangler Fig）
 - 方針詳細:
-  - 画面分離のための BFF エンドポイント（`/app/*`）と `sitemap.xml` を維持
+  - 画面分離のための BFF エンドポイント（`/api/app/*`）と `sitemap.xml` を維持
   - 画面は Inertia に順次寄せる
   - 小さくリリースし、ロールバック可能な単位で進める
 
@@ -46,7 +46,7 @@
 - [x] `sitemap.xml` は `SitemapsController`（ネームスペースなし）で配信
 - [ ] 監視（Cloud Monitoring）は保留
   - 現時点では導入しない
-  - 必要時に `/up` + 主要導線 + `/app/*.json` + `/sitemap.xml` を対象に再検討
+  - 必要時に `/up` + 主要導線 + `/api/app/*.json` + `/sitemap.xml` を対象に再検討
 
 ## 4.1 厳しめ棚卸し（2026-02-10）
 
@@ -59,7 +59,7 @@
 - [x] `/shops` の画面互換差分は許容（既知・対応不要）
   - 旧SPAは `/shops` が画面URL
   - 現状は `/shop` が画面（旧 `/shops` JSON API は削除済み）
-- [x] sitemap の `/shops` 出力差分は許容（既知・対応不要）
+- [x] sitemap の `/shop` 出力を画面URLに統一する
 - [x] ScrollRestoration の同等処理を移植
 - [x] `ensureUserIdCookie` の同等処理を移植
 - [x] OGP/Twitter メタの更新処理を同等化
@@ -280,7 +280,7 @@ curl -i https://<host>/sitemap.xml
 1. `metrics` / `masuda_run/rankings` の旧JSON APIを削除
 2. `HomeController#show` から該当データ取得を除外
 3. `GET /api/app/numbers/metrics.json` / `GET /api/app/masuda_run/rankings.json` を追加
-4. Home 内ミニアプリは「ドロワー起動時に `/app/*` を取得」へ変更
+4. Home 内ミニアプリは「ドロワー起動時に `/api/app/*.json` を取得」へ変更
 5. request spec / 契約ドキュメントを新エンドポイントに更新
 
 ### 12.4 注意点
