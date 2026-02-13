@@ -4,7 +4,6 @@ const OFFLINE_URL = "/offline.html"
 const ROOT_PATH = "/"
 const NAVIGATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000
 const SW_CACHED_AT_HEADER = "x-sw-cached-at"
-const SW_NAVIGATION_DIAGNOSTIC_MESSAGE = "SW_NAVIGATION_DIAGNOSTIC"
 const ORIGIN_WARMUP_PATH = "/up"
 const ORIGIN_WARMUP_PARAM_KEY = "sw_warm"
 const ORIGIN_WARMUP_PARAM_VALUE = "1"
@@ -20,25 +19,6 @@ const PRECACHE_URLS = [
   "/icons/icon-512.png",
 ]
 let lastOriginWarmupAt = 0
-
-function getCachedAt(response) {
-  if (!response) return null
-  const cachedAt = Number(response.headers.get(SW_CACHED_AT_HEADER))
-  return Number.isFinite(cachedAt) ? cachedAt : null
-}
-
-function notifyNavigationDiagnostic(payload) {
-  self.clients
-    .matchAll({ type: "window", includeUncontrolled: true })
-    .then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({ type: SW_NAVIGATION_DIAGNOSTIC_MESSAGE, payload })
-      })
-    })
-    .catch(() => {
-      // no-op: diagnostics should never break responses
-    })
-}
 
 function isSuccessfulBasicResponse(response) {
   return response && response.status === 200 && response.type === "basic"
@@ -64,18 +44,9 @@ function isFreshCachedResponse(cachedResponse, ttlMs) {
 }
 
 async function handleCachedNavigation(request) {
-  const startedAt = Date.now()
-  const requestUrl = new URL(request.url)
-  const path = `${requestUrl.pathname}${requestUrl.search}`
   const cache = await caches.open(CACHE_NAME)
   const cached = await cache.match(request)
   if (isFreshCachedResponse(cached, NAVIGATION_CACHE_TTL_MS)) {
-    notifyNavigationDiagnostic({
-      source: "cache",
-      path,
-      latencyMs: Date.now() - startedAt,
-      cachedAt: getCachedAt(cached),
-    })
     return cached
   }
 
@@ -84,30 +55,11 @@ async function handleCachedNavigation(request) {
     if (isSuccessfulBasicResponse(networkResponse)) {
       await cacheResponseWithTimestamp(cache, request, networkResponse)
     }
-    notifyNavigationDiagnostic({
-      source: "network",
-      path,
-      latencyMs: Date.now() - startedAt,
-      status: networkResponse.status,
-    })
     return networkResponse
   } catch (_error) {
-    if (cached) {
-      notifyNavigationDiagnostic({
-        source: "cache-fallback",
-        path,
-        latencyMs: Date.now() - startedAt,
-        cachedAt: getCachedAt(cached),
-      })
-      return cached
-    }
+    if (cached) return cached
 
     const offline = await cache.match(OFFLINE_URL)
-    notifyNavigationDiagnostic({
-      source: "offline-fallback",
-      path,
-      latencyMs: Date.now() - startedAt,
-    })
     return offline || Response.error()
   }
 }

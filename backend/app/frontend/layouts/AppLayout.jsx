@@ -1,7 +1,6 @@
 import Box from "@mui/material/Box"
 import Container from "@mui/material/Container"
 import Footer from "../components/Footer"
-import PwaCacheStatusBadge from "../components/PwaCacheStatusBadge"
 import Header from "../components/Header"
 import PwaInstallButton from "../components/PwaInstallButton"
 import { PodcastPlayerProvider } from "../features/podcastPlayer/PodcastPlayerContext"
@@ -16,7 +15,6 @@ export default function AppLayout({ children }) {
           {children}
         </Container>
         <PwaInstallButton />
-        <PwaCacheStatusBadge />
         <GlobalPodcastMiniPlayer />
         <Footer />
       </Box>

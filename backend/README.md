@@ -128,22 +128,6 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 - Cloud Run オリジン到達率削減メモ: `backend/docs/cache-origin-reduction-plan.md`
 - 改善バックログ（候補一覧）: `backend/docs/improvement-backlog.md`
 
-## PWA キャッシュ判定バッジ（暫定デバッグ機能）
-
-スマホ実機で DevTools が開けないケース向けに、`?pwa_debug=1` を付与したときのみ
-画面左下へ「キャッシュ/ネットワーク判定」を表示する機能を一時的に導入しています。
-
-- 目的: Service Worker のナビゲーション応答が `cache` か `network` かを可視化する
-- 前提: 本機能は恒久機能ではなく、検証完了後に削除する
-
-削除時のチェックリスト（削除漏れ防止）:
-
-1. `app/frontend/layouts/AppLayout.jsx` から `PwaCacheStatusBadge` の import と配置を削除
-2. `app/frontend/components/PwaCacheStatusBadge.jsx` を削除
-3. `public/service-worker.js` から `SW_NAVIGATION_DIAGNOSTIC` の `postMessage` 通知処理を削除
-4. ルーティング/画面で `?pwa_debug=1` を案内している箇所がないことを確認
-5. 削除後に PWA 通常動作（オンライン/オフライン遷移）を実機で再確認
-
 ## microCMS ページング保護
 
 `Microcms::FetchContentsService` では、異常レスポンスや過大取得による過負荷を防ぐために以下のガードを入れています。

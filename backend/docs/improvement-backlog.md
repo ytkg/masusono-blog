@@ -99,7 +99,6 @@
 - [ ] 色コントラスト・フォーカス表示を WCAG 観点で点検する
 - [ ] iOS/Android PWA 実機確認を定期タスク化する
 - [ ] Service Worker 更新戦略（破壊的変更時の移行）を文書化する
-- [ ] 暫定デバッグ機能 `pwa_debug=1`（`PwaCacheStatusBadge` と SW 通知）を検証完了後に削除する
 
 ## 7. 開発体験（DX）
 
