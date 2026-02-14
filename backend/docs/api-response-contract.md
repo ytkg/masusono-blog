@@ -56,8 +56,11 @@
 
 ## Cache contract
 
-共通の GET キャッシュ契約は持たない。
-エラー時は `Cache-Control: no-store` とし、失敗レスポンスをキャッシュさせない。
+`ApiController` で、`GET` かつ `200` の `application/json` に
+`Cache-Control: public, max-age=0, must-revalidate` を付与する。
+
+- `HEAD` は意図的に対象外（空レスポンス混入リスク回避）
+- エラー時は `Cache-Control: no-store`
 
 ## README / Inertia移行計画 との整合性チェック
 

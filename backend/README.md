@@ -66,8 +66,12 @@ docker compose up --build
 
 ## キャッシュ方針（GET API）
 
-現在は `ApplicationController` での共通キャッシュヘッダ付与は行っていません。
-エンドポイント単位で必要になった場合のみ、個別にキャッシュ方針を定義します。
+`ApiController` で、`GET` かつ `200` の `application/json` に対して
+`Cache-Control: public, max-age=0, must-revalidate` を共通付与します。
+
+補足:
+- `HEAD` は意図的に対象外です。中間キャッシュ実装差で空ボディが混入するリスクを避けるため、キャッシュ付与は `GET` のみに限定します。
+- エラーレスポンスは `Cache-Control: no-store` です。
 
 ## APIエラーレスポンス仕様
 
