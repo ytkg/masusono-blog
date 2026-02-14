@@ -79,7 +79,13 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
           </Box>
           <Box sx={{ flexShrink: 0 }}>
             {isEditing ? (
-              <Button variant="contained" size="small" onClick={onSave} disabled={isSaving} sx={{ height: fieldHeight }}>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={onSave}
+                disabled={isSaving}
+                sx={{ height: fieldHeight }}
+              >
                 {isSaving ? "保存中..." : "保存"}
               </Button>
             ) : (
@@ -152,7 +158,12 @@ export default function SettingsApp() {
   }
 
   return (
-    <AppsDrawerLauncher title="設定" buttonAriaLabel="設定を開く" buttonIcon={<SettingsIcon />} onOpen={loadCurrentUser}>
+    <AppsDrawerLauncher
+      title="設定"
+      buttonAriaLabel="設定を開く"
+      buttonIcon={<SettingsIcon />}
+      onOpen={loadCurrentUser}
+    >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         <NameSection
           name={name}
