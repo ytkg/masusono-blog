@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
@@ -46,7 +46,7 @@ const BUTTON_LABELS = {
   gameover: "リスタート",
 }
 
-export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError }) {
+export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, onScoreSubmit }) {
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
   const scaleRef = useRef(1)
@@ -59,6 +59,8 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
   const suppressClickRef = useRef(false)
   const restartReadyAtRef = useRef(0)
   const [restartReadyAt, setRestartReadyAt] = useState(0)
+  const roundIdRef = useRef(0)
+  const submittedRoundIdRef = useRef(0)
 
   const world = useRef(createInitialWorld())
 
@@ -82,6 +84,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
     setScore(0)
     restartReadyAtRef.current = 0
     setRestartReadyAt(0)
+    roundIdRef.current += 1
     setState("playing")
   }, [state])
 
@@ -95,6 +98,20 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
       if (p.jumps === 2) p.spin = CFG.SPIN_MS
     }
   }, [state])
+
+  useEffect(() => {
+    if (state !== "gameover") return
+    const roundId = roundIdRef.current
+    if (submittedRoundIdRef.current === roundId) return
+
+    submittedRoundIdRef.current = roundId
+    const finalScore = Math.floor(scoreRef.current)
+    if (!onScoreSubmit || finalScore <= 0) return
+
+    onScoreSubmit(finalScore).catch(() => {
+      // 登録失敗時はゲーム体験を止めない
+    })
+  }, [state, onScoreSubmit])
 
   useMasudaRunRestartCooldown(state, restartReadyAt, restartReadyAtRef, setRestartReadyAt)
 

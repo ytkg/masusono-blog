@@ -52,7 +52,7 @@ export default function MasudaRunRankings({ rankings, isLoading, hasError }) {
               {topRankings.map((ranking) => (
                 <TableRow key={`${ranking.rank}-${ranking.userId}-${ranking.score}`} hover>
                   <TableCell>{ranking.rank}</TableCell>
-                  <TableCell>{ranking.userId}</TableCell>
+                  <TableCell>{ranking.name}</TableCell>
                   <TableCell align="right" sx={monoSx}>
                     {formatScore(ranking.score)}
                   </TableCell>

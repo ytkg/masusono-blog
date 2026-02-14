@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "masusono-cache-"
-const CACHE_NAME = `${CACHE_PREFIX}v6`
+const CACHE_NAME = `${CACHE_PREFIX}v7`
 const OFFLINE_URL = "/offline.html"
 const ROOT_PATH = "/"
 const NAVIGATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000

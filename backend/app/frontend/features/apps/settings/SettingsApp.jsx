@@ -13,7 +13,43 @@ const labelTextSx = { fontSize: "14px" }
 const valueSx = { fontWeight: 700, fontSize: "22px" }
 const fieldHeight = 40
 
-function NameSection({ name, draftName, isEditing, onStartEditing, onSave, onDraftChange }) {
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`))
+  return match ? decodeURIComponent(match[2]) : null
+}
+
+async function fetchCurrentUser(userId) {
+  const response = await fetch(`/api/app/users/${encodeURIComponent(userId)}.json`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  })
+
+  if (!response.ok) {
+    throw new Error(`Load failed with ${response.status}`)
+  }
+
+  return response.json()
+}
+
+async function createUser(name, userId) {
+  const response = await fetch("/api/app/users.json", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ name, userId }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Save failed with ${response.status}`)
+  }
+
+  return response.json()
+}
+
+function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onSave, onDraftChange }) {
   return (
     <Card variant="outlined">
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.25, py: 1.5 }}>
@@ -43,8 +79,8 @@ function NameSection({ name, draftName, isEditing, onStartEditing, onSave, onDra
           </Box>
           <Box sx={{ flexShrink: 0 }}>
             {isEditing ? (
-              <Button variant="contained" size="small" onClick={onSave} sx={{ height: fieldHeight }}>
-                保存
+              <Button variant="contained" size="small" onClick={onSave} disabled={isSaving} sx={{ height: fieldHeight }}>
+                {isSaving ? "保存中..." : "保存"}
               </Button>
             ) : (
               <Button variant="outlined" size="small" onClick={onStartEditing} sx={{ height: fieldHeight }}>
@@ -62,29 +98,76 @@ export default function SettingsApp() {
   const [name, setName] = useState(DEFAULT_NAME)
   const [draftName, setDraftName] = useState(name)
   const [isEditing, setIsEditing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const loadCurrentUser = async () => {
+    if (isEditing) return
+
+    const userId = getCookie("user_id")
+    if (!userId) return
+
+    try {
+      const current = await fetchCurrentUser(userId)
+      const fetchedName = current?.name?.toString()?.trim() || DEFAULT_NAME
+      setName(fetchedName)
+      setDraftName(fetchedName)
+      setErrorMessage("")
+    } catch (_error) {
+      // 取得失敗時は既存表示を維持する
+    }
+  }
 
   const startEditing = () => {
     setDraftName(name)
+    setErrorMessage("")
     setIsEditing(true)
   }
 
-  const saveName = () => {
+  const saveName = async () => {
     const trimmed = draftName.trim()
-    setName(trimmed.length > 0 ? trimmed : DEFAULT_NAME)
-    setIsEditing(false)
+    if (trimmed.length === 0) {
+      setErrorMessage("表示名を入力してください")
+      return
+    }
+
+    const userId = getCookie("user_id")
+    if (!userId) {
+      setErrorMessage("ユーザーIDが見つかりません")
+      return
+    }
+
+    setIsSaving(true)
+    setErrorMessage("")
+
+    try {
+      await createUser(trimmed, userId)
+      setName(trimmed)
+      setIsEditing(false)
+    } catch (_error) {
+      setErrorMessage("表示名の保存に失敗しました")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
-    <AppsDrawerLauncher title="設定" buttonAriaLabel="設定を開く" buttonIcon={<SettingsIcon />}>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <AppsDrawerLauncher title="設定" buttonAriaLabel="設定を開く" buttonIcon={<SettingsIcon />} onOpen={loadCurrentUser}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         <NameSection
           name={name}
           draftName={draftName}
           isEditing={isEditing}
+          isSaving={isSaving}
           onStartEditing={startEditing}
           onSave={saveName}
           onDraftChange={setDraftName}
         />
+        {errorMessage ? (
+          <Typography variant="body2" color="error">
+            {errorMessage}
+          </Typography>
+        ) : null}
       </Box>
     </AppsDrawerLauncher>
   )

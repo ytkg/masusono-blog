@@ -1,12 +1,13 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
 import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
 import MasudaRunGame from "./components/MasudaRunGame"
 import useRankings from "./hooks/useRankings"
+import { getUserIdFromCookie } from "../../../utils/userId"
 
 export default function MasudaRunApp() {
   const [enabled, setEnabled] = useState(false)
-  const { rankings, rankingsLoading, rankingsError, refreshRankings } = useRankings(enabled)
+  const { rankings, rankingsLoading, rankingsError, refreshRankings, submitRanking } = useRankings(enabled)
 
   const loadRankings = async () => {
     if (!enabled) {
@@ -17,6 +18,18 @@ export default function MasudaRunApp() {
     await refreshRankings()
   }
 
+  const handleScoreSubmit = useCallback(
+    async (score) => {
+      if (!enabled) return
+
+      const userId = getUserIdFromCookie()
+      if (!userId) return
+
+      await submitRanking(score, userId)
+    },
+    [enabled, submitRanking],
+  )
+
   return (
     <AppsDrawerLauncher
       title="増田RUN"
@@ -24,7 +37,12 @@ export default function MasudaRunApp() {
       buttonIcon={<DirectionsRunIcon />}
       onOpen={loadRankings}
     >
-      <MasudaRunGame rankings={rankings} rankingsLoading={rankingsLoading} rankingsError={rankingsError} />
+      <MasudaRunGame
+        rankings={rankings}
+        rankingsLoading={rankingsLoading}
+        rankingsError={rankingsError}
+        onScoreSubmit={handleScoreSubmit}
+      />
     </AppsDrawerLauncher>
   )
 }

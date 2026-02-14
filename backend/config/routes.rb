@@ -23,11 +23,13 @@ Rails.application.routes.draw do
       resources :shops, only: :index, defaults: { format: :json }
     end
     namespace :app do
+      resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }
+
       namespace :numbers do
         resources :metrics, only: :index
       end
       namespace :masuda_run do
-        resources :rankings, only: :index
+        resources :rankings, only: %i[index create]
       end
     end
   end

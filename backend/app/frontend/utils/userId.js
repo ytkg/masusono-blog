@@ -11,8 +11,12 @@ function setCookie(name, value, maxAgeSeconds) {
   document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Lax${secure}`
 }
 
+export function getUserIdFromCookie() {
+  return getCookie(COOKIE_NAME)
+}
+
 export function ensureUserIdCookie() {
-  let id = getCookie(COOKIE_NAME)
+  let id = getUserIdFromCookie()
   if (!id) {
     id = crypto.randomUUID()
   }

@@ -40,6 +40,17 @@ class ApiController < ApplicationController
     end
   end
 
+  def render_invalid_request(error)
+    clear_error_cache_headers!
+
+    render json: {
+      error: {
+        code: "invalid_request",
+        message: error.message
+      }
+    }, status: :bad_request
+  end
+
   def map_microcms_status(status)
     parsed_status = Integer(status, exception: false)
 
@@ -58,9 +69,7 @@ class ApiController < ApplicationController
   end
 
   def render_api_error(status:, code:)
-    response.cache_control.clear
-    response.cache_control[:no_store] = true
-    response.headers.delete("ETag")
+    clear_error_cache_headers!
 
     render json: {
       error: {
@@ -68,5 +77,11 @@ class ApiController < ApplicationController
         message: ApplicationController::ERROR_MESSAGE_BY_CODE.fetch(code)
       }
     }, status: status
+  end
+
+  def clear_error_cache_headers!
+    response.cache_control.clear
+    response.cache_control[:no_store] = true
+    response.headers.delete("ETag")
   end
 end
