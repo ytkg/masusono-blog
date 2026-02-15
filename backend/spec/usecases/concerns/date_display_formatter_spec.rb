@@ -7,6 +7,10 @@ RSpec.describe DateDisplayFormatter do
       expect(described_class.format("2026-02-23T18:34:56.000Z")).to eq("2026/02/24")
     end
 
+    it "タイムゾーンオフセット付き日時もJSTに変換して整形する" do
+      expect(described_class.format("2026-02-23T23:30:00-05:00")).to eq("2026/02/24")
+    end
+
     it "すでにYYYY/MM/DD形式ならそのまま返す" do
       expect(described_class.format("2026/2/3")).to eq("2026/02/03")
     end
@@ -15,9 +19,10 @@ RSpec.describe DateDisplayFormatter do
       expect(described_class.format("not-a-date")).to eq("not-a-date")
     end
 
-    it "nilと空文字はそのまま返す" do
+    it "nilと空文字と空白文字はそのまま/空文字を返す" do
       expect(described_class.format(nil)).to be_nil
       expect(described_class.format("")).to eq("")
+      expect(described_class.format("   ")).to eq("")
     end
   end
 end

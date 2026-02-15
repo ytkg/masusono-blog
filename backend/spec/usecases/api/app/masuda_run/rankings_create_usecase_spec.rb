@@ -31,8 +31,24 @@ RSpec.describe Api::App::MasudaRun::RankingsCreateUsecase do
     end
   end
 
+  context "scoreが負数の場合" do
+    let(:score) { -1 }
+
+    it do
+      expect { result }.to raise_error(ArgumentError, "score must be a non-negative integer")
+    end
+  end
+
   context "user_idが空の場合" do
     let(:user_id) { "" }
+
+    it do
+      expect { result }.to raise_error(ArgumentError, "user_id is required")
+    end
+  end
+
+  context "user_idが空白のみの場合" do
+    let(:user_id) { "  " }
 
     it do
       expect { result }.to raise_error(ArgumentError, "user_id is required")
