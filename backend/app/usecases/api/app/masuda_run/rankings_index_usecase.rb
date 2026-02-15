@@ -27,7 +27,7 @@ module Api
             userId: user_id,
             name: resolve_display_name(user_id),
             score: ranking[:score],
-            rankedAt: PublishedAtFormatter.format(ranked_at)
+            rankedAt: DateDisplayFormatter.format(ranked_at)
           }
         end
 

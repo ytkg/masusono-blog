@@ -1,9 +1,10 @@
 require "rails_helper"
 
-RSpec.describe PublishedAtFormatter do
+RSpec.describe DateDisplayFormatter do
   describe ".format" do
-    it "ISO形式の日時をYYYY/MM/DDへ整形する" do
+    it "ISO形式の日時をJSTの日付でYYYY/MM/DDへ整形する" do
       expect(described_class.format("2026-02-23T12:34:56.000Z")).to eq("2026/02/23")
+      expect(described_class.format("2026-02-23T18:34:56.000Z")).to eq("2026/02/24")
     end
 
     it "すでにYYYY/MM/DD形式ならそのまま返す" do

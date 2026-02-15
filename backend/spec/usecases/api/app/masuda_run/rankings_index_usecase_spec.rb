@@ -9,7 +9,7 @@ RSpec.describe Api::App::MasudaRun::RankingsIndexUsecase do
         id: "c",
         user_id: "carol",
         score: 2000,
-        createdAt: "2026-02-02T10:00:00.000Z"
+        createdAt: "2026-02-02T18:00:00.000Z"
       },
       {
         id: "b",
@@ -47,7 +47,7 @@ RSpec.describe Api::App::MasudaRun::RankingsIndexUsecase do
             userId: "carol",
             name: "Carol",
             score: 2000,
-            rankedAt: "2026/02/02",
+            rankedAt: "2026/02/03",
             rank: 1
           },
           {

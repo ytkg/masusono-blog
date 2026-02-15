@@ -37,7 +37,7 @@ RSpec.describe Api::Podcast::EpisodesIndexUsecase do
           {
             id: "001",
             title: "テスト回",
-            publishedDate: "2026/02/07",
+            publishedDate: "2026/02/08",
             audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3"
           },
           {

@@ -18,7 +18,7 @@ module Api
         {
           id: extract_podcast_id(audio_url),
           title: podcast[:title],
-          publishedDate: PublishedAtFormatter.format(podcast[:publishedAt]),
+          publishedDate: DateDisplayFormatter.format(podcast[:publishedAt]),
           audioUrl: audio_url
         }
       end

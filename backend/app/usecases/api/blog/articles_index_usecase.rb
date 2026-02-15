@@ -18,7 +18,7 @@ module Api
         {
           id: article[:id],
           title: article[:title],
-          publishedDate: PublishedAtFormatter.format(article[:publishedAt]),
+          publishedDate: DateDisplayFormatter.format(article[:publishedAt]),
           content: article[:content],
           author: extract_author_name(article[:author])
         }

@@ -8,7 +8,7 @@ RSpec.describe Api::Blog::ArticlesIndexUsecase do
       [
         {
           id: "first",
-          publishedAt: "2025-10-05T00:00:00.000Z",
+          publishedAt: "2025-10-05T18:30:00.000Z",
           title: "first title",
           content: "<p>first body</p>",
           author: { name: "増田太郎" }
@@ -33,7 +33,7 @@ RSpec.describe Api::Blog::ArticlesIndexUsecase do
           {
             id: "first",
             title: "first title",
-            publishedDate: "2025/10/05",
+            publishedDate: "2025/10/06",
             content: "<p>first body</p>",
             author: "増田太郎"
           },
