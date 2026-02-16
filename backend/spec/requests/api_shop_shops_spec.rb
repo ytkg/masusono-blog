@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Api::Shop::Shops", type: :request do
   describe "GET /api/shop/shops.json" do
     before do
-      allow(Api::Shop::ShopsIndexUsecase).to receive(:call).and_return(
+      allow(ShopIndexUsecase).to receive(:call).and_return(
         {
           shops: [
             {
@@ -14,8 +14,7 @@ RSpec.describe "Api::Shop::Shops", type: :request do
               url: "https://example.com/shop",
               desc: "説明"
             }
-          ],
-          status: :ok
+          ]
         }
       )
     end

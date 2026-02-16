@@ -9,7 +9,7 @@ class BlogShowUsecase
 
   def call
     {
-      article: Api::Blog::ArticlesIndexUsecase.call.fetch(:articles).find { |item| item[:id] == @article_id }
+      article: BlogIndexUsecase.call.fetch(:articles).find { |item| item[:id] == @article_id }
     }
   end
 end

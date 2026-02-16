@@ -2,7 +2,7 @@ module Api
   module Podcast
     class EpisodesController < ApiController
       def index
-        result = EpisodesIndexUsecase.call
+        result = ::PodcastIndexUsecase.call
         render json: { episodes: result[:episodes] }, status: :ok
       end
     end

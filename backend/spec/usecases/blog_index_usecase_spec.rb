@@ -4,36 +4,52 @@ RSpec.describe BlogIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
-    before do
-      allow(Api::Blog::ArticlesIndexUsecase).to receive(:call).and_return(
+    let(:articles) do
+      [
         {
-          articles: [
-            {
-              id: "article-1",
-              title: "記事1",
-              publishedDate: "2026/02/10",
-              content: "<p>本文</p>",
-              author: "著者"
-            }
-          ]
+          id: "first",
+          publishedAt: "2025-10-05T18:30:00.000Z",
+          title: "first title",
+          content: "<p>first body</p>",
+          author: { name: "増田太郎" }
+        },
+        {
+          id: "second",
+          publishedAt: "2025-10-06T00:00:00.000Z",
+          title: "second title",
+          content: "<p>second body</p>",
+          author: nil
         }
-      )
+      ]
+    end
+
+    before do
+      allow(Article).to receive(:all).and_return(articles)
     end
 
     it do
-      expect(result).to eq(
-        {
-          articles: [
-            {
-              id: "article-1",
-              title: "記事1",
-              publishedDate: "2026/02/10",
-              content: "<p>本文</p>",
-              author: "著者"
-            }
-          ]
-        }
+      expect(result[:articles]).to eq(
+        [
+          {
+            id: "first",
+            title: "first title",
+            publishedDate: "2025/10/06",
+            content: "<p>first body</p>",
+            author: "増田太郎"
+          },
+          {
+            id: "second",
+            title: "second title",
+            publishedDate: "2025/10/06",
+            content: "<p>second body</p>",
+            author: nil
+          }
+        ]
       )
+    end
+
+    it "キー順は id, title, publishedDate, content, author" do
+      expect(result[:articles].map(&:keys)).to all(eq(%i[id title publishedDate content author]))
     end
   end
 end

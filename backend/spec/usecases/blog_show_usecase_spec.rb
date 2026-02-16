@@ -7,7 +7,7 @@ RSpec.describe BlogShowUsecase do
     let(:article_id) { "article-1" }
 
     before do
-      allow(Api::Blog::ArticlesIndexUsecase).to receive(:call).and_return(
+      allow(BlogIndexUsecase).to receive(:call).and_return(
         {
           articles: [
             {

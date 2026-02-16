@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Api::Blog::Articles", type: :request do
   describe "GET /api/blog/articles.json" do
     before do
-      allow(Api::Blog::ArticlesIndexUsecase).to receive(:call).and_return(
+      allow(BlogIndexUsecase).to receive(:call).and_return(
         {
           articles: [
             {

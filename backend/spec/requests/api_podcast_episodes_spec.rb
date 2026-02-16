@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Api::Podcast::Episodes", type: :request do
   describe "GET /api/podcast/episodes.json" do
     before do
-      allow(Api::Podcast::EpisodesIndexUsecase).to receive(:call).and_return(
+      allow(PodcastIndexUsecase).to receive(:call).and_return(
         {
           episodes: [
             {
@@ -12,8 +12,7 @@ RSpec.describe "Api::Podcast::Episodes", type: :request do
               publishedDate: "2026/02/10",
               audioUrl: "https://example.com/001.mp3"
             }
-          ],
-          status: :ok
+          ]
         }
       )
     end

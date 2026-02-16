@@ -9,7 +9,7 @@ class PodcastShowUsecase
 
   def call
     {
-      episode: Api::Podcast::EpisodesIndexUsecase.call.fetch(:episodes).find { |item| item[:id] == @episode_id }
+      episode: PodcastIndexUsecase.call.fetch(:episodes).find { |item| item[:id] == @episode_id }
     }
   end
 end

@@ -5,7 +5,20 @@ class ShopIndexUsecase
 
   def call
     {
-      shops: Api::Shop::ShopsIndexUsecase.call.fetch(:shops)
+      shops: Shop.all.map { |shop| build_shop(shop) }
+    }
+  end
+
+  private
+
+  def build_shop(shop)
+    {
+      name: shop[:name],
+      category: shop[:category],
+      lat: shop[:lat],
+      lng: shop[:lng],
+      url: shop[:url],
+      desc: shop[:desc]
     }
   end
 end

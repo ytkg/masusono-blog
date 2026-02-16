@@ -7,7 +7,7 @@ RSpec.describe PodcastShowUsecase do
     let(:episode_id) { "001" }
 
     before do
-      allow(Api::Podcast::EpisodesIndexUsecase).to receive(:call).and_return(
+      allow(PodcastIndexUsecase).to receive(:call).and_return(
         {
           episodes: [
             {
