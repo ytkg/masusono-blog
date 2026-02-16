@@ -7,7 +7,7 @@ module Api
 
       def call
         episodes = ::Podcast.all.map { |podcast| build_podcast(podcast) }
-        { episodes: episodes, status: :ok }
+        { episodes: episodes }
       end
 
       private

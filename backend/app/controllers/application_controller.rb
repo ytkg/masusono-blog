@@ -18,8 +18,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def inertia_render(result)
-    render inertia: result.except(:status), status: result[:status]
+  def render_inertia_not_found
+    render inertia: "errors/not_found", status: :not_found
   end
 
   def inertia_shared_app

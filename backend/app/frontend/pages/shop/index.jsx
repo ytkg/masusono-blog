@@ -1,15 +1,13 @@
 import { useEffect, useMemo, useState } from "react"
-import Typography from "@mui/material/Typography"
-import PageContainer from "../shared/PageContainer"
-import SectionHeading from "../shared/SectionHeading"
-import ShopsList from "../features/shops/ShopsList"
-import ShopCategoryFilter, { DEFAULT_CATEGORY } from "../features/shops/ShopCategoryFilter"
-import ShopsMap from "../features/shops/ShopsMap"
-import { SHOPS_PAGE_LAYOUT } from "../features/shops/shopsPageStyleConstants"
-import { attachStableShopIds, createShopBaseId, resolveSelectedShopId } from "../features/shops/shopSelection"
-import { usePreventBodyScroll } from "../features/shops/usePreventBodyScroll"
-import useShops from "../features/shops/useShops"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../../shared/PageContainer"
+import SectionHeading from "../../shared/SectionHeading"
+import ShopsList from "../../features/shops/ShopsList"
+import ShopCategoryFilter, { DEFAULT_CATEGORY } from "../../features/shops/ShopCategoryFilter"
+import ShopsMap from "../../features/shops/ShopsMap"
+import { SHOPS_PAGE_LAYOUT } from "../../features/shops/shopsPageStyleConstants"
+import { attachStableShopIds, createShopBaseId, resolveSelectedShopId } from "../../features/shops/shopSelection"
+import { usePreventBodyScroll } from "../../features/shops/usePreventBodyScroll"
+import SeoHead from "../../shared/SeoHead"
 
 function createShopIdResolver(shops) {
   const shopsWithId = attachStableShopIds(shops)
@@ -18,8 +16,7 @@ function createShopIdResolver(shops) {
   return (shop) => idByShop.get(shop) ?? `${createShopBaseId(shop)}#1`
 }
 
-export default function Shops() {
-  const { shops, error, isLoading } = useShops()
+export default function Shops({ shops = [] }) {
   const normalizedShops = shops ?? []
   const [category, setCategory] = useState(DEFAULT_CATEGORY)
   const [selected, setSelected] = useState(null)
@@ -66,23 +63,17 @@ export default function Shops() {
         <SectionHeading component="h1" sx={{ mb: SHOPS_PAGE_LAYOUT.sectionSpacing }}>
           推し店
         </SectionHeading>
-        {isLoading ? (
-          <Typography color="text.secondary">店舗情報を読み込み中です。</Typography>
-        ) : error ? (
-          <Typography color="error.main">店舗情報の取得に失敗しました。時間を置いて再度お試しください。</Typography>
-        ) : (
-          <>
-            <ShopsMap
-              shops={normalizedShops}
-              visibleShops={filteredShops}
-              selectedKey={selected}
-              onSelect={setSelected}
-              getKey={getKey}
-            />
-            <ShopCategoryFilter category={category} categories={categories} onChange={setCategory} />
-            <ShopsList shops={filteredShops} selectedKey={selected} onSelect={setSelected} getKey={getKey} />
-          </>
-        )}
+        <>
+          <ShopsMap
+            shops={normalizedShops}
+            visibleShops={filteredShops}
+            selectedKey={selected}
+            onSelect={setSelected}
+            getKey={getKey}
+          />
+          <ShopCategoryFilter category={category} categories={categories} onChange={setCategory} />
+          <ShopsList shops={filteredShops} selectedKey={selected} onSelect={setSelected} getKey={getKey} />
+        </>
       </PageContainer>
     </>
   )

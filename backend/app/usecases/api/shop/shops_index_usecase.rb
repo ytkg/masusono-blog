@@ -7,7 +7,7 @@ module Api
 
       def call
         shops = ::Shop.all.map { |shop| build_shop(shop) }
-        { shops: shops, status: :ok }
+        { shops: shops }
       end
 
       private

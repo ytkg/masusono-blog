@@ -7,11 +7,11 @@ Rails.application.routes.draw do
 
   inertia "/" => :home, as: :root
   inertia "about" => :about
-  inertia :blog
-  inertia "blog/:article_id" => :blog_detail
-  inertia :podcast
-  inertia :shop
-  inertia "podcast/:episode_id" => :podcast_detail
+  get "blog", to: "blog#index"
+  get "blog/:article_id", to: "blog#show"
+  get "podcast", to: "podcast#index"
+  get "podcast/:episode_id", to: "podcast#show"
+  get "shop", to: "shop#index"
   namespace :api do
     namespace :blog do
       resources :articles, only: :index, defaults: { format: :json }

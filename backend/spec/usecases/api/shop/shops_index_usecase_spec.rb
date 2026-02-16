@@ -37,7 +37,6 @@ RSpec.describe Api::Shop::ShopsIndexUsecase do
     end
 
     it "キー順は name, category, lat, lng, url, desc" do
-      expect(result[:status]).to eq(:ok)
       expect(result[:shops].map(&:keys)).to all(eq(%i[name category lat lng url desc]))
     end
   end

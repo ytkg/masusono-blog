@@ -57,7 +57,6 @@ RSpec.describe Api::Podcast::EpisodesIndexUsecase do
     end
 
     it "キー順は id, title, publishedDate, audioUrl" do
-      expect(result[:status]).to eq(:ok)
       expect(result[:episodes].map(&:keys)).to all(eq(%i[id title publishedDate audioUrl]))
     end
   end

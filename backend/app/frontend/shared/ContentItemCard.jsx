@@ -1,6 +1,6 @@
+import { Link } from "@inertiajs/react"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
-import { Link } from "@inertiajs/react"
 import ContentCard from "./ContentCard"
 
 const ContentItemTitleLink = styled(Link)(({ theme }) => ({

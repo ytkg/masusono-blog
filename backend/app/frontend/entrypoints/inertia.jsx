@@ -31,10 +31,28 @@ function registerServiceWorker() {
   })
 }
 
+function resolvePage(pages, name) {
+  const normalized = String(name)
+  const lower = normalized.toLowerCase()
+  const candidates = [
+    `../pages/${normalized}.jsx`,
+    `../pages/${normalized}/index.jsx`,
+    `../pages/${lower}.jsx`,
+    `../pages/${lower}/index.jsx`,
+  ]
+
+  const matchedPath = candidates.find((path) => pages[path])
+  if (!matchedPath) {
+    throw new Error(`Inertia page not found: ${name}`)
+  }
+
+  return pages[matchedPath]
+}
+
 createInertiaApp({
   resolve: (name) => {
     const pages = import.meta.glob("../pages/**/*.jsx", { eager: true })
-    const page = pages[`../pages/${name}.jsx`]
+    const page = resolvePage(pages, name)
     page.default.layout = page.default.layout || ((pageNode) => <AppLayout>{pageNode}</AppLayout>)
     return page
   },
