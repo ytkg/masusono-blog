@@ -4,7 +4,7 @@ RSpec.describe Microcms::FetchPodcastsService do
   describe ".execute" do
     subject(:result) { described_class.execute }
 
-    let(:endpoint) { described_class::MICROCMS_PODCASTS_ENDPOINT }
+    let(:endpoint) { described_class::ENDPOINT }
     let(:query) { { "limit" => "100", "offset" => "0", "orders" => "-publishedAt" } }
     let(:contents) do
       [
@@ -26,10 +26,6 @@ RSpec.describe Microcms::FetchPodcastsService do
 
     it do
       expect(result).to eq(contents)
-    end
-
-    it do
-      expect(described_class::ENDPOINT).to eq(described_class::MICROCMS_PODCASTS_ENDPOINT)
     end
   end
 end
