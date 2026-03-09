@@ -3,7 +3,7 @@ import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit"
 import CloseIcon from "@mui/icons-material/Close"
-import PodcastAudioPlayer from "../../podcast/PodcastAudioPlayer"
+import PodcastAudioPlayer from "./PodcastAudioPlayer"
 import { MINI_PLAYER_ARIA_LABELS } from "../lib/miniPlayerA11y"
 import {
   MINI_PLAYER_CARD_BORDER_RADIUS,

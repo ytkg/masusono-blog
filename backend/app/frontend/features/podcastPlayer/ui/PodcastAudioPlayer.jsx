@@ -13,8 +13,8 @@ import {
   getEmbeddedPlayerSeekSliderAriaLabel,
   getMiniPlayerSeekSliderAriaLabel,
   MINI_PLAYER_ARIA_LABELS,
-} from "../podcastPlayer/lib/miniPlayerA11y"
-import { useSeekSliderState } from "./useSeekSliderState"
+} from "../lib/miniPlayerA11y"
+import { useSeekSliderState } from "../hooks/useSeekSliderState"
 
 const SEEK_SLIDER_STEP_SECONDS = 0.1
 const PODCAST_ARTWORK_IMAGE = "/icons/icon-192.png"
