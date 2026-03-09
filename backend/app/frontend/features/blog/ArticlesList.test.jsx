@@ -1,0 +1,22 @@
+import { render, screen } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
+import ArticlesList from "./ArticlesList"
+
+vi.mock("./ArticleCard", () => ({
+  default: ({ article }) => <div>{article.title}</div>,
+}))
+
+describe("ArticlesList", () => {
+  it("記事がなければ空状態を表示する", () => {
+    render(<ArticlesList articles={[]} />)
+
+    expect(screen.getByText("記事がありません。")).toBeInTheDocument()
+  })
+
+  it("記事一覧を描画する", () => {
+    render(<ArticlesList articles={[{ id: "a1", title: "記事1" }, { id: "a2", title: "記事2" }]} />)
+
+    expect(screen.getByText("記事1")).toBeInTheDocument()
+    expect(screen.getByText("記事2")).toBeInTheDocument()
+  })
+})

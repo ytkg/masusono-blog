@@ -5,6 +5,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint app/frontend --ext .js,.jsx",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "prettier --write \"app/frontend/**/*.{js,jsx,css,md,json}\"",
     "format:check": "prettier --check \"app/frontend/**/*.{js,jsx,css,md,json}\""
   },
@@ -21,14 +23,18 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^5.0.4",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.0",
     "globals": "^17.3.0",
+    "jsdom": "^28.1.0",
     "prettier": "^3.8.1",
     "vite": "^7.1.10",
-    "vite-plugin-ruby": "^5.1.1"
+    "vite-plugin-ruby": "^5.1.1",
+    "vitest": "^4.0.18"
   }
 }

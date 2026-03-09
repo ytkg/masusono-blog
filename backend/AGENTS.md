@@ -53,6 +53,11 @@ This agent must execute the following steps **before starting any task**, regard
 - Cloud Run expects the app to listen on `$PORT` (default 8080); `backend/Dockerfile` uses `${PORT:-8080}`.
 - Current focus is Inertia Rails app consolidation in `backend`.
 - Frontend data loading may use either Inertia props or dedicated JSON endpoints; choose based on freshness, performance, and operational simplicity.
+- Frontend unit/UI tests use Vitest + React Testing Library.
+- Run frontend lint from `backend/` with: `npm run lint`.
+- Run frontend tests from `backend/` with: `npm test`.
+- Frontend test setup lives in `app/frontend/test/setup.js`.
+- When using `import.meta.glob` for frontend pages, exclude `*.test.jsx` / `*.spec.jsx` so Vite build does not treat test files as app entry pages.
 - microCMS fetch uses Faraday.
 - `/sitemap.xml` is generated from static routes plus microCMS articles.
 - CORS is handled by rack-cors; allowed origins include localhost:5173 and masusono.com/static.

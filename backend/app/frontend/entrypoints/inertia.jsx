@@ -51,7 +51,9 @@ function resolvePage(pages, name) {
 
 createInertiaApp({
   resolve: (name) => {
-    const pages = import.meta.glob("../pages/**/*.jsx", { eager: true })
+    const pages = import.meta.glob(["../pages/**/*.jsx", "!../pages/**/*.test.jsx", "!../pages/**/*.spec.jsx"], {
+      eager: true,
+    })
     const page = resolvePage(pages, name)
     page.default.layout = page.default.layout || ((pageNode) => <AppLayout>{pageNode}</AppLayout>)
     return page
