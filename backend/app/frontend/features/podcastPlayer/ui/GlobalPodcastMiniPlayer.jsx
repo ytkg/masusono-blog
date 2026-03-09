@@ -5,7 +5,7 @@ import { useMiniPlayerFlipAnimation } from "../hooks/useMiniPlayerFlipAnimation"
 import { useMiniPlayerDismissal } from "../hooks/useMiniPlayerDismissal"
 import { useGlobalPodcastMiniPlayerUi } from "../hooks/useGlobalPodcastMiniPlayerUi"
 import { useMiniPlayerVisibility } from "../hooks/useMiniPlayerVisibility"
-import { usePodcastPlayer } from "../PodcastPlayerContext"
+import { usePodcastPlayer } from "../usePodcastPlayer"
 
 export default function GlobalPodcastMiniPlayer() {
   const { currentEpisode, isPlaying, currentTime, duration, togglePlayPause, pause, seekBy, seekTo } =

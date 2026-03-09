@@ -17,7 +17,7 @@ function createShopIdResolver(shops) {
 }
 
 export default function Shops({ shops = [] }) {
-  const normalizedShops = shops ?? []
+  const normalizedShops = shops
   const [category, setCategory] = useState(DEFAULT_CATEGORY)
   const [selected, setSelected] = useState(null)
   const getKey = useMemo(() => createShopIdResolver(normalizedShops), [normalizedShops])

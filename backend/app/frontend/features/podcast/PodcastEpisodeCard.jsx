@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography"
 import PauseIcon from "@mui/icons-material/Pause"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
 import ContentItemCard from "../../shared/ContentItemCard"
-import { usePodcastPlayer } from "../podcastPlayer/PodcastPlayerContext"
+import { usePodcastPlayer } from "../podcastPlayer/usePodcastPlayer"
 
 export default function PodcastEpisodeCard({ episode, mode = "list" }) {
   const { currentEpisode, isPlaying, playEpisode, stop } = usePodcastPlayer()
