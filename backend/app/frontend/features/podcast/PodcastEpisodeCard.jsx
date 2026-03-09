@@ -35,7 +35,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list" }) {
       <ContentItemCard
         title={episode.title}
         titleVariant="h6"
-        titleComponent={mode === "detail" ? "h1" : "h2"}
+        titleComponent={mode === "detail" ? "h1" : "h3"}
         titleTo={mode === "list" ? `/podcast/${episode.id}` : undefined}
         metaParts={[episode.publishedDate, `エピソード${episode.id}`]}
       >
