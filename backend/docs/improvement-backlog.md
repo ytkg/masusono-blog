@@ -45,7 +45,7 @@
 - [ ] SWR hook の重複パターンを共通化する（一覧系 hook のボイラープレート削減）
 - [x] `SeoHead` の canonical を絶対URL出力へ統一する
 - [ ] `ApiController` の `no-store` 契約を request spec で網羅し、回帰を防止する
-- [ ] `MetricsIndexUsecase`（231行）の責務分割を検討する
+- [x] `MetricsIndexUsecase` の責務を分割した（article 集計 / payload 構築 / orchestration）
 
 ## 4. セキュリティ・運用
 
