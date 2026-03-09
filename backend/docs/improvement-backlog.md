@@ -1,6 +1,6 @@
-# 改善バックログ（2026-02-13 再棚卸し）
+# 改善バックログ（2026-03-10 再棚卸し）
 
-- 最終更新: 2026-02-13
+- 最終更新: 2026-03-10
 - 目的: `backend` の改善候補を実装事実ベースで管理し、着手順を明確にする
 - 調査範囲: `README.md`, `AGENTS.md`, `docs/*.md`, `.github/*`, `config/*`, `app/**/*`, `spec/**/*`
 
@@ -9,6 +9,9 @@
 - [x] API パスを `README.md` / `docs/inertia-migration-plan.md` / `docs/api-response-contract.md` で `/api/app/...` に統一済み
 - [x] 上記3ファイルの相互整合性チェック手順を追加済み
 - [x] Dependabot に npm エコシステム更新を追加済み（`.github/dependabot.yml`）
+- [x] フロント単体テスト基盤（Vitest + React Testing Library）は導入済み
+- [x] `SeoHead` の canonical は絶対URL出力へ統一済み
+- [x] バックログに残っていた `ApplicationController#inertia_render` / `MICROCMS_*_ENDPOINT` は現行コード上で未検出
 - [ ] CI の test ジョブが `bin/rails db:test:prepare test` のままで、RSpec中心運用と乖離
 - [ ] CI に frontend lint / format check が未追加
 - [ ] PR テンプレートが未整備（`.github/pull_request_template.md` なし）
@@ -29,18 +32,18 @@
 
 - [ ] `bin/ci` を CI 本体と同じ実行内容に揃える（Ruby lint/test + frontend lint）
 - [ ] API controller / usecase の返却契約を統一する（`{ json:, status: }` 形式に寄せるかを決定）
-- [ ] 未使用コードを整理する（`ApplicationController#inertia_render`, `MICROCMS_*_ENDPOINT`）
+- [x] 未使用コードを整理する（`ApplicationController#inertia_render`, `MICROCMS_*_ENDPOINT`）
 - [ ] `docs/` の目次ページを追加し、運用導線を一本化する
 - [ ] `bundler-audit` 設定のプレースホルダ（`CVE-THAT-DOES-NOT-APPLY`）を実運用値へ更新する
 - [ ] PR テンプレートを追加し、影響範囲/検証観点/ロールバック手順を固定化する
 
 ## 3. P2（品質・設計）
 
-- [ ] フロント単体テスト基盤（Vitest）を導入し、hooks / shared lib から優先してテスト追加
+- [x] フロント単体テスト基盤（Vitest）を導入し、hooks / shared lib から優先してテスト追加
 - [ ] 主要導線の E2E（Playwright）を最小構成で導入（`/`, `/blog`, `/podcast`, `/shop`）
 - [ ] `fetchJson` のエラー表現を API 契約（`error.code`, `error.message`）へ接続する
 - [ ] SWR hook の重複パターンを共通化する（一覧系 hook のボイラープレート削減）
-- [ ] `SeoHead` の canonical を絶対URL出力へ統一する
+- [x] `SeoHead` の canonical を絶対URL出力へ統一する
 - [ ] `ApiController` の `no-store` 契約を request spec で網羅し、回帰を防止する
 - [ ] `MetricsIndexUsecase`（231行）の責務分割を検討する
 
