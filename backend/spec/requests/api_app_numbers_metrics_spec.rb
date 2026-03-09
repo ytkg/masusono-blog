@@ -23,10 +23,7 @@ RSpec.describe "Api::App::Numbers", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/json")
-      expect(response.headers["Cache-Control"]).to include("public")
-      expect(response.headers["Cache-Control"]).to include("max-age=0")
-      expect(response.headers["Cache-Control"]).to include("must-revalidate")
-      expect(response.headers["Cache-Control"]).not_to include("private")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
       payload = JSON.parse(response.body)
       expect(payload["blocks"]).to be_an(Array)
       expect(payload["blocks"].first["label"]).to eq("ポッドキャスト総本数")

@@ -20,6 +20,7 @@ RSpec.describe "Api::App::Users", type: :request do
       expect(Api::App::Users::ShowUsecase).to have_received(:call).with(user_id: "cookie-user")
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/json")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
       expect(JSON.parse(response.body)).to eq(
         {
           "userId" => "cookie-user",
@@ -51,6 +52,7 @@ RSpec.describe "Api::App::Users", type: :request do
       expect(Api::App::Users::CreateUsecase).to have_received(:call).with(name: "表示名太郎", user_id: "cookie-user")
       expect(response).to have_http_status(:created)
       expect(response.media_type).to eq("application/json")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
       expect(JSON.parse(response.body)).to eq(
         {
           "id" => "new-user-id",

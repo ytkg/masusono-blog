@@ -23,12 +23,11 @@
 - [ ] `spec/routing/routes_spec.rb` に `/api/app/*`, `/sitemap.xml`, `/up` のルーティング検証を追加する
 - [ ] API エラーレスポンスに `request_id` を含める（調査容易化）
 - [x] `docs/inertia-migration-plan.md` の `/app/*` / `/app/*.json` を `/api/app/*` 系に統一する
-- [x] `docs/cache-origin-reduction-plan.md` の `/app/*.json` 記述を現行APIに合わせる
+- [x] Cloud Run ウォーム維持戦略を正本に統一し、旧キャッシュ戦略 docs を廃止する
 
 ## 2. P1（次スプリント）
 
 - [ ] `bin/ci` を CI 本体と同じ実行内容に揃える（Ruby lint/test + frontend lint）
-- [ ] `spec/requests/api_blog_articles_spec.rb` / `spec/requests/api_podcast_episodes_spec.rb` / `spec/requests/api_shop_shops_spec.rb` に成功時 Cache-Control 検証を追加する
 - [ ] API controller / usecase の返却契約を統一する（`{ json:, status: }` 形式に寄せるかを決定）
 - [ ] 未使用コードを整理する（`ApplicationController#inertia_render`, `MICROCMS_*_ENDPOINT`）
 - [ ] `docs/` の目次ページを追加し、運用導線を一本化する
@@ -42,7 +41,7 @@
 - [ ] `fetchJson` のエラー表現を API 契約（`error.code`, `error.message`）へ接続する
 - [ ] SWR hook の重複パターンを共通化する（一覧系 hook のボイラープレート削減）
 - [ ] `SeoHead` の canonical を絶対URL出力へ統一する
-- [ ] `ApiController` のキャッシュ契約を request spec で網羅し、回帰を防止する
+- [ ] `ApiController` の `no-store` 契約を request spec で網羅し、回帰を防止する
 - [ ] `MetricsIndexUsecase`（231行）の責務分割を検討する
 
 ## 4. セキュリティ・運用
@@ -59,12 +58,12 @@
 - [ ] microCMS タイムアウト値（10s/5s）を環境変数化する
 - [ ] microCMS 再試行ポリシー（429/5xx）を実装し、specで固定する
 - [ ] upstream 障害時のフォールバック戦略（前回成功データ利用可否）を決める
-- [ ] APIごとの鮮度要件を整理し、Cache-Control 設計に反映する
+- [ ] Cloud Scheduler の実行間隔と監視項目を見直し、ウォーム維持運用へ反映する
 - [ ] Cloud Run での SQLite（`storage/*.sqlite3`）運用を継続するか再評価する
 
 ## 6. 小さめ改善（細かい候補）
 
-- [ ] `docs/inertia-migration-plan.md` / `docs/cache-origin-reduction-plan.md` の最終更新日を現状へ更新する
+- [ ] `docs/inertia-migration-plan.md` / `docs/cloud-run-warmup-strategy.md` の最終更新日を現状へ更新する
 - [ ] `spec/requests` に `/up` の正常系を追加する
 - [ ] `README.md` に `bin/ci` の位置づけと実行例を追記する
 - [ ] `bin/dev`（ホスト実行時）の Vite 同時起動方針を明記する

@@ -64,14 +64,12 @@ docker compose up --build
 - `GET /sitemap.xml`
   - 公開用サイトマップXMLを返す
 
-## キャッシュ方針（GET API）
+## キャッシュ方針
 
-`ApiController` で、`GET` かつ `200` の `application/json` に対して
-`Cache-Control: public, max-age=0, must-revalidate` を共通付与します。
+キャッシュ最適化は採用せず、Cloud Run のウォーム維持を主戦略とします。
 
-補足:
-- `HEAD` は意図的に対象外です。中間キャッシュ実装差で空ボディが混入するリスクを避けるため、キャッシュ付与は `GET` のみに限定します。
-- エラーレスポンスは `Cache-Control: no-store` です。
+- `ApiController` 配下のレスポンスは `Cache-Control: no-store` を返します
+- Cloud Run のウォーム維持方針は `docs/cloud-run-warmup-strategy.md` を参照してください
 
 ## APIエラーレスポンス仕様
 
@@ -149,7 +147,7 @@ git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.m
 
 ## 運用メモ
 
-- Cloud Run オリジン到達率削減メモ: `backend/docs/cache-origin-reduction-plan.md`
+- Cloud Run ウォーム維持戦略: `backend/docs/cloud-run-warmup-strategy.md`
 - 改善バックログ（候補一覧）: `backend/docs/improvement-backlog.md`
 
 ## microCMS ページング保護

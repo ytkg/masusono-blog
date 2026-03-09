@@ -23,6 +23,7 @@ RSpec.describe "Api::App::MasudaRun::Rankings", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/json")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
       payload = JSON.parse(response.body)
       expect(payload).to be_an(Array)
       expect(payload.first["userId"]).to eq("alice")
@@ -51,6 +52,7 @@ RSpec.describe "Api::App::MasudaRun::Rankings", type: :request do
       expect(Api::App::MasudaRun::RankingsCreateUsecase).to have_received(:call).with(score: "1234", user_id: "cookie-user")
       expect(response).to have_http_status(:created)
       expect(response.media_type).to eq("application/json")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
       expect(JSON.parse(response.body)).to eq(
         {
           "id" => "new-ranking-id",
