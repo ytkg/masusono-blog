@@ -3,13 +3,14 @@ module Api
     module MasudaRun
       class RankingsIndexUsecase
         FALLBACK_DISPLAY_NAME = "NO NAME".freeze
+        RANKINGS_LIMIT = 10
 
         def self.call
           new.call
         end
 
         def call
-          ranked = ::MasudaRunRanking.all.map { |ranking| build_ranking(ranking) }
+          ranked = ::MasudaRunRanking.all(limit: RANKINGS_LIMIT).map { |ranking| build_ranking(ranking) }
           rankings = ranked.map.with_index(1) do |ranking, index|
             build_response(ranking, index)
           end

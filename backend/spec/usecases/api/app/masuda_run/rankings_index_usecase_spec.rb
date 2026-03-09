@@ -33,7 +33,7 @@ RSpec.describe Api::App::MasudaRun::RankingsIndexUsecase do
   end
 
   before do
-    allow(MasudaRunRanking).to receive(:all).and_return(rankings)
+    allow(MasudaRunRanking).to receive(:all).with(limit: described_class::RANKINGS_LIMIT).and_return(rankings)
     allow(Microcms::Users::FetchByUserIdService).to receive(:execute).with(user_id: "carol").and_return({ name: "Carol" })
     allow(Microcms::Users::FetchByUserIdService).to receive(:execute).with(user_id: "bob").and_return({})
     allow(Microcms::Users::FetchByUserIdService).to receive(:execute).with(user_id: "alice").and_return({ name: "Alice" })
