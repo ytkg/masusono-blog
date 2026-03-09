@@ -13,15 +13,6 @@ Rails.application.routes.draw do
   get "podcast/:episode_id", to: "podcast#show"
   get "shop", to: "shop#index"
   namespace :api do
-    namespace :blog do
-      resources :articles, only: :index, defaults: { format: :json }
-    end
-    namespace :podcast do
-      resources :episodes, only: :index, defaults: { format: :json }
-    end
-    namespace :shop do
-      resources :shops, only: :index, defaults: { format: :json }
-    end
     namespace :app do
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }
 

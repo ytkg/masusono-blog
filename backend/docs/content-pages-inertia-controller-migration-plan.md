@@ -73,9 +73,8 @@
 
 ## 7. APIエンドポイントの扱い
 
-- 既存 `/api/blog/articles.json`, `/api/podcast/episodes.json`, `/api/shop/shops.json` は、
-  すぐには削除せず互換維持（段階的廃止）
-- 内部利用がなくなったことを確認後に廃止可否を判断
+- 旧 `/api/blog/articles.json`, `/api/podcast/episodes.json`, `/api/shop/shops.json` は廃止済み
+- 継続して公開するJSON APIは app系エンドポイントと `/sitemap.xml` のみ
 
 ## 8. 段階移行手順
 
@@ -83,7 +82,7 @@
 2. 各 page を server props 参照に置換
 3. 不要 hook（`useArticles`, `useArticle`, `useEpisodes`, `useEpisode`, `useShops`）を削除
 4. request spec / routing spec を server props 前提に更新
-5. API request spec は互換維持のため当面残す
+5. 廃止した旧コンテンツAPIの request spec は削除する
 
 ## 9. 受け入れ条件
 
