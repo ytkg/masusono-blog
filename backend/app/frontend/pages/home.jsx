@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import HomeHero from "../features/home/HomeHero"
-import UechanBirthdaySection from "../features/home/UechanBirthdaySection"
 import HomeFeatureLinks from "../features/home/HomeFeatureLinks"
 import HomeAppLaunchers from "../features/home/HomeAppLaunchers"
 import { ensureUserIdCookie } from "../utils/userId"
@@ -36,7 +35,6 @@ export default function Home() {
       <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, display: "flex", flexDirection: "column", gap: { xs: 3, sm: 4 } }}>
         <HomeHero formattedNow={formatted} />
         <Stack spacing={1.75}>
-          <UechanBirthdaySection now={now} />
           <HomeAppLaunchers />
           <HomeFeatureLinks />
         </Stack>
