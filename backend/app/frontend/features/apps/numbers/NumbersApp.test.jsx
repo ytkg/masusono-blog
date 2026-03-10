@@ -26,6 +26,7 @@ describe("NumbersApp", () => {
     vi.mocked(useMetrics).mockImplementation((enabled) => ({
       metrics: null,
       isLoading: enabled,
+      error: null,
       hasError: false,
       refresh,
     }))

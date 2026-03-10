@@ -4,11 +4,11 @@ import MasudaRunRankings from "./MasudaRunRankings"
 
 describe("MasudaRunRankings", () => {
   it("読み込み中と空状態を切り替える", () => {
-    const { rerender } = render(<MasudaRunRankings rankings={[]} isLoading hasError={false} />)
+    const { rerender } = render(<MasudaRunRankings rankings={[]} isLoading hasError={false} error={null} />)
 
     expect(screen.getByText("読み込み中...")).toBeInTheDocument()
 
-    rerender(<MasudaRunRankings rankings={[]} isLoading={false} hasError={false} />)
+    rerender(<MasudaRunRankings rankings={[]} isLoading={false} hasError={false} error={null} />)
 
     expect(screen.getByText("まだランキングがありません。")).toBeInTheDocument()
   })
@@ -22,10 +22,17 @@ describe("MasudaRunRankings", () => {
       rankedAt: `2026/03/${String(index + 1).padStart(2, "0")}`,
     }))
 
-    const { rerender } = render(<MasudaRunRankings rankings={[]} isLoading={false} hasError />)
-    expect(screen.getByText("ランキングの取得に失敗しました。")).toBeInTheDocument()
+    const { rerender } = render(
+      <MasudaRunRankings
+        rankings={[]}
+        isLoading={false}
+        hasError
+        error={{ code: "upstream_rate_limited", message: "Upstream service is temporarily rate limited." }}
+      />,
+    )
+    expect(screen.getByText("ランキングへのアクセスが集中しています。少し待ってから再度お試しください。")).toBeInTheDocument()
 
-    rerender(<MasudaRunRankings rankings={rankings} isLoading={false} hasError={false} />)
+    rerender(<MasudaRunRankings rankings={rankings} isLoading={false} hasError={false} error={null} />)
 
     expect(screen.getByRole("table", { name: "増田RUNランキング" })).toBeInTheDocument()
     expect(screen.getByText("1,000")).toBeInTheDocument()

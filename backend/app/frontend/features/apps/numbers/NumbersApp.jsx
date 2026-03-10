@@ -6,7 +6,7 @@ import useMetrics from "./hooks/useMetrics"
 
 export default function NumbersApp() {
   const [enabled, setEnabled] = useState(false)
-  const { metrics, isLoading, hasError, refresh } = useMetrics(enabled)
+  const { metrics, isLoading, error, hasError, refresh } = useMetrics(enabled)
 
   const loadMetrics = async () => {
     if (!enabled) {
@@ -25,7 +25,7 @@ export default function NumbersApp() {
       buttonIcon={<NumbersIcon />}
       onOpen={loadMetrics}
     >
-      <NumbersPreview metrics={metrics} isLoading={isLoading} hasError={hasError} />
+      <NumbersPreview metrics={metrics} isLoading={isLoading} error={error} hasError={hasError} />
     </AppsDrawerLauncher>
   )
 }

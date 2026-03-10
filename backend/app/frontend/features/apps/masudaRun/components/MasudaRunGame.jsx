@@ -46,7 +46,7 @@ const BUTTON_LABELS = {
   gameover: "リスタート",
 }
 
-export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, onScoreSubmit }) {
+export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
   const scaleRef = useRef(1)
@@ -187,7 +187,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
       <Typography variant="body2" color="text.secondary">
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
-      <MasudaRunRankings rankings={rankings} isLoading={rankingsLoading} hasError={rankingsError} />
+      <MasudaRunRankings rankings={rankings} isLoading={rankingsLoading} hasError={rankingsError} error={rankingsFetchError} />
     </Box>
   )
 }

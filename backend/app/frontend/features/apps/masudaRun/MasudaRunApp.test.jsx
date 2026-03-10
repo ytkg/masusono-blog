@@ -36,6 +36,7 @@ describe("MasudaRunApp", () => {
     vi.mocked(useRankings).mockImplementation((enabled) => ({
       rankings: [],
       rankingsLoading: enabled,
+      error: null,
       rankingsError: false,
       refreshRankings,
       submitRanking: vi.fn(),
@@ -62,6 +63,7 @@ describe("MasudaRunApp", () => {
     vi.mocked(useRankings).mockImplementation((enabled) => ({
       rankings: [{ rank: 1 }],
       rankingsLoading: false,
+      error: null,
       rankingsError: false,
       refreshRankings: vi.fn(),
       submitRanking: enabled ? submitRanking : vi.fn(),

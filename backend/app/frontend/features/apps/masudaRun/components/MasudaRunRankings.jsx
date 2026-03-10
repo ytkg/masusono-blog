@@ -6,16 +6,23 @@ import TableCell from "@mui/material/TableCell"
 import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
+import { getApiErrorDisplayMessage } from "../../../../shared/lib/fetchJson"
 
 const TOP_RANKINGS_LIMIT = 10
 const containerSx = { border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }
 const titleSx = { mb: 1 }
 const monoSx = { fontVariantNumeric: "tabular-nums" }
+const ERROR_MESSAGES_BY_CODE = {
+  upstream_timeout: "ランキング取得がタイムアウトしました。少し待ってから再度お試しください。",
+  upstream_rate_limited: "ランキングへのアクセスが集中しています。少し待ってから再度お試しください。",
+  upstream_connection_error: "ランキング取得に失敗しました。接続を確認して再度お試しください。",
+}
 
 const formatScore = (score) => Math.floor(score).toLocaleString("ja-JP")
 
-export default function MasudaRunRankings({ rankings, isLoading, hasError }) {
+export default function MasudaRunRankings({ rankings, isLoading, hasError, error }) {
   const topRankings = rankings?.slice(0, TOP_RANKINGS_LIMIT) ?? []
+  const errorMessage = getApiErrorDisplayMessage(error, "ランキングの取得に失敗しました。", ERROR_MESSAGES_BY_CODE)
 
   return (
     <Box sx={containerSx}>
@@ -29,7 +36,7 @@ export default function MasudaRunRankings({ rankings, isLoading, hasError }) {
       ) : null}
       {hasError ? (
         <Typography variant="body2" color="text.secondary">
-          ランキングの取得に失敗しました。
+          {errorMessage}
         </Typography>
       ) : null}
       {!isLoading && !hasError && topRankings.length === 0 ? (

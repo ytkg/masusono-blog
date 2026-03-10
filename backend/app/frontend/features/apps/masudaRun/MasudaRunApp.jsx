@@ -7,7 +7,7 @@ import { getUserIdFromCookie } from "../../../utils/userId"
 
 export default function MasudaRunApp() {
   const [enabled, setEnabled] = useState(false)
-  const { rankings, rankingsLoading, rankingsError, refreshRankings, submitRanking } = useRankings(enabled)
+  const { rankings, rankingsLoading, error, rankingsError, refreshRankings, submitRanking } = useRankings(enabled)
 
   const loadRankings = async () => {
     if (!enabled) {
@@ -40,6 +40,7 @@ export default function MasudaRunApp() {
       <MasudaRunGame
         rankings={rankings}
         rankingsLoading={rankingsLoading}
+        rankingsFetchError={error}
         rankingsError={rankingsError}
         onScoreSubmit={handleScoreSubmit}
       />
