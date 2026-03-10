@@ -34,6 +34,7 @@ export default function ArticleCard({ article, mode = "list" }) {
             "& a": {
               overflowWrap: "anywhere",
               wordBreak: "break-word",
+              textDecoration: "underline",
             },
           }}
           dangerouslySetInnerHTML={{ __html: html }}

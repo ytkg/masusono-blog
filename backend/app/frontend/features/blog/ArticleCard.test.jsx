@@ -40,6 +40,23 @@ describe("ArticleCard", () => {
     expect(screen.getByText("2026/03/09 増田")).toBeInTheDocument()
   })
 
+  it("本文内リンクには下線スタイルを付ける", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: '<p><a href="https://example.com">本文リンク</a></p>',
+        }}
+      />,
+    )
+
+    expect(screen.getByRole("link", { name: "本文リンク" })).toHaveStyle({ textDecoration: "underline" })
+  })
+
   it("本文が空ならフォールバックを表示する", () => {
     render(
       <ArticleCard
