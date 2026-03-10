@@ -35,7 +35,7 @@ RSpec.describe SitemapsIndexUsecase do
     end
 
     it "静的ページと記事ページを含むサイトマップXMLを返す" do
-      xml = result[:plain]
+      xml = result[:body]
 
       expect(result[:status]).to eq(:ok)
       expect(result[:content_type]).to eq("application/xml; charset=utf-8")

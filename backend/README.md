@@ -10,6 +10,25 @@ masusono-blog の Rails API バックエンドです。
 docker compose up --build
 ```
 
+ホスト環境で Docker を使わずに動かす場合は、Rails と Vite を別々に起動します。
+
+```bash
+cd backend
+bin/dev
+```
+
+別ターミナルで:
+
+```bash
+cd backend
+npm run dev
+```
+
+補足:
+- `bin/dev` は Rails サーバーのみを起動します
+- 画面確認で Inertia/Vite のJS配信が必要なため、`npm run dev` を同時起動してください
+- Ruby/Bundler は `rbenv` 経由を前提にしてください
+
 ## Inertia ページ開発（`/about` PoC）
 
 `/about` は Inertia Rails で返すようにしています。開発時は Rails に加えて Vite を起動してください。
@@ -79,7 +98,8 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 {
   "error": {
     "code": "upstream_timeout",
-    "message": "Upstream service request timed out."
+    "message": "Upstream service request timed out.",
+    "request_id": "7c4f8b7e-6d38-4a17-b6a1-1db1f31c2a6e"
   }
 }
 ```
@@ -97,6 +117,7 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 
 補足:
 - 依存先（microCMS/HTTP）起因の障害は 5xx または 424 で返します。
+- `error.request_id` は Rails の request id で、アプリログとの突合に使います。
 - エラーレスポンスでは `Cache-Control: no-store` を返し、失敗レスポンスをキャッシュしません。
 
 ## APIレスポンス契約のキー記載順
@@ -147,6 +168,7 @@ git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.m
 
 ## 運用メモ
 
+- ドキュメント目次: `backend/docs/README.md`
 - Cloud Run ウォーム維持戦略: `backend/docs/cloud-run-warmup-strategy.md`
 - 改善バックログ（候補一覧）: `backend/docs/improvement-backlog.md`
 
@@ -167,6 +189,12 @@ git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.m
 ```bash
 docker compose run --rm backend bundle exec rubocop
 docker compose run --rm backend bundle exec rspec
+```
+
+ローカルで GitHub Actions 相当の主要チェックをまとめて回す場合:
+
+```bash
+bin/ci
 ```
 
 ## フロントエンドのLint/Format

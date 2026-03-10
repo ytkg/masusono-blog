@@ -5,7 +5,10 @@ class ShopIndexUsecase
 
   def call
     {
-      shops: Shop.all.map { |shop| build_shop(shop) }
+      props: {
+        shops: Shop.all.map { |shop| build_shop(shop) }
+      },
+      status: :ok
     }
   end
 

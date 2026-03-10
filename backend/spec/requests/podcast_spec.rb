@@ -7,14 +7,17 @@ RSpec.describe "WebPodcast", type: :request do
     before do
       allow(PodcastIndexUsecase).to receive(:call).and_return(
         {
-          episodes: [
-            {
-              id: "001",
-              title: "テスト回",
-              publishedDate: "2026/02/10",
-              audioUrl: "https://example.com/001.mp3"
-            }
-          ]
+          props: {
+            episodes: [
+              {
+                id: "001",
+                title: "テスト回",
+                publishedDate: "2026/02/10",
+                audioUrl: "https://example.com/001.mp3"
+              }
+            ]
+          },
+          status: :ok
         }
       )
     end
@@ -34,12 +37,15 @@ RSpec.describe "WebPodcast", type: :request do
       before do
         allow(PodcastShowUsecase).to receive(:call).with(episode_id: "001").and_return(
           {
-            episode: {
-              id: "001",
-              title: "テスト回",
-              publishedDate: "2026/02/10",
-              audioUrl: "https://example.com/001.mp3"
-            }
+            props: {
+              episode: {
+                id: "001",
+                title: "テスト回",
+                publishedDate: "2026/02/10",
+                audioUrl: "https://example.com/001.mp3"
+              }
+            },
+            status: :ok
           }
         )
       end
@@ -58,7 +64,10 @@ RSpec.describe "WebPodcast", type: :request do
       before do
         allow(PodcastShowUsecase).to receive(:call).with(episode_id: "missing").and_return(
           {
-            episode: nil
+            props: {
+              episode: nil
+            },
+            status: :not_found
           }
         )
       end

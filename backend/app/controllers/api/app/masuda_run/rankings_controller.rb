@@ -6,7 +6,7 @@ module Api
 
         def index
           result = ::Api::App::MasudaRun::RankingsIndexUsecase.call
-          render json: result[:json], status: result[:status]
+          render_json_result(result)
         end
 
         def create
@@ -15,7 +15,7 @@ module Api
             user_id: params[:userId]
           )
 
-          render json: result[:json], status: result[:status]
+          render_json_result(result)
         end
       end
     end

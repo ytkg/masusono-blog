@@ -8,8 +8,13 @@ class PodcastShowUsecase
   end
 
   def call
+    episode = PodcastIndexUsecase.call.dig(:props, :episodes)&.find { |item| item[:id] == @episode_id }
+
     {
-      episode: PodcastIndexUsecase.call.fetch(:episodes).find { |item| item[:id] == @episode_id }
+      props: {
+        episode: episode
+      },
+      status: episode.nil? ? :not_found : :ok
     }
   end
 end

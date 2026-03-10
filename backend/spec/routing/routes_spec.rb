@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Web routes", type: :routing do
+  it "routes /up to rails/health#show" do
+    expect(get: "/up").to route_to("rails/health#show")
+  end
+
   it "routes /blog to blog#index" do
     expect(get: "/blog").to route_to("blog#index")
   end
@@ -35,5 +39,13 @@ RSpec.describe "Web routes", type: :routing do
 
   it "routes POST /api/app/users.json to api/app/users#create" do
     expect(post: "/api/app/users.json").to route_to("api/app/users#create", format: "json")
+  end
+
+  it "routes /api/app/numbers/metrics.json to api/app/numbers/metrics#index" do
+    expect(get: "/api/app/numbers/metrics.json").to route_to("api/app/numbers/metrics#index", format: "json")
+  end
+
+  it "routes /sitemap.xml to sitemaps#index" do
+    expect(get: "/sitemap.xml").to route_to("sitemaps#index")
   end
 end

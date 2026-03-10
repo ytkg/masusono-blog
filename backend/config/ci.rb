@@ -7,8 +7,11 @@ CI.run do
 
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
-  step "Tests: RSpec", "bundle exec rspec"
-  step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
+  step "Tests: Prepare database", "env RAILS_ENV=test bin/rails db:test:prepare"
+  step "Tests: RSpec", "env RAILS_ENV=test bundle exec rspec"
+  step "Style: Frontend", "npm run lint"
+  step "Format: Frontend", "npm run format:check"
+  step "Tests: Frontend", "npm test"
 
   # Optional: set a green GitHub commit status to unblock PR merge.
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.

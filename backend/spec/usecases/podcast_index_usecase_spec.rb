@@ -32,32 +32,35 @@ RSpec.describe PodcastIndexUsecase do
     end
 
     it do
-      expect(result[:episodes]).to eq(
-        [
-          {
-            id: "001",
-            title: "テスト回",
-            publishedDate: "2026/02/08",
-            audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3"
-          },
-          {
-            id: "002",
-            title: "クエリ付きURL",
-            publishedDate: "2026/02/08",
-            audioUrl: "https://storage.googleapis.com/masusono-podcast/002.mp3?download=1"
-          },
-          {
-            id: "",
-            title: "不正URL(別ドメイン)",
-            publishedDate: "2026/02/09",
-            audioUrl: "https://example.com/podcast/003.mp3"
-          }
-        ]
+      expect(result[:status]).to eq(:ok)
+      expect(result[:props]).to eq(
+        {
+          episodes: [
+            {
+              id: "001",
+              title: "テスト回",
+              publishedDate: "2026/02/08",
+              audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3"
+            },
+            {
+              id: "002",
+              title: "クエリ付きURL",
+              publishedDate: "2026/02/08",
+              audioUrl: "https://storage.googleapis.com/masusono-podcast/002.mp3?download=1"
+            },
+            {
+              id: "",
+              title: "不正URL(別ドメイン)",
+              publishedDate: "2026/02/09",
+              audioUrl: "https://example.com/podcast/003.mp3"
+            }
+          ]
+        }
       )
     end
 
     it "キー順は id, title, publishedDate, audioUrl" do
-      expect(result[:episodes].map(&:keys)).to all(eq(%i[id title publishedDate audioUrl]))
+      expect(result.dig(:props, :episodes).map(&:keys)).to all(eq(%i[id title publishedDate audioUrl]))
     end
   end
 end

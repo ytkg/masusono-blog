@@ -5,7 +5,10 @@ class PodcastIndexUsecase
 
   def call
     {
-      episodes: Podcast.all.map { |podcast| build_podcast(podcast) }
+      props: {
+        episodes: Podcast.all.map { |podcast| build_podcast(podcast) }
+      },
+      status: :ok
     }
   end
 

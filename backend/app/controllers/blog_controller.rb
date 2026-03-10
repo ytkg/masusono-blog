@@ -2,14 +2,14 @@ class BlogController < ApplicationController
   def index
     result = BlogIndexUsecase.call
 
-    render inertia: { articles: result[:articles] }
+    render_inertia_result(result)
   end
 
   def show
     result = BlogShowUsecase.call(article_id: params[:article_id])
 
-    return render_inertia_not_found if result[:article].nil?
+    return render_inertia_not_found if result[:status] == :not_found
 
-    render inertia: { article: result[:article] }
+    render_inertia_result(result)
   end
 end

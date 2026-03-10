@@ -70,11 +70,15 @@ RSpec.describe "Api::App::Users", type: :request do
       expect(response).to have_http_status(:bad_request)
       expect(response.media_type).to eq("application/json")
       expect(response.headers["Cache-Control"]).to eq("no-store")
+      expect(response.headers["ETag"]).to be_nil
+      request_id = response.headers["X-Request-Id"]
+      expect(request_id).to be_present
       expect(JSON.parse(response.body)).to eq(
         {
           "error" => {
             "code" => "invalid_request",
-            "message" => "user_id is required"
+            "message" => "user_id is required",
+            "request_id" => request_id
           }
         }
       )

@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def render_inertia_result(result)
+    render inertia: result.fetch(:props), status: result.fetch(:status)
+  end
+
   def render_inertia_not_found
     render inertia: "errors/not_found", status: :not_found
   end

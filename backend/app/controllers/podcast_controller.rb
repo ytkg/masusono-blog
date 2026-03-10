@@ -2,14 +2,14 @@ class PodcastController < ApplicationController
   def index
     result = PodcastIndexUsecase.call
 
-    render inertia: { episodes: result[:episodes] }
+    render_inertia_result(result)
   end
 
   def show
     result = PodcastShowUsecase.call(episode_id: params[:episode_id])
 
-    return render_inertia_not_found if result[:episode].nil?
+    return render_inertia_not_found if result[:status] == :not_found
 
-    render inertia: { episode: result[:episode] }
+    render_inertia_result(result)
   end
 end

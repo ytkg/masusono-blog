@@ -9,14 +9,17 @@ RSpec.describe PodcastShowUsecase do
     before do
       allow(PodcastIndexUsecase).to receive(:call).and_return(
         {
-          episodes: [
-            {
-              id: "001",
-              title: "テスト回",
-              publishedDate: "2026/02/10",
-              audioUrl: "https://example.com/001.mp3"
-            }
-          ]
+          props: {
+            episodes: [
+              {
+                id: "001",
+                title: "テスト回",
+                publishedDate: "2026/02/10",
+                audioUrl: "https://example.com/001.mp3"
+              }
+            ]
+          },
+          status: :ok
         }
       )
     end
@@ -24,12 +27,15 @@ RSpec.describe PodcastShowUsecase do
     it do
       expect(result).to eq(
         {
-          episode: {
-            id: "001",
-            title: "テスト回",
-            publishedDate: "2026/02/10",
-            audioUrl: "https://example.com/001.mp3"
-          }
+          props: {
+            episode: {
+              id: "001",
+              title: "テスト回",
+              publishedDate: "2026/02/10",
+              audioUrl: "https://example.com/001.mp3"
+            }
+          },
+          status: :ok
         }
       )
     end
@@ -40,7 +46,10 @@ RSpec.describe PodcastShowUsecase do
       it do
         expect(result).to eq(
           {
-            episode: nil
+            props: {
+              episode: nil
+            },
+            status: :not_found
           }
         )
       end

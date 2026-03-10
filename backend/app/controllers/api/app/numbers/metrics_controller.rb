@@ -4,7 +4,7 @@ module Api
       class MetricsController < ApiController
         def index
           result = ::Api::App::Numbers::MetricsIndexUsecase.call
-          render json: result[:json], status: result[:status]
+          render_json_result(result)
         end
       end
     end

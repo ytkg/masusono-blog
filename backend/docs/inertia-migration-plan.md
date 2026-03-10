@@ -1,6 +1,6 @@
 # Inertia Rails 移行計画
 
-- 最終更新: 2026-02-11
+- 最終更新: 2026-03-10
 - 対象: `backend` (Rails) + `frontend` (React SPA)
 - 参照: `https://inertia-rails.dev/llms-full.txt`
 
@@ -40,7 +40,7 @@
 - [x] Home の `HomeAppLaunchers` / `AppsDrawerLauncher` 移植
 - [x] `MasudaRun` 本体（キャンバスゲーム）移植
 
-## 4. 残タスク（2026-02-11 時点）
+## 4. 残タスク（2026-03-10 時点）
 
 - [x] `/shop` は単数URLのまま維持する（`/shops` へは戻さない）
 - [x] `sitemap.xml` は `SitemapsController`（ネームスペースなし）で配信

@@ -17,7 +17,7 @@ class SitemapsIndexUsecase
 
   def call
     {
-      plain: build_sitemap_xml(Article.all),
+      body: build_sitemap_xml(Article.all),
       content_type: CONTENT_TYPE,
       status: :ok
     }

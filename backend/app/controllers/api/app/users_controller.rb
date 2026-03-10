@@ -5,7 +5,7 @@ module Api
 
       def show
         result = ::Api::App::Users::ShowUsecase.call(user_id: params[:user_id])
-        render json: result[:json], status: result[:status]
+        render_json_result(result)
       end
 
       def create
@@ -14,7 +14,7 @@ module Api
           user_id: params[:userId]
         )
 
-        render json: result[:json], status: result[:status]
+        render_json_result(result)
       end
     end
   end

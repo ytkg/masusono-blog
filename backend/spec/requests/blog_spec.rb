@@ -7,15 +7,18 @@ RSpec.describe "WebBlog", type: :request do
     before do
       allow(BlogIndexUsecase).to receive(:call).and_return(
         {
-          articles: [
-            {
-              id: "article-1",
-              title: "記事1",
-              publishedDate: "2026/02/10",
-              content: "<p>本文</p>",
-              author: "著者"
-            }
-          ]
+          props: {
+            articles: [
+              {
+                id: "article-1",
+                title: "記事1",
+                publishedDate: "2026/02/10",
+                content: "<p>本文</p>",
+                author: "著者"
+              }
+            ]
+          },
+          status: :ok
         }
       )
     end
@@ -35,13 +38,16 @@ RSpec.describe "WebBlog", type: :request do
       before do
         allow(BlogShowUsecase).to receive(:call).with(article_id: "article-1").and_return(
           {
-            article: {
-              id: "article-1",
-              title: "記事1",
-              publishedDate: "2026/02/10",
-              content: "<p>本文</p>",
-              author: "著者"
-            }
+            props: {
+              article: {
+                id: "article-1",
+                title: "記事1",
+                publishedDate: "2026/02/10",
+                content: "<p>本文</p>",
+                author: "著者"
+              }
+            },
+            status: :ok
           }
         )
       end
@@ -60,7 +66,10 @@ RSpec.describe "WebBlog", type: :request do
       before do
         allow(BlogShowUsecase).to receive(:call).with(article_id: "missing").and_return(
           {
-            article: nil
+            props: {
+              article: nil
+            },
+            status: :not_found
           }
         )
       end

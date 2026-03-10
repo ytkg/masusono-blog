@@ -14,7 +14,7 @@
 - [x] バックログに残っていた `ApplicationController#inertia_render` / `MICROCMS_*_ENDPOINT` は現行コード上で未検出
 - [x] CI の test ジョブが `bundle exec rspec` ベースへ移行済み
 - [x] CI に frontend lint / format check を追加済み
-- [ ] PR テンプレートが未整備（`.github/pull_request_template.md` なし）
+- [x] PR テンプレートを追加済み（`.github/pull_request_template.md`）
 - [x] ドキュメント内に旧表記が残存（`/app/*`, `/app/*.json`）
 - [x] `sitemap.xml` の静的URLに `/shops` が残り、画面URL `/shop` と不整合
 
@@ -23,19 +23,19 @@
 - [x] CI test を `bundle exec rspec` ベースに移行する（`.github/workflows/ci_backend.yml`）
 - [x] CI に `npm run lint` / `npm run format:check` を追加する（`.github/workflows/ci_frontend.yml`）
 - [x] `sitemap.xml` の `/shops` 方針を決定する（`/shop` へ変更 or `/shops` リダイレクト追加）
-- [ ] `spec/routing/routes_spec.rb` に `/api/app/*`, `/sitemap.xml`, `/up` のルーティング検証を追加する
-- [ ] API エラーレスポンスに `request_id` を含める（調査容易化）
+- [x] `spec/routing/routes_spec.rb` に `/api/app/*`, `/sitemap.xml`, `/up` のルーティング検証を追加する
+- [x] API エラーレスポンスに `request_id` を含める（調査容易化）
 - [x] `docs/inertia-migration-plan.md` の `/app/*` / `/app/*.json` を `/api/app/*` 系に統一する
 - [x] Cloud Run ウォーム維持戦略を正本に統一し、旧キャッシュ戦略 docs を廃止する
 
 ## 2. P1（次スプリント）
 
-- [ ] `bin/ci` を CI 本体と同じ実行内容に揃える（Ruby lint/test + frontend lint）
-- [ ] API controller / usecase の返却契約を統一する（`{ json:, status: }` 形式に寄せるかを決定）
+- [x] `bin/ci` を CI 本体と同じ実行内容に揃える（Ruby lint/test + frontend lint）
+- [x] controller / usecase の返却契約を統一する（Inertia は `{ props:, status: }`、API は `{ json:, status: }`、XML は `{ body:, content_type:, status: }`）
 - [x] 未使用コードを整理する（`ApplicationController#inertia_render`, `MICROCMS_*_ENDPOINT`）
-- [ ] `docs/` の目次ページを追加し、運用導線を一本化する
-- [ ] `bundler-audit` 設定のプレースホルダ（`CVE-THAT-DOES-NOT-APPLY`）を実運用値へ更新する
-- [ ] PR テンプレートを追加し、影響範囲/検証観点/ロールバック手順を固定化する
+- [x] `docs/` の目次ページを追加し、運用導線を一本化する
+- [x] `bundler-audit` 設定のプレースホルダ（`CVE-THAT-DOES-NOT-APPLY`）を削除し、ignore なし運用へ更新した
+- [x] PR テンプレートを追加し、影響範囲/検証観点/ロールバック手順を固定化する
 
 ## 3. P2（品質・設計）
 
@@ -44,7 +44,7 @@
 - [ ] `fetchJson` のエラー表現を API 契約（`error.code`, `error.message`）へ接続する
 - [ ] SWR hook の重複パターンを共通化する（一覧系 hook のボイラープレート削減）
 - [x] `SeoHead` の canonical を絶対URL出力へ統一する
-- [ ] `ApiController` の `no-store` 契約を request spec で網羅し、回帰を防止する
+- [x] `ApiController` の `no-store` 契約を request spec で網羅し、回帰を防止する
 - [x] `MetricsIndexUsecase` の責務を分割した（article 集計 / payload 構築 / orchestration）
 
 ## 4. セキュリティ・運用
@@ -66,13 +66,13 @@
 
 ## 6. 小さめ改善（細かい候補）
 
-- [ ] `docs/inertia-migration-plan.md` / `docs/cloud-run-warmup-strategy.md` の最終更新日を現状へ更新する
-- [ ] `spec/requests` に `/up` の正常系を追加する
-- [ ] `README.md` に `bin/ci` の位置づけと実行例を追記する
-- [ ] `bin/dev`（ホスト実行時）の Vite 同時起動方針を明記する
+- [x] `docs/inertia-migration-plan.md` / `docs/cloud-run-warmup-strategy.md` の最終更新日を現状へ更新する
+- [x] `spec/requests` に `/up` の正常系を追加する
+- [x] `README.md` に `bin/ci` の位置づけと実行例を追記する
+- [x] `bin/dev`（ホスト実行時）の Vite 同時起動方針を明記する
 - [ ] CI で RSpec 結果（JUnit等）をアーティファクト化する
 - [ ] GitHub Actions に path filter を導入し、不要ジョブを抑制する
-- [ ] Service Worker のバージョン更新手順をドキュメント化する
+- [x] Service Worker のバージョン更新手順をドキュメント化する
 
 ## 7. バックログ運用ルール
 

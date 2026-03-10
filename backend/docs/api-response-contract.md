@@ -49,10 +49,17 @@
 {
   "error": {
     "code": "upstream_timeout",
-    "message": "Upstream service request timed out."
+    "message": "Upstream service request timed out.",
+    "request_id": "7c4f8b7e-6d38-4a17-b6a1-1db1f31c2a6e"
   }
 }
 ```
+
+| key | type | nullable | note |
+| --- | --- | --- | --- |
+| `error.code` | `String` | No | エラー種別 |
+| `error.message` | `String` | No | 表示/記録用メッセージ |
+| `error.request_id` | `String` | No | Rails の request id。ログ相関に使う |
 
 ## Cache contract
 
