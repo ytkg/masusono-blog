@@ -14,7 +14,14 @@ describe("ArticlesList", () => {
   })
 
   it("記事一覧を描画する", () => {
-    render(<ArticlesList articles={[{ id: "a1", title: "記事1" }, { id: "a2", title: "記事2" }]} />)
+    render(
+      <ArticlesList
+        articles={[
+          { id: "a1", title: "記事1" },
+          { id: "a2", title: "記事2" },
+        ]}
+      />,
+    )
 
     expect(screen.getByText("記事1")).toBeInTheDocument()
     expect(screen.getByText("記事2")).toBeInTheDocument()

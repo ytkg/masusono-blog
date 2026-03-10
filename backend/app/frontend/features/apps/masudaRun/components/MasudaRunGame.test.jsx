@@ -50,7 +50,9 @@ vi.mock("../lib", async () => {
 describe("MasudaRunGame", () => {
   it("初期表示でスコアとランキングを描画し、スタートできる", async () => {
     useMasudaRunLoopMock.mockReset()
-    render(<MasudaRunGame rankings={[{ rank: 1 }]} rankingsLoading={false} rankingsError={false} onScoreSubmit={vi.fn()} />)
+    render(
+      <MasudaRunGame rankings={[{ rank: 1 }]} rankingsLoading={false} rankingsError={false} onScoreSubmit={vi.fn()} />,
+    )
 
     expect(screen.getByText("スコア 00000")).toBeInTheDocument()
     expect(screen.getByText("ハイスコア 00042")).toBeInTheDocument()

@@ -22,9 +22,7 @@ describe("useMasudaRunRestartCooldown", () => {
     const restartReadyAtRef = { current: 900 }
     const setRestartReadyAt = vi.fn()
 
-    renderHook(() =>
-      useMasudaRunRestartCooldown("gameover", 900, restartReadyAtRef, setRestartReadyAt),
-    )
+    renderHook(() => useMasudaRunRestartCooldown("gameover", 900, restartReadyAtRef, setRestartReadyAt))
 
     expect(restartReadyAtRef.current).toBe(0)
     expect(setRestartReadyAt).toHaveBeenCalledWith(0)
@@ -35,9 +33,7 @@ describe("useMasudaRunRestartCooldown", () => {
     const restartReadyAtRef = { current: 1300 }
     const setRestartReadyAt = vi.fn()
 
-    renderHook(() =>
-      useMasudaRunRestartCooldown("gameover", 1300, restartReadyAtRef, setRestartReadyAt),
-    )
+    renderHook(() => useMasudaRunRestartCooldown("gameover", 1300, restartReadyAtRef, setRestartReadyAt))
 
     expect(setRestartReadyAt).not.toHaveBeenCalled()
 

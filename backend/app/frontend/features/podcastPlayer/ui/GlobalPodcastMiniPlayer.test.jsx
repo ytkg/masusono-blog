@@ -87,7 +87,10 @@ describe("GlobalPodcastMiniPlayer", () => {
     mockBase()
     const { rerender } = render(<GlobalPodcastMiniPlayer />)
 
-    expect(screen.getByTestId("global-podcast-mini-player")).toHaveAttribute("data-visibility-reason", "HAS_CURRENT_EPISODE")
+    expect(screen.getByTestId("global-podcast-mini-player")).toHaveAttribute(
+      "data-visibility-reason",
+      "HAS_CURRENT_EPISODE",
+    )
     expect(screen.getByText("expanded:第1回")).toBeInTheDocument()
 
     vi.mocked(useGlobalPodcastMiniPlayerUi).mockReturnValue({

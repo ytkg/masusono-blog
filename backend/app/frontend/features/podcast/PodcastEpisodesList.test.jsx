@@ -14,7 +14,14 @@ describe("PodcastEpisodesList", () => {
   })
 
   it("エピソード一覧を描画する", () => {
-    render(<PodcastEpisodesList episodes={[{ id: "1", title: "回1" }, { id: "2", title: "回2" }]} />)
+    render(
+      <PodcastEpisodesList
+        episodes={[
+          { id: "1", title: "回1" },
+          { id: "2", title: "回2" },
+        ]}
+      />,
+    )
 
     expect(screen.getByText("回1")).toBeInTheDocument()
     expect(screen.getByText("回2")).toBeInTheDocument()

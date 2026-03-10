@@ -27,12 +27,7 @@ describe("podcastPlayerReducer", () => {
   })
 
   it("PLAY_PAUSED で再生を止める", () => {
-    expect(
-      podcastPlayerReducer(
-        { status: "ready", error: null, isPlaying: true },
-        { type: "PLAY_PAUSED" },
-      ),
-    ).toEqual({
+    expect(podcastPlayerReducer({ status: "ready", error: null, isPlaying: true }, { type: "PLAY_PAUSED" })).toEqual({
       status: "ready",
       error: null,
       isPlaying: false,
@@ -40,12 +35,7 @@ describe("podcastPlayerReducer", () => {
   })
 
   it("PLAY_ENDED で ready に戻す", () => {
-    expect(
-      podcastPlayerReducer(
-        { status: "loading", error: null, isPlaying: true },
-        { type: "PLAY_ENDED" },
-      ),
-    ).toEqual({
+    expect(podcastPlayerReducer({ status: "loading", error: null, isPlaying: true }, { type: "PLAY_ENDED" })).toEqual({
       status: "ready",
       error: null,
       isPlaying: false,
@@ -54,10 +44,7 @@ describe("podcastPlayerReducer", () => {
 
   it("BUFFERING_STARTED で loading にする", () => {
     expect(
-      podcastPlayerReducer(
-        { status: "ready", error: null, isPlaying: true },
-        { type: "BUFFERING_STARTED" },
-      ),
+      podcastPlayerReducer({ status: "ready", error: null, isPlaying: true }, { type: "BUFFERING_STARTED" }),
     ).toEqual({
       status: "loading",
       error: null,
@@ -66,12 +53,7 @@ describe("podcastPlayerReducer", () => {
   })
 
   it("CAN_PLAY で ready にしつつ error を消す", () => {
-    expect(
-      podcastPlayerReducer(
-        { status: "loading", error: "x", isPlaying: false },
-        { type: "CAN_PLAY" },
-      ),
-    ).toEqual({
+    expect(podcastPlayerReducer({ status: "loading", error: "x", isPlaying: false }, { type: "CAN_PLAY" })).toEqual({
       status: "ready",
       error: null,
       isPlaying: false,

@@ -12,16 +12,16 @@
 - [x] フロント単体テスト基盤（Vitest + React Testing Library）は導入済み
 - [x] `SeoHead` の canonical は絶対URL出力へ統一済み
 - [x] バックログに残っていた `ApplicationController#inertia_render` / `MICROCMS_*_ENDPOINT` は現行コード上で未検出
-- [ ] CI の test ジョブが `bin/rails db:test:prepare test` のままで、RSpec中心運用と乖離
-- [ ] CI に frontend lint / format check が未追加
+- [x] CI の test ジョブが `bundle exec rspec` ベースへ移行済み
+- [x] CI に frontend lint / format check を追加済み
 - [ ] PR テンプレートが未整備（`.github/pull_request_template.md` なし）
 - [x] ドキュメント内に旧表記が残存（`/app/*`, `/app/*.json`）
 - [x] `sitemap.xml` の静的URLに `/shops` が残り、画面URL `/shop` と不整合
 
 ## 1. P0（今週）
 
-- [ ] CI test を `bundle exec rspec` ベースに移行する（`.github/workflows/ci.yml`）
-- [ ] CI に `npm run lint` / `npm run format:check` を追加する
+- [x] CI test を `bundle exec rspec` ベースに移行する（`.github/workflows/ci_backend.yml`）
+- [x] CI に `npm run lint` / `npm run format:check` を追加する（`.github/workflows/ci_frontend.yml`）
 - [x] `sitemap.xml` の `/shops` 方針を決定する（`/shop` へ変更 or `/shops` リダイレクト追加）
 - [ ] `spec/routing/routes_spec.rb` に `/api/app/*`, `/sitemap.xml`, `/up` のルーティング検証を追加する
 - [ ] API エラーレスポンスに `request_id` を含める（調査容易化）

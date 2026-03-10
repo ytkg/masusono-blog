@@ -4,9 +4,7 @@ import { useMiniPlayerFlipAnimation } from "./useMiniPlayerFlipAnimation"
 
 function buildElement(rects) {
   return {
-    getBoundingClientRect: vi.fn()
-      .mockReturnValueOnce(rects[0])
-      .mockReturnValueOnce(rects[1]),
+    getBoundingClientRect: vi.fn().mockReturnValueOnce(rects[0]).mockReturnValueOnce(rects[1]),
     animate: vi.fn(),
   }
 }

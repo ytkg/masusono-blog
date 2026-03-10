@@ -15,7 +15,15 @@ describe("ShopsMap", () => {
     const onSelect = vi.fn()
     const getKey = vi.fn()
 
-    render(<ShopsMap shops={[{ name: "A" }]} visibleShops={[{ name: "A" }]} selectedKey="id-1" onSelect={onSelect} getKey={getKey} />)
+    render(
+      <ShopsMap
+        shops={[{ name: "A" }]}
+        visibleShops={[{ name: "A" }]}
+        selectedKey="id-1"
+        onSelect={onSelect}
+        getKey={getKey}
+      />,
+    )
 
     expect(useLeafletMapMock).toHaveBeenCalledWith(
       expect.objectContaining({

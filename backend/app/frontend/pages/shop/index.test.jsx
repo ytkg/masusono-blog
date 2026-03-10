@@ -54,12 +54,18 @@ describe("Shops page", () => {
     expect(await screen.findByText(/map:3:/)).toBeInTheDocument()
 
     fireEvent.click(screen.getByText("B店"))
-    expect(await screen.findByText((text) => text.startsWith("list:3:") && text.includes("B店-ラーメン"))).toBeInTheDocument()
+    expect(
+      await screen.findByText((text) => text.startsWith("list:3:") && text.includes("B店-ラーメン")),
+    ).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "ラーメンに切替" }))
-    expect(await screen.findByText((text) => text.startsWith("map:2:") && text.includes("B店-ラーメン"))).toBeInTheDocument()
+    expect(
+      await screen.findByText((text) => text.startsWith("map:2:") && text.includes("B店-ラーメン")),
+    ).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "すべてに切替" }))
-    expect(await screen.findByText((text) => text.startsWith("map:3:") && text.includes("B店-ラーメン"))).toBeInTheDocument()
+    expect(
+      await screen.findByText((text) => text.startsWith("map:3:") && text.includes("B店-ラーメン")),
+    ).toBeInTheDocument()
   })
 })

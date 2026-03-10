@@ -67,7 +67,13 @@ describe("drawPlayer", () => {
 
     drawPlayer(ctx, { x: 20, y: 100, w: 40, h: 50, spin: 0 }, { width: 10, height: 10 })
 
-    expect(ctx.drawImage).toHaveBeenCalledWith(expect.anything(), Math.round(20 - (CHAR_W - 40) / 2), Math.round(100 + 50 - CHAR_H), CHAR_W, CHAR_H)
+    expect(ctx.drawImage).toHaveBeenCalledWith(
+      expect.anything(),
+      Math.round(20 - (CHAR_W - 40) / 2),
+      Math.round(100 + 50 - CHAR_H),
+      CHAR_W,
+      CHAR_H,
+    )
     expect(ctx.fillRect).not.toHaveBeenCalled()
   })
 
