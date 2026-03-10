@@ -1,9 +1,8 @@
 # masusono-blog
 
-現在の主要構成は `backend` 中心です。
+現在の主要構成は `backend` です。
 
 - `backend`: Rails + Inertia + React（本体）
-- `edge-api-worker`: Cloudflare Worker（必要時のみ）
 
 ## 開発
 
