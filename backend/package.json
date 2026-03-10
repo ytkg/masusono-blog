@@ -6,7 +6,10 @@
     "build": "vite build",
     "lint": "eslint app/frontend --ext .js,.jsx",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:docker": "PLAYWRIGHT_DISABLE_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://e2e-backend:3000 playwright test",
     "test:watch": "vitest",
+    "wait:e2e:docker": "node ./e2e/waitForServices.js http://e2e-backend:3000/up http://e2e-backend:3000/vite/@vite/client",
     "format": "prettier --write \"app/frontend/**/*.{js,jsx,css,md,json}\"",
     "format:check": "prettier --check \"app/frontend/**/*.{js,jsx,css,md,json}\""
   },
@@ -23,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^5.0.4",

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -d "${HOME}/.rbenv/shims" ]]; then
+  export PATH="${HOME}/.rbenv/shims:${PATH}"
+fi
+
+export RAILS_ENV="${RAILS_ENV:-development}"
+export VITE_RUBY_MODE="${VITE_RUBY_MODE:-development}"
+export CI="${CI:-1}"
+
+exec bundle exec ruby ./e2e/rails_server.rb

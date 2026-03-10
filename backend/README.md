@@ -207,6 +207,35 @@ docker compose run --rm backend npm run format:check
 docker compose run --rm backend npm run format
 ```
 
+## E2E
+
+`backend/` で実行します:
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+補足:
+- Playwright は E2E 用の Rails / Vite を自動起動します
+- `/blog` と `/podcast` は E2E 起動時に `microCMS` 応答を stub して安定化しています
+
+原則:
+- E2E テストのためだけの分岐、stub、polyfill、フォールバックは `app/` 配下のアプリケーションコードに入れない
+- E2E 用の吸収は Playwright の setup/init script、`e2e/` 配下、起動用 script、Docker/Compose 設定に閉じ込める
+- 例外は、本番コードとしても妥当な互換性改善や障害耐性向上であり、E2E 専用実装ではないと説明できる変更に限る
+
+Docker に Chromium を閉じ込めて実行する場合:
+
+```bash
+docker compose up -d e2e-backend
+docker compose run --rm e2e
+```
+
+補足:
+- `e2e` service は Playwright ブラウザ込みのコンテナです
+- `e2e-backend` はコンテナ内で Vite と `./bin/e2e-rails-server` を一緒に立ち上げ、ローカル実行と同じ stub を使います
+
 ## Cloud Run へのデプロイ
 
 `backend/` でデプロイスクリプトを実行します:

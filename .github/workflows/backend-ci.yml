@@ -47,3 +47,9 @@ jobs:
 
       - name: Run backend CI checks
         run: bin/ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: npm run test:e2e

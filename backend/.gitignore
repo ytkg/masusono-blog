@@ -30,6 +30,8 @@
 /tmp/storage/*
 !/tmp/storage/
 !/tmp/storage/.keep
+/playwright-report
+/test-results
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
