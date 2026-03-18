@@ -23,6 +23,13 @@ export function podcastPlayerReducer(state, action) {
         ...state,
         isPlaying: false,
       }
+    case "PLAY_ABORTED":
+      return {
+        ...state,
+        status: "ready",
+        error: null,
+        isPlaying: false,
+      }
     case "PLAY_ENDED":
       return {
         ...state,

@@ -25,6 +25,7 @@ describe("PodcastEpisodeCard", () => {
     vi.mocked(usePodcastPlayer).mockReturnValue({
       currentEpisode: null,
       isPlaying: false,
+      isPlaybackActive: false,
       playEpisode: vi.fn(),
       stop: vi.fn(),
     })
@@ -39,6 +40,7 @@ describe("PodcastEpisodeCard", () => {
     vi.mocked(usePodcastPlayer).mockReturnValue({
       currentEpisode: null,
       isPlaying: false,
+      isPlaybackActive: false,
       playEpisode,
       stop: vi.fn(),
     })
@@ -59,6 +61,23 @@ describe("PodcastEpisodeCard", () => {
     vi.mocked(usePodcastPlayer).mockReturnValue({
       currentEpisode: { id: "001" },
       isPlaying: true,
+      isPlaybackActive: true,
+      playEpisode: vi.fn(),
+      stop,
+    })
+
+    render(<PodcastEpisodeCard episode={{ id: "001", title: "第1回", publishedDate: "2026/03/09" }} />)
+    fireEvent.click(screen.getByRole("button", { name: "一時停止" }))
+
+    expect(stop).toHaveBeenCalledTimes(1)
+  })
+
+  it("loading 中の現在エピソードなら stop を呼ぶ", () => {
+    const stop = vi.fn()
+    vi.mocked(usePodcastPlayer).mockReturnValue({
+      currentEpisode: { id: "001" },
+      isPlaying: false,
+      isPlaybackActive: true,
       playEpisode: vi.fn(),
       stop,
     })

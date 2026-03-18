@@ -39,6 +39,7 @@ function mockBase() {
   vi.mocked(usePodcastPlayer).mockReturnValue({
     currentEpisode: { id: "ep-1", title: "第1回" },
     isPlaying: false,
+    isPlaybackActive: false,
     currentTime: 0,
     duration: 120,
     togglePlayPause: vi.fn(),

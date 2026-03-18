@@ -7,7 +7,7 @@ import ContentItemCard from "../../shared/ContentItemCard"
 import { usePodcastPlayer } from "../podcastPlayer/usePodcastPlayer"
 
 export default function PodcastEpisodeCard({ episode, mode = "list" }) {
-  const { currentEpisode, isPlaying, playEpisode, stop } = usePodcastPlayer()
+  const { currentEpisode, isPlaybackActive, playEpisode, stop } = usePodcastPlayer()
 
   if (!episode) {
     return (
@@ -18,7 +18,7 @@ export default function PodcastEpisodeCard({ episode, mode = "list" }) {
   }
 
   const isCurrentEpisode = Boolean(episode?.id && currentEpisode?.id === episode.id)
-  const isActiveEpisode = Boolean(isCurrentEpisode && isPlaying)
+  const isActiveEpisode = Boolean(isCurrentEpisode && isPlaybackActive)
   const toggleIconLabel = isActiveEpisode ? "一時停止" : "再生"
 
   const handleToggle = () => {

@@ -34,6 +34,16 @@ describe("podcastPlayerReducer", () => {
     })
   })
 
+  it("PLAY_ABORTED で ready に戻して error を残さない", () => {
+    expect(
+      podcastPlayerReducer({ status: "loading", error: "x", isPlaying: false }, { type: "PLAY_ABORTED" }),
+    ).toEqual({
+      status: "ready",
+      error: null,
+      isPlaying: false,
+    })
+  })
+
   it("PLAY_ENDED で ready に戻す", () => {
     expect(podcastPlayerReducer({ status: "loading", error: null, isPlaying: true }, { type: "PLAY_ENDED" })).toEqual({
       status: "ready",

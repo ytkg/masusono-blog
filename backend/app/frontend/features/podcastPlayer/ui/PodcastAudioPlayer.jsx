@@ -115,7 +115,7 @@ function PodcastAudioPlayer({
           }}
           onChangeCommitted={(_event, value) => {
             if (Array.isArray(value)) return
-            handleSeekCommit()
+            handleSeekCommit(value)
           }}
           aria-label={seekSliderAriaLabel}
           disabled={!canSeek}

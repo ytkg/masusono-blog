@@ -7,7 +7,19 @@ export function PodcastPlayerProvider({ children }) {
   return (
     <PodcastPlayerContext.Provider value={value}>
       {children}
-      <audio ref={audioRef} preload="metadata" playsInline style={{ display: "none" }} />
+      <audio
+        ref={audioRef}
+        preload="metadata"
+        playsInline
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          opacity: 0,
+          pointerEvents: "none",
+          inset: 0,
+        }}
+      />
     </PodcastPlayerContext.Provider>
   )
 }

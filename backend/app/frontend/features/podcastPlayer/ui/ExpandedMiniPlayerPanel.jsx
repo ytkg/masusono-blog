@@ -1,6 +1,7 @@
 import { memo } from "react"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
+import Typography from "@mui/material/Typography"
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit"
 import CloseIcon from "@mui/icons-material/Close"
 import PodcastAudioPlayer from "./PodcastAudioPlayer"
@@ -17,6 +18,7 @@ import {
   MINI_PLAYER_COLLAPSE_BUTTON_SIZE_PX,
   MINI_PLAYER_COLLAPSE_ICON_SIZE_PX,
 } from "../lib/miniPlayerStyleConstants"
+import { BUILD_VERSION } from "../../../shared/lib/buildVersion"
 
 const panelSx = {
   position: "relative",
@@ -91,6 +93,24 @@ function ExpandedMiniPlayerPanel({
         onSeekTo={onSeekTo}
         variant="mini"
       />
+      <Typography
+        component="div"
+        variant="caption"
+        sx={{
+          position: "absolute",
+          right: 10,
+          bottom: 10,
+          color: "text.disabled",
+          fontVariantNumeric: "tabular-nums",
+          letterSpacing: "0.04em",
+          fontSize: "0.6rem",
+          lineHeight: 1,
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      >
+        build {BUILD_VERSION}
+      </Typography>
     </Box>
   )
 }

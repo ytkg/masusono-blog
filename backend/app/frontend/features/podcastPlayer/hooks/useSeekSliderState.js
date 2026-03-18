@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
+const SEEK_PREVIEW_INTERVAL_MS = 150
+const SEEK_PREVIEW_HOLD_MS = 250
 const SEEK_SYNC_EPSILON_SECONDS = 0.01
 
 function isSameSeekPoint(a, b) {
@@ -8,39 +10,112 @@ function isSameSeekPoint(a, b) {
 
 export function useSeekSliderState({ canSeek, currentTime, duration, onSeekTo }) {
   const [seekPreviewTime, setSeekPreviewTime] = useState(null)
-  const lastSeekedTimeRef = useRef(null)
+  const previewTimeoutRef = useRef(null)
+  const previewHoldTimeoutRef = useRef(null)
+  const queuedPreviewTimeRef = useRef(null)
+  const lastPreviewDispatchedAtRef = useRef(0)
+  const lastPreviewSeekedTimeRef = useRef(null)
 
   const displayedCurrentTime = seekPreviewTime ?? currentTime
   const sliderValue = useMemo(() => Math.min(displayedCurrentTime, duration || 0), [displayedCurrentTime, duration])
 
-  useEffect(() => {
-    if (!canSeek) {
-      setSeekPreviewTime(null)
-      lastSeekedTimeRef.current = null
+  const clearScheduledPreview = useCallback(() => {
+    if (previewTimeoutRef.current != null) {
+      clearTimeout(previewTimeoutRef.current)
+      previewTimeoutRef.current = null
     }
-  }, [canSeek])
 
-  const syncSeekTo = useCallback(
+    queuedPreviewTimeRef.current = null
+  }, [])
+
+  const clearPreviewHold = useCallback(() => {
+    if (previewHoldTimeoutRef.current != null) {
+      clearTimeout(previewHoldTimeoutRef.current)
+      previewHoldTimeoutRef.current = null
+    }
+  }, [])
+
+  const schedulePreviewHoldRelease = useCallback(() => {
+    clearPreviewHold()
+    previewHoldTimeoutRef.current = setTimeout(() => {
+      previewHoldTimeoutRef.current = null
+      setSeekPreviewTime(null)
+    }, SEEK_PREVIEW_HOLD_MS)
+  }, [clearPreviewHold])
+
+  const dispatchPreviewSeek = useCallback(
     (value) => {
-      if (!canSeek) return
-      if (lastSeekedTimeRef.current != null && isSameSeekPoint(lastSeekedTimeRef.current, value)) return
-      lastSeekedTimeRef.current = value
+      if (lastPreviewSeekedTimeRef.current != null && isSameSeekPoint(lastPreviewSeekedTimeRef.current, value)) return
+
+      lastPreviewSeekedTimeRef.current = value
+      lastPreviewDispatchedAtRef.current = Date.now()
       onSeekTo(value)
     },
-    [canSeek, onSeekTo],
+    [onSeekTo],
+  )
+
+  useEffect(() => {
+    if (!canSeek) {
+      clearScheduledPreview()
+      clearPreviewHold()
+      setSeekPreviewTime(null)
+      lastPreviewDispatchedAtRef.current = 0
+      lastPreviewSeekedTimeRef.current = null
+    }
+  }, [canSeek, clearPreviewHold, clearScheduledPreview])
+
+  useEffect(
+    () => () => {
+      clearScheduledPreview()
+      clearPreviewHold()
+    },
+    [clearPreviewHold, clearScheduledPreview],
   )
 
   const handleSeekChange = useCallback(
     (value) => {
       setSeekPreviewTime((prev) => (prev === value ? prev : value))
-      syncSeekTo(value)
+      schedulePreviewHoldRelease()
+
+      if (!canSeek) return
+
+      const elapsed = Date.now() - lastPreviewDispatchedAtRef.current
+      if (lastPreviewDispatchedAtRef.current === 0 || elapsed >= SEEK_PREVIEW_INTERVAL_MS) {
+        clearScheduledPreview()
+        dispatchPreviewSeek(value)
+        return
+      }
+
+      queuedPreviewTimeRef.current = value
+      if (previewTimeoutRef.current != null) return
+
+      previewTimeoutRef.current = setTimeout(() => {
+        previewTimeoutRef.current = null
+        const queuedPreviewTime = queuedPreviewTimeRef.current
+        queuedPreviewTimeRef.current = null
+        if (queuedPreviewTime == null) return
+        dispatchPreviewSeek(queuedPreviewTime)
+      }, SEEK_PREVIEW_INTERVAL_MS - elapsed)
     },
-    [syncSeekTo],
+    [canSeek, clearScheduledPreview, dispatchPreviewSeek, schedulePreviewHoldRelease],
   )
 
-  const handleSeekCommit = useCallback(() => {
-    setSeekPreviewTime(null)
-  }, [])
+  const handleSeekCommit = useCallback(
+    (value) => {
+      const commitTime = seekPreviewTime == null ? Math.max(value, currentTime) : value
+
+      if (canSeek) {
+        clearScheduledPreview()
+        clearPreviewHold()
+        lastPreviewDispatchedAtRef.current = 0
+        lastPreviewSeekedTimeRef.current = commitTime
+        onSeekTo(commitTime)
+      }
+
+      setSeekPreviewTime(null)
+    },
+    [canSeek, clearPreviewHold, clearScheduledPreview, currentTime, onSeekTo, seekPreviewTime],
+  )
 
   return {
     displayedCurrentTime,

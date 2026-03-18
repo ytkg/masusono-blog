@@ -2,6 +2,26 @@ import { useCallback, useMemo, useReducer, useRef, useState } from "react"
 import { usePodcastPlayerAudioEvents } from "./usePodcastPlayerAudioEvents"
 import { initialPodcastPlayerState, podcastPlayerReducer } from "../model/podcastPlayerState"
 
+function isPlayAbortError(error, message) {
+  if (error instanceof DOMException) {
+    return error.name === "AbortError"
+  }
+
+  if (error instanceof Error && error.name === "AbortError") {
+    return true
+  }
+
+  return /aborted/i.test(message)
+}
+
+function getPlayErrorMessage(error) {
+  if (error instanceof Error) return error.message
+  if (error && typeof error === "object" && "message" in error && typeof error.message === "string") {
+    return error.message
+  }
+  return "再生を開始できませんでした。"
+}
+
 export function usePodcastPlayerController() {
   const audioRef = useRef(null)
   const [playerState, dispatch] = useReducer(podcastPlayerReducer, initialPodcastPlayerState)
@@ -9,6 +29,7 @@ export function usePodcastPlayerController() {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const { isPlaying, status, error } = playerState
+  const isPlaybackActive = currentEpisode != null && (isPlaying || status === "loading")
 
   const handleLoadedMetadata = useCallback((nextDuration) => {
     setDuration(nextDuration)
@@ -73,9 +94,15 @@ export function usePodcastPlayerController() {
       try {
         await audio.play()
       } catch (err) {
+        const message = getPlayErrorMessage(err)
+        if (isPlayAbortError(err, message)) {
+          dispatch({ type: "PLAY_ABORTED" })
+          return
+        }
+
         dispatch({
           type: "PLAY_FAILED",
-          error: err instanceof Error ? err.message : "再生を開始できませんでした。",
+          error: message,
         })
       }
     },
@@ -90,9 +117,15 @@ export function usePodcastPlayerController() {
       try {
         await audio.play()
       } catch (err) {
+        const message = getPlayErrorMessage(err)
+        if (isPlayAbortError(err, message)) {
+          dispatch({ type: "PLAY_ABORTED" })
+          return
+        }
+
         dispatch({
           type: "PLAY_FAILED",
-          error: err instanceof Error ? err.message : "再生を開始できませんでした。",
+          error: message,
         })
       }
       return
@@ -142,6 +175,7 @@ export function usePodcastPlayerController() {
     () => ({
       currentEpisode,
       isPlaying,
+      isPlaybackActive,
       currentTime,
       duration,
       status,
@@ -156,6 +190,7 @@ export function usePodcastPlayerController() {
     [
       currentEpisode,
       isPlaying,
+      isPlaybackActive,
       currentTime,
       duration,
       status,

@@ -59,6 +59,21 @@ describe("usePodcastPlayerController", () => {
     expect(result.current.value.error).toBe("autoplay blocked")
   })
 
+  it("AbortError は即 error state にしない", async () => {
+    const { result } = renderHook(() => usePodcastPlayerController())
+    result.current.audioRef.current = buildAudio({
+      play: vi.fn().mockRejectedValue(new DOMException("The operation was aborted.", "AbortError")),
+    })
+
+    await act(async () => {
+      await result.current.value.playEpisode({ id: "ep-1", title: "第1回", audioUrl: "https://example.com/ep-1.mp3" })
+    })
+
+    expect(result.current.value.status).toBe("ready")
+    expect(result.current.value.error).toBeNull()
+    expect(result.current.value.isPlaybackActive).toBe(false)
+  })
+
   it("toggle、seek、stop を audio に反映する", async () => {
     const { result } = renderHook(() => usePodcastPlayerController())
     const audio = buildAudio()
