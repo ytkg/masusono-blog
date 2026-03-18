@@ -22,8 +22,18 @@ module Api
           {
             articles: ::Article.all,
             shops: ::Shop.all,
-            podcasts: ::Podcast.all
+            podcasts: ::Podcast.all,
+            masuda_run_total_plays: fetch_masuda_run_total_plays
           }
+        end
+
+        def fetch_masuda_run_total_plays
+          ::MasudaRunRanking.total_count
+        rescue ::Microcms::FetchContentsService::FetchError, ::Faraday::Error => error
+          Rails.logger.warn(
+            "[Api::App::Numbers::MetricsIndexUsecase] failed to fetch masuda run total plays: #{error.class}: #{error.message}"
+          )
+          nil
         end
       end
     end

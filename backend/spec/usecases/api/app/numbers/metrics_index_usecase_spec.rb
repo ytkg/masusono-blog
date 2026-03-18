@@ -42,6 +42,7 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
       allow(Article).to receive(:all).and_return(articles)
       allow(Shop).to receive(:all).and_return(shops)
       allow(Podcast).to receive(:all).and_return(podcasts)
+      allow(MasudaRunRanking).to receive(:total_count).and_return(25)
     end
 
     let(:blocks) { result[:json][:blocks] }
@@ -114,6 +115,33 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
 
       it do
         expect(podcast_block[:value]).to eq("1 本")
+      end
+    end
+
+    describe "増田RUN" do
+      let(:masuda_run_block) { blocks.find { |block| block[:label] == "増田RUN総プレイ回数" } }
+
+      it do
+        expect(masuda_run_block).not_to be_nil
+      end
+
+      it do
+        expect(blocks.last[:label]).to eq("増田RUN総プレイ回数")
+      end
+
+      it do
+        expect(masuda_run_block[:value]).to eq("25 回")
+      end
+
+      context "総プレイ回数の取得に失敗したとき" do
+        before do
+          allow(MasudaRunRanking).to receive(:total_count).and_raise(Faraday::TimeoutError, "execution expired")
+        end
+
+        it do
+          expect(result[:status]).to eq(:ok)
+          expect(masuda_run_block[:value]).to be_nil
+        end
       end
     end
   end

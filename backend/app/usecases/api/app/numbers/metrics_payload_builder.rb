@@ -10,6 +10,7 @@ module Api
         UNITS = {
           articles: "本",
           chars: "字",
+          plays: "回",
           shops: "件"
         }.freeze
 
@@ -18,6 +19,7 @@ module Api
           blog: "ブログ",
           total_articles: "総記事数",
           total_chars: "総文字数",
+          masuda_run_total_plays: "増田RUN総プレイ回数",
           podcast_total: "ポッドキャスト総本数",
           shops: "推し店",
           total_count: "総件数",
@@ -44,7 +46,8 @@ module Api
               build_launch_block,
               build_blog_block,
               build_podcast_block,
-              build_shops_block
+              build_shops_block,
+              build_masuda_run_block
             ]
           }
         end
@@ -89,6 +92,14 @@ module Api
           build_count_block(label_key: :podcast_total, value: source_data.fetch(:podcasts).size, unit_key: :articles)
         end
 
+        def build_masuda_run_block
+          build_count_block(
+            label_key: :masuda_run_total_plays,
+            value: source_data.fetch(:masuda_run_total_plays),
+            unit_key: :plays
+          )
+        end
+
         def build_shops_block
           shops = source_data.fetch(:shops)
 
@@ -126,7 +137,8 @@ module Api
         end
 
         def build_count_block(label_key:, value:, unit_key:, children: nil)
-          build_block(label: label(label_key), value: format_count(value, unit(unit_key)), children: children)
+          formatted_value = value.nil? ? nil : format_count(value, unit(unit_key))
+          build_block(label: label(label_key), value: formatted_value, children: children)
         end
 
         def totals

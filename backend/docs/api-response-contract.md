@@ -15,6 +15,9 @@
 | --- | --- | --- | --- |
 | `blocks` | `Array<MetricBlock>` | No | 表示ブロック |
 
+補足:
+- 現在の表示項目には `増田RUN総プレイ回数` を含む
+
 ### MetricBlock
 
 | key | type | nullable | note |
