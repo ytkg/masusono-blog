@@ -8,16 +8,8 @@ import { useMiniPlayerVisibility } from "../hooks/useMiniPlayerVisibility"
 import { usePodcastPlayer } from "../usePodcastPlayer"
 
 export default function GlobalPodcastMiniPlayer() {
-  const {
-    currentEpisode,
-    isPlaybackActive,
-    currentTime,
-    duration,
-    togglePlayPause,
-    pause,
-    seekBy,
-    seekTo,
-  } = usePodcastPlayer()
+  const { currentEpisode, isPlaybackActive, currentTime, duration, togglePlayPause, pause, seekBy, seekTo } =
+    usePodcastPlayer()
   const { isCollapsed, playerRef, containerStyle, containerSx, startDrag, expand, collapse } =
     useGlobalPodcastMiniPlayerUi({ hasCurrentEpisode: currentEpisode != null })
   const { isDismissed, dismiss } = useMiniPlayerDismissal({

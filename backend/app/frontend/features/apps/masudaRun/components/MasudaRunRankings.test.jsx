@@ -30,7 +30,9 @@ describe("MasudaRunRankings", () => {
         error={{ code: "upstream_rate_limited", message: "Upstream service is temporarily rate limited." }}
       />,
     )
-    expect(screen.getByText("ランキングへのアクセスが集中しています。少し待ってから再度お試しください。")).toBeInTheDocument()
+    expect(
+      screen.getByText("ランキングへのアクセスが集中しています。少し待ってから再度お試しください。"),
+    ).toBeInTheDocument()
 
     rerender(<MasudaRunRankings rankings={rankings} isLoading={false} hasError={false} error={null} />)
 

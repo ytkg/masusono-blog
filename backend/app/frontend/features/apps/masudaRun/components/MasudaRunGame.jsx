@@ -187,7 +187,12 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
       <Typography variant="body2" color="text.secondary">
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
-      <MasudaRunRankings rankings={rankings} isLoading={rankingsLoading} hasError={rankingsError} error={rankingsFetchError} />
+      <MasudaRunRankings
+        rankings={rankings}
+        isLoading={rankingsLoading}
+        hasError={rankingsError}
+        error={rankingsFetchError}
+      />
     </Box>
   )
 }

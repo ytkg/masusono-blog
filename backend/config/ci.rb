@@ -7,7 +7,7 @@ CI.run do
 
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
-  step "Tests: Prepare database", "env RAILS_ENV=test bin/rails db:test:prepare"
+  step "Tests: Prepare database", "env RAILS_ENV=test bin/rails db:prepare"
   step "Tests: RSpec", "env RAILS_ENV=test bundle exec rspec"
   step "Style: Frontend", "npm run lint"
   step "Format: Frontend", "npm run format:check"

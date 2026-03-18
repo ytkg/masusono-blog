@@ -27,7 +27,9 @@ describe("NumbersPreview", () => {
   })
 
   it("データがあればグリッドを表示する", () => {
-    render(<NumbersPreview metrics={{ blocks: [{ label: "記事数" }] }} isLoading={false} hasError={false} error={null} />)
+    render(
+      <NumbersPreview metrics={{ blocks: [{ label: "記事数" }] }} isLoading={false} hasError={false} error={null} />,
+    )
 
     expect(screen.getByTestId("numbers-grid")).toHaveTextContent("1 blocks")
   })
