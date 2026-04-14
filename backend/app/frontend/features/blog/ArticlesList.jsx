@@ -2,9 +2,9 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import ArticleCard from "./ArticleCard"
 
-export default function ArticlesList({ articles }) {
+export default function ArticlesList({ articles, emptyMessage = "記事がありません。" }) {
   if (!articles?.length) {
-    return <Typography color="text.secondary">記事がありません。</Typography>
+    return <Typography color="text.secondary">{emptyMessage}</Typography>
   }
 
   return (

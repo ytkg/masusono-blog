@@ -13,6 +13,12 @@ describe("ArticlesList", () => {
     expect(screen.getByText("記事がありません。")).toBeInTheDocument()
   })
 
+  it("emptyMessage があればそちらを表示する", () => {
+    render(<ArticlesList articles={[]} emptyMessage="条件に一致する記事がありません。" />)
+
+    expect(screen.getByText("条件に一致する記事がありません。")).toBeInTheDocument()
+  })
+
   it("記事一覧を描画する", () => {
     render(
       <ArticlesList
