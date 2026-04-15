@@ -11,7 +11,11 @@ vi.mock("../../features/blog/ArticleFilters", () => ({
 }))
 
 vi.mock("../../features/blog/ArticlesList", () => ({
-  default: ({ articles, emptyMessage }) => <div>articles:{articles.length}:{emptyMessage}</div>,
+  default: ({ articles, emptyMessage }) => (
+    <div>
+      articles:{articles.length}:{emptyMessage}
+    </div>
+  ),
 }))
 
 describe("Blog page", () => {
