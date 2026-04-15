@@ -1,0 +1,46 @@
+name: backend-rubocop
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**/*.rb
+      - backend/Gemfile
+      - backend/Gemfile.lock
+      - backend/.ruby-version
+      - backend/.rubocop.yml
+      - backend/Rakefile
+      - backend/config.ru
+      - backend/bin/rubocop
+      - .github/workflows/backend-rubocop.yml
+  pull_request:
+    paths:
+      - backend/**/*.rb
+      - backend/Gemfile
+      - backend/Gemfile.lock
+      - backend/.ruby-version
+      - backend/.rubocop.yml
+      - backend/Rakefile
+      - backend/config.ru
+      - backend/bin/rubocop
+      - .github/workflows/backend-rubocop.yml
+
+jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: backend
+
+      - name: Run RuboCop
+        run: bin/rubocop

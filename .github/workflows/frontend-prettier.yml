@@ -1,0 +1,44 @@
+name: frontend-prettier
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/app/frontend/**
+      - backend/package.json
+      - backend/package-lock.json
+      - backend/.prettierrc.json
+      - backend/.prettierignore
+      - .github/workflows/frontend-prettier.yml
+  pull_request:
+    paths:
+      - backend/app/frontend/**
+      - backend/package.json
+      - backend/package-lock.json
+      - backend/.prettierrc.json
+      - backend/.prettierignore
+      - .github/workflows/frontend-prettier.yml
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run Prettier check
+        run: npm run format:check

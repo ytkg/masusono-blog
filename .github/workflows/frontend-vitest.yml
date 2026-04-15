@@ -1,0 +1,44 @@
+name: frontend-vitest
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/app/frontend/**
+      - backend/package.json
+      - backend/package-lock.json
+      - backend/vite.config.ts
+      - backend/config/vite.json
+      - .github/workflows/frontend-vitest.yml
+  pull_request:
+    paths:
+      - backend/app/frontend/**
+      - backend/package.json
+      - backend/package-lock.json
+      - backend/vite.config.ts
+      - backend/config/vite.json
+      - .github/workflows/frontend-vitest.yml
+
+jobs:
+  vitest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run Vitest
+        run: npm test

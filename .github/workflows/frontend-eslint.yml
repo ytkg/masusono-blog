@@ -1,4 +1,4 @@
-name: frontend-ci
+name: frontend-eslint
 
 on:
   push:
@@ -9,21 +9,17 @@ on:
       - backend/package.json
       - backend/package-lock.json
       - backend/eslint.config.mjs
-      - backend/.prettierrc.json
-      - backend/.prettierignore
-      - .github/workflows/frontend-ci.yml
+      - .github/workflows/frontend-eslint.yml
   pull_request:
     paths:
       - backend/app/frontend/**
       - backend/package.json
       - backend/package-lock.json
       - backend/eslint.config.mjs
-      - backend/.prettierrc.json
-      - backend/.prettierignore
-      - .github/workflows/frontend-ci.yml
+      - .github/workflows/frontend-eslint.yml
 
 jobs:
-  frontend-ci:
+  eslint:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,8 +38,5 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Lint frontend
+      - name: Run ESLint
         run: npm run lint
-
-      - name: Check frontend formatting
-        run: npm run format:check

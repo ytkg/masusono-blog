@@ -1,0 +1,52 @@
+name: backend-brakeman
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/app/**
+      - "!backend/app/frontend/**"
+      - backend/config/**
+      - "!backend/config/vite.json"
+      - backend/db/**
+      - backend/lib/**
+      - backend/Gemfile
+      - backend/Gemfile.lock
+      - backend/.ruby-version
+      - backend/config.ru
+      - backend/bin/brakeman
+      - .github/workflows/backend-brakeman.yml
+  pull_request:
+    paths:
+      - backend/app/**
+      - "!backend/app/frontend/**"
+      - backend/config/**
+      - "!backend/config/vite.json"
+      - backend/db/**
+      - backend/lib/**
+      - backend/Gemfile
+      - backend/Gemfile.lock
+      - backend/.ruby-version
+      - backend/config.ru
+      - backend/bin/brakeman
+      - .github/workflows/backend-brakeman.yml
+
+jobs:
+  brakeman:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: backend
+
+      - name: Run Brakeman
+        run: bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error
