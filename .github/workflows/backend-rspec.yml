@@ -17,6 +17,9 @@ on:
       - backend/.ruby-version
       - backend/.rspec
       - backend/Rakefile
+      - backend/package.json
+      - backend/package-lock.json
+      - backend/vite.config.ts
       - backend/config.ru
       - backend/bin/rails
       - backend/bin/rake
@@ -36,6 +39,9 @@ on:
       - backend/.ruby-version
       - backend/.rspec
       - backend/Rakefile
+      - backend/package.json
+      - backend/package-lock.json
+      - backend/vite.config.ts
       - backend/config.ru
       - backend/bin/rails
       - backend/bin/rake
@@ -59,6 +65,16 @@ jobs:
         with:
           bundler-cache: true
           working-directory: backend
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
 
       - name: Install system dependencies
         run: |
