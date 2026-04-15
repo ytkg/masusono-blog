@@ -10,7 +10,7 @@ RSpec.describe "WebHome", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
       expect(inertia).to be_inertia_response
-      expect(inertia).to render_component(:home)
+      expect(inertia).to render_component("home")
       expect(inertia.props).to include("app", "flash")
     end
   end
@@ -22,7 +22,7 @@ RSpec.describe "WebHome", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/html")
       expect(inertia).to be_inertia_response
-      expect(inertia).to render_component(:about)
+      expect(inertia).to render_component("about")
     end
   end
 end
