@@ -2,28 +2,38 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import ArticleFilters from "./ArticleFilters"
 
+function renderArticleFilters(onAuthorChange) {
+  render(
+    <ArticleFilters
+      author="増田"
+      authorOptions={[
+        { name: "増田", count: 1 },
+        { name: "その他1", count: 2 },
+      ]}
+      totalCount={3}
+      onAuthorChange={onAuthorChange}
+    />,
+  )
+}
+
+function stubScrollTo() {
+  const scrollTo = vi.fn()
+
+  Object.defineProperty(window, "scrollTo", {
+    value: scrollTo,
+    writable: true,
+    configurable: true,
+  })
+
+  return scrollTo
+}
+
 describe("ArticleFilters", () => {
   it("右下ボタンからモーダルを開き、著者選択で閉じる", async () => {
     const onAuthorChange = vi.fn()
-    const scrollTo = vi.fn()
+    const scrollTo = stubScrollTo()
 
-    Object.defineProperty(window, "scrollTo", {
-      value: scrollTo,
-      writable: true,
-      configurable: true,
-    })
-
-    render(
-      <ArticleFilters
-        author="増田"
-        authorOptions={[
-          { name: "増田", count: 1 },
-          { name: "その他1", count: 2 },
-        ]}
-        totalCount={3}
-        onAuthorChange={onAuthorChange}
-      />,
-    )
+    renderArticleFilters(onAuthorChange)
 
     fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
 
@@ -41,12 +51,19 @@ describe("ArticleFilters", () => {
     await waitFor(() => {
       expect(screen.queryByRole("dialog", { name: "絞り込み" })).not.toBeInTheDocument()
     })
+  })
+
+  it("すべてを選ぶと all を渡して閉じる", async () => {
+    const onAuthorChange = vi.fn()
+    const scrollTo = stubScrollTo()
+
+    renderArticleFilters(onAuthorChange)
 
     fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
     fireEvent.click(screen.getByRole("button", { name: "すべて (3)" }))
 
-    expect(onAuthorChange).toHaveBeenNthCalledWith(2, "all")
-    expect(scrollTo).toHaveBeenNthCalledWith(2, { top: 0, behavior: "smooth" })
+    expect(onAuthorChange).toHaveBeenCalledWith("all")
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: "smooth" })
     await waitFor(() => {
       expect(screen.queryByRole("dialog", { name: "絞り込み" })).not.toBeInTheDocument()
     })
