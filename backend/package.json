@@ -37,7 +37,7 @@
     "globals": "^17.3.0",
     "jsdom": "^28.1.0",
     "prettier": "^3.8.1",
-    "vite": "^7.1.10",
+    "vite": "^7.3.2",
     "vite-plugin-ruby": "^5.1.1",
     "vitest": "^4.0.18"
   }
