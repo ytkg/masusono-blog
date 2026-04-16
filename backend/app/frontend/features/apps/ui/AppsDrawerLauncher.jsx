@@ -15,6 +15,7 @@ export default function AppsDrawerLauncher({
   buttonSx,
   buttonIcon,
   paperSx,
+  titleAccessory,
 }) {
   const [open, setOpen] = useState(false)
   const titleId = useId()
@@ -81,10 +82,19 @@ export default function AppsDrawerLauncher({
         PaperProps={{ sx: paperCombinedSx }}
       >
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column", gap: 3, p: { xs: 2, sm: 3 } }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1.5,
+              flexWrap: "wrap",
+            }}
+          >
             <Typography id={titleId} variant="h5" component="h2" sx={{ fontWeight: 600 }}>
               {title}
             </Typography>
+            {titleAccessory ? <Box sx={{ ml: "auto" }}>{titleAccessory}</Box> : null}
           </Box>
           <Box sx={{ flexGrow: 1, overflow: "auto" }}>{open ? children : null}</Box>
           <Box sx={{ display: "flex", justifyContent: "center" }}>

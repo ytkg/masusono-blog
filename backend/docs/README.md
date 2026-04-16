@@ -15,6 +15,8 @@
   - 画面移行の現在地、完了条件、切り戻し方針
 - [コンテンツページ Inertia Controller 移行設計メモ](./content-pages-inertia-controller-migration-plan.md)
   - コンテンツページを server props 化した背景と設計判断
+- [増その図鑑プロフィール更新手順](./zukan-profile-update.md)
+  - 記事が増えたときに、人物像プロフィールを同じ判断軸で更新する手順
 
 ## 運用
 
