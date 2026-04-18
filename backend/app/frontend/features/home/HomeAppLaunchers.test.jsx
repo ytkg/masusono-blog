@@ -14,6 +14,10 @@ vi.mock("../apps/numbers/NumbersApp", () => ({
   default: () => <div>NumbersApp</div>,
 }))
 
+vi.mock("../apps/anonymousSurvey/AnonymousSurveyApp", () => ({
+  default: () => <div>AnonymousSurveyApp</div>,
+}))
+
 vi.mock("../apps/settings/SettingsApp", () => ({
   default: () => <div>SettingsApp</div>,
 }))
@@ -25,6 +29,7 @@ describe("HomeAppLaunchers", () => {
     expect(screen.getAllByText(/App$/).map((app) => app.textContent)).toEqual([
       "MasudaRunApp",
       "NumbersApp",
+      "AnonymousSurveyApp",
       "ZukanApp",
       "SettingsApp",
     ])
