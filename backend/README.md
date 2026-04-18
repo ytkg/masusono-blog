@@ -252,6 +252,7 @@ gcloud run deploy masusono \
   --project masusono \
   --region asia-northeast1 \
   --allow-unauthenticated \
+  --max-instances 1 \
   --set-env-vars RAILS_MASTER_KEY=$(cat config/master.key)
 ```
 
