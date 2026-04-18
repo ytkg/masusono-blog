@@ -29,9 +29,9 @@ describe("HomeAppLaunchers", () => {
     expect(screen.getAllByText(/App$/).map((app) => app.textContent)).toEqual([
       "MasudaRunApp",
       "NumbersApp",
-      "AnonymousSurveyApp",
       "ZukanApp",
       "SettingsApp",
     ])
+    expect(screen.queryByText("AnonymousSurveyApp")).not.toBeInTheDocument()
   })
 })

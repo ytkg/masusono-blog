@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import AnonymousSurveyApp from "../apps/anonymousSurvey/AnonymousSurveyApp"
+// import AnonymousSurveyApp from "../apps/anonymousSurvey/AnonymousSurveyApp"
 import MasudaRunApp from "../apps/masudaRun/MasudaRunApp"
 import NumbersApp from "../apps/numbers/NumbersApp"
 import SettingsApp from "../apps/settings/SettingsApp"
@@ -10,7 +10,7 @@ export default function HomeAppLaunchers() {
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
       <MasudaRunApp />
       <NumbersApp />
-      <AnonymousSurveyApp />
+      {/* <AnonymousSurveyApp /> */}
       <ZukanApp />
       <SettingsApp />
     </Box>
