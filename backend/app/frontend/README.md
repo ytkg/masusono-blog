@@ -13,7 +13,6 @@
 - `assets/`: Site-wide assets. Feature-only assets should live under that feature directory.
 - `styles/`: Global CSS.
 - `test/`: Shared test setup.
-- `utils/`: Legacy app-wide utilities. Prefer `shared/lib` for new cross-cutting logic.
 
 ## Placement Rules
 

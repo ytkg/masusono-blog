@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack"
 import HomeHero from "../features/home/HomeHero"
 import HomeFeatureLinks from "../features/home/HomeFeatureLinks"
 import HomeAppLaunchers from "../features/home/HomeAppLaunchers"
-import { ensureUserIdCookie } from "../utils/userId"
+import { ensureUserIdCookie } from "@/shared/lib/userId"
 import SeoHead from "../shared/SeoHead"
 
 export default function Home() {

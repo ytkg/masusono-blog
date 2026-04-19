@@ -1,10 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
-import { getUserIdFromCookie } from "@/utils/userId"
+import { getUserIdFromCookie } from "@/shared/lib/userId"
 import useRankings from "./hooks/useRankings"
 import MasudaRunApp from "./MasudaRunApp"
 
-vi.mock("@/utils/userId", () => ({
+vi.mock("@/shared/lib/userId", () => ({
   getUserIdFromCookie: vi.fn(),
 }))
 

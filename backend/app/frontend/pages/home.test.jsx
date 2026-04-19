@@ -18,7 +18,7 @@ vi.mock("../shared/SeoHead", () => ({
   default: () => <div>seo</div>,
 }))
 
-vi.mock("../utils/userId", () => ({
+vi.mock("@/shared/lib/userId", () => ({
   ensureUserIdCookie: vi.fn(),
 }))
 
@@ -33,7 +33,7 @@ describe("Home page", () => {
   })
 
   it("時刻表示を更新し user_id cookie を確保する", async () => {
-    const { ensureUserIdCookie } = await import("../utils/userId")
+    const { ensureUserIdCookie } = await import("@/shared/lib/userId")
 
     render(<Home />)
 
