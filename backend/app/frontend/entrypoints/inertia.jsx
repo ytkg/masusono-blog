@@ -2,7 +2,6 @@ import { createRoot } from "react-dom/client"
 import { createInertiaApp } from "@inertiajs/react"
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
-import AppLayout from "../layouts/AppLayout"
 import theme from "../theme"
 import "../styles/index.css"
 
@@ -54,7 +53,10 @@ function resolvePageLoader(name) {
 createInertiaApp({
   resolve: async (name) => {
     const page = await resolvePageLoader(name)()
-    page.default.layout = page.default.layout || ((pageNode) => <AppLayout>{pageNode}</AppLayout>)
+    if (!page.default.layout) {
+      const { default: AppLayout } = await import("../layouts/AppLayout")
+      page.default.layout = (pageNode) => <AppLayout>{pageNode}</AppLayout>
+    }
     return page
   },
   setup({ el, App, props }) {

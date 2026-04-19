@@ -23,10 +23,10 @@ vi.mock("../apps/settings/SettingsApp", () => ({
 }))
 
 describe("HomeAppLaunchers", () => {
-  it("アプリ起動導線を並べる", () => {
+  it("アプリ起動導線を並べる", async () => {
     render(<HomeAppLaunchers />)
 
-    expect(screen.getAllByText(/App$/).map((app) => app.textContent)).toEqual([
+    expect((await screen.findAllByText(/App$/)).map((app) => app.textContent)).toEqual([
       "MasudaRunApp",
       "NumbersApp",
       "ZukanApp",
