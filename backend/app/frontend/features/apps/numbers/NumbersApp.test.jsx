@@ -7,7 +7,7 @@ vi.mock("./hooks/useMetrics", () => ({
   default: vi.fn(),
 }))
 
-vi.mock("../ui/AppsDrawerLauncher", () => ({
+vi.mock("../shared/AppsDrawerLauncher", () => ({
   default: ({ title, onOpen, children }) => (
     <div>
       <button onClick={() => void onOpen()}>{title}</button>

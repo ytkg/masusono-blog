@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 import ZukanApp from "./ZukanApp"
 import { zukanEntries } from "./zukanData"
 
-vi.mock("../ui/AppsDrawerLauncher", () => ({
+vi.mock("../shared/AppsDrawerLauncher", () => ({
   default: ({ title, titleAccessory, children }) => (
     <div>
       <button>{title}</button>

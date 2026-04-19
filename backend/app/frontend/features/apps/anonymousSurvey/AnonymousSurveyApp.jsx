@@ -17,7 +17,7 @@ import LinearProgress from "@mui/material/LinearProgress"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
-import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
+import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 import { ensureUserIdCookie } from "@/shared/lib/userId"
 import { ANONYMOUS_SURVEY_IDENTIFIER, buildCableUrl } from "./anonymousSurveyCable"
 

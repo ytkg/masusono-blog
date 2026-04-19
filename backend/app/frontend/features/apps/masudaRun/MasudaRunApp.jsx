@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
-import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
+import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 import MasudaRunGame from "./components/MasudaRunGame"
 import useRankings from "./hooks/useRankings"
 import { getUserIdFromCookie } from "@/shared/lib/userId"

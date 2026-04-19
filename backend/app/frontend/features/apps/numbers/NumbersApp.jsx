@@ -1,6 +1,6 @@
 import { useState } from "react"
 import NumbersIcon from "@mui/icons-material/Numbers"
-import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
+import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 import NumbersPreview from "./NumbersPreview"
 import useMetrics from "./hooks/useMetrics"
 

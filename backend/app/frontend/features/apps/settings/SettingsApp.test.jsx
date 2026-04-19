@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import SettingsApp from "./SettingsApp"
 
-vi.mock("../ui/AppsDrawerLauncher", () => ({
+vi.mock("../shared/AppsDrawerLauncher", () => ({
   default: ({ title, onOpen, children }) => (
     <div>
       <button onClick={() => void onOpen()}>{title}</button>

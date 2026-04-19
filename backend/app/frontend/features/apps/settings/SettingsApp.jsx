@@ -6,7 +6,7 @@ import CardContent from "@mui/material/CardContent"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useState } from "react"
-import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
+import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 
 const DEFAULT_NAME = "NO NAME"
 const labelTextSx = { fontSize: "14px" }

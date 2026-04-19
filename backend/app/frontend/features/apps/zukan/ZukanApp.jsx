@@ -5,7 +5,7 @@ import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
+import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 import { zukanEntries } from "./zukanData"
 
 const labelTextSx = { m: 0, fontSize: "13px", fontWeight: 700, letterSpacing: 0, lineHeight: 1.4 }

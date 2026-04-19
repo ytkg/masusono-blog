@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import AnonymousSurveyApp from "./AnonymousSurveyApp"
 import { buildCableUrl } from "./anonymousSurveyCable"
 
-vi.mock("../ui/AppsDrawerLauncher", () => ({
+vi.mock("../shared/AppsDrawerLauncher", () => ({
   default: ({ title, children }) => (
     <section>
       <h1>{title}</h1>
