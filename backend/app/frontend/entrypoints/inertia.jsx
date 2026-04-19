@@ -31,7 +31,9 @@ function registerServiceWorker() {
   })
 }
 
-function resolvePage(pages, name) {
+const pages = import.meta.glob(["../pages/**/*.jsx", "!../pages/**/*.test.jsx", "!../pages/**/*.spec.jsx"])
+
+function resolvePageLoader(name) {
   const normalized = String(name)
   const lower = normalized.toLowerCase()
   const candidates = [
@@ -50,11 +52,8 @@ function resolvePage(pages, name) {
 }
 
 createInertiaApp({
-  resolve: (name) => {
-    const pages = import.meta.glob(["../pages/**/*.jsx", "!../pages/**/*.test.jsx", "!../pages/**/*.spec.jsx"], {
-      eager: true,
-    })
-    const page = resolvePage(pages, name)
+  resolve: async (name) => {
+    const page = await resolvePageLoader(name)()
     page.default.layout = page.default.layout || ((pageNode) => <AppLayout>{pageNode}</AppLayout>)
     return page
   },

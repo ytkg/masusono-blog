@@ -34,6 +34,9 @@ export default defineConfig({
       "@": frontendRoot,
     },
   },
+  build: {
+    chunkSizeWarningLimit: 600,
+  },
   test: {
     environment: "jsdom",
     setupFiles: ["./test/setup.js"],
