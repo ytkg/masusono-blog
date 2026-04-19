@@ -3,7 +3,7 @@ import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
 import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
 import MasudaRunGame from "./components/MasudaRunGame"
 import useRankings from "./hooks/useRankings"
-import { getUserIdFromCookie } from "../../../utils/userId"
+import { getUserIdFromCookie } from "@/utils/userId"
 
 export default function MasudaRunApp() {
   const [enabled, setEnabled] = useState(false)

@@ -1,4 +1,4 @@
-import useApiSWR from "../../../../shared/hooks/useApiSWR"
+import useApiSWR from "@/shared/hooks/useApiSWR"
 
 const NUMBERS_ENDPOINT = "/api/app/numbers/metrics.json"
 

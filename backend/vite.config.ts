@@ -3,6 +3,7 @@
 import { defineConfig } from "vite"
 import RubyPlugin from "vite-plugin-ruby"
 import react from "@vitejs/plugin-react"
+import { fileURLToPath } from "node:url"
 
 function formatBuildVersion(date: Date) {
   const parts = new Intl.DateTimeFormat("ja-JP", {
@@ -21,12 +22,18 @@ function formatBuildVersion(date: Date) {
 }
 
 const buildVersion = formatBuildVersion(new Date())
+const frontendRoot = fileURLToPath(new URL("./app/frontend", import.meta.url))
 
 export default defineConfig({
   define: {
     "import.meta.env.VITE_BUILD_VERSION": JSON.stringify(buildVersion),
   },
   plugins: [RubyPlugin(), react()],
+  resolve: {
+    alias: {
+      "@": frontendRoot,
+    },
+  },
   test: {
     environment: "jsdom",
     setupFiles: ["./test/setup.js"],

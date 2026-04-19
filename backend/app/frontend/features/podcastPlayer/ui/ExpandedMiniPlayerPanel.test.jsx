@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import ExpandedMiniPlayerPanel from "./ExpandedMiniPlayerPanel"
-import { BUILD_VERSION } from "../../../shared/lib/buildVersion"
+import { BUILD_VERSION } from "@/shared/lib/buildVersion"
 
 vi.mock("./PodcastAudioPlayer", () => ({
   default: ({ title }) => <div>player:{title}</div>,

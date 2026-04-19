@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import useApiSWR from "../../../../shared/hooks/useApiSWR"
+import useApiSWR from "@/shared/hooks/useApiSWR"
 import useRankings from "./useRankings"
 
-vi.mock("../../../../shared/hooks/useApiSWR", () => ({
+vi.mock("@/shared/hooks/useApiSWR", () => ({
   default: vi.fn(),
 }))
 

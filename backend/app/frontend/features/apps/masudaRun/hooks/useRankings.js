@@ -1,5 +1,5 @@
-import useApiSWR from "../../../../shared/hooks/useApiSWR"
-import { postJson } from "../../../../shared/lib/fetchJson"
+import useApiSWR from "@/shared/hooks/useApiSWR"
+import { postJson } from "@/shared/lib/fetchJson"
 
 const RANKINGS_ENDPOINT = "/api/app/masuda_run/rankings.json"
 

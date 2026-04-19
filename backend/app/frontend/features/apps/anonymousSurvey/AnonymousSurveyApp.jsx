@@ -18,7 +18,7 @@ import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import AppsDrawerLauncher from "../ui/AppsDrawerLauncher"
-import { ensureUserIdCookie } from "../../../utils/userId"
+import { ensureUserIdCookie } from "@/utils/userId"
 import { ANONYMOUS_SURVEY_IDENTIFIER, buildCableUrl } from "./anonymousSurveyCable"
 
 const MAX_QUESTION_LENGTH = 120

@@ -6,7 +6,7 @@ import TableCell from "@mui/material/TableCell"
 import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
-import { getApiErrorDisplayMessage } from "../../../../shared/lib/fetchJson"
+import { getApiErrorDisplayMessage } from "@/shared/lib/fetchJson"
 
 const TOP_RANKINGS_LIMIT = 10
 const containerSx = { border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }

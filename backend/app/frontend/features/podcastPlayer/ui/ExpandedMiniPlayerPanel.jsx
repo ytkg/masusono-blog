@@ -18,7 +18,7 @@ import {
   MINI_PLAYER_COLLAPSE_BUTTON_SIZE_PX,
   MINI_PLAYER_COLLAPSE_ICON_SIZE_PX,
 } from "../lib/miniPlayerStyleConstants"
-import { BUILD_VERSION } from "../../../shared/lib/buildVersion"
+import { BUILD_VERSION } from "@/shared/lib/buildVersion"
 
 const panelSx = {
   position: "relative",

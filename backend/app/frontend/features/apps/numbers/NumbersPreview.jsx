@@ -1,6 +1,6 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { getApiErrorDisplayMessage } from "../../../shared/lib/fetchJson"
+import { getApiErrorDisplayMessage } from "@/shared/lib/fetchJson"
 import NumbersMetricsGrid from "./NumbersMetricsGrid"
 
 const ERROR_MESSAGES_BY_CODE = {
