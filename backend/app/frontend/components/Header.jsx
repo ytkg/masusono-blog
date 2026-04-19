@@ -2,7 +2,7 @@ import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
 import Toolbar from "@mui/material/Toolbar"
 import { Link } from "@inertiajs/react"
-import logo from "../assets/logo.png"
+import logo from "../assets/logo.webp"
 
 export default function Header() {
   return (

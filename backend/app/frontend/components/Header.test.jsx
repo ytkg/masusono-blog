@@ -15,7 +15,7 @@ vi.mock("@inertiajs/react", async () => {
   }
 })
 
-vi.mock("../assets/logo.png", () => ({
+vi.mock("../assets/logo.webp", () => ({
   default: "/mock-logo.png",
 }))
 

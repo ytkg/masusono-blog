@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
-import masudaIconSrc from "./assets/aimi.png"
+import masudaIconSrc from "./assets/aimi.webp"
 import { masudaMessages } from "./masudaMessages"
 
 const fallbackMasudaMessage = "今日も見に来てくれてありがとうございます。ゆっくりしていってください。"

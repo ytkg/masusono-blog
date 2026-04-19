@@ -3,9 +3,9 @@ import { useEffect } from "react"
 import { describe, expect, it, vi } from "vitest"
 import MasudaRunGame from "./MasudaRunGame"
 
-vi.mock("../assets/masuda_run.png", () => ({ default: "/player.png" }))
-vi.mock("../assets/other1.png", () => ({ default: "/short.png" }))
-vi.mock("../assets/other2.png", () => ({ default: "/tall.png" }))
+vi.mock("../assets/masuda_run.webp", () => ({ default: "/player.png" }))
+vi.mock("../assets/other1.webp", () => ({ default: "/short.png" }))
+vi.mock("../assets/other2.webp", () => ({ default: "/tall.png" }))
 
 vi.mock("../hooks/useMasudaRunAssets", () => ({
   useMasudaRunAssets: vi.fn(),
