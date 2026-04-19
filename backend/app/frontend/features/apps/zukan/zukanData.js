@@ -1,8 +1,8 @@
-import masudaImage from "./assets/masuda.png"
-import other1Image from "./assets/other-1.png"
-import other2Image from "./assets/other-2.png"
-import other3Image from "./assets/other-3.png"
-import other4Image from "./assets/other-4.png"
+import masudaImage from "./assets/masuda.webp"
+import other1Image from "./assets/other-1.webp"
+import other2Image from "./assets/other-2.webp"
+import other3Image from "./assets/other-3.webp"
+import other4Image from "./assets/other-4.webp"
 
 export const zukanEntries = [
   {
