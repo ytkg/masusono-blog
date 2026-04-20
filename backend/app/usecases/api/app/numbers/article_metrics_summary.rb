@@ -41,9 +41,13 @@ module Api
         end
 
         def sort_author_rows(authors)
-          authors.sort_by do |name, data|
-            [ name.include?(PRIORITY_AUTHOR_KEYWORD) ? 0 : 1, -data[:articles], name ]
+          authors.sort_by do |name, _data|
+            [ name.include?(PRIORITY_AUTHOR_KEYWORD) ? 0 : 1, natural_sort_key(name) ]
           end
+        end
+
+        def natural_sort_key(name)
+          name.scan(/\d+|\D+/).map { |part| part.match?(/\A\d+\z/) ? [ 1, part.to_i ] : [ 0, part ] }
         end
 
         def initial_article_totals

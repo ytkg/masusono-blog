@@ -19,6 +19,20 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
           title: "second title",
           content: "de",
           author: nil
+        },
+        {
+          id: "third",
+          publishedDate: "2025/10/07",
+          title: "third title",
+          content: "fghi",
+          author: "その他4"
+        },
+        {
+          id: "fourth",
+          publishedDate: "2025/10/08",
+          title: "fourth title",
+          content: "jkl",
+          author: "その他3"
         }
       ]
     end
@@ -70,21 +84,25 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
       it do
         total_articles = children.find { |child| child[:label] == "総記事数" }
 
-        expect(total_articles[:value]).to eq("2 本")
-        expect(total_articles[:children]).to include(
+        expect(total_articles[:value]).to eq("4 本")
+        expect(total_articles[:children]).to eq([
           { label: "増田太郎の総記事数", value: "1 本" },
+          { label: "その他3の総記事数", value: "1 本" },
+          { label: "その他4の総記事数", value: "1 本" },
           { label: "不明の総記事数", value: "1 本" }
-        )
+        ])
       end
 
       it do
         total_chars = children.find { |child| child[:label] == "総文字数" }
 
-        expect(total_chars[:value]).to eq("5 字")
-        expect(total_chars[:children]).to include(
+        expect(total_chars[:value]).to eq("12 字")
+        expect(total_chars[:children]).to eq([
           { label: "増田太郎の総文字数", value: "3 字" },
+          { label: "その他3の総文字数", value: "3 字" },
+          { label: "その他4の総文字数", value: "4 字" },
           { label: "不明の総文字数", value: "2 字" }
-        )
+        ])
       end
     end
 
