@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
-import HomeFeatureLinks from "./HomeFeatureLinks"
+import HomeRecommendedArticles from "./HomeRecommendedArticles"
 
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
@@ -15,17 +15,20 @@ vi.mock("@inertiajs/react", async () => {
   }
 })
 
-describe("HomeFeatureLinks", () => {
-  it("主要導線とAIおすすめ記事を表示する", () => {
-    render(<HomeFeatureLinks />)
+describe("HomeRecommendedArticles", () => {
+  it("おすすめ記事を3件表示する", () => {
+    render(<HomeRecommendedArticles />)
 
-    expect(screen.getByRole("link", { name: /ブログ/ })).toHaveAttribute("href", "/blog")
-    expect(screen.getByRole("link", { name: /ポッドキャスト/ })).toHaveAttribute("href", "/podcast")
-    expect(screen.getByRole("link", { name: /推し店/ })).toHaveAttribute("href", "/shop")
     expect(screen.getByRole("heading", { name: "おすすめ記事" })).toBeInTheDocument()
+    expect(screen.getByText("読後感、ブログらしさ、入りやすさでAIが選定")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /言葉は本当に本心を表しているのか/ })).toHaveAttribute(
       "href",
       "/blog/7149ji78dg2w",
     )
+    expect(screen.getByRole("link", { name: /余白とは、愛なのかもしれない/ })).toHaveAttribute(
+      "href",
+      "/blog/h7yiloouf_kh",
+    )
+    expect(screen.getByRole("link", { name: /パインバーグディッシュ/ })).toHaveAttribute("href", "/blog/zm5_f8m7vw")
   })
 })

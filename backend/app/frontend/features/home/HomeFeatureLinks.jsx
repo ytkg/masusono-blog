@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box"
 import FeatureLinkCard from "../../shared/FeatureLinkCard"
+import HomeRecommendedArticles from "./HomeRecommendedArticles"
 
 const featureLinks = [
   { label: "ブログ", description: "最新の記事やお知らせはこちら", href: "/blog" },
@@ -13,6 +14,7 @@ export default function HomeFeatureLinks() {
       {featureLinks.map((item) => (
         <FeatureLinkCard key={item.href} title={item.label} description={item.description} href={item.href} />
       ))}
+      <HomeRecommendedArticles />
     </Box>
   )
 }
