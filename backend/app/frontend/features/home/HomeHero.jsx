@@ -70,9 +70,7 @@ export default function HomeHero({ formattedNow }) {
             },
           }}
         >
-          <Typography variant="body1">
-            {masudaMessage}
-          </Typography>
+          <Typography variant="body1">{masudaMessage}</Typography>
         </Paper>
         <Box
           component="img"

@@ -37,13 +37,7 @@ function MemberProfile({ member }) {
           "&:last-child": { pb: { xs: 2, sm: 2.5 } },
         }}
       >
-        <Box
-          component="img"
-          src={member.image}
-          alt={`${member.name}の人物像イラスト`}
-          loading="lazy"
-          sx={imageSx}
-        />
+        <Box component="img" src={member.image} alt={`${member.name}の人物像イラスト`} loading="lazy" sx={imageSx} />
         <Stack spacing={{ xs: 0.75, sm: 0.875 }} sx={{ minWidth: 0 }}>
           <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
             {member.title}

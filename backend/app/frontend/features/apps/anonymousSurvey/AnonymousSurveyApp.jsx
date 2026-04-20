@@ -160,7 +160,12 @@ function RoomStatus({ participants, status, currentUserId }) {
               ルーム状況
             </Typography>
           </Box>
-          <Chip label={statusLabel(status)} color={status === "open" ? "success" : "default"} variant="outlined" size="small" />
+          <Chip
+            label={statusLabel(status)}
+            color={status === "open" ? "success" : "default"}
+            variant="outlined"
+            size="small"
+          />
         </Box>
         <Divider />
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, color: "text.secondary" }}>
@@ -264,7 +269,11 @@ function ActiveSurvey({
         <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2, "&:last-child": { pb: 2 } }}>
           <SurveyStage survey={survey} isRevealed={false} />
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
-            <Typography variant="h6" component="h3" sx={{ overflowWrap: "anywhere", lineHeight: 1.45, fontWeight: 700 }}>
+            <Typography
+              variant="h6"
+              component="h3"
+              sx={{ overflowWrap: "anywhere", lineHeight: 1.45, fontWeight: 700 }}
+            >
               {survey.questioner.name}さんの質問
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -276,7 +285,12 @@ function ActiveSurvey({
             <Box
               component="form"
               onSubmit={onSubmitQuestion}
-              sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "minmax(0, 1fr) auto" }, gap: 1, alignItems: "flex-end" }}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "minmax(0, 1fr) auto" },
+                gap: 1,
+                alignItems: "flex-end",
+              }}
             >
               <TextField
                 label="YES / NO で答えられる質問"
@@ -362,7 +376,13 @@ function ActiveSurvey({
               )}
             </>
           ) : isQuestioner ? (
-            <Button variant="outlined" startIcon={<VisibilityIcon />} disabled={!canReveal} onClick={onReveal} sx={actionButtonSx}>
+            <Button
+              variant="outlined"
+              startIcon={<VisibilityIcon />}
+              disabled={!canReveal}
+              onClick={onReveal}
+              sx={actionButtonSx}
+            >
               結果を見る
             </Button>
           ) : (
@@ -549,7 +569,9 @@ function AnonymousSurveyRoom() {
       ) : (
         <Card variant="outlined" sx={cardSx}>
           <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.5, p: 2, "&:last-child": { pb: 2 } }}>
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, flexWrap: "wrap" }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, flexWrap: "wrap" }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
                 <PollIcon sx={{ fontSize: 22 }} />
                 <Typography variant="h6" component="h3">
