@@ -18,9 +18,6 @@ export default function HomeHero() {
 
   return (
     <Box sx={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 2 }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
-        ようこそ
-      </Typography>
       <Typography variant="body1" color="text.secondary">
         ブログやポッドキャスト、ちょっとしたゲームまで。最新のコンテンツをまとめてチェックできます。
       </Typography>
