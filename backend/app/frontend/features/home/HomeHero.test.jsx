@@ -15,13 +15,12 @@ describe("HomeHero", () => {
     vi.restoreAllMocks()
   })
 
-  it("見出し、日付、説明を表示する", () => {
+  it("見出し、説明、増田のメッセージを表示する", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.6)
 
-    render(<HomeHero formattedNow="2026/03/09" />)
+    render(<HomeHero />)
 
     expect(screen.getByRole("heading", { name: "ようこそ" })).toBeInTheDocument()
-    expect(screen.getByText("2026/03/09")).toBeInTheDocument()
     expect(screen.getAllByRole("img", { name: "増田のアイコン" })).toHaveLength(1)
     expect(screen.getByRole("img", { name: "増田のアイコン" })).toHaveAttribute("src", "/mock-aimi.png")
     const description = screen.getByText(/ブログやポッドキャスト/)

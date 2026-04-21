@@ -13,16 +13,13 @@ function pickRandomMasudaMessage(messages) {
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
-export default function HomeHero({ formattedNow }) {
+export default function HomeHero() {
   const masudaMessage = useMemo(() => pickRandomMasudaMessage(masudaMessages), [])
 
   return (
     <Box sx={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 2 }}>
       <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
         ようこそ
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {formattedNow}
       </Typography>
       <Typography variant="body1" color="text.secondary">
         ブログやポッドキャスト、ちょっとしたゲームまで。最新のコンテンツをまとめてチェックできます。
