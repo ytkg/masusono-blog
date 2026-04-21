@@ -29,12 +29,15 @@ test.describe("主要導線", () => {
 
     const main = page.getByRole("main")
 
-    await expect(page.getByRole("heading", { name: "ようこそ" })).toBeVisible()
+    await expect(
+      main.getByText("ブログやポッドキャスト、ちょっとしたゲームまで。最新のコンテンツをまとめてチェックできます。"),
+    ).toBeVisible()
     await expect(main.getByRole("link", { name: "ブログ 最新の記事やお知らせはこちら" })).toBeVisible()
     await expect(main.getByRole("link", { name: "ポッドキャスト 番組のアーカイブを毎週更新" })).toBeVisible()
     await expect(main.getByRole("link", { name: "推し店 おすすめスポットをマップで紹介" })).toBeVisible()
-    await expect(page.getByRole("button", { name: "増田RUNを開く" })).toBeVisible()
-    await expect(page.getByRole("button", { name: "数字でわかる、増田とその他！を開く" })).toBeVisible()
+    await expect(main.getByRole("button", { name: "増田RUNを開く" })).toBeVisible()
+    await expect(main.getByRole("button", { name: "数字でわかる、増田とその他！を開く" })).toBeVisible()
+    await expect(main.getByRole("button", { name: "増その図鑑を開く" })).toBeVisible()
     await expect(page.getByRole("button", { name: "設定を開く" })).toBeVisible()
   })
 
