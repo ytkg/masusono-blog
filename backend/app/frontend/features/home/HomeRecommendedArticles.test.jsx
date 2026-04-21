@@ -30,5 +30,8 @@ describe("HomeRecommendedArticles", () => {
       "/blog/h7yiloouf_kh",
     )
     expect(screen.getByRole("link", { name: /パインバーグディッシュ/ })).toHaveAttribute("href", "/blog/zm5_f8m7vw")
+    expect(screen.getByRole("img", { name: "本と言葉をイメージしたアイキャッチ" })).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "余白と歩みをイメージしたアイキャッチ" })).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "パインバーグディッシュをイメージしたアイキャッチ" })).toBeInTheDocument()
   })
 })
