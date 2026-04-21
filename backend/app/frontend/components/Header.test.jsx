@@ -19,6 +19,18 @@ vi.mock("../assets/logo.webp", () => ({
   default: "/mock-logo.png",
 }))
 
+vi.mock("../features/apps/settings/SettingsApp", () => ({
+  default: ({ showLauncherLabel, buttonSx }) => (
+    <button
+      aria-label="設定を開く"
+      data-has-label={String(showLauncherLabel)}
+      data-has-button-sx={String(Boolean(buttonSx))}
+    >
+      Settings
+    </button>
+  ),
+}))
+
 describe("Header", () => {
   afterEach(() => {
     vi.useRealTimers()
@@ -47,5 +59,13 @@ describe("Header", () => {
     render(<Header />)
 
     expect(screen.getByText(/\d{2}\/\d{2}/)).toBeInTheDocument()
+  })
+
+  it("ヘッダー右側に設定ボタンを表示する", () => {
+    render(<Header />)
+
+    const button = screen.getByRole("button", { name: "設定を開く" })
+    expect(button).toHaveAttribute("data-has-label", "false")
+    expect(button).toHaveAttribute("data-has-button-sx", "true")
   })
 })

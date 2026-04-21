@@ -18,10 +18,6 @@ vi.mock("../apps/anonymousSurvey/AnonymousSurveyApp", () => ({
   default: () => <div>AnonymousSurveyApp</div>,
 }))
 
-vi.mock("../apps/settings/SettingsApp", () => ({
-  default: () => <div>SettingsApp</div>,
-}))
-
 describe("HomeAppLaunchers", () => {
   it("アプリ起動導線を並べる", async () => {
     render(<HomeAppLaunchers />)
@@ -30,8 +26,8 @@ describe("HomeAppLaunchers", () => {
       "MasudaRunApp",
       "NumbersApp",
       "ZukanApp",
-      "SettingsApp",
     ])
     expect(screen.queryByText("AnonymousSurveyApp")).not.toBeInTheDocument()
+    expect(screen.queryByText("SettingsApp")).not.toBeInTheDocument()
   })
 })

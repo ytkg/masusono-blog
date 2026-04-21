@@ -15,6 +15,7 @@ export default function AppsDrawerLauncher({
   buttonSx,
   buttonIcon,
   paperSx,
+  showLauncherLabel = true,
   titleAccessory,
 }) {
   const [open, setOpen] = useState(false)
@@ -70,9 +71,11 @@ export default function AppsDrawerLauncher({
         <IconButton aria-label={buttonAriaLabel} onClick={handleOpen} sx={iconSx}>
           {buttonIcon ?? <AppsIcon />}
         </IconButton>
-        <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", width: "100%" }}>
-          {launcherLabelText}
-        </Typography>
+        {showLauncherLabel ? (
+          <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", width: "100%" }}>
+            {launcherLabelText}
+          </Typography>
+        ) : null}
       </Box>
       <Drawer
         anchor="bottom"

@@ -5,6 +5,7 @@ import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import { Link } from "@inertiajs/react"
 import logo from "../assets/logo.webp"
+import SettingsApp from "../features/apps/settings/SettingsApp"
 
 function getHeaderDateParts(date) {
   const formatter = new Intl.DateTimeFormat("en-US", {
@@ -94,6 +95,28 @@ export default function Header() {
             {headerDate.weekday}
           </Box>
         </Typography>
+        <Box
+          sx={{
+            alignSelf: "center",
+            gridColumn: 3,
+            gridRow: 1,
+            justifySelf: "end",
+            transform: "translate(6px, 3px)",
+          }}
+        >
+          <SettingsApp
+            showLauncherLabel={false}
+            buttonSx={{
+              width: { xs: 36, sm: 40 },
+              height: { xs: 36, sm: 40 },
+              bgcolor: "transparent",
+              color: "primary.contrastText",
+              "&:hover": {
+                bgcolor: "rgba(255, 255, 255, 0.12)",
+              },
+            }}
+          />
+        </Box>
       </Toolbar>
     </AppBar>
   )

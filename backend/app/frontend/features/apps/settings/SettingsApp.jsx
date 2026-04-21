@@ -100,7 +100,7 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
   )
 }
 
-export default function SettingsApp() {
+export default function SettingsApp({ buttonSx, showLauncherLabel = true }) {
   const [name, setName] = useState(DEFAULT_NAME)
   const [draftName, setDraftName] = useState(name)
   const [isEditing, setIsEditing] = useState(false)
@@ -162,7 +162,9 @@ export default function SettingsApp() {
       title="設定"
       buttonAriaLabel="設定を開く"
       buttonIcon={<SettingsIcon />}
+      buttonSx={buttonSx}
       onOpen={loadCurrentUser}
+      showLauncherLabel={showLauncherLabel}
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         <NameSection
