@@ -25,7 +25,8 @@ RSpec.describe "API error contract", type: :request do
     { method: :post, path: "/api/app/masuda_run/rankings.json", params: { score: 1234, userId: "cookie-user" }, usecase: Api::App::MasudaRun::RankingsCreateUsecase },
     { method: :get, path: "/api/app/users/cookie-user.json", params: nil, usecase: Api::App::Users::ShowUsecase },
     { method: :post, path: "/api/app/users.json", params: { name: "表示名太郎", userId: "cookie-user" }, usecase: Api::App::Users::CreateUsecase },
-    { method: :get, path: "/sitemap.xml", params: nil, usecase: SitemapsIndexUsecase }
+    { method: :get, path: "/sitemap.xml", params: nil, usecase: SitemapsIndexUsecase },
+    { method: :get, path: "/feed.xml", params: nil, usecase: FeedsShowUsecase }
   ].each do |target|
     describe "#{target[:method].to_s.upcase} #{target[:path]}" do
       let(:path) { target[:path] }

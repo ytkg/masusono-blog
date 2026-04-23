@@ -48,4 +48,8 @@ RSpec.describe "Web routes", type: :routing do
   it "routes /sitemap.xml to sitemaps#index" do
     expect(get: "/sitemap.xml").to route_to("sitemaps#index")
   end
+
+  it "routes /feed.xml to feeds#show" do
+    expect(get: "/feed.xml").to route_to("feeds#show")
+  end
 end

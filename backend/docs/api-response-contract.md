@@ -2,7 +2,7 @@
 
 この文書は現行 backend API のレスポンス契約の正本です。
 
-- 対象: `GET /api/app/numbers/metrics.json`, `GET /api/app/masuda_run/rankings.json`, `GET /sitemap.xml`
+- 対象: `GET /api/app/numbers/metrics.json`, `GET /api/app/masuda_run/rankings.json`, `GET /sitemap.xml`, `GET /feed.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
 ## GET /api/app/numbers/metrics.json
@@ -43,6 +43,12 @@
 
 - Content-Type: `application/xml; charset=utf-8`
 - Response: XML sitemap
+
+## GET /feed.xml
+
+- Content-Type: `application/rss+xml; charset=utf-8`
+- Response: RSS 2.0 feed
+- 対象: ブログ記事全件
 
 ## Error contract
 

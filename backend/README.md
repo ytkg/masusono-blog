@@ -82,6 +82,8 @@ docker compose up --build
   - 増田RUNアプリ用ランキング配列を返す
 - `GET /sitemap.xml`
   - 公開用サイトマップXMLを返す
+- `GET /feed.xml`
+  - ブログ記事全件のRSSフィードを返す
 
 ## キャッシュ方針
 

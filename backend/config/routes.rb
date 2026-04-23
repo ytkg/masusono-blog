@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   end
 
   get "sitemap.xml", to: "sitemaps#index"
+  get "feed.xml", to: "feeds#show"
 
   # Defines the root path route ("/")
   # root "posts#index"
