@@ -62,7 +62,7 @@ export default function HomeHero() {
           <Paper
             variant="outlined"
             sx={{
-              borderRadius: 4,
+              borderRadius: 3,
               flex: 1,
               minWidth: 0,
               p: { xs: 2, sm: 2.5 },
