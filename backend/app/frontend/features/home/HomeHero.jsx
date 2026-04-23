@@ -18,67 +18,97 @@ export default function HomeHero() {
 
   return (
     <Box sx={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 2 }}>
-      <Typography variant="body1" color="text.secondary">
-        ブログやポッドキャスト、ちょっとしたゲームまで。最新のコンテンツをまとめてチェックできます。
-      </Typography>
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
-          alignItems: "flex-end",
           alignSelf: "center",
           display: "flex",
-          gap: { xs: 1.25, sm: 1.75 },
+          flexDirection: "column",
+          gap: 2,
           maxWidth: 600,
-          textAlign: "left",
+          p: { xs: 2, sm: 2.5 },
           width: "100%",
         }}
       >
-        <Paper
-          variant="outlined"
+        <Box sx={{ textAlign: "left" }}>
+          <Typography component="p" sx={{ lineHeight: 1.35 }}>
+            <Box component="span" sx={{ fontSize: { xs: "1.22rem", sm: "1.32rem" } }}>
+              ブログ
+            </Box>
+            や
+            <Box component="span" sx={{ fontSize: { xs: "1.22rem", sm: "1.32rem" } }}>
+              ポッドキャスト
+            </Box>
+            、
+            <br />
+            ちょっとした
+            <Box component="span" sx={{ fontSize: { xs: "1.22rem", sm: "1.32rem" } }}>
+              ゲーム
+            </Box>
+            まで。
+          </Typography>
+          <Typography color="text.secondary" component="p" sx={{ fontSize: "0.92rem", lineHeight: 1.7, mt: 0.5 }}>
+            最新のコンテンツをまとめてチェックできます。
+          </Typography>
+        </Box>
+        <Box
           sx={{
-            borderRadius: 1,
-            flex: 1,
-            minWidth: 0,
-            p: { xs: 2, sm: 2.5 },
-            position: "relative",
-            "&::before": {
-              borderBottom: "8.25px solid transparent",
-              borderLeft: "8.25px solid",
-              borderLeftColor: "divider",
-              borderTop: "8.25px solid transparent",
-              content: '""',
-              position: "absolute",
-              right: -8.25,
-              top: "50%",
-              transform: "translateY(-50%)",
-            },
-            "&::after": {
-              borderBottom: "7px solid transparent",
-              borderLeft: "7px solid",
-              borderLeftColor: "background.paper",
-              borderTop: "7px solid transparent",
-              content: '""',
-              position: "absolute",
-              right: -7,
-              top: "50%",
-              transform: "translateY(-50%)",
-            },
+            alignItems: "flex-end",
+            display: "flex",
+            gap: { xs: 1.25, sm: 1.75 },
+            textAlign: "left",
           }}
         >
-          <Typography variant="body1">{masudaMessage}</Typography>
-        </Paper>
-        <Box
-          component="img"
-          alt="増田のアイコン"
-          src={masudaIconSrc}
-          sx={{
-            borderRadius: 0,
-            flex: "0 0 auto",
-            height: { xs: 64, sm: 72 },
-            objectFit: "cover",
-            width: { xs: 64, sm: 72 },
-          }}
-        />
-      </Box>
+          <Paper
+            variant="outlined"
+            sx={{
+              borderRadius: 4,
+              flex: 1,
+              minWidth: 0,
+              p: { xs: 2, sm: 2.5 },
+              position: "relative",
+              "&::before": {
+                borderBottom: "8.25px solid transparent",
+                borderLeft: "8.25px solid",
+                borderLeftColor: "divider",
+                borderTop: "8.25px solid transparent",
+                content: '""',
+                position: "absolute",
+                right: -8.25,
+                top: "62%",
+                transform: "translateY(-50%)",
+              },
+              "&::after": {
+                borderBottom: "7px solid transparent",
+                borderLeft: "7px solid",
+                borderLeftColor: "background.paper",
+                borderTop: "7px solid transparent",
+                content: '""',
+                position: "absolute",
+                right: -7,
+                top: "62%",
+                transform: "translateY(-50%)",
+              },
+            }}
+          >
+            <Typography variant="body1">{masudaMessage}</Typography>
+          </Paper>
+          <Box
+            component="img"
+            alt="増田のアイコン"
+            src={masudaIconSrc}
+            sx={{
+              borderRadius: 0,
+              flex: "0 0 auto",
+              height: { xs: 72, sm: 80 },
+              mb: { xs: -2, sm: -2.5 },
+              mr: { xs: -2, sm: -2.5 },
+              objectFit: "cover",
+              width: { xs: 72, sm: 80 },
+            }}
+          />
+        </Box>
+      </Paper>
     </Box>
   )
 }
