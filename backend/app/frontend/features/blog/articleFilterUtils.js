@@ -1,8 +1,20 @@
 export const DEFAULT_AUTHOR = "all"
+export const DEFAULT_YEAR_MONTH = "all"
 const PRIORITY_AUTHOR_NAME = "増田"
 
 function normalizeAuthor(author) {
   return typeof author === "string" ? author.trim() : ""
+}
+
+function normalizeYearMonth(yearMonth) {
+  return typeof yearMonth === "string" ? yearMonth.trim() : ""
+}
+
+function getArticleYearMonth(article) {
+  const publishedDate = typeof article?.publishedDate === "string" ? article.publishedDate.trim() : ""
+  const matched = publishedDate.match(/^(\d{4}\/\d{2})\/\d{2}$/)
+
+  return matched ? matched[1] : ""
 }
 
 export function getArticleAuthorOptions(articles) {
@@ -31,12 +43,35 @@ export function getArticleAuthorOptions(articles) {
   })
 }
 
-export function filterArticles({ articles, author = DEFAULT_AUTHOR }) {
+export function getArticleYearMonthOptions(articles) {
+  const counts = new Map()
+
+  ;(articles ?? []).forEach((article) => {
+    const yearMonth = getArticleYearMonth(article)
+
+    if (!yearMonth) {
+      return
+    }
+
+    counts.set(yearMonth, (counts.get(yearMonth) ?? 0) + 1)
+  })
+
+  return Array.from(counts, ([yearMonth, count]) => ({ yearMonth, count })).sort((left, right) =>
+    right.yearMonth.localeCompare(left.yearMonth, "ja"),
+  )
+}
+
+export function filterArticles({ articles, author = DEFAULT_AUTHOR, yearMonth = DEFAULT_YEAR_MONTH }) {
   const normalizedAuthorFilter = author === DEFAULT_AUTHOR ? DEFAULT_AUTHOR : normalizeAuthor(author)
+  const normalizedYearMonthFilter =
+    yearMonth === DEFAULT_YEAR_MONTH ? DEFAULT_YEAR_MONTH : normalizeYearMonth(yearMonth)
 
-  if (normalizedAuthorFilter === DEFAULT_AUTHOR) {
-    return articles ?? []
-  }
+  return (articles ?? []).filter((article) => {
+    const matchesAuthor =
+      normalizedAuthorFilter === DEFAULT_AUTHOR || normalizeAuthor(article?.author) === normalizedAuthorFilter
+    const matchesYearMonth =
+      normalizedYearMonthFilter === DEFAULT_YEAR_MONTH || getArticleYearMonth(article) === normalizedYearMonthFilter
 
-  return (articles ?? []).filter((article) => normalizeAuthor(article?.author) === normalizedAuthorFilter)
+    return matchesAuthor && matchesYearMonth
+  })
 }

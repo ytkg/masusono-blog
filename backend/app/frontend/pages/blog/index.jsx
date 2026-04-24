@@ -3,15 +3,25 @@ import PageContainer from "../../shared/PageContainer"
 import SectionHeading from "../../shared/SectionHeading"
 import ArticlesList from "../../features/blog/ArticlesList"
 import ArticleFilters from "../../features/blog/ArticleFilters"
-import { DEFAULT_AUTHOR, filterArticles, getArticleAuthorOptions } from "../../features/blog/articleFilterUtils"
+import {
+  DEFAULT_AUTHOR,
+  DEFAULT_YEAR_MONTH,
+  filterArticles,
+  getArticleAuthorOptions,
+  getArticleYearMonthOptions,
+} from "../../features/blog/articleFilterUtils"
 import SeoHead from "../../shared/SeoHead"
 
 export default function Blog({ articles = [] }) {
   const [author, setAuthor] = useState(DEFAULT_AUTHOR)
+  const [yearMonth, setYearMonth] = useState(DEFAULT_YEAR_MONTH)
 
-  const authorOptions = useMemo(() => getArticleAuthorOptions(articles), [articles])
-  const filteredArticles = useMemo(() => filterArticles({ articles, author }), [articles, author])
-  const hasActiveFilters = author !== DEFAULT_AUTHOR
+  const authorFilteredArticles = useMemo(() => filterArticles({ articles, author }), [articles, author])
+  const yearMonthFilteredArticles = useMemo(() => filterArticles({ articles, yearMonth }), [articles, yearMonth])
+  const authorOptions = useMemo(() => getArticleAuthorOptions(yearMonthFilteredArticles), [yearMonthFilteredArticles])
+  const yearMonthOptions = useMemo(() => getArticleYearMonthOptions(authorFilteredArticles), [authorFilteredArticles])
+  const filteredArticles = useMemo(() => filterArticles({ articles, author, yearMonth }), [articles, author, yearMonth])
+  const hasActiveFilters = author !== DEFAULT_AUTHOR || yearMonth !== DEFAULT_YEAR_MONTH
 
   useEffect(() => {
     if (author === DEFAULT_AUTHOR) {
@@ -22,6 +32,16 @@ export default function Blog({ articles = [] }) {
       setAuthor(DEFAULT_AUTHOR)
     }
   }, [author, authorOptions])
+
+  useEffect(() => {
+    if (yearMonth === DEFAULT_YEAR_MONTH) {
+      return
+    }
+
+    if (!yearMonthOptions.some((option) => option.yearMonth === yearMonth)) {
+      setYearMonth(DEFAULT_YEAR_MONTH)
+    }
+  }, [yearMonth, yearMonthOptions])
 
   return (
     <>
@@ -37,8 +57,12 @@ export default function Blog({ articles = [] }) {
           <ArticleFilters
             author={author}
             authorOptions={authorOptions}
-            totalCount={articles.length}
+            yearMonth={yearMonth}
+            yearMonthOptions={yearMonthOptions}
+            authorTotalCount={yearMonthFilteredArticles.length}
+            yearMonthTotalCount={authorFilteredArticles.length}
             onAuthorChange={setAuthor}
+            onYearMonthChange={setYearMonth}
           />
         ) : null}
         <ArticlesList

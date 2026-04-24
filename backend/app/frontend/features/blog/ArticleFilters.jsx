@@ -9,16 +9,31 @@ import DialogTitle from "@mui/material/DialogTitle"
 import Fab from "@mui/material/Fab"
 import IconButton from "@mui/material/IconButton"
 import Typography from "@mui/material/Typography"
-import { DEFAULT_AUTHOR } from "./articleFilterUtils"
+import { DEFAULT_AUTHOR, DEFAULT_YEAR_MONTH } from "./articleFilterUtils"
 
-export default function ArticleFilters({ author, authorOptions, totalCount, onAuthorChange }) {
+export default function ArticleFilters({
+  author,
+  authorOptions,
+  yearMonth,
+  yearMonthOptions,
+  authorTotalCount,
+  yearMonthTotalCount,
+  onAuthorChange,
+  onYearMonthChange,
+}) {
   const [open, setOpen] = useState(false)
   const titleId = useId()
-  const hasActiveFilters = author !== DEFAULT_AUTHOR
+  const hasActiveFilters = author !== DEFAULT_AUTHOR || yearMonth !== DEFAULT_YEAR_MONTH
 
   const handleAuthorChange = (nextAuthor) => {
     onAuthorChange(nextAuthor)
-    setOpen(false)
+    if (typeof window !== "undefined" && typeof window.scrollTo === "function") {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }
+
+  const handleYearMonthChange = (nextYearMonth) => {
+    onYearMonthChange(nextYearMonth)
     if (typeof window !== "undefined" && typeof window.scrollTo === "function") {
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
@@ -74,7 +89,7 @@ export default function ArticleFilters({ author, authorOptions, totalCount, onAu
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                   <Chip
-                    label={`すべて (${totalCount})`}
+                    label={`著者: すべて (${authorTotalCount})`}
                     variant={author === DEFAULT_AUTHOR ? "filled" : "outlined"}
                     color={author === DEFAULT_AUTHOR ? "primary" : "default"}
                     onClick={() => handleAuthorChange(DEFAULT_AUTHOR)}
@@ -86,6 +101,30 @@ export default function ArticleFilters({ author, authorOptions, totalCount, onAu
                       variant={author === name ? "filled" : "outlined"}
                       color={author === name ? "primary" : "default"}
                       onClick={() => handleAuthorChange(name)}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            ) : null}
+            {yearMonthOptions.length ? (
+              <Box sx={{ display: "grid", gap: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  年月
+                </Typography>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                  <Chip
+                    label={`年月: すべて (${yearMonthTotalCount})`}
+                    variant={yearMonth === DEFAULT_YEAR_MONTH ? "filled" : "outlined"}
+                    color={yearMonth === DEFAULT_YEAR_MONTH ? "primary" : "default"}
+                    onClick={() => handleYearMonthChange(DEFAULT_YEAR_MONTH)}
+                  />
+                  {yearMonthOptions.map(({ yearMonth: optionYearMonth, count }) => (
+                    <Chip
+                      key={optionYearMonth}
+                      label={`${optionYearMonth} (${count})`}
+                      variant={yearMonth === optionYearMonth ? "filled" : "outlined"}
+                      color={yearMonth === optionYearMonth ? "primary" : "default"}
+                      onClick={() => handleYearMonthChange(optionYearMonth)}
                     />
                   ))}
                 </Box>
