@@ -2,6 +2,10 @@ import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import HomeAppLaunchers from "./HomeAppLaunchers"
 
+vi.mock("../apps/masudaAimi/MasudaAimiApp", () => ({
+  default: () => <div>MasudaAimiApp</div>,
+}))
+
 vi.mock("../apps/masudaRun/MasudaRunApp", () => ({
   default: () => <div>MasudaRunApp</div>,
 }))
@@ -27,6 +31,7 @@ describe("HomeAppLaunchers", () => {
       "NumbersApp",
       "ZukanApp",
     ])
+    expect(screen.queryByText("MasudaAimiApp")).not.toBeInTheDocument()
     expect(screen.queryByText("AnonymousSurveyApp")).not.toBeInTheDocument()
     expect(screen.queryByText("SettingsApp")).not.toBeInTheDocument()
   })

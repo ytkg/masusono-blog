@@ -5,9 +5,10 @@ import AppsDrawerLauncher from "./AppsDrawerLauncher"
 describe("AppsDrawerLauncher", () => {
   it("起動ボタンでドロワーを開き、閉じると子要素を隠す", async () => {
     const onOpen = vi.fn()
+    const onClose = vi.fn()
 
     render(
-      <AppsDrawerLauncher title="Numbers" buttonAriaLabel="アプリを開く" onOpen={onOpen}>
+      <AppsDrawerLauncher title="Numbers" buttonAriaLabel="アプリを開く" onOpen={onOpen} onClose={onClose}>
         <div>現在のデータ</div>
       </AppsDrawerLauncher>,
     )
@@ -25,5 +26,6 @@ describe("AppsDrawerLauncher", () => {
     await waitFor(() => {
       expect(screen.queryByText("現在のデータ")).not.toBeInTheDocument()
     })
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 })

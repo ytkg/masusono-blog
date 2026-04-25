@@ -12,6 +12,7 @@ export default function AppsDrawerLauncher({
   buttonAriaLabel,
   children,
   onOpen,
+  onClose,
   buttonSx,
   buttonIcon,
   paperSx,
@@ -58,6 +59,11 @@ export default function AppsDrawerLauncher({
     setOpen(true)
   }
 
+  const handleClose = () => {
+    setOpen(false)
+    onClose?.()
+  }
+
   return (
     <Box
       sx={{
@@ -80,7 +86,7 @@ export default function AppsDrawerLauncher({
       <Drawer
         anchor="bottom"
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         aria-labelledby={titleId}
         PaperProps={{ sx: paperCombinedSx }}
       >
@@ -101,7 +107,7 @@ export default function AppsDrawerLauncher({
           </Box>
           <Box sx={{ flexGrow: 1, overflow: "auto" }}>{open ? children : null}</Box>
           <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <IconButton aria-label="閉じる" onClick={() => setOpen(false)} sx={closeButtonSx}>
+            <IconButton aria-label="閉じる" onClick={handleClose} sx={closeButtonSx}>
               <CloseIcon />
             </IconButton>
           </Box>
