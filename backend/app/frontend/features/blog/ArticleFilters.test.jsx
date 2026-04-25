@@ -51,8 +51,8 @@ describe("ArticleFilters", () => {
     expect(screen.getByRole("dialog", { name: "絞り込み" })).toBeInTheDocument()
     expect(screen.queryByText("3件中1件を表示")).not.toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "クリア" })).not.toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "著者: すべて (3)" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "年月: すべて (1)" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "すべて (3)" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "すべて (1)" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "増田 (1)" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "その他1 (2)" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "2025/10 (1)" })).toBeInTheDocument()
@@ -72,7 +72,7 @@ describe("ArticleFilters", () => {
     renderArticleFilters(onAuthorChange)
 
     fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
-    fireEvent.click(screen.getByRole("button", { name: "著者: すべて (3)" }))
+    fireEvent.click(screen.getByRole("button", { name: "すべて (3)" }))
 
     expect(onAuthorChange).toHaveBeenCalledWith("all")
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: "smooth" })

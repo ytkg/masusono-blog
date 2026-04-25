@@ -55,11 +55,11 @@ describe("Blog page", () => {
     )
 
     fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
-    expect(screen.getByRole("button", { name: "年月: すべて (3)" })).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: "すべて (3)" })).toHaveLength(2)
 
     fireEvent.click(screen.getByRole("button", { name: "増田 (2)" }))
 
-    expect(screen.getByRole("button", { name: "年月: すべて (2)" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "すべて (2)" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "2025/10 (1)" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "2025/09 (1)" })).toBeInTheDocument()
   })
@@ -82,11 +82,11 @@ describe("Blog page", () => {
     )
 
     fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
-    expect(screen.getByRole("button", { name: "著者: すべて (3)" })).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: "すべて (3)" })).toHaveLength(2)
 
     fireEvent.click(screen.getByRole("button", { name: "2025/10 (1)" }))
 
-    expect(screen.getByRole("button", { name: "著者: すべて (1)" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "すべて (1)" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "増田 (1)" })).toBeInTheDocument()
     expect(screen.getByText("その他1 (0)")).toBeInTheDocument()
     expect(screen.getByText("その他1 (0)").closest(".MuiChip-root")).toHaveClass("Mui-disabled")
@@ -112,7 +112,7 @@ describe("Blog page", () => {
     fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
     fireEvent.click(screen.getByRole("button", { name: "その他1 (1)" }))
 
-    expect(screen.getByRole("button", { name: "年月: すべて (1)" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "すべて (1)" })).toBeInTheDocument()
     expect(screen.getByText("2025/10 (0)")).toBeInTheDocument()
     expect(screen.getByText("2025/09 (0)")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "2025/08 (1)" })).toBeInTheDocument()

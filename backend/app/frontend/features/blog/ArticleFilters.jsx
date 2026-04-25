@@ -89,7 +89,7 @@ export default function ArticleFilters({
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                   <Chip
-                    label={`著者: すべて (${authorTotalCount})`}
+                    label={`すべて (${authorTotalCount})`}
                     variant={author === DEFAULT_AUTHOR ? "filled" : "outlined"}
                     color={author === DEFAULT_AUTHOR ? "primary" : "default"}
                     onClick={() => handleAuthorChange(DEFAULT_AUTHOR)}
@@ -114,7 +114,7 @@ export default function ArticleFilters({
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                   <Chip
-                    label={`年月: すべて (${yearMonthTotalCount})`}
+                    label={`すべて (${yearMonthTotalCount})`}
                     variant={yearMonth === DEFAULT_YEAR_MONTH ? "filled" : "outlined"}
                     color={yearMonth === DEFAULT_YEAR_MONTH ? "primary" : "default"}
                     onClick={() => handleYearMonthChange(DEFAULT_YEAR_MONTH)}
