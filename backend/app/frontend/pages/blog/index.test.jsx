@@ -88,6 +88,35 @@ describe("Blog page", () => {
 
     expect(screen.getByRole("button", { name: "著者: すべて (1)" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "増田 (1)" })).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "その他1 (1)" })).not.toBeInTheDocument()
+    expect(screen.getByText("その他1 (0)")).toBeInTheDocument()
+    expect(screen.getByText("その他1 (0)").closest(".MuiChip-root")).toHaveClass("Mui-disabled")
+  })
+
+  it("著者を選んでも年月ラベルは減らず、0件は残る", () => {
+    Object.defineProperty(window, "scrollTo", {
+      value: vi.fn(),
+      writable: true,
+      configurable: true,
+    })
+
+    render(
+      <Blog
+        articles={[
+          { id: "a1", title: "記事1", author: "増田", publishedDate: "2025/10/01", content: "<p>本文1</p>" },
+          { id: "a2", title: "記事2", author: "増田", publishedDate: "2025/09/01", content: "<p>本文2</p>" },
+          { id: "a3", title: "記事3", author: "その他1", publishedDate: "2025/08/15", content: "<p>本文3</p>" },
+        ]}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
+    fireEvent.click(screen.getByRole("button", { name: "その他1 (1)" }))
+
+    expect(screen.getByRole("button", { name: "年月: すべて (1)" })).toBeInTheDocument()
+    expect(screen.getByText("2025/10 (0)")).toBeInTheDocument()
+    expect(screen.getByText("2025/09 (0)")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "2025/08 (1)" })).toBeInTheDocument()
+    expect(screen.getByText("2025/10 (0)").closest(".MuiChip-root")).toHaveClass("Mui-disabled")
+    expect(screen.getByText("2025/09 (0)").closest(".MuiChip-root")).toHaveClass("Mui-disabled")
   })
 })

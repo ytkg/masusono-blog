@@ -18,8 +18,14 @@ export default function Blog({ articles = [] }) {
 
   const authorFilteredArticles = useMemo(() => filterArticles({ articles, author }), [articles, author])
   const yearMonthFilteredArticles = useMemo(() => filterArticles({ articles, yearMonth }), [articles, yearMonth])
-  const authorOptions = useMemo(() => getArticleAuthorOptions(yearMonthFilteredArticles), [yearMonthFilteredArticles])
-  const yearMonthOptions = useMemo(() => getArticleYearMonthOptions(authorFilteredArticles), [authorFilteredArticles])
+  const authorOptions = useMemo(
+    () => getArticleAuthorOptions(articles, yearMonthFilteredArticles),
+    [articles, yearMonthFilteredArticles],
+  )
+  const yearMonthOptions = useMemo(
+    () => getArticleYearMonthOptions(articles, authorFilteredArticles),
+    [articles, authorFilteredArticles],
+  )
   const filteredArticles = useMemo(() => filterArticles({ articles, author, yearMonth }), [articles, author, yearMonth])
   const hasActiveFilters = author !== DEFAULT_AUTHOR || yearMonth !== DEFAULT_YEAR_MONTH
 

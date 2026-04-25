@@ -17,10 +17,21 @@ function getArticleYearMonth(article) {
   return matched ? matched[1] : ""
 }
 
-export function getArticleAuthorOptions(articles) {
+export function getArticleAuthorOptions(articles, countedArticles = articles) {
   const counts = new Map()
+  const names = new Set()
 
   ;(articles ?? []).forEach((article) => {
+    const name = normalizeAuthor(article?.author)
+
+    if (!name) {
+      return
+    }
+
+    names.add(name)
+  })
+
+  ;(countedArticles ?? []).forEach((article) => {
     const name = normalizeAuthor(article?.author)
 
     if (!name) {
@@ -30,7 +41,7 @@ export function getArticleAuthorOptions(articles) {
     counts.set(name, (counts.get(name) ?? 0) + 1)
   })
 
-  return Array.from(counts, ([name, count]) => ({ name, count })).sort((left, right) => {
+  return Array.from(names, (name) => ({ name, count: counts.get(name) ?? 0 })).sort((left, right) => {
     if (left.name === PRIORITY_AUTHOR_NAME && right.name !== PRIORITY_AUTHOR_NAME) {
       return -1
     }
@@ -43,10 +54,21 @@ export function getArticleAuthorOptions(articles) {
   })
 }
 
-export function getArticleYearMonthOptions(articles) {
+export function getArticleYearMonthOptions(articles, countedArticles = articles) {
   const counts = new Map()
+  const yearMonths = new Set()
 
   ;(articles ?? []).forEach((article) => {
+    const yearMonth = getArticleYearMonth(article)
+
+    if (!yearMonth) {
+      return
+    }
+
+    yearMonths.add(yearMonth)
+  })
+
+  ;(countedArticles ?? []).forEach((article) => {
     const yearMonth = getArticleYearMonth(article)
 
     if (!yearMonth) {
@@ -56,8 +78,8 @@ export function getArticleYearMonthOptions(articles) {
     counts.set(yearMonth, (counts.get(yearMonth) ?? 0) + 1)
   })
 
-  return Array.from(counts, ([yearMonth, count]) => ({ yearMonth, count })).sort((left, right) =>
-    right.yearMonth.localeCompare(left.yearMonth, "ja"),
+  return Array.from(yearMonths, (yearMonth) => ({ yearMonth, count: counts.get(yearMonth) ?? 0 })).sort(
+    (left, right) => right.yearMonth.localeCompare(left.yearMonth, "ja"),
   )
 }
 

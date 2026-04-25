@@ -91,4 +91,43 @@ describe("ArticleFilters", () => {
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: "smooth" })
     expect(screen.getByRole("dialog", { name: "絞り込み" })).toBeInTheDocument()
   })
+
+  it("0件のラベルは表示したまま選択不可にする", () => {
+    const onAuthorChange = vi.fn()
+    const onYearMonthChange = vi.fn()
+
+    render(
+      <ArticleFilters
+        author="all"
+        yearMonth="2025/08"
+        authorOptions={[
+          { name: "増田", count: 0 },
+          { name: "その他1", count: 0 },
+          { name: "あいう", count: 1 },
+        ]}
+        yearMonthOptions={[
+          { yearMonth: "2025/10", count: 2 },
+          { yearMonth: "2025/09", count: 1 },
+          { yearMonth: "2025/08", count: 0 },
+        ]}
+        authorTotalCount={1}
+        yearMonthTotalCount={4}
+        onAuthorChange={onAuthorChange}
+        onYearMonthChange={onYearMonthChange}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole("button", { name: "絞り込みを開く" }))
+
+    expect(screen.getByText("増田 (0)").closest(".MuiChip-root")).toHaveClass("Mui-disabled")
+    expect(screen.getByText("その他1 (0)").closest(".MuiChip-root")).toHaveClass("Mui-disabled")
+    expect(screen.getByRole("button", { name: "あいう (1)" })).not.toBeDisabled()
+    expect(screen.getByText("2025/08 (0)").closest(".MuiChip-root")).toHaveClass("Mui-disabled")
+
+    fireEvent.click(screen.getByText("増田 (0)"))
+    fireEvent.click(screen.getByText("2025/08 (0)"))
+
+    expect(onAuthorChange).not.toHaveBeenCalled()
+    expect(onYearMonthChange).not.toHaveBeenCalled()
+  })
 })

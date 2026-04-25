@@ -41,6 +41,16 @@ describe("articleFilterUtils", () => {
     ])
   })
 
+  it("著者一覧は全件ぶんを残しつつ、件数は指定集合で計算できる", () => {
+    const countedArticles = filterArticles({ articles, yearMonth: "2025/08" })
+
+    expect(getArticleAuthorOptions(articles, countedArticles)).toEqual([
+      { name: "増田", count: 0 },
+      { name: "あいう", count: 1 },
+      { name: "その他1", count: 0 },
+    ])
+  })
+
   it("著者で絞り込める", () => {
     expect(filterArticles({ articles, author: "その他1" }).map((article) => article.id)).toEqual(["a1", "a3"])
   })
@@ -50,6 +60,16 @@ describe("articleFilterUtils", () => {
       { yearMonth: "2025/10", count: 2 },
       { yearMonth: "2025/09", count: 1 },
       { yearMonth: "2025/08", count: 1 },
+    ])
+  })
+
+  it("年月一覧は全件ぶんを残しつつ、件数は指定集合で計算できる", () => {
+    const countedArticles = filterArticles({ articles, author: "その他1" })
+
+    expect(getArticleYearMonthOptions(articles, countedArticles)).toEqual([
+      { yearMonth: "2025/10", count: 1 },
+      { yearMonth: "2025/09", count: 1 },
+      { yearMonth: "2025/08", count: 0 },
     ])
   })
 

@@ -100,7 +100,8 @@ export default function ArticleFilters({
                       label={`${name} (${count})`}
                       variant={author === name ? "filled" : "outlined"}
                       color={author === name ? "primary" : "default"}
-                      onClick={() => handleAuthorChange(name)}
+                      disabled={count === 0}
+                      onClick={count === 0 ? undefined : () => handleAuthorChange(name)}
                     />
                   ))}
                 </Box>
@@ -124,7 +125,8 @@ export default function ArticleFilters({
                       label={`${optionYearMonth} (${count})`}
                       variant={yearMonth === optionYearMonth ? "filled" : "outlined"}
                       color={yearMonth === optionYearMonth ? "primary" : "default"}
-                      onClick={() => handleYearMonthChange(optionYearMonth)}
+                      disabled={count === 0}
+                      onClick={count === 0 ? undefined : () => handleYearMonthChange(optionYearMonth)}
                     />
                   ))}
                 </Box>
