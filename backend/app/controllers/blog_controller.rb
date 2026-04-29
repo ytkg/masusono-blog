@@ -5,6 +5,12 @@ class BlogController < ApplicationController
     render_inertia_result(result)
   end
 
+  def three_sixty_five
+    result = Blog365Usecase.call
+
+    render_inertia_result(result)
+  end
+
   def show
     result = BlogShowUsecase.call(article_id: params[:article_id])
 

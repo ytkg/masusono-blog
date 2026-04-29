@@ -33,6 +33,51 @@ RSpec.describe "WebBlog", type: :request do
     end
   end
 
+  describe "GET /blog/365" do
+    before do
+      allow(Blog365Usecase).to receive(:call).and_return(
+        {
+          props: {
+            months: [
+              {
+                id: "01",
+                title: "1月",
+                filledDaysCount: 1,
+                totalDaysCount: 31,
+                days: [
+                  {
+                    id: "01-01",
+                    title: "1月1日",
+                    articles: [
+                      {
+                        id: "article-1",
+                        title: "記事1"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          status: :ok
+        }
+      )
+    end
+
+    it "365日一覧のInertiaページを返す" do
+      get "/blog/365", headers: html_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("blog/three_sixty_five")
+      expect(inertia.props.dig("months", 0, "title")).to eq("1月")
+      expect(inertia.props.dig("months", 0, "filledDaysCount")).to eq(1)
+      expect(inertia.props.dig("months", 0, "totalDaysCount")).to eq(31)
+      expect(inertia.props.dig("months", 0, "days", 0, "title")).to eq("1月1日")
+      expect(inertia.props.dig("months", 0, "days", 0, "articles", 0, "title")).to eq("記事1")
+    end
+  end
+
   describe "GET /blog/:article_id" do
     context "記事が存在する場合" do
       before do
