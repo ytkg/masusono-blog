@@ -20,11 +20,17 @@ describe("ZukanApp", () => {
     expect(screen.getByRole("button", { name: "増その図鑑" })).toBeInTheDocument()
     expect(screen.getByText("AI分析による人物像")).toBeInTheDocument()
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(zukanEntries.length)
+    expect(screen.getAllByText("過去のプロフィールを見る")).toHaveLength(zukanEntries.length)
+    expect(screen.getAllByText("以前のプロフィール")).toHaveLength(zukanEntries.length)
 
     for (const member of zukanEntries) {
       expect(screen.getByText(member.name)).toBeInTheDocument()
       expect(screen.getByText(member.title)).toBeInTheDocument()
       expect(screen.getByRole("img", { name: `${member.name}の人物像イラスト` })).toBeInTheDocument()
+
+      for (const item of member.history ?? []) {
+        expect(screen.getByText(item.title)).toBeInTheDocument()
+      }
     }
   })
 })
