@@ -35,6 +35,7 @@
 | key | type | nullable | note |
 | --- | --- | --- | --- |
 | `userId` | `String` | No | ユーザーID |
+| `name` | `String` | No | 表示名。未登録または空の場合は `userId`、`userId` も空の場合は `NO NAME` |
 | `score` | `Numeric` | No | スコア |
 | `rankedAt` | `String` | No | 形式: `YYYY/MM/DD` |
 | `rank` | `Integer` | No | 順位 |
