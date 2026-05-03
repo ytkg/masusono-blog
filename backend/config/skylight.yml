@@ -1,0 +1,12 @@
+---
+# Read the authentication token from Rails credentials and allow ENV fallback
+# for container platforms such as Cloud Run.
+authentication: <%= Rails.application.credentials.dig(:skylight, :authentication) || ENV["SKYLIGHT_AUTHENTICATION"] %>
+
+# Cloud Run has a writable /tmp but not a durable app filesystem.
+daemon.sockdir_path: /tmp
+log_file: /tmp/skylight.log
+
+environments:
+  production:
+    enable: true
