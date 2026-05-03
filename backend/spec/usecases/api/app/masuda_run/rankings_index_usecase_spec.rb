@@ -31,15 +31,22 @@ RSpec.describe Api::App::MasudaRun::RankingsIndexUsecase do
       }
     ]
   end
+  let(:users_by_id) do
+    {
+      "carol" => { name: "Carol" },
+      "bob" => {},
+      "alice" => { name: "Alice" }
+    }
+  end
 
   before do
     allow(MasudaRunRanking).to receive(:all).with(limit: described_class::RANKINGS_LIMIT).and_return(rankings)
-    allow(Microcms::Users::FetchByUserIdService).to receive(:execute).with(user_id: "carol").and_return({ name: "Carol" })
-    allow(Microcms::Users::FetchByUserIdService).to receive(:execute).with(user_id: "bob").and_return({})
-    allow(Microcms::Users::FetchByUserIdService).to receive(:execute).with(user_id: "alice").and_return({ name: "Alice" })
+    allow(Microcms::Users::FetchByUserIdsService).to receive(:execute).and_return(users_by_id)
   end
 
   it "取得順にrankを付け、表示名とrankedAtを整形する" do
+    expect(Microcms::Users::FetchByUserIdsService).to receive(:execute).with(user_ids: [ "carol", "bob", "alice", "" ])
+
     expect(result).to eq(
       {
         json: [

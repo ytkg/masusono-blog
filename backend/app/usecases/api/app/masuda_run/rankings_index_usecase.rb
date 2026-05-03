@@ -10,7 +10,9 @@ module Api
         end
 
         def call
-          ranked = ::MasudaRunRanking.all(limit: RANKINGS_LIMIT).map { |ranking| build_ranking(ranking) }
+          rankings_source = ::MasudaRunRanking.all(limit: RANKINGS_LIMIT)
+          @users_by_id = fetch_users_by_id(rankings_source)
+          ranked = rankings_source.map { |ranking| build_ranking(ranking) }
           rankings = ranked.map.with_index(1) do |ranking, index|
             build_response(ranking, index)
           end
@@ -36,15 +38,16 @@ module Api
           normalized_user_id = user_id.to_s.strip
           return FALLBACK_DISPLAY_NAME if normalized_user_id.empty?
 
-          user_name_by_id[normalized_user_id] ||= begin
-            fetched = ::Microcms::Users::FetchByUserIdService.execute(user_id: normalized_user_id)
-            fetched_name = fetched[:name].to_s.strip
-            fetched_name.empty? ? normalized_user_id : fetched_name
-          end
+          fetched_name = users_by_id.fetch(normalized_user_id, {})[:name].to_s.strip
+          fetched_name.empty? ? normalized_user_id : fetched_name
         end
 
-        def user_name_by_id
-          @user_name_by_id ||= {}
+        def fetch_users_by_id(rankings)
+          ::Microcms::Users::FetchByUserIdsService.execute(user_ids: rankings.map { |ranking| ranking[:user_id] })
+        end
+
+        def users_by_id
+          @users_by_id ||= {}
         end
 
         def build_response(ranking, index)
