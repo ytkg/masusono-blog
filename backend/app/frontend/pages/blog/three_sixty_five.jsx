@@ -12,14 +12,8 @@ import SeoHead from "../../shared/SeoHead"
 
 export default function BlogThreeSixtyFive({ months = [] }) {
   const [expandedMonthId, setExpandedMonthId] = useState(null)
-  const totalDaysCount = useMemo(
-    () => months.reduce((sum, month) => sum + (month.totalDaysCount ?? 0), 0),
-    [months],
-  )
-  const filledDaysCount = useMemo(
-    () => months.reduce((sum, month) => sum + (month.filledDaysCount ?? 0), 0),
-    [months],
-  )
+  const totalDaysCount = useMemo(() => months.reduce((sum, month) => sum + (month.totalDaysCount ?? 0), 0), [months])
+  const filledDaysCount = useMemo(() => months.reduce((sum, month) => sum + (month.filledDaysCount ?? 0), 0), [months])
   const totalProgressPercentLabel = `${Math.round(totalDaysCount ? (filledDaysCount / totalDaysCount) * 100 : 0)}%`
 
   function handleMonthChange(monthId) {
@@ -28,11 +22,7 @@ export default function BlogThreeSixtyFive({ months = [] }) {
 
   return (
     <>
-      <SeoHead
-        title="365日"
-        description="365日ブログ記事のタイトル一覧。"
-        canonicalPath="/blog/365"
-      />
+      <SeoHead title="365日" description="365日ブログ記事のタイトル一覧。" canonicalPath="/blog/365" />
 
       <PageContainer id="blog-365" sx={{ pb: 3 }}>
         <Box sx={{ mx: "auto", maxWidth: 1120 }}>
@@ -198,7 +188,12 @@ export default function BlogThreeSixtyFive({ months = [] }) {
                         </Box>
                         <Typography
                           color="text.secondary"
-                          sx={{ flexShrink: 0, fontSize: "0.8rem", fontWeight: 500, fontVariantNumeric: "tabular-nums" }}
+                          sx={{
+                            flexShrink: 0,
+                            fontSize: "0.8rem",
+                            fontWeight: 500,
+                            fontVariantNumeric: "tabular-nums",
+                          }}
                         >
                           {progressSummaryLabel}
                         </Typography>
@@ -222,7 +217,10 @@ export default function BlogThreeSixtyFive({ months = [] }) {
                               },
                             }}
                           >
-                            <Typography color="text.secondary" sx={{ fontSize: "0.82rem", fontWeight: 700, letterSpacing: "0.02em" }}>
+                            <Typography
+                              color="text.secondary"
+                              sx={{ fontSize: "0.82rem", fontWeight: 700, letterSpacing: "0.02em" }}
+                            >
                               {day.title}
                             </Typography>
                             <Box component="ul" sx={{ m: 0, mt: 0.5, pl: 1.5, listStylePosition: "outside" }}>

@@ -30,7 +30,6 @@ export function getArticleAuthorOptions(articles, countedArticles = articles) {
 
     names.add(name)
   })
-
   ;(countedArticles ?? []).forEach((article) => {
     const name = normalizeAuthor(article?.author)
 
@@ -67,7 +66,6 @@ export function getArticleYearMonthOptions(articles, countedArticles = articles)
 
     yearMonths.add(yearMonth)
   })
-
   ;(countedArticles ?? []).forEach((article) => {
     const yearMonth = getArticleYearMonth(article)
 
@@ -78,8 +76,8 @@ export function getArticleYearMonthOptions(articles, countedArticles = articles)
     counts.set(yearMonth, (counts.get(yearMonth) ?? 0) + 1)
   })
 
-  return Array.from(yearMonths, (yearMonth) => ({ yearMonth, count: counts.get(yearMonth) ?? 0 })).sort(
-    (left, right) => right.yearMonth.localeCompare(left.yearMonth, "ja"),
+  return Array.from(yearMonths, (yearMonth) => ({ yearMonth, count: counts.get(yearMonth) ?? 0 })).sort((left, right) =>
+    right.yearMonth.localeCompare(left.yearMonth, "ja"),
   )
 }
 

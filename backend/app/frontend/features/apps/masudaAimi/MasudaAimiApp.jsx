@@ -184,13 +184,19 @@ export default function MasudaAimiApp() {
         },
       )
 
-      const reply = typeof response?.reply === "string" && response.reply.trim().length > 0 ? response.reply.trim() : FALLBACK_REPLY
+      const reply =
+        typeof response?.reply === "string" && response.reply.trim().length > 0 ? response.reply.trim() : FALLBACK_REPLY
       const draftReply =
-        typeof response?.draft_reply === "string" && response.draft_reply.trim().length > 0 ? response.draft_reply.trim() : null
+        typeof response?.draft_reply === "string" && response.draft_reply.trim().length > 0
+          ? response.draft_reply.trim()
+          : null
       setMessages((current) => [...current, { id: current.length + 1, role: "assistant", text: reply, draftReply }])
     } catch (error) {
       if (error?.name !== "AbortError") {
-        setMessages((current) => [...current, { id: current.length + 1, role: "assistant", text: FALLBACK_REPLY, draftReply: null }])
+        setMessages((current) => [
+          ...current,
+          { id: current.length + 1, role: "assistant", text: FALLBACK_REPLY, draftReply: null },
+        ])
       }
     } finally {
       if (abortControllerRef.current === controller) {

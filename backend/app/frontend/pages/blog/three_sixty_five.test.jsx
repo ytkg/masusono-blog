@@ -46,8 +46,20 @@ describe("BlogThreeSixtyFive page", () => {
     render(
       <BlogThreeSixtyFive
         months={[
-          { id: "01", title: "1月", filledDaysCount: 0, totalDaysCount: 31, days: [{ id: "01-01", title: "1月1日", articles: [] }] },
-          { id: "02", title: "2月", filledDaysCount: 0, totalDaysCount: 28, days: [{ id: "02-01", title: "2月1日", articles: [] }] },
+          {
+            id: "01",
+            title: "1月",
+            filledDaysCount: 0,
+            totalDaysCount: 31,
+            days: [{ id: "01-01", title: "1月1日", articles: [] }],
+          },
+          {
+            id: "02",
+            title: "2月",
+            filledDaysCount: 0,
+            totalDaysCount: 28,
+            days: [{ id: "02-01", title: "2月1日", articles: [] }],
+          },
         ]}
       />,
     )
