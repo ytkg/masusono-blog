@@ -5,7 +5,7 @@ import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 
 const DEFAULT_NAME = "NO NAME"
@@ -100,14 +100,14 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
   )
 }
 
-export default function SettingsApp({ buttonSx, showLauncherLabel = true }) {
+export function SettingsContent({ loadOnMount = false, loadSignal = 0 }) {
   const [name, setName] = useState(DEFAULT_NAME)
   const [draftName, setDraftName] = useState(name)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
-  const loadCurrentUser = async () => {
+  const loadCurrentUser = useCallback(async () => {
     if (isEditing) return
 
     const userId = getCookie("user_id")
@@ -122,7 +122,13 @@ export default function SettingsApp({ buttonSx, showLauncherLabel = true }) {
     } catch (_error) {
       // 取得失敗時は既存表示を維持する
     }
-  }
+  }, [isEditing])
+
+  useEffect(() => {
+    if (!loadOnMount && loadSignal === 0) return
+
+    void loadCurrentUser()
+  }, [loadCurrentUser, loadOnMount, loadSignal])
 
   const startEditing = () => {
     setDraftName(name)
@@ -158,30 +164,38 @@ export default function SettingsApp({ buttonSx, showLauncherLabel = true }) {
   }
 
   return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+      <NameSection
+        name={name}
+        draftName={draftName}
+        isEditing={isEditing}
+        isSaving={isSaving}
+        onStartEditing={startEditing}
+        onSave={saveName}
+        onDraftChange={setDraftName}
+      />
+      {errorMessage ? (
+        <Typography variant="body2" color="error">
+          {errorMessage}
+        </Typography>
+      ) : null}
+    </Box>
+  )
+}
+
+export default function SettingsApp({ buttonSx, showLauncherLabel = true }) {
+  const [loadSignal, setLoadSignal] = useState(0)
+
+  return (
     <AppsDrawerLauncher
       title="設定"
       buttonAriaLabel="設定を開く"
       buttonIcon={<SettingsIcon />}
       buttonSx={buttonSx}
-      onOpen={loadCurrentUser}
+      onOpen={() => setLoadSignal((current) => current + 1)}
       showLauncherLabel={showLauncherLabel}
     >
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-        <NameSection
-          name={name}
-          draftName={draftName}
-          isEditing={isEditing}
-          isSaving={isSaving}
-          onStartEditing={startEditing}
-          onSave={saveName}
-          onDraftChange={setDraftName}
-        />
-        {errorMessage ? (
-          <Typography variant="body2" color="error">
-            {errorMessage}
-          </Typography>
-        ) : null}
-      </Box>
+      <SettingsContent loadSignal={loadSignal} />
     </AppsDrawerLauncher>
   )
 }

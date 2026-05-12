@@ -24,7 +24,16 @@ describe("Footer", () => {
     render(<Footer />)
 
     expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("href", "/")
+    expect(screen.getByText("設定").closest("a")).toHaveAttribute("href", "/settings")
     expect(screen.getByText("ブログ").closest(".Mui-selected")).not.toBeNull()
     expect(screen.getByText(`© ${new Date().getFullYear()} 増田とその他！`)).toBeInTheDocument()
+  })
+
+  it("設定ページでは設定タブを選択する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/settings" })
+
+    render(<Footer />)
+
+    expect(screen.getByText("設定").closest(".Mui-selected")).not.toBeNull()
   })
 })

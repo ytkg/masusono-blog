@@ -1,6 +1,7 @@
 import HomeIcon from "@mui/icons-material/Home"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
 import PodcastsIcon from "@mui/icons-material/Podcasts"
+import SettingsIcon from "@mui/icons-material/Settings"
 
 export const MAIN_NAVIGATION_LINKS = [
   { value: "home", label: "ホーム", href: "/", icon: <HomeIcon /> },
@@ -18,6 +19,12 @@ export const MAIN_NAVIGATION_LINKS = [
     href: "/podcast",
     icon: <PodcastsIcon />,
   },
+  {
+    value: "settings",
+    label: "設定",
+    href: "/settings",
+    icon: <SettingsIcon />,
+  },
 ]
 
-export const HOME_FEATURE_LINKS = MAIN_NAVIGATION_LINKS.filter((link) => link.href !== "/")
+export const HOME_FEATURE_LINKS = MAIN_NAVIGATION_LINKS.filter((link) => !["/", "/settings"].includes(link.href))

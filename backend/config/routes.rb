@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   inertia "/" => :home, as: :root
   inertia "about" => :about
+  inertia "settings" => :settings
   mount ActionCable.server => "/cable"
   get "blog", to: "blog#index"
   get "blog/365", to: "blog#three_sixty_five"
