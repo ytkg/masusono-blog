@@ -1,23 +1,12 @@
 import Box from "@mui/material/Box"
-import MenuBookIcon from "@mui/icons-material/MenuBook"
-import PodcastsIcon from "@mui/icons-material/Podcasts"
 import FeatureLinkCard from "../../shared/FeatureLinkCard"
+import { HOME_FEATURE_LINKS } from "../../shared/mainNavigationLinks"
 import HomeRecommendedArticles from "./HomeRecommendedArticles"
-
-const featureLinks = [
-  { label: "ブログ", description: "最新の記事やお知らせはこちら", href: "/blog", icon: <MenuBookIcon /> },
-  {
-    label: "ポッドキャスト",
-    description: "番組のアーカイブを毎週更新",
-    href: "/podcast",
-    icon: <PodcastsIcon />,
-  },
-]
 
 export default function HomeFeatureLinks() {
   return (
     <Box sx={{ display: "grid", gap: 1.75 }}>
-      {featureLinks.map((item) => (
+      {HOME_FEATURE_LINKS.map((item) => (
         <FeatureLinkCard
           key={item.href}
           title={item.label}

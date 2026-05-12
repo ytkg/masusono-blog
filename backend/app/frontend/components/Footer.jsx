@@ -4,21 +4,13 @@ import BottomNavigationAction from "@mui/material/BottomNavigationAction"
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
-import HomeIcon from "@mui/icons-material/Home"
-import ArticleIcon from "@mui/icons-material/MenuBook"
-import PodcastIcon from "@mui/icons-material/Podcasts"
-
-const TABS = [
-  { value: "home", label: "ホーム", href: "/", icon: <HomeIcon /> },
-  { value: "blog", label: "ブログ", href: "/blog", icon: <ArticleIcon /> },
-  { value: "podcast", label: "ポッドキャスト", href: "/podcast", icon: <PodcastIcon /> },
-]
+import { MAIN_NAVIGATION_LINKS } from "../shared/mainNavigationLinks"
 
 export default function Footer() {
   const year = new Date().getFullYear()
   const { url } = usePage()
   const path = String(url || "/").split("?")[0]
-  const active = TABS.find((tab) => tab.href !== "/" && path.startsWith(tab.href))?.value ?? "home"
+  const active = MAIN_NAVIGATION_LINKS.find((tab) => tab.href !== "/" && path.startsWith(tab.href))?.value ?? "home"
 
   return (
     <Paper
@@ -47,7 +39,7 @@ export default function Footer() {
           },
         }}
       >
-        {TABS.map((tab) => (
+        {MAIN_NAVIGATION_LINKS.map((tab) => (
           <BottomNavigationAction
             key={tab.value}
             label={tab.label}
