@@ -33,7 +33,7 @@ describe("NumbersMetricsGrid", () => {
   })
 
   it("値がない block はダッシュを表示する", () => {
-    render(<NumbersMetricsGrid blocks={[{ label: "ポッドキャスト", value: null }]} />)
+    render(<NumbersMetricsGrid blocks={[{ label: "増田RUN", value: null }]} />)
 
     expect(screen.getByText("—")).toBeInTheDocument()
   })

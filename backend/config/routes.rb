@@ -12,8 +12,6 @@ Rails.application.routes.draw do
   get "blog", to: "blog#index"
   get "blog/365", to: "blog#three_sixty_five"
   get "blog/:article_id", to: "blog#show"
-  get "podcast", to: "podcast#index"
-  get "podcast/:episode_id", to: "podcast#show"
   namespace :api do
     namespace :app do
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }

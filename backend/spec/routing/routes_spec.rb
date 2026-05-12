@@ -17,14 +17,6 @@ RSpec.describe "Web routes", type: :routing do
     expect(get: "/blog/article-1").to route_to("blog#show", article_id: "article-1")
   end
 
-  it "routes /podcast to podcast#index" do
-    expect(get: "/podcast").to route_to("podcast#index")
-  end
-
-  it "routes /podcast/:episode_id to podcast#show" do
-    expect(get: "/podcast/001").to route_to("podcast#show", episode_id: "001")
-  end
-
   it "routes /api/app/masuda_run/rankings.json to api/app/masuda_run/rankings#index" do
     expect(get: "/api/app/masuda_run/rankings.json").to route_to("api/app/masuda_run/rankings#index", format: "json")
   end

@@ -20,7 +20,6 @@ describe("HomeFeatureLinks", () => {
     render(<HomeFeatureLinks />)
 
     expect(screen.getByRole("link", { name: /ブログ/ })).toHaveAttribute("href", "/blog")
-    expect(screen.getByRole("link", { name: /ポッドキャスト/ })).toHaveAttribute("href", "/podcast")
     expect(screen.getByRole("heading", { name: "おすすめ記事" })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /言葉は本当に本心を表しているのか/ })).toHaveAttribute(
       "href",

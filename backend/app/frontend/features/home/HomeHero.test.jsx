@@ -27,7 +27,7 @@ describe("HomeHero", () => {
     const description = screen.getByText("ブログ").closest("p")
     const message = screen.getByText("せっかく来たなら、なんか読んでってよ〜")
     expect(description).toBeInTheDocument()
-    expect(description).toHaveTextContent("ブログやポッドキャスト、ちょっとしたゲームまで。")
+    expect(description).toHaveTextContent("ブログや、ちょっとしたゲームまで。")
     expect(screen.getByText("最新のコンテンツをまとめてチェックできます。")).toBeInTheDocument()
     expect(message).toBeInTheDocument()
     expect(description.compareDocumentPosition(message) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()

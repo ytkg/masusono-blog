@@ -18,12 +18,12 @@ vi.mock("@inertiajs/react", async () => {
 describe("ContentItemCard", () => {
   it("metaParts を連結しリンク付きタイトルを描画する", () => {
     render(
-      <ContentItemCard title="第1回" titleTo="/podcast/1" metaParts={["2026/03/09", "増田"]} metaSeparator=" / ">
+      <ContentItemCard title="記事タイトル" titleTo="/blog/1" metaParts={["2026/03/09", "増田"]} metaSeparator=" / ">
         <p>本文</p>
       </ContentItemCard>,
     )
 
-    expect(screen.getByRole("link", { name: "第1回" })).toHaveAttribute("href", "/podcast/1")
+    expect(screen.getByRole("link", { name: "記事タイトル" })).toHaveAttribute("href", "/blog/1")
     expect(screen.getByText("2026/03/09 / 増田")).toBeInTheDocument()
     expect(screen.getByText("本文")).toBeInTheDocument()
   })

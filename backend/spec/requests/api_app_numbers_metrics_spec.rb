@@ -8,8 +8,8 @@ RSpec.describe "Api::App::Numbers", type: :request do
           json: {
             "blocks" => [
               {
-                "label" => "ポッドキャスト総本数",
-                "value" => "1 本"
+                "label" => "増田RUN総プレイ回数",
+                "value" => "10 回"
               }
             ]
           },
@@ -26,7 +26,7 @@ RSpec.describe "Api::App::Numbers", type: :request do
       expect(response.headers["Cache-Control"]).to eq("no-store")
       payload = JSON.parse(response.body)
       expect(payload["blocks"]).to be_an(Array)
-      expect(payload["blocks"].first["label"]).to eq("ポッドキャスト総本数")
+      expect(payload["blocks"].first["label"]).to eq("増田RUN総プレイ回数")
     end
   end
 end

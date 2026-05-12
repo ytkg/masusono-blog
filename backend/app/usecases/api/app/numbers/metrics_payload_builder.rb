@@ -19,7 +19,6 @@ module Api
           total_articles: "総記事数",
           total_chars: "総文字数",
           masuda_run_total_plays: "増田RUN総プレイ回数",
-          podcast_total: "ポッドキャスト総本数",
           total_count: "総件数"
         }.freeze
 
@@ -42,7 +41,6 @@ module Api
             blocks: [
               build_launch_block,
               build_blog_block,
-              build_podcast_block,
               build_masuda_run_block
             ]
           }
@@ -82,10 +80,6 @@ module Api
           author_rows.map do |name, data|
             { label: "#{name}の#{label(label_key)}", value: format_count(data.fetch(metric_key), unit(metric_key)) }
           end
-        end
-
-        def build_podcast_block
-          build_count_block(label_key: :podcast_total, value: source_data.fetch(:podcasts).size, unit_key: :articles)
         end
 
         def build_masuda_run_block

@@ -1,6 +1,5 @@
 import HomeIcon from "@mui/icons-material/Home"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
-import PodcastsIcon from "@mui/icons-material/Podcasts"
 import SettingsIcon from "@mui/icons-material/Settings"
 
 export const MAIN_NAVIGATION_LINKS = [
@@ -11,13 +10,6 @@ export const MAIN_NAVIGATION_LINKS = [
     description: "最新の記事やお知らせはこちら",
     href: "/blog",
     icon: <MenuBookIcon />,
-  },
-  {
-    value: "podcast",
-    label: "ポッドキャスト",
-    description: "番組のアーカイブを毎週更新",
-    href: "/podcast",
-    icon: <PodcastsIcon />,
   },
   {
     value: "settings",

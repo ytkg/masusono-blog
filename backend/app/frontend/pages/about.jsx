@@ -36,8 +36,8 @@ export default function About() {
           <a href="https://masusono.com" target="_blank" rel="noreferrer">
             masusono.com
           </a>{" "}
-          では、日常のブログを中心に、今後公開予定の <strong>ポッドキャスト</strong>、さらにおすすめの{" "}
-          <strong>居酒屋・ラーメン屋紹介ページ</strong> なども用意しています。
+          では、日常のブログを中心に、ちょっとしたゲームやおすすめの <strong>居酒屋・ラーメン屋紹介ページ</strong>{" "}
+          なども用意しています。
         </Typography>
 
         <Box

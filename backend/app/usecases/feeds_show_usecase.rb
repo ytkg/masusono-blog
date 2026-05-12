@@ -5,7 +5,7 @@ class FeedsShowUsecase
   SITE_TITLE = "増田とその他！".freeze
   SITE_URL = "https://masusono.com".freeze
   SITE_DESCRIPTION =
-    "増田とその他！の公式サイト。ブログやポッドキャスト、ミニゲームなど増田周辺の最新コンテンツをまとめてチェックできます。".freeze
+    "増田とその他！の公式サイト。ブログやミニゲームなど増田周辺の最新コンテンツをまとめてチェックできます。".freeze
   FEED_URL = "#{SITE_URL}/feed.xml".freeze
 
   def self.call

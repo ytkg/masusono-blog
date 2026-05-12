@@ -35,11 +35,7 @@ export default function HomeHero() {
             <Box component="span" sx={{ fontSize: { xs: "1.22rem", sm: "1.32rem" } }}>
               ブログ
             </Box>
-            や
-            <Box component="span" sx={{ fontSize: { xs: "1.22rem", sm: "1.32rem" } }}>
-              ポッドキャスト
-            </Box>
-            、
+            や、
             <br />
             ちょっとした
             <Box component="span" sx={{ fontSize: { xs: "1.22rem", sm: "1.32rem" } }}>

@@ -3,7 +3,7 @@ import { Head } from "@inertiajs/react"
 const SITE_TITLE = "増田とその他！"
 const SITE_URL = "https://masusono.com"
 const DEFAULT_DESCRIPTION =
-  "増田とその他！の公式サイト。ブログやポッドキャスト、ミニゲームなど増田周辺の最新コンテンツをまとめてチェックできます。"
+  "増田とその他！の公式サイト。ブログやミニゲームなど増田周辺の最新コンテンツをまとめてチェックできます。"
 
 function toAbsoluteUrl(path) {
   const normalizedPath = path?.startsWith("/") ? path : `/${path ?? ""}`

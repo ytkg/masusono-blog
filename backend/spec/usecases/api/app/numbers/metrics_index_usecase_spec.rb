@@ -37,16 +37,9 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
       ]
     end
 
-    let(:podcasts) do
-      [
-        { "id" => "001" }
-      ]
-    end
-
     before do
       allow(Date).to receive(:current).and_return(Date.new(2025, 10, 10))
       allow(Article).to receive(:all).and_return(articles)
-      allow(Podcast).to receive(:all).and_return(podcasts)
       allow(MasudaRunRanking).to receive(:total_count).and_return(25)
     end
 
@@ -94,18 +87,6 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
           { label: "その他4の総文字数", value: "4 字" },
           { label: "不明の総文字数", value: "2 字" }
         ])
-      end
-    end
-
-    describe "ポッドキャスト" do
-      let(:podcast_block) { blocks.find { |block| block[:label] == "ポッドキャスト総本数" } }
-
-      it do
-        expect(podcast_block).not_to be_nil
-      end
-
-      it do
-        expect(podcast_block[:value]).to eq("1 本")
       end
     end
 

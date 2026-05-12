@@ -4,7 +4,6 @@ module E2e
 
     def install!
       stub_execute(Microcms::FetchArticlesService, articles_fixture)
-      stub_execute(Microcms::FetchPodcastsService, podcasts_fixture)
     end
 
     def articles_fixture
@@ -17,16 +16,6 @@ module E2e
           author: {
             name: "E2E 著者"
           }
-        }
-      ]
-    end
-
-    def podcasts_fixture
-      [
-        {
-          title: "E2E ポッドキャスト回",
-          publishedAt: "2026-03-02T10:00:00+09:00",
-          audioUrl: "https://storage.googleapis.com/masusono-podcast/001.mp3"
         }
       ]
     end
