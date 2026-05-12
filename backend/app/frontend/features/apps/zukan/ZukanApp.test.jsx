@@ -1,27 +1,7 @@
 import { render, screen } from "@testing-library/react"
-import { describe, expect, it, vi } from "vitest"
-import ZukanApp, { ZukanContent, ZukanTitleAccessory } from "./ZukanApp"
+import { describe, expect, it } from "vitest"
+import { ZukanContent, ZukanTitleAccessory } from "./ZukanApp"
 import { zukanEntries } from "./zukanData"
-
-vi.mock("../shared/AppsDrawerLauncher", () => ({
-  default: ({ title, titleAccessory, children }) => (
-    <div>
-      <button>{title}</button>
-      {titleAccessory}
-      {children}
-    </div>
-  ),
-}))
-
-describe("ZukanApp", () => {
-  it("ミニアプリ起動用の Drawer を組み立てる", () => {
-    render(<ZukanApp />)
-
-    expect(screen.getByRole("button", { name: "増その図鑑" })).toBeInTheDocument()
-    expect(screen.getByText("AI分析による人物像")).toBeInTheDocument()
-    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(zukanEntries.length)
-  })
-})
 
 describe("ZukanContent", () => {
   it("図鑑項目を一覧表示する", () => {

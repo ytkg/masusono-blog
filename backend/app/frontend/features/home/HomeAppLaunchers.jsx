@@ -1,7 +1,6 @@
 import { lazy, Suspense } from "react"
 import Box from "@mui/material/Box"
 
-// const MasudaAimiApp = lazy(() => import("../apps/masudaAimi/MasudaAimiApp"))
 const MasudaRunApp = lazy(() => import("../apps/masudaRun/MasudaRunApp"))
 const NumbersApp = lazy(() => import("../apps/numbers/NumbersApp"))
 
@@ -29,7 +28,6 @@ export default function HomeAppLaunchers() {
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
       <Suspense fallback={<HomeAppLaunchersFallback />}>
         <MasudaRunApp />
-        {/* <MasudaAimiApp /> */}
         <NumbersApp />
       </Suspense>
     </Box>

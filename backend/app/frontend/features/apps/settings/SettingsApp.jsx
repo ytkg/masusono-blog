@@ -1,4 +1,3 @@
-import SettingsIcon from "@mui/icons-material/Settings"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -6,7 +5,6 @@ import CardContent from "@mui/material/CardContent"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useCallback, useEffect, useState } from "react"
-import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 
 const DEFAULT_NAME = "NO NAME"
 const labelTextSx = { fontSize: "14px" }
@@ -100,7 +98,7 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
   )
 }
 
-export function SettingsContent({ loadOnMount = false, loadSignal = 0 }) {
+export function SettingsContent({ loadOnMount = false }) {
   const [name, setName] = useState(DEFAULT_NAME)
   const [draftName, setDraftName] = useState(name)
   const [isEditing, setIsEditing] = useState(false)
@@ -125,10 +123,10 @@ export function SettingsContent({ loadOnMount = false, loadSignal = 0 }) {
   }, [isEditing])
 
   useEffect(() => {
-    if (!loadOnMount && loadSignal === 0) return
+    if (!loadOnMount) return
 
     void loadCurrentUser()
-  }, [loadCurrentUser, loadOnMount, loadSignal])
+  }, [loadCurrentUser, loadOnMount])
 
   const startEditing = () => {
     setDraftName(name)
@@ -180,22 +178,5 @@ export function SettingsContent({ loadOnMount = false, loadSignal = 0 }) {
         </Typography>
       ) : null}
     </Box>
-  )
-}
-
-export default function SettingsApp({ buttonSx, showLauncherLabel = true }) {
-  const [loadSignal, setLoadSignal] = useState(0)
-
-  return (
-    <AppsDrawerLauncher
-      title="設定"
-      buttonAriaLabel="設定を開く"
-      buttonIcon={<SettingsIcon />}
-      buttonSx={buttonSx}
-      onOpen={() => setLoadSignal((current) => current + 1)}
-      showLauncherLabel={showLauncherLabel}
-    >
-      <SettingsContent loadSignal={loadSignal} />
-    </AppsDrawerLauncher>
   )
 }

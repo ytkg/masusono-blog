@@ -1,17 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import SettingsApp from "./SettingsApp"
+import { SettingsContent } from "./SettingsApp"
 
-vi.mock("../shared/AppsDrawerLauncher", () => ({
-  default: ({ title, onOpen, children }) => (
-    <div>
-      <button onClick={() => void onOpen()}>{title}</button>
-      {children}
-    </div>
-  ),
-}))
-
-describe("SettingsApp", () => {
+describe("SettingsContent", () => {
   beforeEach(() => {
     document.cookie = "user_id=cookie-user; Path=/"
   })
@@ -21,15 +12,14 @@ describe("SettingsApp", () => {
     vi.unstubAllGlobals()
   })
 
-  it("open 時に現在のユーザー名を取得する", async () => {
+  it("mount 時に現在のユーザー名を取得する", async () => {
     const fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: vi.fn().mockResolvedValue({ name: "表示名太郎" }),
     })
     vi.stubGlobal("fetch", fetch)
 
-    render(<SettingsApp />)
-    fireEvent.click(screen.getByRole("button", { name: "設定" }))
+    render(<SettingsContent loadOnMount />)
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith("/api/app/users/cookie-user.json", {
@@ -54,8 +44,7 @@ describe("SettingsApp", () => {
       })
     vi.stubGlobal("fetch", fetch)
 
-    render(<SettingsApp />)
-    fireEvent.click(screen.getByRole("button", { name: "設定" }))
+    render(<SettingsContent loadOnMount />)
     await screen.findByText("現在名")
 
     fireEvent.click(screen.getByRole("button", { name: "変更" }))
@@ -84,8 +73,7 @@ describe("SettingsApp", () => {
       }),
     )
 
-    render(<SettingsApp />)
-    fireEvent.click(screen.getByRole("button", { name: "設定" }))
+    render(<SettingsContent loadOnMount />)
     await screen.findByText("現在名")
 
     fireEvent.click(screen.getByRole("button", { name: "変更" }))

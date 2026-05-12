@@ -25,7 +25,3 @@ export const MAIN_NAVIGATION_LINKS = [
     icon: <SettingsIcon />,
   },
 ]
-
-export const HOME_FEATURE_LINKS = MAIN_NAVIGATION_LINKS.filter(
-  (link) => !["/", "/blog", "/settings", "/zukan"].includes(link.href),
-)

@@ -1,12 +1,10 @@
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome"
-import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark"
 import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Divider from "@mui/material/Divider"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 import { zukanEntries } from "./zukanData"
 
 const labelTextSx = { m: 0, fontSize: "13px", fontWeight: 700, letterSpacing: 0, lineHeight: 1.4 }
@@ -119,19 +117,5 @@ export function ZukanContent() {
         <MemberProfile key={member.id} member={member} />
       ))}
     </Stack>
-  )
-}
-
-export default function ZukanApp() {
-  return (
-    <AppsDrawerLauncher
-      title="増その図鑑"
-      launcherLabel="図鑑"
-      buttonAriaLabel="増その図鑑を開く"
-      buttonIcon={<CollectionsBookmarkIcon />}
-      titleAccessory={<ZukanTitleAccessory />}
-    >
-      <ZukanContent />
-    </AppsDrawerLauncher>
   )
 }
