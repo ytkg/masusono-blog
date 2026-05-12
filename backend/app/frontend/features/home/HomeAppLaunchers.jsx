@@ -4,10 +4,9 @@ import Box from "@mui/material/Box"
 // const MasudaAimiApp = lazy(() => import("../apps/masudaAimi/MasudaAimiApp"))
 const MasudaRunApp = lazy(() => import("../apps/masudaRun/MasudaRunApp"))
 const NumbersApp = lazy(() => import("../apps/numbers/NumbersApp"))
-const ZukanApp = lazy(() => import("../apps/zukan/ZukanApp"))
 
 function HomeAppLaunchersFallback() {
-  return Array.from({ length: 3 }, (_, index) => (
+  return Array.from({ length: 2 }, (_, index) => (
     <Box
       key={index}
       aria-hidden="true"
@@ -32,7 +31,6 @@ export default function HomeAppLaunchers() {
         <MasudaRunApp />
         {/* <MasudaAimiApp /> */}
         <NumbersApp />
-        <ZukanApp />
       </Suspense>
     </Box>
   )

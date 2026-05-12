@@ -1,4 +1,5 @@
 import HomeIcon from "@mui/icons-material/Home"
+import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
 import SettingsIcon from "@mui/icons-material/Settings"
 
@@ -12,6 +13,12 @@ export const MAIN_NAVIGATION_LINKS = [
     icon: <MenuBookIcon />,
   },
   {
+    value: "zukan",
+    label: "図鑑",
+    href: "/zukan",
+    icon: <CollectionsBookmarkIcon />,
+  },
+  {
     value: "settings",
     label: "設定",
     href: "/settings",
@@ -19,4 +26,6 @@ export const MAIN_NAVIGATION_LINKS = [
   },
 ]
 
-export const HOME_FEATURE_LINKS = MAIN_NAVIGATION_LINKS.filter((link) => !["/", "/settings"].includes(link.href))
+export const HOME_FEATURE_LINKS = MAIN_NAVIGATION_LINKS.filter(
+  (link) => !["/", "/settings", "/zukan"].includes(link.href),
+)

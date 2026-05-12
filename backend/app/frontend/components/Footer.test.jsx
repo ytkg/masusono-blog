@@ -24,6 +24,7 @@ describe("Footer", () => {
     render(<Footer />)
 
     expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("href", "/")
+    expect(screen.getByText("図鑑").closest("a")).toHaveAttribute("href", "/zukan")
     expect(screen.getByText("設定").closest("a")).toHaveAttribute("href", "/settings")
     expect(screen.getByText("ブログ").closest(".Mui-selected")).not.toBeNull()
     expect(screen.getByText(`© ${new Date().getFullYear()} 増田とその他！`)).toBeInTheDocument()
@@ -35,5 +36,13 @@ describe("Footer", () => {
     render(<Footer />)
 
     expect(screen.getByText("設定").closest(".Mui-selected")).not.toBeNull()
+  })
+
+  it("図鑑ページでは図鑑タブを選択する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/zukan" })
+
+    render(<Footer />)
+
+    expect(screen.getByText("図鑑").closest(".Mui-selected")).not.toBeNull()
   })
 })

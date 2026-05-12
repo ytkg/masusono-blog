@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
-import ZukanApp from "./ZukanApp"
+import ZukanApp, { ZukanContent, ZukanTitleAccessory } from "./ZukanApp"
 import { zukanEntries } from "./zukanData"
 
 vi.mock("../shared/AppsDrawerLauncher", () => ({
@@ -14,10 +14,24 @@ vi.mock("../shared/AppsDrawerLauncher", () => ({
 }))
 
 describe("ZukanApp", () => {
-  it("図鑑項目を一覧表示する", () => {
+  it("ミニアプリ起動用の Drawer を組み立てる", () => {
     render(<ZukanApp />)
 
     expect(screen.getByRole("button", { name: "増その図鑑" })).toBeInTheDocument()
+    expect(screen.getByText("AI分析による人物像")).toBeInTheDocument()
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(zukanEntries.length)
+  })
+})
+
+describe("ZukanContent", () => {
+  it("図鑑項目を一覧表示する", () => {
+    render(
+      <>
+        <ZukanTitleAccessory />
+        <ZukanContent />
+      </>,
+    )
+
     expect(screen.getByText("AI分析による人物像")).toBeInTheDocument()
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(zukanEntries.length)
     expect(screen.getAllByText("過去のプロフィールを見る")).toHaveLength(zukanEntries.length)

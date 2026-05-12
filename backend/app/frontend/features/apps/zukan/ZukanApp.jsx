@@ -101,6 +101,27 @@ function MemberProfile({ member }) {
   )
 }
 
+export function ZukanTitleAccessory() {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "text.secondary" }}>
+      <AutoAwesomeIcon sx={{ fontSize: 17 }} />
+      <Typography variant="body2" sx={noteTextSx}>
+        AI分析による人物像
+      </Typography>
+    </Box>
+  )
+}
+
+export function ZukanContent() {
+  return (
+    <Stack spacing={{ xs: 1.5, sm: 2 }}>
+      {zukanEntries.map((member) => (
+        <MemberProfile key={member.id} member={member} />
+      ))}
+    </Stack>
+  )
+}
+
 export default function ZukanApp() {
   return (
     <AppsDrawerLauncher
@@ -108,20 +129,9 @@ export default function ZukanApp() {
       launcherLabel="図鑑"
       buttonAriaLabel="増その図鑑を開く"
       buttonIcon={<CollectionsBookmarkIcon />}
-      titleAccessory={
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "text.secondary" }}>
-          <AutoAwesomeIcon sx={{ fontSize: 17 }} />
-          <Typography variant="body2" sx={noteTextSx}>
-            AI分析による人物像
-          </Typography>
-        </Box>
-      }
+      titleAccessory={<ZukanTitleAccessory />}
     >
-      <Stack spacing={{ xs: 1.5, sm: 2 }}>
-        {zukanEntries.map((member) => (
-          <MemberProfile key={member.id} member={member} />
-        ))}
-      </Stack>
+      <ZukanContent />
     </AppsDrawerLauncher>
   )
 }

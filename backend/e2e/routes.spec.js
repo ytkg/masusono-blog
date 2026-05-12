@@ -33,10 +33,11 @@ test.describe("主要導線", () => {
       main.getByText("ブログや、ちょっとしたゲームまで。最新のコンテンツをまとめてチェックできます。"),
     ).toBeVisible()
     await expect(main.getByRole("link", { name: "ブログ 最新の記事やお知らせはこちら" })).toBeVisible()
+    await expect(page.getByRole("link", { name: "図鑑" })).toBeVisible()
     await expect(main.getByRole("link", { name: "推し店 おすすめスポットをマップで紹介" })).toBeVisible()
     await expect(main.getByRole("button", { name: "増田RUNを開く" })).toBeVisible()
     await expect(main.getByRole("button", { name: "数字でわかる、増田とその他！を開く" })).toBeVisible()
-    await expect(main.getByRole("button", { name: "増その図鑑を開く" })).toBeVisible()
+    await expect(main.getByRole("button", { name: "増その図鑑を開く" })).toHaveCount(0)
   })
 
   test("ブログ一覧ページを表示できる", async ({ page }) => {
@@ -55,5 +56,13 @@ test.describe("主要導線", () => {
     await expect(page.getByRole("heading", { name: "推し店" })).toBeVisible()
     await expect(page.getByRole("button", { name: "遊飯家 酒舞 を選択" })).toBeVisible()
     await expect(page.getByRole("button", { name: "すべて" })).toBeVisible()
+  })
+
+  test("図鑑ページを表示できる", async ({ page }) => {
+    await page.goto("/zukan")
+
+    await expect(page).toHaveTitle(/増その図鑑/)
+    await expect(page.getByRole("heading", { name: "増その図鑑" })).toBeVisible()
+    await expect(page.getByText("AI分析による人物像")).toBeVisible()
   })
 })
