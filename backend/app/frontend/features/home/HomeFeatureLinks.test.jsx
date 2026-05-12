@@ -16,10 +16,10 @@ vi.mock("@inertiajs/react", async () => {
 })
 
 describe("HomeFeatureLinks", () => {
-  it("主要導線とAIおすすめ記事を表示する", () => {
+  it("ブログへのカード導線を出さず、AIおすすめ記事を表示する", () => {
     render(<HomeFeatureLinks />)
 
-    expect(screen.getByRole("link", { name: /ブログ/ })).toHaveAttribute("href", "/blog")
+    expect(screen.queryByRole("link", { name: "ブログ 最新の記事やお知らせはこちら" })).not.toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "おすすめ記事" })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /言葉は本当に本心を表しているのか/ })).toHaveAttribute(
       "href",

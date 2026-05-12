@@ -27,5 +27,5 @@ export const MAIN_NAVIGATION_LINKS = [
 ]
 
 export const HOME_FEATURE_LINKS = MAIN_NAVIGATION_LINKS.filter(
-  (link) => !["/", "/settings", "/zukan"].includes(link.href),
+  (link) => !["/", "/blog", "/settings", "/zukan"].includes(link.href),
 )
