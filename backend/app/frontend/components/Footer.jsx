@@ -7,13 +7,11 @@ import Typography from "@mui/material/Typography"
 import HomeIcon from "@mui/icons-material/Home"
 import ArticleIcon from "@mui/icons-material/MenuBook"
 import PodcastIcon from "@mui/icons-material/Podcasts"
-import PlaceIcon from "@mui/icons-material/Place"
 
 const TABS = [
   { value: "home", label: "ホーム", href: "/", icon: <HomeIcon /> },
   { value: "blog", label: "ブログ", href: "/blog", icon: <ArticleIcon /> },
   { value: "podcast", label: "ポッドキャスト", href: "/podcast", icon: <PodcastIcon /> },
-  { value: "shops", label: "推し店", href: "/shop", icon: <PlaceIcon /> },
 ]
 
 export default function Footer() {

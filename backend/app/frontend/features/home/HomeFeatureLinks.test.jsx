@@ -21,7 +21,6 @@ describe("HomeFeatureLinks", () => {
 
     expect(screen.getByRole("link", { name: /ブログ/ })).toHaveAttribute("href", "/blog")
     expect(screen.getByRole("link", { name: /ポッドキャスト/ })).toHaveAttribute("href", "/podcast")
-    expect(screen.getByRole("link", { name: /推し店/ })).toHaveAttribute("href", "/shop")
     expect(screen.getByRole("heading", { name: "おすすめ記事" })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /言葉は本当に本心を表しているのか/ })).toHaveAttribute(
       "href",

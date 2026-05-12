@@ -10,8 +10,7 @@ module Api
         UNITS = {
           articles: "本",
           chars: "字",
-          plays: "回",
-          shops: "件"
+          plays: "回"
         }.freeze
 
         LABELS = {
@@ -21,9 +20,7 @@ module Api
           total_chars: "総文字数",
           masuda_run_total_plays: "増田RUN総プレイ回数",
           podcast_total: "ポッドキャスト総本数",
-          shops: "推し店",
-          total_count: "総件数",
-          uncategorized: "未分類"
+          total_count: "総件数"
         }.freeze
 
         BLOG_METRIC_DEFINITIONS = [
@@ -46,7 +43,6 @@ module Api
               build_launch_block,
               build_blog_block,
               build_podcast_block,
-              build_shops_block,
               build_masuda_run_block
             ]
           }
@@ -100,32 +96,6 @@ module Api
           )
         end
 
-        def build_shops_block
-          shops = source_data.fetch(:shops)
-
-          build_section_block(
-            label(:shops),
-            children: [
-              build_count_block(
-                label_key: :total_count,
-                value: shops.size,
-                unit_key: :shops,
-                children: build_shop_category_children(shops)
-              )
-            ]
-          )
-        end
-
-        def build_shop_category_children(shops)
-          grouped_categories(shops).sort_by { |name, _| name }.map do |name, items|
-            { label: "#{name}の#{unit(:shops)}数", value: format_count(items.size, unit(:shops)) }
-          end
-        end
-
-        def grouped_categories(shops)
-          shops.group_by { |shop| normalize_shop_category(shop[:category]) }
-        end
-
         def build_block(label:, value:, children: nil)
           block = { label: label, value: value }
           block[:children] = children if children
@@ -151,11 +121,6 @@ module Api
 
         def launch_label
           "#{label(:launch)}（#{LAUNCH_DATE.strftime(DATE_FORMAT)}〜）"
-        end
-
-        def normalize_shop_category(category)
-          normalized = category.to_s.strip
-          normalized == "" ? label(:uncategorized) : normalized
         end
 
         def label(key)

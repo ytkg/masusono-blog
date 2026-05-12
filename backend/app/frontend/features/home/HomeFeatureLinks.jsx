@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
-import PlaceIcon from "@mui/icons-material/Place"
 import PodcastsIcon from "@mui/icons-material/Podcasts"
 import FeatureLinkCard from "../../shared/FeatureLinkCard"
 import HomeRecommendedArticles from "./HomeRecommendedArticles"
@@ -13,7 +12,6 @@ const featureLinks = [
     href: "/podcast",
     icon: <PodcastsIcon />,
   },
-  { label: "推し店", description: "おすすめスポットをマップで紹介", href: "/shop", icon: <PlaceIcon /> },
 ]
 
 export default function HomeFeatureLinks() {

@@ -37,14 +37,6 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
       ]
     end
 
-    let(:shops) do
-      [
-        { category: "居酒屋" },
-        { category: "居酒屋" },
-        { category: "ラーメン" }
-      ]
-    end
-
     let(:podcasts) do
       [
         { "id" => "001" }
@@ -54,7 +46,6 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
     before do
       allow(Date).to receive(:current).and_return(Date.new(2025, 10, 10))
       allow(Article).to receive(:all).and_return(articles)
-      allow(Shop).to receive(:all).and_return(shops)
       allow(Podcast).to receive(:all).and_return(podcasts)
       allow(MasudaRunRanking).to receive(:total_count).and_return(25)
     end
@@ -103,24 +94,6 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
           { label: "その他4の総文字数", value: "4 字" },
           { label: "不明の総文字数", value: "2 字" }
         ])
-      end
-    end
-
-    describe "推し店" do
-      let(:shops_block) { blocks.find { |block| block[:label] == "推し店" } }
-
-      it do
-        expect(shops_block).not_to be_nil
-      end
-
-      it do
-        total_shops = shops_block[:children].first
-
-        expect(total_shops[:value]).to eq("3 件")
-        expect(total_shops[:children]).to include(
-          { label: "居酒屋の件数", value: "2 件" },
-          { label: "ラーメンの件数", value: "1 件" }
-        )
       end
     end
 

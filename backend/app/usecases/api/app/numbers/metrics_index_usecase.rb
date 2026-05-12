@@ -21,7 +21,6 @@ module Api
         def fetch_source_data
           {
             articles: ::Article.all,
-            shops: ::Shop.all,
             podcasts: ::Podcast.all,
             masuda_run_total_plays: fetch_masuda_run_total_plays
           }

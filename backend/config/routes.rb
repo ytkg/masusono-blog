@@ -13,7 +13,6 @@ Rails.application.routes.draw do
   get "blog/:article_id", to: "blog#show"
   get "podcast", to: "podcast#index"
   get "podcast/:episode_id", to: "podcast#show"
-  get "shop", to: "shop#index"
   namespace :api do
     namespace :app do
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }
