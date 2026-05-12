@@ -26,7 +26,7 @@ RSpec.describe Blog365Usecase do
       expect(january[:totalDaysCount]).to eq(31)
       expect(january[:days].length).to eq(31)
       expect(january[:days].first).to eq(
-        { id: "01-01", title: "1月1日", articles: [{ id: "article-1", title: "元日" }] }
+        { id: "01-01", title: "1月1日", articles: [ { id: "article-1", title: "元日" } ] }
       )
 
       expect(december[:id]).to eq("12")
@@ -34,7 +34,7 @@ RSpec.describe Blog365Usecase do
       expect(december[:filledDaysCount]).to eq(1)
       expect(december[:totalDaysCount]).to eq(31)
       expect(december[:days].last).to eq(
-        { id: "12-31", title: "12月31日", articles: [{ id: "article-2", title: "大晦日" }] }
+        { id: "12-31", title: "12月31日", articles: [ { id: "article-2", title: "大晦日" } ] }
       )
 
       expect(all_days.none? { |day| day[:id] == "02-29" }).to be(true)
