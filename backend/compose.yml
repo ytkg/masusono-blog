@@ -23,29 +23,6 @@ services:
       RAILS_LOG_TO_STDOUT: "1"
     tty: true
     stdin_open: true
-  e2e-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        RAILS_ENV: development
-        BUNDLE_WITHOUT: ""
-        BUNDLE_DEPLOYMENT: "0"
-        INSTALL_DEV_TOOLS: "1"
-    command: sh -lc "npm install --no-audit --no-fund && ./bin/e2e-vite-server >/tmp/e2e-vite.log 2>&1 & HOST=0.0.0.0 VITE_RUBY_HOST=127.0.0.1 PORT=3000 ./bin/e2e-rails-server"
-    volumes:
-      - .:/rails
-      - bundle_cache:/usr/local/bundle
-      - node_modules_cache:/rails/node_modules
-    environment:
-      RAILS_ENV: development
-      RAILS_DEVELOPMENT_HOSTS: e2e-backend,e2e-backend:3000
-      BUNDLE_WITHOUT: ""
-      BUNDLE_DEPLOYMENT: "0"
-      BUNDLE_PATH: /usr/local/bundle
-      RAILS_LOG_TO_STDOUT: "1"
-    tty: true
-    stdin_open: true
   vite:
     image: node:22-bookworm
     user: "1000:1000"
@@ -58,19 +35,6 @@ services:
       - "3036:3036"
     tty: true
     stdin_open: true
-  e2e:
-    image: mcr.microsoft.com/playwright:v1.58.2-jammy
-    user: "1000:1000"
-    working_dir: /rails
-    command: sh -lc "npm install --no-audit --no-fund && npm run wait:e2e:docker && npm run test:e2e:docker"
-    depends_on:
-      - e2e-backend
-    volumes:
-      - .:/rails
-      - node_modules_cache:/rails/node_modules
-    tty: true
-    stdin_open: true
-
 volumes:
   bundle_cache:
   node_modules_cache:

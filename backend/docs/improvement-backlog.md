@@ -40,7 +40,7 @@
 ## 3. P2（品質・設計）
 
 - [x] フロント単体テスト基盤（Vitest）を導入し、hooks / shared lib から優先してテスト追加
-- [x] 主要導線の E2E（Playwright）を最小構成で導入（`/`, `/blog`, `/shop`）
+- [x] 主要導線のブラウザE2Eは撤去済み。主要確認は request spec / frontend test に集約
 - [ ] `fetchJson` のエラー表現を API 契約（`error.code`, `error.message`）へ接続する
 - [ ] SWR hook の重複パターンを共通化する（一覧系 hook のボイラープレート削減）
 - [x] `SeoHead` の canonical を絶対URL出力へ統一する

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-export RAILS_ENV="development"
-export VITE_RUBY_MODE="development"
-
-exec ./node_modules/.bin/vite --host 127.0.0.1 --port "${VITE_PORT:-3036}"
