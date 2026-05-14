@@ -22,6 +22,8 @@ export default function Footer() {
         bottom: 0,
         width: "100%",
         zIndex: (t) => t.zIndex.appBar,
+        bgcolor: "background.default",
+        color: "text.primary",
         borderTop: "1px solid",
         borderColor: "divider",
       }}
@@ -30,6 +32,7 @@ export default function Footer() {
         showLabels
         value={active}
         sx={{
+          bgcolor: "background.default",
           ".MuiBottomNavigationAction-root": {
             minWidth: 0,
             px: 0.5,
@@ -57,8 +60,10 @@ export default function Footer() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          bgcolor: "primary.main",
-          color: "common.white",
+          bgcolor: "background.default",
+          color: "text.primary",
+          borderTop: "1px solid",
+          borderColor: "divider",
         }}
       >
         <Typography variant="body2" color="inherit">

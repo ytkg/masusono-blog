@@ -35,7 +35,20 @@ export default function Header() {
   const headerDate = getHeaderDateParts(now)
 
   return (
-    <AppBar position="sticky" color="primary" enableColorOnDark sx={{ minHeight: { xs: 44, sm: 52 }, py: 0 }}>
+    <AppBar
+      position="sticky"
+      color="transparent"
+      enableColorOnDark
+      sx={{
+        minHeight: { xs: 44, sm: 52 },
+        py: 0,
+        bgcolor: "background.default",
+        color: "text.primary",
+        boxShadow: "none",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+      }}
+    >
       <Toolbar
         disableGutters
         sx={{
@@ -74,7 +87,7 @@ export default function Header() {
           variant="caption"
           sx={{
             alignSelf: "center",
-            color: "primary.contrastText",
+            color: "text.primary",
             display: "inline-flex",
             alignItems: "baseline",
             fontSize: "1.125rem",
