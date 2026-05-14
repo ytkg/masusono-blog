@@ -11,10 +11,10 @@ export const drawGround = (ctx, w, W) => {
 
 export const drawStateText = (ctx, W, H, state) => {
   if (state === "ready") {
-    ctx.font = '24px "Noto Sans JP", sans-serif'
+    ctx.font = '24px "M PLUS Rounded 1c", sans-serif'
     drawCenterText(ctx, W, H, "増田RUN - スペース/タップで開始")
   } else if (state === "gameover") {
-    ctx.font = '24px "Noto Sans JP", sans-serif'
+    ctx.font = '24px "M PLUS Rounded 1c", sans-serif'
     drawCenterText(ctx, W, H, "GAME OVER  -  スペース/タップで再開")
   }
 }

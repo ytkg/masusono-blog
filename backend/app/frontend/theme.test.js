@@ -6,6 +6,6 @@ describe("theme", () => {
     expect(theme.palette.mode).toBe("light")
     expect(theme.palette.primary.main).toBe("#000000")
     expect(theme.components.MuiButton.styleOverrides.contained.backgroundColor).toBe("#000")
-    expect(theme.typography.fontFamily).toContain("Noto Sans JP")
+    expect(theme.typography.fontFamily).toContain("M PLUS Rounded 1c")
   })
 })
