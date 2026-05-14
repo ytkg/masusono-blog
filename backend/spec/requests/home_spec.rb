@@ -37,6 +37,17 @@ RSpec.describe "WebHome", type: :request do
     end
   end
 
+  describe "GET /others" do
+    it "Inertiaページを返す" do
+      get "/others", headers: html_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("text/html")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("others/index")
+    end
+  end
+
   describe "GET /zukan" do
     it "Inertiaページを返す" do
       get "/zukan", headers: html_headers

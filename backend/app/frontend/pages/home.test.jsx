@@ -10,10 +10,6 @@ vi.mock("../features/home/HomeFeatureLinks", () => ({
   default: () => <div>links</div>,
 }))
 
-vi.mock("../features/home/HomeAppLaunchers", () => ({
-  default: () => <div>apps</div>,
-}))
-
 vi.mock("../shared/SeoHead", () => ({
   default: () => <div>seo</div>,
 }))
@@ -30,7 +26,6 @@ describe("Home page", () => {
 
     expect(ensureUserIdCookie).toHaveBeenCalledTimes(1)
     expect(screen.getByText("hero")).toBeInTheDocument()
-    expect(screen.getByText("apps")).toBeInTheDocument()
     expect(screen.getByText("links")).toBeInTheDocument()
   })
 })

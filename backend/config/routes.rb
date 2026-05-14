@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   inertia "/" => :home, as: :root
   inertia "about" => :about
+  inertia "others" => "others/index"
   inertia "settings" => :settings
   inertia "zukan" => :zukan
   mount ActionCable.server => "/cable"

@@ -26,6 +26,7 @@ describe("Footer", () => {
     expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("href", "/")
     expect(screen.getByText("図鑑").closest("a")).toHaveAttribute("href", "/zukan")
     expect(screen.getByText("数字").closest("a")).toHaveAttribute("href", "/numbers")
+    expect(screen.getByText("その他！").closest("a")).toHaveAttribute("href", "/others")
     expect(screen.queryByText("設定")).not.toBeInTheDocument()
     expect(screen.getByText("ブログ").closest(".Mui-selected")).not.toBeNull()
     expect(screen.getByText(`© ${new Date().getFullYear()} 増田とその他！`)).toBeInTheDocument()
@@ -53,5 +54,13 @@ describe("Footer", () => {
     render(<Footer />)
 
     expect(screen.getByText("数字").closest(".Mui-selected")).not.toBeNull()
+  })
+
+  it("その他ページではその他タブを選択する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/others" })
+
+    render(<Footer />)
+
+    expect(screen.getByText("その他！").closest(".Mui-selected")).not.toBeNull()
   })
 })

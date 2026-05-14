@@ -1,4 +1,5 @@
 import HomeIcon from "@mui/icons-material/Home"
+import AppsIcon from "@mui/icons-material/Apps"
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
 import NumbersIcon from "@mui/icons-material/Numbers"
@@ -23,5 +24,11 @@ export const MAIN_NAVIGATION_LINKS = [
     label: "図鑑",
     href: "/zukan",
     icon: <CollectionsBookmarkIcon />,
+  },
+  {
+    value: "others",
+    label: "その他！",
+    href: "/others",
+    icon: <AppsIcon />,
   },
 ]
