@@ -49,9 +49,9 @@ describe("Header", () => {
     expect(screen.getByText(/\d{2}\/\d{2}/)).toBeInTheDocument()
   })
 
-  it("ヘッダー右側に設定ボタンを表示しない", () => {
+  it("ヘッダー右側に設定リンクを表示する", () => {
     render(<Header />)
 
-    expect(screen.queryByRole("button", { name: "設定を開く" })).not.toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "設定を開く" })).toHaveAttribute("href", "/settings")
   })
 })
