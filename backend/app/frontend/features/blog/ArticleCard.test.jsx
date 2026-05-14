@@ -57,6 +57,23 @@ describe("ArticleCard", () => {
     expect(screen.getByRole("link", { name: "本文リンク" })).toHaveStyle({ textDecoration: "underline" })
   })
 
+  it("本文内画像には角丸スタイルを付ける", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: '<figure><img src="/photo.jpg" alt="本文画像"></figure>',
+        }}
+      />,
+    )
+
+    expect(screen.getByRole("img", { name: "本文画像" })).toHaveStyle({ borderRadius: "12px" })
+  })
+
   it("本文が空ならフォールバックを表示する", () => {
     render(
       <ArticleCard

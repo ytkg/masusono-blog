@@ -27,7 +27,7 @@ export default function ArticleCard({ article, mode = "list" }) {
       {hasBody ? (
         <Box
           sx={{
-            "& img": { maxWidth: "100%", height: "auto" },
+            "& img": { maxWidth: "100%", height: "auto", borderRadius: "12px" },
             "& p": { margin: "0 0 1em" },
             overflowWrap: "anywhere",
             wordBreak: "break-word",
