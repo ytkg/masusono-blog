@@ -18,9 +18,6 @@ Rails.application.routes.draw do
     namespace :app do
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }
 
-      namespace :numbers do
-        resources :metrics, only: :index
-      end
       namespace :masuda_run do
         resources :rankings, only: %i[index create]
       end

@@ -14,7 +14,7 @@ export default function NumbersIndex({ metrics }) {
 
       <PageContainer id="numbers" sx={{ pb: 10 }}>
         <SectionHeading component="h1">数字でわかる、増田とその他！</SectionHeading>
-        <NumbersPreview metrics={metrics} isLoading={false} error={null} hasError={false} />
+        <NumbersPreview metrics={metrics} />
       </PageContainer>
     </>
   )

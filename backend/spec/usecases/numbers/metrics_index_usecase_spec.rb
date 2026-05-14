@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
+RSpec.describe Numbers::MetricsIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
@@ -43,7 +43,7 @@ RSpec.describe Api::App::Numbers::MetricsIndexUsecase do
       allow(MasudaRunRanking).to receive(:total_count).and_return(25)
     end
 
-    let(:blocks) { result[:json][:blocks] }
+    let(:blocks) { result[:metrics][:blocks] }
 
     describe "起算日" do
       it do

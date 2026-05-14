@@ -20,7 +20,6 @@ RSpec.describe "API error contract", type: :request do
   end
 
   [
-    { method: :get, path: "/api/app/numbers/metrics.json", params: nil, usecase: Api::App::Numbers::MetricsIndexUsecase },
     { method: :get, path: "/api/app/masuda_run/rankings.json", params: nil, usecase: Api::App::MasudaRun::RankingsIndexUsecase },
     { method: :post, path: "/api/app/masuda_run/rankings.json", params: { score: 1234, userId: "cookie-user" }, usecase: Api::App::MasudaRun::RankingsCreateUsecase },
     { method: :get, path: "/api/app/users/cookie-user.json", params: nil, usecase: Api::App::Users::ShowUsecase },
