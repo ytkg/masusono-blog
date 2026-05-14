@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   inertia "settings" => :settings
   inertia "zukan" => :zukan
   mount ActionCable.server => "/cable"
+  get "numbers", to: "numbers#index"
   get "blog", to: "blog#index"
   get "blog/365", to: "blog#three_sixty_five"
   get "blog/:article_id", to: "blog#show"

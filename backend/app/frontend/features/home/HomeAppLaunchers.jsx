@@ -2,10 +2,9 @@ import { lazy, Suspense } from "react"
 import Box from "@mui/material/Box"
 
 const MasudaRunApp = lazy(() => import("../apps/masudaRun/MasudaRunApp"))
-const NumbersApp = lazy(() => import("../apps/numbers/NumbersApp"))
 
 function HomeAppLaunchersFallback() {
-  return Array.from({ length: 2 }, (_, index) => (
+  return Array.from({ length: 1 }, (_, index) => (
     <Box
       key={index}
       aria-hidden="true"
@@ -28,7 +27,6 @@ export default function HomeAppLaunchers() {
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
       <Suspense fallback={<HomeAppLaunchersFallback />}>
         <MasudaRunApp />
-        <NumbersApp />
       </Suspense>
     </Box>
   )
