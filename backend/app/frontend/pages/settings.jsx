@@ -12,7 +12,7 @@ export default function Settings() {
         canonicalPath="/settings"
       />
 
-      <PageContainer id="settings" sx={{ pb: 10 }}>
+      <PageContainer id="settings">
         <SectionHeading component="h1">設定</SectionHeading>
         <SettingsContent loadOnMount />
       </PageContainer>

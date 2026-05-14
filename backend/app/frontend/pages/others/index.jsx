@@ -33,7 +33,7 @@ export default function OthersIndex() {
         canonicalPath="/others"
       />
 
-      <PageContainer id="others" sx={{ pb: 10 }}>
+      <PageContainer id="others">
         <SectionHeading component="h1">増田とその他のその他！</SectionHeading>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
           <Suspense fallback={<OthersAppFallback />}>

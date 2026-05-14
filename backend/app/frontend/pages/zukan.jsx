@@ -13,7 +13,7 @@ export default function Zukan() {
         canonicalPath="/zukan"
       />
 
-      <PageContainer id="zukan" sx={{ pb: 10 }}>
+      <PageContainer id="zukan">
         <Stack spacing={1.25} sx={{ mb: 2 }}>
           <SectionHeading component="h1">増その図鑑</SectionHeading>
           <ZukanTitleAccessory />
