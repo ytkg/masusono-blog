@@ -25,11 +25,11 @@ describe("NumbersMetricsGrid", () => {
 
     expect(screen.getByText("ブログ")).toBeInTheDocument()
     expect(screen.getByText("記事数")).toBeInTheDocument()
-    expect(screen.getByText("2 本")).toBeInTheDocument()
+    expect(screen.getByText("2 本")).toHaveStyle({ fontSize: "22px" })
     expect(screen.getByText("文字数")).toBeInTheDocument()
-    expect(screen.getByText("100 字")).toBeInTheDocument()
+    expect(screen.getByText("100 字")).toHaveStyle({ fontSize: "22px" })
     expect(screen.getByText("平均")).toBeInTheDocument()
-    expect(screen.getByText("50 字")).toBeInTheDocument()
+    expect(screen.getByText("50 字")).toHaveStyle({ fontSize: "17px" })
   })
 
   it("値がない block はダッシュを表示する", () => {

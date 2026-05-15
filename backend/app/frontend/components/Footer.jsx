@@ -24,8 +24,6 @@ export default function Footer() {
         zIndex: (t) => t.zIndex.appBar,
         bgcolor: "background.default",
         color: "text.primary",
-        borderTop: "1px solid",
-        borderColor: "divider",
       }}
     >
       <BottomNavigation
@@ -62,8 +60,6 @@ export default function Footer() {
           justifyContent: "center",
           bgcolor: "background.default",
           color: "text.primary",
-          borderTop: "1px solid",
-          borderColor: "divider",
         }}
       >
         <Typography variant="body2" color="inherit">

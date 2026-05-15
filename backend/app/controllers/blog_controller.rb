@@ -1,8 +1,6 @@
 class BlogController < ApplicationController
   def index
-    result = BlogIndexUsecase.call
-
-    render_inertia_result(result)
+    redirect_to root_path
   end
 
   def three_sixty_five

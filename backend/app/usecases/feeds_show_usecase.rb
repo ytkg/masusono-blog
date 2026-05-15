@@ -37,7 +37,7 @@ class FeedsShowUsecase
       id = article[:id]
       next if id.nil? || id == ""
 
-      url = "#{SITE_URL}/blog/#{id}"
+      url = "#{SITE_URL}/articles/#{id}"
       {
         title: article[:title],
         link: url,

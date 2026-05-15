@@ -27,7 +27,7 @@ RSpec.describe "Feeds", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/rss+xml")
       expect(response.headers["Cache-Control"]).to eq("no-store")
-      blog_item_count = response.body.scan(%r{<guid isPermaLink="true">https://masusono\.com/blog/[^<]+</guid>}).size
+      blog_item_count = response.body.scan(%r{<guid isPermaLink="true">https://masusono\.com/articles/[^<]+</guid>}).size
       expect(blog_item_count).to eq(article_count)
       expect(blog_item_count).to eq(120)
       expect(response.body).to include("<title>増田とその他！</title>")

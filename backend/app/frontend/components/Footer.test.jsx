@@ -19,24 +19,35 @@ vi.mock("@inertiajs/react", async () => {
 
 describe("Footer", () => {
   it("タブとコピーライトを表示し、現在パスに応じてタブを選択する", () => {
-    vi.mocked(usePage).mockReturnValue({ url: "/blog/article-1?page=1" })
+    vi.mocked(usePage).mockReturnValue({ url: "/?page=1" })
 
     render(<Footer />)
 
     expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("href", "/")
-    expect(screen.getByText("図鑑").closest("a")).toHaveAttribute("href", "/zukan")
+    expect(screen.getByText("著者").closest("a")).toHaveAttribute("href", "/authors")
     expect(screen.getByText("数字").closest("a")).toHaveAttribute("href", "/numbers")
     expect(screen.getByText("その他！").closest("a")).toHaveAttribute("href", "/others")
-    expect(screen.getByText("ブログ").closest(".Mui-selected")).not.toBeNull()
+    expect(screen.queryByText("ブログ")).not.toBeInTheDocument()
+    expect(screen.getByText("ホーム").closest(".Mui-selected")).not.toBeNull()
     expect(screen.getByText(`© ${new Date().getFullYear()} 増田とその他！`)).toBeInTheDocument()
   })
 
-  it("図鑑ページでは図鑑タブを選択する", () => {
-    vi.mocked(usePage).mockReturnValue({ url: "/zukan" })
+  it("著者タブを数字タブより左に表示する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/" })
 
     render(<Footer />)
 
-    expect(screen.getByText("図鑑").closest(".Mui-selected")).not.toBeNull()
+    expect(screen.getByText("著者").compareDocumentPosition(screen.getByText("数字"))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+  })
+
+  it("著者ページでは著者タブを選択する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/authors" })
+
+    render(<Footer />)
+
+    expect(screen.getByText("著者").closest(".Mui-selected")).not.toBeNull()
   })
 
   it("数字ページでは数字タブを選択する", () => {

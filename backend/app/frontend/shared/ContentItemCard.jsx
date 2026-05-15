@@ -1,4 +1,5 @@
 import { Link } from "@inertiajs/react"
+import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
 import ContentCard from "./ContentCard"
@@ -20,16 +21,31 @@ export default function ContentItemCard({
   meta,
   metaParts,
   metaSeparator = " ",
+  metaPlacement = "below",
   metaSx,
+  action,
+  presentation = "card",
   children,
   sx,
 }) {
   const normalizedMetaParts = (metaParts ?? []).map((part) => String(part).trim()).filter((part) => part.length > 0)
   const resolvedMeta = meta ?? (normalizedMetaParts.length ? normalizedMetaParts.join(metaSeparator) : undefined)
+  const Container = presentation === "plain" ? Box : ContentCard
 
   return (
-    <ContentCard sx={sx}>
-      <Typography variant={titleVariant} component={titleComponent} gutterBottom sx={[{ fontWeight: 700 }, titleSx]}>
+    <Container sx={[{ position: "relative" }, sx]}>
+      {action ? <Box sx={{ position: "absolute", top: 0, right: 0 }}>{action}</Box> : null}
+      {resolvedMeta && metaPlacement === "above" ? (
+        <Typography variant="body2" color="text.secondary" sx={[{ mb: 0.75, pr: action ? 5 : 0 }, metaSx]}>
+          {resolvedMeta}
+        </Typography>
+      ) : null}
+      <Typography
+        variant={titleVariant}
+        component={titleComponent}
+        gutterBottom
+        sx={[{ fontWeight: 700, pr: action ? 5 : 0 }, titleSx]}
+      >
         {titleTo ? (
           <ContentItemTitleLink href={titleTo} prefetch>
             {title}
@@ -38,12 +54,12 @@ export default function ContentItemCard({
           title
         )}
       </Typography>
-      {resolvedMeta ? (
-        <Typography variant="body2" color="text.secondary" sx={[{ mb: 2 }, metaSx]}>
+      {resolvedMeta && metaPlacement === "below" ? (
+        <Typography variant="body2" color="text.secondary" sx={[{ mb: 2, pr: action ? 5 : 0 }, metaSx]}>
           {resolvedMeta}
         </Typography>
       ) : null}
       {children}
-    </ContentCard>
+    </Container>
   )
 }

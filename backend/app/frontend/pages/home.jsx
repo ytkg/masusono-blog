@@ -1,25 +1,24 @@
 import { useEffect } from "react"
-import Box from "@mui/material/Box"
-import Stack from "@mui/material/Stack"
-import HomeHero from "../features/home/HomeHero"
-import HomeFeatureLinks from "../features/home/HomeFeatureLinks"
 import { ensureUserIdCookie } from "@/shared/lib/userId"
+import ArticlesList from "../features/blog/ArticlesList"
+import PageContainer from "../shared/PageContainer"
 import SeoHead from "../shared/SeoHead"
 
-export default function Home() {
+export default function Home({ articles = [] }) {
   useEffect(() => {
     ensureUserIdCookie()
   }, [])
 
   return (
     <>
-      <SeoHead title="ホーム" canonicalPath="/" />
-      <Box sx={{ px: { xs: 2, sm: 3 }, py: 3, display: "flex", flexDirection: "column", gap: { xs: 3, sm: 4 } }}>
-        <HomeHero />
-        <Stack spacing={1.75}>
-          <HomeFeatureLinks />
-        </Stack>
-      </Box>
+      <SeoHead
+        title="ホーム"
+        description="「増田とその他！」のブログ記事一覧。最近の出来事やお知らせ、コラムをまとめて読むことができます。"
+        canonicalPath="/"
+      />
+      <PageContainer id="home">
+        <ArticlesList articles={articles} variant="divided" />
+      </PageContainer>
     </>
   )
 }

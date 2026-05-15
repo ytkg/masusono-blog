@@ -5,15 +5,18 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up", to: "rails/health#show", as: :rails_health_check
 
-  inertia "/" => :home, as: :root
+  root "home#index"
   inertia "about" => :about
   inertia "others" => "others/index"
-  inertia "zukan" => :zukan
+  get "authors", to: "authors#index"
+  get "zukan", to: redirect("/authors")
   mount ActionCable.server => "/cable"
   get "numbers", to: "numbers#index"
+  get "authors/:author_id", to: "authors#show"
+  get "articles/:article_id", to: "blog#show"
   get "blog", to: "blog#index"
   get "blog/365", to: "blog#three_sixty_five"
-  get "blog/:article_id", to: "blog#show"
+  get "blog/:article_id", to: redirect("/articles/%{article_id}")
   namespace :api do
     namespace :app do
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }

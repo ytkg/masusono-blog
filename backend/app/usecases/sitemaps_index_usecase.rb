@@ -5,10 +5,10 @@ class SitemapsIndexUsecase
 
   STATIC_ENTRIES = [
     { path: "/", changefreq: "weekly", priority: 1.0 },
-    { path: "/blog", changefreq: "weekly", priority: 0.8 },
     { path: "/about", changefreq: "monthly", priority: 0.7 },
-    { path: "/zukan", changefreq: "monthly", priority: 0.6 },
-    { path: "/settings", changefreq: "monthly", priority: 0.4 }
+    { path: "/authors", changefreq: "monthly", priority: 0.6 },
+    { path: "/numbers", changefreq: "monthly", priority: 0.5 },
+    { path: "/others", changefreq: "monthly", priority: 0.4 }
   ].freeze
 
   def self.call
@@ -17,7 +17,7 @@ class SitemapsIndexUsecase
 
   def call
     {
-      body: build_sitemap_xml(Article.all),
+      body: build_sitemap_xml(articles: Article.all, authors: Author.all),
       content_type: CONTENT_TYPE,
       status: :ok
     }
@@ -25,8 +25,8 @@ class SitemapsIndexUsecase
 
   private
 
-  def build_sitemap_xml(articles)
-    entries = static_entries + article_entries(articles)
+  def build_sitemap_xml(articles:, authors:)
+    entries = static_entries + author_entries(authors) + article_entries(articles)
     SitemapXmlBuilder.call(entries)
   end
 
@@ -46,10 +46,24 @@ class SitemapsIndexUsecase
       next if id.nil? || id == ""
 
       {
-        loc: "#{BASE_URL}/blog/#{id}",
+        loc: "#{BASE_URL}/articles/#{id}",
         lastmod: article[:publishedAt],
         changefreq: BLOG_ENTRY[:changefreq],
         priority: BLOG_ENTRY[:priority]
+      }
+    end
+  end
+
+  def author_entries(authors)
+    authors.filter_map do |author|
+      id = author[:id]
+      next if id.nil? || id == ""
+
+      {
+        loc: "#{BASE_URL}/authors/#{id}",
+        lastmod: author[:revisedAt] || author[:updatedAt] || author[:publishedAt],
+        changefreq: "monthly",
+        priority: 0.5
       }
     end
   end

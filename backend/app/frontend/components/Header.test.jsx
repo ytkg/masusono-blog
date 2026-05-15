@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { fireEvent, render, screen } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
 import Header from "./Header"
+import { usePage } from "@inertiajs/react"
 
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
@@ -12,6 +13,7 @@ vi.mock("@inertiajs/react", async () => {
         </a>
       )
     }),
+    usePage: vi.fn(() => ({ url: "/" })),
   }
 })
 
@@ -20,10 +22,6 @@ vi.mock("../assets/logo.webp", () => ({
 }))
 
 describe("Header", () => {
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
   it("ホームへのリンク付きロゴを表示する", () => {
     render(<Header />)
 
@@ -32,21 +30,31 @@ describe("Header", () => {
     expect(image.closest("a")).toHaveAttribute("href", "/")
   })
 
-  it("ヘッダー左側に日付のみ表示する", () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date("2026-03-09T12:34:56+09:00"))
-
+  it("通常ページでは戻るボタンを表示しない", () => {
     render(<Header />)
 
-    expect(screen.getByText("03/09")).toBeInTheDocument()
-    expect(screen.getByText("MON")).toBeInTheDocument()
-    expect(screen.queryByText(/12:34:56/)).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "前のページに戻る" })).not.toBeInTheDocument()
+    expect(screen.queryByText(/\d{2}\/\d{2}/)).not.toBeInTheDocument()
   })
 
-  it("日付表示はパス情報に依存しない", () => {
+  it("個別記事ページでは戻るボタンを表示し、前のページへ戻る", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/articles/hello-world" })
+    const back = vi.spyOn(window.history, "back").mockImplementation(() => {})
+    vi.spyOn(window.history, "length", "get").mockReturnValue(2)
     render(<Header />)
 
-    expect(screen.getByText(/\d{2}\/\d{2}/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "前のページに戻る" }))
+
+    expect(back).toHaveBeenCalledTimes(1)
+    back.mockRestore()
+  })
+
+  it("著者ページでは戻るボタンを表示する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/authors/masuda" })
+
+    render(<Header />)
+
+    expect(screen.getByRole("button", { name: "前のページに戻る" })).toBeInTheDocument()
   })
 
   it("ヘッダー右側に設定リンクを表示しない", () => {

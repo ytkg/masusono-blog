@@ -3,7 +3,11 @@ import { describe, expect, it, vi } from "vitest"
 import ArticlesList from "./ArticlesList"
 
 vi.mock("./ArticleCard", () => ({
-  default: ({ article }) => <div>{article.title}</div>,
+  default: ({ article, presentation }) => (
+    <div>
+      {article.title}:{presentation ?? "card"}
+    </div>
+  ),
 }))
 
 describe("ArticlesList", () => {
@@ -29,7 +33,22 @@ describe("ArticlesList", () => {
       />,
     )
 
-    expect(screen.getByText("記事1")).toBeInTheDocument()
-    expect(screen.getByText("記事2")).toBeInTheDocument()
+    expect(screen.getByText("記事1:card")).toBeInTheDocument()
+    expect(screen.getByText("記事2:card")).toBeInTheDocument()
+  })
+
+  it("区切り線型の記事一覧を描画する", () => {
+    render(
+      <ArticlesList
+        variant="divided"
+        articles={[
+          { id: "a1", title: "記事1" },
+          { id: "a2", title: "記事2" },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText("記事1:plain")).toBeInTheDocument()
+    expect(screen.getByText("記事2:plain")).toBeInTheDocument()
   })
 })

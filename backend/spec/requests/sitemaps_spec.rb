@@ -17,6 +17,7 @@ RSpec.describe "Sitemaps", type: :request do
 
     before do
       allow(Article).to receive(:all).and_return(articles)
+      allow(Author).to receive(:all).and_return([])
     end
 
     it do
@@ -27,7 +28,7 @@ RSpec.describe "Sitemaps", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/xml")
       expect(response.headers["Cache-Control"]).to eq("no-store")
-      blog_entry_count = response.body.scan(%r{<loc>https://masusono\.com/blog/[^<]+</loc>}).size
+      blog_entry_count = response.body.scan(%r{<loc>https://masusono\.com/articles/[^<]+</loc>}).size
       expect(blog_entry_count).to eq(article_count)
       expect(blog_entry_count).to eq(120)
     end

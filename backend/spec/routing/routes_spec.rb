@@ -5,6 +5,10 @@ RSpec.describe "Web routes", type: :routing do
     expect(get: "/up").to route_to("rails/health#show")
   end
 
+  it "routes / to home#index" do
+    expect(get: "/").to route_to("home#index")
+  end
+
   it "routes /blog to blog#index" do
     expect(get: "/blog").to route_to("blog#index")
   end
@@ -13,12 +17,16 @@ RSpec.describe "Web routes", type: :routing do
     expect(get: "/numbers").to route_to("numbers#index")
   end
 
+  it "routes /authors/:author_id to authors#show" do
+    expect(get: "/authors/9wgrey2lh3").to route_to("authors#show", author_id: "9wgrey2lh3")
+  end
+
   it "routes /blog/365 to blog#three_sixty_five" do
     expect(get: "/blog/365").to route_to("blog#three_sixty_five")
   end
 
-  it "routes /blog/:article_id to blog#show" do
-    expect(get: "/blog/article-1").to route_to("blog#show", article_id: "article-1")
+  it "routes /articles/:article_id to blog#show" do
+    expect(get: "/articles/article-1").to route_to("blog#show", article_id: "article-1")
   end
 
   it "routes /api/app/masuda_run/rankings.json to api/app/masuda_run/rankings#index" do

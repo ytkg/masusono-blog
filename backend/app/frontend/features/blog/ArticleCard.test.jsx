@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import ArticleCard from "./ArticleCard"
 
@@ -16,6 +16,17 @@ vi.mock("@inertiajs/react", async () => {
 })
 
 describe("ArticleCard", () => {
+  function mockClipboard() {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    })
+
+    return writeText
+  }
+
   it("article がない場合は案内を表示する", () => {
     render(<ArticleCard article={null} />)
 
@@ -35,9 +46,34 @@ describe("ArticleCard", () => {
       />,
     )
 
-    expect(screen.getByRole("link", { name: "Hello" })).toHaveAttribute("href", "/blog/hello-world")
+    expect(screen.getByRole("link", { name: "Hello" })).toHaveAttribute("href", "/articles/hello-world")
     expect(screen.getByText("本文です")).toBeInTheDocument()
     expect(screen.getByText("2026/03/09 増田")).toBeInTheDocument()
+  })
+
+  it("記事メニューから記事URLをコピーできる", async () => {
+    const writeText = mockClipboard()
+
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    fireEvent.click(screen.getByRole("menuitem", { name: "記事URLをコピー" }))
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith("http://localhost:3000/articles/hello-world")
+    })
+    expect(await screen.findByText("記事URLをコピーしました")).toBeInTheDocument()
   })
 
   it("本文内リンクには下線スタイルを付ける", () => {
@@ -57,6 +93,23 @@ describe("ArticleCard", () => {
     expect(screen.getByRole("link", { name: "本文リンク" })).toHaveStyle({ textDecoration: "underline" })
   })
 
+  it("ブログ本文は薄めの色で表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId("article-body-html")).toHaveStyle({ color: "rgba(0, 0, 0, 0.6)" })
+  })
+
   it("本文内画像には角丸スタイルを付ける", () => {
     render(
       <ArticleCard
@@ -72,6 +125,169 @@ describe("ArticleCard", () => {
     )
 
     expect(screen.getByRole("img", { name: "本文画像" })).toHaveStyle({ borderRadius: "12px" })
+  })
+
+  it("plain presentation ではカード枠を消す", () => {
+    const { container } = render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(container.querySelector(".MuiBox-root")).toContainElement(screen.getByRole("link", { name: "Hello" }))
+  })
+
+  it("plain presentation では著者と日付をタイトルより上に表示する", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    const meta = screen.getByTestId("article-meta-author").closest("p")
+    const title = screen.getByRole("link", { name: "Hello" })
+
+    expect(meta).toHaveTextContent("増田 2026/03/09")
+    expect(meta.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it("plain presentation では著者名を日付より目立たせる", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId("article-meta-author")).toHaveStyle({ fontWeight: "700" })
+  })
+
+  it("plain presentation では著者名から著者ページへ遷移できる", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          authorId: "9wgrey2lh3",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId("article-meta-author")).toHaveAttribute("href", "/authors/9wgrey2lh3")
+  })
+
+  it("plain presentation では著者アイコンから著者ページへ遷移できる", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          authorId: "9wgrey2lh3",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByRole("link", { name: "増田の著者ページへ" })).toHaveAttribute("href", "/authors/9wgrey2lh3")
+  })
+
+  it("plain presentation ではAPI由来の著者画像URLをアイコンに使う", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          authorId: "9wgrey2lh3",
+          authorImageUrl: "/author.webp",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByRole("img", { name: "増田" })).toHaveAttribute("src", "/author.webp")
+  })
+
+  it("plain presentation の一覧では抜粋を表示し、その場で全文を展開できる", () => {
+    const longText = "あ".repeat(100)
+
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: `<p>${longText}</p><p>追加本文</p>`,
+        }}
+      />,
+    )
+
+    expect(screen.getByText(`${"あ".repeat(80)}…`)).toBeInTheDocument()
+    expect(screen.queryByText("追加本文")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "続きを読む" })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("button", { name: "続きを読む" }))
+
+    expect(screen.getByText(longText)).toBeInTheDocument()
+    expect(screen.getByText("追加本文")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "閉じる" })).toBeInTheDocument()
+  })
+
+  it("詳細の plain presentation では著者情報を記事部分の上に表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          authorId: "9wgrey2lh3",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    const author = screen.getByTestId("article-detail-author")
+    const meta = screen.getByTestId("article-detail-meta")
+    const title = screen.getByRole("heading", { name: "Hello" })
+
+    expect(author).toHaveAttribute("href", "/authors/9wgrey2lh3")
+    expect(screen.getByText("2026/03/09")).toBeInTheDocument()
+    expect(meta).toHaveStyle({ display: "flex" })
+    expect(author.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it("本文が空ならフォールバックを表示する", () => {

@@ -24,7 +24,9 @@ vi.mock("../../shared/SeoHead", () => ({
 }))
 
 vi.mock("../../features/blog/ArticleCard", () => ({
-  default: ({ article, mode }) => <div>{`article:${mode}:${article?.title ?? "missing"}`}</div>,
+  default: ({ article, mode, presentation }) => (
+    <div>{`article:${mode}:${presentation}:${article?.title ?? "missing"}`}</div>
+  ),
 }))
 
 describe("BlogDetail page", () => {
@@ -42,17 +44,17 @@ describe("BlogDetail page", () => {
     const [{ title, description, canonicalPath }] = seoMock.mock.calls[0]
     expect(title).toBe("Hello")
     expect(description).toBe(`${"あ".repeat(120)}…`)
-    expect(canonicalPath).toBe("/blog/hello-world")
-    expect(screen.getByText("article:detail:Hello")).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /記事一覧に戻る/ })).toHaveAttribute("href", "/blog")
+    expect(canonicalPath).toBe("/articles/hello-world")
+    expect(screen.queryByRole("heading", { name: "ブログ" })).not.toBeInTheDocument()
+    expect(screen.getByText("article:detail:plain:Hello")).toBeInTheDocument()
   })
 
-  it("article がなければ一覧 canonical に戻す", () => {
+  it("article がなければトップページ canonical に戻す", () => {
     render(<BlogDetail article={null} />)
 
     const [{ title, description, canonicalPath }] = seoMock.mock.calls.at(-1)
     expect(title).toBe("ブログ記事")
     expect(description).toBeUndefined()
-    expect(canonicalPath).toBe("/blog")
+    expect(canonicalPath).toBe("/")
   })
 })

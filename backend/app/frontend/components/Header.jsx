@@ -1,35 +1,24 @@
-import { useEffect, useState } from "react"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
+import IconButton from "@mui/material/IconButton"
 import Toolbar from "@mui/material/Toolbar"
-import Typography from "@mui/material/Typography"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import logo from "../assets/logo.webp"
 
-function getHeaderDateParts(date) {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    timeZone: "Asia/Tokyo",
-    weekday: "short",
-  })
-  const parts = Object.fromEntries(formatter.formatToParts(date).map((part) => [part.type, part.value]))
-
-  return {
-    date: `${parts.month}/${parts.day}`,
-    weekday: parts.weekday.toUpperCase(),
+function goBack() {
+  if (window.history.length > 1) {
+    window.history.back()
+    return
   }
+
+  window.location.assign("/")
 }
 
 export default function Header() {
-  const [now, setNow] = useState(() => new Date())
-
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000)
-    return () => window.clearInterval(id)
-  }, [])
-
-  const headerDate = getHeaderDateParts(now)
+  const { url } = usePage()
+  const path = String(url || "/").split("?")[0]
+  const showsBackButton = path.startsWith("/articles/") || path.startsWith("/authors/")
 
   return (
     <AppBar
@@ -80,33 +69,23 @@ export default function Header() {
             }}
           />
         </Box>
-        <Typography
-          variant="caption"
-          sx={{
-            alignSelf: "center",
-            color: "text.primary",
-            display: "inline-flex",
-            alignItems: "baseline",
-            fontSize: "1.125rem",
-            fontWeight: 600,
-            gap: 0.5,
-            gridColumn: 1,
-            gridRow: 1,
-            justifySelf: "start",
-            lineHeight: 1.2,
-            maxWidth: "100%",
-            overflow: "hidden",
-            textAlign: "left",
-            textOverflow: "ellipsis",
-            transform: "translateY(2px)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <Box component="span">{headerDate.date}</Box>
-          <Box component="span" sx={{ fontSize: "0.75em", lineHeight: 1 }}>
-            {headerDate.weekday}
-          </Box>
-        </Typography>
+        {showsBackButton ? (
+          <IconButton
+            aria-label="前のページに戻る"
+            onClick={goBack}
+            size="small"
+            sx={{
+              alignSelf: "center",
+              color: "text.secondary",
+              gridColumn: 1,
+              gridRow: 1,
+              justifySelf: "start",
+              transform: "translate(-8px, 2px)",
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+        ) : null}
       </Toolbar>
     </AppBar>
   )

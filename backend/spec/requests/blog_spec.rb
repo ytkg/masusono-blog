@@ -4,32 +4,10 @@ RSpec.describe "WebBlog", type: :request do
   let(:html_headers) { { "ACCEPT" => "text/html" } }
 
   describe "GET /blog" do
-    before do
-      allow(BlogIndexUsecase).to receive(:call).and_return(
-        {
-          props: {
-            articles: [
-              {
-                id: "article-1",
-                title: "記事1",
-                publishedDate: "2026/02/10",
-                content: "<p>本文</p>",
-                author: "著者"
-              }
-            ]
-          },
-          status: :ok
-        }
-      )
-    end
-
-    it "Inertiaページを返す" do
+    it "トップページへリダイレクトする" do
       get "/blog", headers: html_headers
 
-      expect(response).to have_http_status(:ok)
-      expect(inertia).to be_inertia_response
-      expect(inertia).to render_component("blog/index")
-      expect(inertia.props.dig("articles", 0, "id")).to eq("article-1")
+      expect(response).to redirect_to("/")
     end
   end
 
@@ -78,7 +56,7 @@ RSpec.describe "WebBlog", type: :request do
     end
   end
 
-  describe "GET /blog/:article_id" do
+  describe "GET /articles/:article_id" do
     context "記事が存在する場合" do
       before do
         allow(BlogShowUsecase).to receive(:call).with(article_id: "article-1").and_return(
@@ -98,7 +76,7 @@ RSpec.describe "WebBlog", type: :request do
       end
 
       it "詳細Inertiaページを返す" do
-        get "/blog/article-1", headers: html_headers
+        get "/articles/article-1", headers: html_headers
 
         expect(response).to have_http_status(:ok)
         expect(inertia).to be_inertia_response
@@ -120,12 +98,20 @@ RSpec.describe "WebBlog", type: :request do
       end
 
       it "Inertiaの404ページを返す" do
-        get "/blog/missing", headers: html_headers
+        get "/articles/missing", headers: html_headers
 
         expect(response).to have_http_status(:not_found)
         expect(inertia).to be_inertia_response
         expect(inertia).to render_component("errors/not_found")
       end
+    end
+  end
+
+  describe "GET /blog/:article_id" do
+    it "新しい記事URLへリダイレクトする" do
+      get "/blog/article-1", headers: html_headers
+
+      expect(response).to redirect_to("/articles/article-1")
     end
   end
 end
