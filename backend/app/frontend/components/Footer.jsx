@@ -24,6 +24,8 @@ export default function Footer() {
         zIndex: (t) => t.zIndex.appBar,
         bgcolor: "background.default",
         color: "text.primary",
+        borderTop: "1px solid",
+        borderColor: "divider",
       }}
     >
       <BottomNavigation
@@ -54,7 +56,7 @@ export default function Footer() {
       </BottomNavigation>
       <Box
         sx={{
-          height: 36,
+          height: 28,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

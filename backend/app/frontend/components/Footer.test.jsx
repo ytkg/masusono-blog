@@ -32,6 +32,14 @@ describe("Footer", () => {
     expect(screen.getByText(`© ${new Date().getFullYear()} 増田とその他！`)).toBeInTheDocument()
   })
 
+  it("フッター上部の区切り線を表示する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/" })
+
+    const { container } = render(<Footer />)
+
+    expect(container.querySelector("footer")).toHaveStyle({ borderTopStyle: "solid" })
+  })
+
   it("著者タブを数字タブより左に表示する", () => {
     vi.mocked(usePage).mockReturnValue({ url: "/" })
 
