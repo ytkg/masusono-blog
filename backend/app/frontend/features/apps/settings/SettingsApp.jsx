@@ -2,9 +2,11 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
+import SettingsIcon from "@mui/icons-material/Settings"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useCallback, useEffect, useState } from "react"
+import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 
 const DEFAULT_NAME = "NO NAME"
 const labelTextSx = { fontSize: "14px" }
@@ -178,5 +180,13 @@ export function SettingsContent({ loadOnMount = false }) {
         </Typography>
       ) : null}
     </Box>
+  )
+}
+
+export default function SettingsApp() {
+  return (
+    <AppsDrawerLauncher title="設定" launcherLabel="設定" buttonAriaLabel="設定を開く" buttonIcon={<SettingsIcon />}>
+      <SettingsContent loadOnMount />
+    </AppsDrawerLauncher>
   )
 }

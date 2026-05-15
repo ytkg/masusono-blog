@@ -5,6 +5,7 @@ import SectionHeading from "../../shared/SectionHeading"
 import SeoHead from "../../shared/SeoHead"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
+const SettingsApp = lazy(() => import("../../features/apps/settings/SettingsApp"))
 
 function OthersAppFallback() {
   return (
@@ -38,6 +39,7 @@ export default function OthersIndex() {
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
           <Suspense fallback={<OthersAppFallback />}>
             <MasudaRunApp />
+            <SettingsApp />
           </Suspense>
         </Box>
       </PageContainer>

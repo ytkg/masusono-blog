@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react"
-import SettingsIcon from "@mui/icons-material/Settings"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
-import IconButton from "@mui/material/IconButton"
-import Tooltip from "@mui/material/Tooltip"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import { Link } from "@inertiajs/react"
@@ -110,24 +107,6 @@ export default function Header() {
             {headerDate.weekday}
           </Box>
         </Typography>
-        <Tooltip title="設定">
-          <IconButton
-            aria-label="設定を開く"
-            color="inherit"
-            component={Link}
-            href="/settings"
-            prefetch
-            sx={{
-              alignSelf: "center",
-              gridColumn: 3,
-              gridRow: 1,
-              justifySelf: "end",
-              transform: "translate(6px, 3px)",
-            }}
-          >
-            <SettingsIcon />
-          </IconButton>
-        </Tooltip>
       </Toolbar>
     </AppBar>
   )

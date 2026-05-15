@@ -10,12 +10,17 @@ vi.mock("../../features/apps/masudaRun/MasudaRunApp", () => ({
   default: () => <div>MasudaRunApp</div>,
 }))
 
+vi.mock("../../features/apps/settings/SettingsApp", () => ({
+  default: () => <div>SettingsApp</div>,
+}))
+
 describe("Others page", () => {
-  it("その他ページに増田RUNを表示する", async () => {
+  it("その他ページにミニアプリを表示する", async () => {
     render(<OthersIndex />)
 
     expect(screen.getByText("seo:増田とその他のその他！:/others")).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "増田とその他のその他！" })).toBeInTheDocument()
     expect(await screen.findByText("MasudaRunApp")).toBeInTheDocument()
+    expect(await screen.findByText("SettingsApp")).toBeInTheDocument()
   })
 })
