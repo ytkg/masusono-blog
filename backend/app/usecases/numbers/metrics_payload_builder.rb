@@ -13,7 +13,6 @@ module Numbers
 
     LABELS = {
       launch: "増田とその他！始動から",
-      blog: "ブログ",
       total_articles: "総記事数",
       total_chars: "総文字数",
       masuda_run_total_plays: "増田RUN総プレイ回数",
@@ -38,7 +37,7 @@ module Numbers
       {
         blocks: [
           build_launch_block,
-          build_blog_block,
+          *build_blog_metric_blocks,
           build_masuda_run_block
         ]
       }
@@ -50,10 +49,6 @@ module Numbers
 
     def build_launch_block
       build_block(label: launch_label, value: days_since_launch_text)
-    end
-
-    def build_blog_block
-      build_section_block(label(:blog), children: build_blog_metric_blocks)
     end
 
     def build_blog_metric_blocks
@@ -92,10 +87,6 @@ module Numbers
       block = { label: label, value: value }
       block[:children] = children if children
       block
-    end
-
-    def build_section_block(section_label, children:)
-      build_block(label: section_label, value: nil, children: children)
     end
 
     def build_count_block(label_key:, value:, unit_key:, children: nil)

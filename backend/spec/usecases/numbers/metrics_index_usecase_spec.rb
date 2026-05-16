@@ -57,16 +57,9 @@ RSpec.describe Numbers::MetricsIndexUsecase do
       end
     end
 
-    describe "ブログ" do
-      let(:blog_block) { blocks.find { |block| block[:label] == "ブログ" } }
-      let(:children) { blog_block[:children] }
-
+    describe "記事" do
       it do
-        expect(blog_block).not_to be_nil
-      end
-
-      it do
-        total_articles = children.find { |child| child[:label] == "総記事数" }
+        total_articles = blocks.find { |block| block[:label] == "総記事数" }
 
         expect(total_articles[:value]).to eq("4 本")
         expect(total_articles[:children]).to eq([
@@ -78,7 +71,7 @@ RSpec.describe Numbers::MetricsIndexUsecase do
       end
 
       it do
-        total_chars = children.find { |child| child[:label] == "総文字数" }
+        total_chars = blocks.find { |block| block[:label] == "総文字数" }
 
         expect(total_chars[:value]).to eq("12 字")
         expect(total_chars[:children]).to eq([
@@ -87,6 +80,11 @@ RSpec.describe Numbers::MetricsIndexUsecase do
           { label: "その他4の総文字数", value: "4 字" },
           { label: "不明の総文字数", value: "2 字" }
         ])
+      end
+
+      it do
+        expect(blocks.map { |block| block[:label] }).to include("総記事数", "総文字数")
+        expect(blocks.map { |block| block[:label] }).not_to include("ブログ")
       end
     end
 

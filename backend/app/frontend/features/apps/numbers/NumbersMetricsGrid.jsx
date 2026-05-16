@@ -9,7 +9,7 @@ const childRowsGridSx = {
   rowGap: 1.25,
 }
 
-const indentSx = [{ pl: 2 }, { pl: 4 }, { pl: 6 }]
+const indentSx = [{ pl: 2 }, { pl: 2 }, { pl: 4 }]
 const valueSx = { fontWeight: 700, fontSize: "22px", textAlign: "right", justifySelf: "end" }
 const childValueSx = { fontWeight: 700, fontSize: "17px", textAlign: "right", justifySelf: "end" }
 const labelTextSx = { fontSize: "14px" }
@@ -48,7 +48,7 @@ function MetricRowList({ rows }) {
 }
 
 function MetricCard({ block, isLast }) {
-  const rows = flattenMetricRows(block.children ?? [])
+  const rows = flattenMetricRows(block.children ?? [], block.value ? 1 : 0)
   const hasRows = rows.length > 0
   const showValue = !hasRows || Boolean(block.value)
 

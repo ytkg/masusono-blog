@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import NumbersMetricsGrid from "./NumbersMetricsGrid"
 
 describe("NumbersMetricsGrid", () => {
-  it("ネストした metrics をフラットに描画する", () => {
+  it("セクション配下の metrics を主指標として描画する", () => {
     render(
       <NumbersMetricsGrid
         blocks={[
@@ -30,6 +30,25 @@ describe("NumbersMetricsGrid", () => {
     expect(screen.getByText("100 字")).toHaveStyle({ fontSize: "22px" })
     expect(screen.getByText("平均")).toBeInTheDocument()
     expect(screen.getByText("50 字")).toHaveStyle({ fontSize: "17px" })
+  })
+
+  it("値を持つ指標の子要素は子指標として描画する", () => {
+    render(
+      <NumbersMetricsGrid
+        blocks={[
+          {
+            label: "総記事数",
+            value: "2 本",
+            children: [{ label: "増田の総記事数", value: "1 本" }],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText("総記事数")).toBeInTheDocument()
+    expect(screen.getByText("2 本")).toHaveStyle({ fontSize: "22px" })
+    expect(screen.getByText("増田の総記事数")).toBeInTheDocument()
+    expect(screen.getByText("1 本")).toHaveStyle({ fontSize: "17px" })
   })
 
   it("値がない block はダッシュを表示する", () => {
