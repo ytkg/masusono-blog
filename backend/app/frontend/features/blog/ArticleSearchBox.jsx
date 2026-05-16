@@ -6,7 +6,7 @@ import InputAdornment from "@mui/material/InputAdornment"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 
-export default function ArticleSearchBox({ inputRef, isSearching, onChange, onClear, query, resultCount }) {
+export default function ArticleSearchBox({ isSearching, onChange, onClear, query, resultCount }) {
   return (
     <Box
       sx={{
@@ -20,7 +20,6 @@ export default function ArticleSearchBox({ inputRef, isSearching, onChange, onCl
     >
       <TextField
         fullWidth
-        inputRef={inputRef}
         value={query}
         onChange={(event) => onChange(event.target.value)}
         placeholder="記事を検索"

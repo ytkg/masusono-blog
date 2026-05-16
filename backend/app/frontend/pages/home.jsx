@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import { ensureUserIdCookie } from "@/shared/lib/userId"
 import ArticleSearchBox from "../features/blog/ArticleSearchBox"
@@ -10,8 +10,7 @@ import SeoHead from "../shared/SeoHead"
 
 export default function Home({ articles = [] }) {
   const [query, setQuery] = useState("")
-  const [searchVisible, setSearchVisible] = useState(false)
-  const searchInputRef = useRef(null)
+  const [searchMounted, setSearchMounted] = useState(false)
   const normalizedQuery = normalizeArticleSearchText(query)
   const isSearching = Boolean(normalizedQuery)
   const filteredArticles = useMemo(
@@ -25,18 +24,19 @@ export default function Home({ articles = [] }) {
 
   useEffect(() => {
     function toggleSearch() {
-      setSearchVisible((current) => (current && normalizedQuery ? true : !current))
+      if (searchMounted) {
+        if (!normalizedQuery) {
+          setSearchMounted(false)
+        }
+        return
+      }
+
+      setSearchMounted(true)
     }
 
     window.addEventListener(TOGGLE_HOME_SEARCH_EVENT, toggleSearch)
     return () => window.removeEventListener(TOGGLE_HOME_SEARCH_EVENT, toggleSearch)
-  }, [normalizedQuery])
-
-  useEffect(() => {
-    if (searchVisible) {
-      searchInputRef.current?.focus()
-    }
-  }, [searchVisible])
+  }, [normalizedQuery, searchMounted])
 
   return (
     <>
@@ -47,16 +47,28 @@ export default function Home({ articles = [] }) {
       />
       <PageContainer id="home">
         <Box sx={{ display: "grid", gap: 1.5 }}>
-          {searchVisible ? (
-            <ArticleSearchBox
-              inputRef={searchInputRef}
-              isSearching={isSearching}
-              onChange={setQuery}
-              onClear={() => setQuery("")}
-              query={query}
-              resultCount={filteredArticles.length}
-            />
-          ) : null}
+          <Box
+            aria-hidden={!searchMounted}
+            sx={{
+              display: "grid",
+              gridTemplateRows: searchMounted ? "1fr" : "0fr",
+              opacity: searchMounted ? 1 : 0,
+              overflow: "hidden",
+              transition:
+                "grid-template-rows 220ms cubic-bezier(0.2, 0, 0, 1), opacity 140ms cubic-bezier(0.2, 0, 0, 1)",
+              pointerEvents: searchMounted ? "auto" : "none",
+            }}
+          >
+            <Box sx={{ minHeight: 0 }}>
+              <ArticleSearchBox
+                isSearching={isSearching}
+                onChange={setQuery}
+                onClear={() => setQuery("")}
+                query={query}
+                resultCount={filteredArticles.length}
+              />
+            </Box>
+          </Box>
           <ArticlesList
             articles={filteredArticles}
             variant="divided"

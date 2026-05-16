@@ -61,7 +61,16 @@ describe("Home page", () => {
     openSearch()
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveAttribute("placeholder", "記事を検索")
-    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveFocus()
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).not.toHaveFocus()
+  })
+
+  it("検索欄を閉じると操作対象から外れる", () => {
+    render(<Home articles={articles} />)
+
+    openSearch()
+    openSearch()
+
+    expect(screen.queryByRole("textbox", { name: "記事を検索" })).not.toBeInTheDocument()
   })
 
   it("検索語でタイトル・本文・著者名を即時に絞り込む", () => {
