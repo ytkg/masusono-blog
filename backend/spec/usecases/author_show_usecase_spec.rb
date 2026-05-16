@@ -63,7 +63,7 @@ RSpec.describe AuthorShowUsecase do
       expect(result.dig(:props, :author, :name)).to eq("増田")
       expect(result.dig(:props, :author, :bio)).to eq("プロフィール本文")
       expect(result.dig(:props, :author, :imageUrl)).to eq("https://images.microcms-assets.io/assets/masuda.webp")
-      expect(result.dig(:props, :articles).map { |article| article[:id] }).to eq(["article-1"])
+      expect(result.dig(:props, :articles).map { |article| article[:id] }).to eq([ "article-1" ])
       expect(result[:status]).to eq(:ok)
     end
 
