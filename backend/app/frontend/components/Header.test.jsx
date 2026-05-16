@@ -37,6 +37,17 @@ describe("Header", () => {
     expect(screen.queryByText(/\d{2}\/\d{2}/)).not.toBeInTheDocument()
   })
 
+  it("トップページでは検索ボタンを表示し、検索表示イベントを発火する", () => {
+    const dispatchEvent = vi.spyOn(window, "dispatchEvent")
+
+    render(<Header />)
+
+    fireEvent.click(screen.getByRole("button", { name: "記事を検索" }))
+
+    expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "masusono:toggle-home-search" }))
+    dispatchEvent.mockRestore()
+  })
+
   it("個別記事ページでは戻るボタンを表示し、前のページへ戻る", () => {
     vi.mocked(usePage).mockReturnValue({ url: "/articles/hello-world" })
     const back = vi.spyOn(window.history, "back").mockImplementation(() => {})
@@ -47,6 +58,7 @@ describe("Header", () => {
 
     expect(back).toHaveBeenCalledTimes(1)
     back.mockRestore()
+    expect(screen.queryByRole("button", { name: "記事を検索" })).not.toBeInTheDocument()
   })
 
   it("著者ページでは戻るボタンを表示する", () => {
