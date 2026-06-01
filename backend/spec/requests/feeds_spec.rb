@@ -34,5 +34,12 @@ RSpec.describe "Feeds", type: :request do
       expect(response.body).to include("<link>https://masusono.com</link>")
       expect(response.body).to include('<atom:link href="https://masusono.com/feed.xml" rel="self" type="application/rss+xml" />')
     end
+
+    it "任意の Origin から取得できる CORS ヘッダーを返す" do
+      get "/feed.xml", headers: { "Origin" => "https://example.com" }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+    end
   end
 end
