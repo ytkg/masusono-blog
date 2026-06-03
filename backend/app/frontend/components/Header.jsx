@@ -4,8 +4,6 @@ import IconButton from "@mui/material/IconButton"
 import Toolbar from "@mui/material/Toolbar"
 import { Link, usePage } from "@inertiajs/react"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import SearchIcon from "@mui/icons-material/Search"
-import { TOGGLE_HOME_SEARCH_EVENT } from "../shared/homeSearchEvents"
 import logo from "../assets/logo.webp"
 
 function goBack() {
@@ -21,7 +19,6 @@ export default function Header() {
   const { url } = usePage()
   const path = String(url || "/").split("?")[0]
   const showsBackButton = path.startsWith("/articles/") || path.startsWith("/authors/")
-  const showsSearchButton = path === "/"
 
   return (
     <AppBar
@@ -87,23 +84,6 @@ export default function Header() {
             }}
           >
             <ArrowBackIcon />
-          </IconButton>
-        ) : null}
-        {showsSearchButton ? (
-          <IconButton
-            aria-label="記事を検索"
-            onClick={() => window.dispatchEvent(new Event(TOGGLE_HOME_SEARCH_EVENT))}
-            size="small"
-            sx={{
-              alignSelf: "center",
-              color: "text.secondary",
-              gridColumn: 3,
-              gridRow: 1,
-              justifySelf: "end",
-              transform: "translate(8px, 2px)",
-            }}
-          >
-            <SearchIcon />
           </IconButton>
         ) : null}
       </Toolbar>

@@ -43,6 +43,34 @@ RSpec.describe "WebHome", type: :request do
     end
   end
 
+  describe "GET /search" do
+    before do
+      allow(BlogIndexUsecase).to receive(:call).and_return(
+        {
+          props: {
+            articles: [
+              {
+                id: "article-1",
+                title: "記事1"
+              }
+            ]
+          },
+          status: :ok
+        }
+      )
+    end
+
+    it "Inertiaページを返す" do
+      get "/search", headers: html_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("text/html")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("search")
+      expect(inertia.props.dig("articles", 0, "id")).to eq("article-1")
+    end
+  end
+
   describe "GET /others" do
     it "Inertiaページを返す" do
       get "/others", headers: html_headers

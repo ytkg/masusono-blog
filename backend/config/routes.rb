@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   root "home#index"
   inertia "about" => :about
   inertia "others" => "others/index"
+  get "search", to: "search#index"
   get "authors", to: "authors#index"
   get "zukan", to: redirect("/authors")
   mount ActionCable.server => "/cable"

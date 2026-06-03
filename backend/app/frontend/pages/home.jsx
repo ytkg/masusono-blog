@@ -1,42 +1,14 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect } from "react"
 import Box from "@mui/material/Box"
 import { ensureUserIdCookie } from "@/shared/lib/userId"
-import ArticleSearchBox from "../features/blog/ArticleSearchBox"
-import { articleMatchesQuery, normalizeArticleSearchText } from "../features/blog/articleSearch"
 import ArticlesList from "../features/blog/ArticlesList"
 import PageContainer from "../shared/PageContainer"
-import { TOGGLE_HOME_SEARCH_EVENT } from "../shared/homeSearchEvents"
 import SeoHead from "../shared/SeoHead"
 
 export default function Home({ articles = [] }) {
-  const [query, setQuery] = useState("")
-  const [searchMounted, setSearchMounted] = useState(false)
-  const normalizedQuery = normalizeArticleSearchText(query)
-  const isSearching = Boolean(normalizedQuery)
-  const filteredArticles = useMemo(
-    () => articles.filter((article) => articleMatchesQuery(article, normalizedQuery)),
-    [articles, normalizedQuery],
-  )
-
   useEffect(() => {
     ensureUserIdCookie()
   }, [])
-
-  useEffect(() => {
-    function toggleSearch() {
-      if (searchMounted) {
-        if (!normalizedQuery) {
-          setSearchMounted(false)
-        }
-        return
-      }
-
-      setSearchMounted(true)
-    }
-
-    window.addEventListener(TOGGLE_HOME_SEARCH_EVENT, toggleSearch)
-    return () => window.removeEventListener(TOGGLE_HOME_SEARCH_EVENT, toggleSearch)
-  }, [normalizedQuery, searchMounted])
 
   return (
     <>
@@ -47,33 +19,7 @@ export default function Home({ articles = [] }) {
       />
       <PageContainer id="home">
         <Box sx={{ display: "grid", gap: 1.5 }}>
-          <Box
-            aria-hidden={!searchMounted}
-            sx={{
-              display: "grid",
-              gridTemplateRows: searchMounted ? "1fr" : "0fr",
-              opacity: searchMounted ? 1 : 0,
-              overflow: "hidden",
-              transition:
-                "grid-template-rows 220ms cubic-bezier(0.2, 0, 0, 1), opacity 140ms cubic-bezier(0.2, 0, 0, 1)",
-              pointerEvents: searchMounted ? "auto" : "none",
-            }}
-          >
-            <Box sx={{ minHeight: 0 }}>
-              <ArticleSearchBox
-                isSearching={isSearching}
-                onChange={setQuery}
-                onClear={() => setQuery("")}
-                query={query}
-                resultCount={filteredArticles.length}
-              />
-            </Box>
-          </Box>
-          <ArticlesList
-            articles={filteredArticles}
-            variant="divided"
-            emptyMessage={isSearching ? "該当する記事はありません。" : undefined}
-          />
+          <ArticlesList articles={articles} variant="divided" />
         </Box>
       </PageContainer>
     </>

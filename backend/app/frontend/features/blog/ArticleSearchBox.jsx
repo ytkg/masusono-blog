@@ -4,21 +4,31 @@ import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import InputAdornment from "@mui/material/InputAdornment"
 import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
 
-export default function ArticleSearchBox({ isSearching, onChange, onClear, query, resultCount }) {
+export default function ArticleSearchBox({
+  autoFocus = false,
+  onChange,
+  onClear,
+  query,
+}) {
   return (
     <Box
       sx={{
-        position: "sticky",
-        top: { xs: 44, sm: 52 },
+        position: "fixed",
+        top: { xs: 45, sm: 53 },
+        left: 0,
+        right: 0,
         zIndex: (theme) => theme.zIndex.appBar - 1,
         bgcolor: "background.default",
-        pt: 1,
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        px: { xs: 2, sm: 3 },
+        pt: 1.5,
         pb: 1.5,
       }}
     >
       <TextField
+        autoFocus={autoFocus}
         fullWidth
         value={query}
         onChange={(event) => onChange(event.target.value)}
@@ -44,11 +54,6 @@ export default function ArticleSearchBox({ isSearching, onChange, onClear, query
           },
         }}
       />
-      {isSearching ? (
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 0 }}>
-          {resultCount}件
-        </Typography>
-      ) : null}
     </Box>
   )
 }

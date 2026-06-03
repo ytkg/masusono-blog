@@ -24,6 +24,7 @@ describe("Footer", () => {
     render(<Footer />)
 
     expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("href", "/")
+    expect(screen.getByText("検索").closest("a")).toHaveAttribute("href", "/search")
     expect(screen.getByText("著者").closest("a")).toHaveAttribute("href", "/authors")
     expect(screen.getByText("数字").closest("a")).toHaveAttribute("href", "/numbers")
     expect(screen.getByText("その他！").closest("a")).toHaveAttribute("href", "/others")
@@ -40,14 +41,22 @@ describe("Footer", () => {
     expect(container.querySelector("footer")).toHaveStyle({ borderTopStyle: "solid" })
   })
 
-  it("著者タブを数字タブより左に表示する", () => {
+  it("検索タブを著者タブより左に表示する", () => {
     vi.mocked(usePage).mockReturnValue({ url: "/" })
 
     render(<Footer />)
 
-    expect(screen.getByText("著者").compareDocumentPosition(screen.getByText("数字"))).toBe(
+    expect(screen.getByText("検索").compareDocumentPosition(screen.getByText("著者"))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
+  })
+
+  it("検索ページでは検索タブを選択する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/search?q=増田" })
+
+    render(<Footer />)
+
+    expect(screen.getByText("検索").closest(".Mui-selected")).not.toBeNull()
   })
 
   it("著者ページでは著者タブを選択する", () => {

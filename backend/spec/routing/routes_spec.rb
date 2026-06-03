@@ -13,6 +13,10 @@ RSpec.describe "Web routes", type: :routing do
     expect(get: "/blog").to route_to("blog#index")
   end
 
+  it "routes /search to search#index" do
+    expect(get: "/search").to route_to("search#index")
+  end
+
   it "routes /numbers to numbers#index" do
     expect(get: "/numbers").to route_to("numbers#index")
   end
