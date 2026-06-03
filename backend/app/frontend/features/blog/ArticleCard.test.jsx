@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import ArticleCard from "./ArticleCard"
+import { extractTextFromHtml } from "./articleHtmlText"
 
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
@@ -262,6 +263,36 @@ describe("ArticleCard", () => {
     expect(screen.getByText(longText)).toBeInTheDocument()
     expect(screen.getByText("追加本文")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "閉じる" })).toBeInTheDocument()
+  })
+
+  it("plain presentation の一覧では展開前に本文画像を描画しない", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: '<p>本文です</p><figure><img src="/photo.jpg" alt="本文画像"></figure>',
+        }}
+      />,
+    )
+
+    expect(screen.queryByRole("img", { name: "本文画像" })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("button", { name: "続きを読む" }))
+
+    expect(screen.getByRole("img", { name: "本文画像" })).toHaveAttribute("src", "/photo.jpg")
+  })
+
+  it("抜粋生成では本文 HTML を DOM 化しない", () => {
+    const createElement = vi.spyOn(document, "createElement")
+
+    expect(extractTextFromHtml('<p>本文 &amp; 続き</p><img src="/photo.jpg" alt="本文画像">')).toBe("本文 & 続き")
+    expect(createElement).not.toHaveBeenCalled()
+
+    createElement.mockRestore()
   })
 
   it("詳細の plain presentation では著者情報を記事部分の上に表示する", () => {

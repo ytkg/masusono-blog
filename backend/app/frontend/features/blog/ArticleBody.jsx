@@ -2,28 +2,11 @@ import { useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
+import { extractTextFromHtml } from "./articleHtmlText"
 
 const EXCERPT_MAX_LENGTH = 80
 const RICH_HTML_PATTERN = /<(img|figure|iframe|video|audio|table|ul|ol|blockquote)\b/i
 const supportingTextSx = { fontSize: "12px", fontWeight: 700, letterSpacing: 0, lineHeight: 1.5 }
-
-function extractTextFromHtml(html) {
-  if (!html.trim()) {
-    return ""
-  }
-
-  if (typeof document === "undefined") {
-    return html
-      .replace(/<[^>]*>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-  }
-
-  const container = document.createElement("div")
-  container.innerHTML = html
-
-  return container.textContent.replace(/\s+/g, " ").trim()
-}
 
 function truncateText(text, maxLength = EXCERPT_MAX_LENGTH) {
   if (text.length <= maxLength) {
