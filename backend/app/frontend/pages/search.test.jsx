@@ -27,6 +27,7 @@ describe("Search page", () => {
       id: "article-2",
       title: "読書メモ",
       author: "その他1",
+      tags: "本,暮らし",
       content: "<p>本と生活の話です</p>",
     },
   ]
@@ -83,5 +84,23 @@ describe("Search page", () => {
 
     expect(screen.queryByText("0件")).not.toBeInTheDocument()
     expect(screen.getByText("articles:0 variant:divided empty:該当する記事はありません。")).toBeInTheDocument()
+  })
+
+  it("タグで記事を絞り込む", () => {
+    window.history.replaceState(null, "", "/search?q=%23%E6%9A%AE%E3%82%89%E3%81%97")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#暮らし")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+  })
+
+  it("#付きの検索語はタグだけを検索対象にする", () => {
+    window.history.replaceState(null, "", "/search?q=%23%E7%94%9F%E6%B4%BB")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#生活")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:0 variant:divided")
   })
 })

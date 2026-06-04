@@ -9,7 +9,17 @@ export function normalizeArticleSearchText(value) {
 export function articleMatchesQuery(article, normalizedQuery) {
   if (!normalizedQuery) return true
 
-  const searchTarget = [article?.title, article?.content, article?.author].map(normalizeArticleSearchText).join(" ")
+  if (normalizedQuery.startsWith("#")) {
+    const tagQuery = normalizedQuery.slice(1).trim()
+
+    if (!tagQuery) return false
+
+    return normalizeArticleSearchText(article?.tags).includes(tagQuery)
+  }
+
+  const searchTarget = [article?.title, article?.content, article?.author, article?.tags]
+    .map(normalizeArticleSearchText)
+    .join(" ")
 
   return searchTarget.includes(normalizedQuery)
 }

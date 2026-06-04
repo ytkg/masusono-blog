@@ -321,6 +321,51 @@ describe("ArticleCard", () => {
     expect(author.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it("タイトルと本文の間にタグを表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          tags: "旅行, 日記,,Ruby ",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    const title = screen.getByRole("heading", { name: "Hello" })
+    const tags = screen.getByTestId("article-tags")
+    const body = screen.getByTestId("article-body-html")
+
+    expect(screen.getByText("#旅行")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "#日記" })).toHaveAttribute("href", "/search?q=%23%E6%97%A5%E8%A8%98")
+    expect(screen.getByText("#Ruby")).toBeInTheDocument()
+    expect(tags.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy()
+    expect(tags.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it("タグが空なら表示しない", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          tags: " , ,, ",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.queryByTestId("article-tags")).not.toBeInTheDocument()
+  })
+
   it("本文が空ならフォールバックを表示する", () => {
     render(
       <ArticleCard

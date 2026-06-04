@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
+import Chip from "@mui/material/Chip"
 import Typography from "@mui/material/Typography"
 import ContentItemCard from "../../shared/ContentItemCard"
 import ArticleActions from "./ArticleActions"
@@ -8,6 +9,37 @@ import ArticleBody from "./ArticleBody"
 
 function getAuthorHref(article) {
   return article.authorId ? `/authors/${article.authorId}` : undefined
+}
+
+function normalizeTags(tags) {
+  return String(tags ?? "")
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0)
+}
+
+function ArticleTags({ tags }) {
+  const normalizedTags = normalizeTags(tags)
+
+  if (!normalizedTags.length) {
+    return null
+  }
+
+  return (
+    <Box data-testid="article-tags" sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mb: 1.5 }}>
+      {normalizedTags.map((tag) => (
+        <Chip
+          key={tag}
+          component={Link}
+          href={`/search?q=${encodeURIComponent(`#${tag}`)}`}
+          label={`#${tag}`}
+          size="small"
+          variant="outlined"
+          clickable
+        />
+      ))}
+    </Box>
+  )
 }
 
 export default function ArticleCard({ article, mode = "list", presentation = "card", sx }) {
@@ -70,6 +102,7 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
       presentation={presentation}
       sx={isPlain ? { minWidth: 0 } : sx}
     >
+      <ArticleTags tags={article.tags} />
       <ArticleBody html={html} hasBody={hasBody} shouldCollapse={shouldCollapseBody} />
     </ContentItemCard>
   )
