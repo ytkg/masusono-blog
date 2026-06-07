@@ -14,15 +14,12 @@ export default function ArticleSearchBox({
   return (
     <Box
       sx={{
-        position: "fixed",
+        position: "sticky",
         top: { xs: 45, sm: 53 },
-        left: 0,
-        right: 0,
         zIndex: (theme) => theme.zIndex.appBar - 1,
         bgcolor: "background.default",
         borderBottom: "1px solid",
         borderColor: "divider",
-        px: { xs: 2, sm: 3 },
         pt: 1.5,
         pb: 1.5,
       }}
