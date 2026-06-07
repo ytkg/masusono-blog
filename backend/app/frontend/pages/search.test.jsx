@@ -33,6 +33,7 @@ describe("Search page", () => {
   ]
 
   afterEach(() => {
+    vi.restoreAllMocks()
     window.history.replaceState(null, "", "/")
   })
 
@@ -42,8 +43,30 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveFocus()
-    expect(screen.getByText("記事を検索")).toBeInTheDocument()
+    expect(screen.getByText("タグから探す")).toBeInTheDocument()
     expect(screen.queryByTestId("articles-list")).not.toBeInTheDocument()
+  })
+
+  it("検索語が空ならランダムなタグ候補を表示し、クリックでタグ検索する", () => {
+    const manyTaggedArticles = Array.from({ length: 13 }, (_, index) => ({
+      id: `article-${index}`,
+      title: `記事${index}`,
+      author: "その他1",
+      tags: `タグ${index}`,
+      content: "<p>本文</p>",
+    }))
+    vi.spyOn(Math, "random").mockReturnValue(0.5)
+    window.history.replaceState(null, "", "/search")
+
+    render(<Search articles={manyTaggedArticles} />)
+
+    expect(screen.getByText("タグから探す")).toBeInTheDocument()
+    expect(screen.getAllByText(/^#タグ/)).toHaveLength(12)
+
+    fireEvent.click(screen.getByText("#タグ0"))
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#タグ0")
+    expect(window.location.search).toBe("?q=%23%E3%82%BF%E3%82%B00")
   })
 
   it("URLの q を初期検索語に使って記事を絞り込む", () => {
@@ -52,6 +75,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("生活")
+    expect(screen.queryByText("タグから探す")).not.toBeInTheDocument()
     expect(screen.queryByText("1件")).not.toBeInTheDocument()
     expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
   })
@@ -71,7 +95,7 @@ describe("Search page", () => {
     fireEvent.click(screen.getByRole("button", { name: "検索語をクリア" }))
 
     expect(window.location.search).toBe("")
-    expect(screen.getByText("記事を検索")).toBeInTheDocument()
+    expect(screen.getByText("タグから探す")).toBeInTheDocument()
     expect(screen.queryByTestId("articles-list")).not.toBeInTheDocument()
   })
 

@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
+import Chip from "@mui/material/Chip"
 import Typography from "@mui/material/Typography"
 import ArticleSearchBox from "../features/blog/ArticleSearchBox"
 import { articleMatchesQuery, normalizeArticleSearchText } from "../features/blog/articleSearch"
 import ArticlesList from "../features/blog/ArticlesList"
 import PageContainer from "../shared/PageContainer"
 import SeoHead from "../shared/SeoHead"
+
+const TAG_SUGGESTION_LIMIT = 12
 
 function readInitialQuery() {
   if (typeof window === "undefined") {
@@ -30,8 +33,30 @@ function writeQueryToUrl(query) {
   window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`)
 }
 
+function extractArticleTags(articles) {
+  const tags = new Set()
+  articles.forEach((article) => {
+    String(article.tags || "")
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+      .forEach((tag) => tags.add(tag))
+  })
+
+  return Array.from(tags)
+}
+
+function randomTags(tags, limit = TAG_SUGGESTION_LIMIT) {
+  return tags
+    .map((tag) => ({ tag, sort: Math.random() }))
+    .sort((current, next) => current.sort - next.sort)
+    .slice(0, limit)
+    .map(({ tag }) => tag)
+}
+
 export default function Search({ articles = [] }) {
   const [query, setQuery] = useState(readInitialQuery)
+  const [suggestedTags] = useState(() => randomTags(extractArticleTags(articles)))
   const normalizedQuery = normalizeArticleSearchText(query)
   const isSearching = Boolean(normalizedQuery)
   const filteredArticles = useMemo(
@@ -61,7 +86,27 @@ export default function Search({ articles = [] }) {
           {isSearching ? (
             <ArticlesList articles={filteredArticles} variant="divided" emptyMessage="該当する記事はありません。" />
           ) : (
-            <Typography color="text.secondary">記事を検索</Typography>
+            <Box sx={{ display: "grid", gap: 1.5 }}>
+              {suggestedTags.length ? (
+                <Box>
+                  <Typography color="text.secondary" sx={{ mb: 1 }}>
+                    タグから探す
+                  </Typography>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+                    {suggestedTags.map((tag) => (
+                      <Chip
+                        key={tag}
+                        label={`#${tag}`}
+                        onClick={() => setQuery(`#${tag}`)}
+                        size="small"
+                        sx={{ color: "text.secondary", borderColor: "divider" }}
+                        variant="outlined"
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              ) : null}
+            </Box>
           )}
         </Box>
       </PageContainer>
