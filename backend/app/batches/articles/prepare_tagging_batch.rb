@@ -90,7 +90,8 @@ module Articles
 
         - Tags should connect at least two articles.
         - Each article should have at most three tags.
-        - Do not use `日常` by default; prefer more specific relationship tags.
+        - Existing tags are reference material, not a constraint; create new tags when they connect at least two articles more clearly.
+        - Prefer specific connection tags over broad tags such as `日常`, `生活`, `生き方`, `人間関係`, or `内省`.
         - Keep `tmp/tagging/tag-updates.json` machine-readable with only `id` and `tags`.
 
         ## Existing Tags

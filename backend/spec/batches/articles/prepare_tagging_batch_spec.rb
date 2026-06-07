@@ -94,7 +94,8 @@ RSpec.describe Articles::PrepareTaggingBatch do
       expect(JSON.parse(output_dir.join("tag-updates.json").read)).to eq({ "tag_updates" => [] })
       expect(output_dir.join("review.md").read).to include(
         "Candidate articles: 1",
-        "Do not use `日常` by default",
+        "Existing tags are reference material, not a constraint",
+        "Prefer specific connection tags over broad tags",
         "### タグなし",
         "| id | title | current | proposed | reason |"
       )
