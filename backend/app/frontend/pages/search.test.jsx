@@ -65,7 +65,7 @@ describe("Search page", () => {
     expect(window.location.search).toBe("?q=%40%E3%81%9D%E3%81%AE%E4%BB%961")
   })
 
-  it("検索語が空ならランダムなタグ候補を表示し、クリックでタグ検索する", () => {
+  it("検索語が空ならタグ候補を初出順ですべて表示し、クリックでタグ検索する", () => {
     const manyTaggedArticles = Array.from({ length: 13 }, (_, index) => ({
       id: `article-${index}`,
       title: `記事${index}`,
@@ -73,13 +73,15 @@ describe("Search page", () => {
       tags: `タグ${index}`,
       content: "<p>本文</p>",
     }))
-    vi.spyOn(Math, "random").mockReturnValue(0.5)
     window.history.replaceState(null, "", "/search")
 
     render(<Search articles={manyTaggedArticles} />)
 
     expect(screen.getByText("タグから探す")).toBeInTheDocument()
-    expect(screen.getAllByText(/^#タグ/)).toHaveLength(12)
+    expect(screen.getAllByText(/^#タグ/)).toHaveLength(13)
+    expect(screen.getByText("#タグ0").compareDocumentPosition(screen.getByText("#タグ12"))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
 
     fireEvent.click(screen.getByText("#タグ0"))
 

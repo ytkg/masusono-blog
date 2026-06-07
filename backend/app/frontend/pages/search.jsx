@@ -8,8 +8,6 @@ import ArticlesList from "../features/blog/ArticlesList"
 import PageContainer from "../shared/PageContainer"
 import SeoHead from "../shared/SeoHead"
 
-const TAG_SUGGESTION_LIMIT = 12
-
 function readInitialQuery() {
   if (typeof window === "undefined") {
     return ""
@@ -56,17 +54,9 @@ function extractArticleAuthors(articles) {
   return Array.from(authors)
 }
 
-function randomTags(tags, limit = TAG_SUGGESTION_LIMIT) {
-  return tags
-    .map((tag) => ({ tag, sort: Math.random() }))
-    .sort((current, next) => current.sort - next.sort)
-    .slice(0, limit)
-    .map(({ tag }) => tag)
-}
-
 export default function Search({ articles = [] }) {
   const [query, setQuery] = useState(readInitialQuery)
-  const [suggestedTags] = useState(() => randomTags(extractArticleTags(articles)))
+  const [suggestedTags] = useState(() => extractArticleTags(articles))
   const [suggestedAuthors] = useState(() => extractArticleAuthors(articles))
   const normalizedQuery = normalizeArticleSearchText(query)
   const isSearching = Boolean(normalizedQuery)
