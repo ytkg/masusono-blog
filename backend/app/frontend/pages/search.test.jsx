@@ -80,6 +80,24 @@ describe("Search page", () => {
     expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
   })
 
+  it("空白区切りの AND 検索で記事を絞り込む", () => {
+    window.history.replaceState(null, "", "/search?q=%E6%9C%AC%20%E6%9A%AE%E3%82%89%E3%81%97")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("本 暮らし")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+  })
+
+  it("OR 検索で記事を絞り込む", () => {
+    window.history.replaceState(null, "", "/search?q=%E9%81%A0%E8%B6%B3%20OR%20%E6%9A%AE%E3%82%89%E3%81%97")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("遠足 OR 暮らし")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:2 variant:divided")
+  })
+
   it("検索語の変更を URL に反映し、クリアで空状態に戻る", () => {
     window.history.replaceState(null, "", "/search")
 

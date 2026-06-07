@@ -6,11 +6,16 @@ export function normalizeArticleSearchText(value) {
     .toLowerCase()
 }
 
-export function articleMatchesQuery(article, normalizedQuery) {
-  if (!normalizedQuery) return true
+function parseSearchQuery(normalizedQuery) {
+  return normalizedQuery
+    .split(/\s+or\s+/i)
+    .map((group) => group.split(/\s+/).filter((token) => token && token !== "and"))
+    .filter((group) => group.length)
+}
 
-  if (normalizedQuery.startsWith("#")) {
-    const tagQuery = normalizedQuery.slice(1).trim()
+function articleMatchesToken(article, token) {
+  if (token.startsWith("#")) {
+    const tagQuery = token.slice(1).trim()
 
     if (!tagQuery) return false
 
@@ -21,5 +26,15 @@ export function articleMatchesQuery(article, normalizedQuery) {
     .map(normalizeArticleSearchText)
     .join(" ")
 
-  return searchTarget.includes(normalizedQuery)
+  return searchTarget.includes(token)
+}
+
+export function articleMatchesQuery(article, normalizedQuery) {
+  if (!normalizedQuery) return true
+
+  const queryGroups = parseSearchQuery(normalizedQuery)
+
+  if (!queryGroups.length) return false
+
+  return queryGroups.some((group) => group.every((token) => articleMatchesToken(article, token)))
 }
