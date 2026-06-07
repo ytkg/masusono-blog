@@ -46,6 +46,16 @@ function extractArticleTags(articles) {
   return Array.from(tags)
 }
 
+function extractArticleAuthors(articles) {
+  const authors = new Set()
+  articles.forEach((article) => {
+    const author = String(article.author || "").trim()
+    if (author) authors.add(author)
+  })
+
+  return Array.from(authors)
+}
+
 function randomTags(tags, limit = TAG_SUGGESTION_LIMIT) {
   return tags
     .map((tag) => ({ tag, sort: Math.random() }))
@@ -57,6 +67,7 @@ function randomTags(tags, limit = TAG_SUGGESTION_LIMIT) {
 export default function Search({ articles = [] }) {
   const [query, setQuery] = useState(readInitialQuery)
   const [suggestedTags] = useState(() => randomTags(extractArticleTags(articles)))
+  const [suggestedAuthors] = useState(() => extractArticleAuthors(articles))
   const normalizedQuery = normalizeArticleSearchText(query)
   const isSearching = Boolean(normalizedQuery)
   const filteredArticles = useMemo(
@@ -86,6 +97,25 @@ export default function Search({ articles = [] }) {
             <ArticlesList articles={filteredArticles} variant="divided" emptyMessage="該当する記事はありません。" />
           ) : (
             <Box sx={{ display: "grid", gap: 1.5 }}>
+              {suggestedAuthors.length ? (
+                <Box>
+                  <Typography color="text.secondary" sx={{ mb: 1 }}>
+                    著者から探す
+                  </Typography>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+                    {suggestedAuthors.map((author) => (
+                      <Chip
+                        key={author}
+                        label={`@${author}`}
+                        onClick={() => setQuery(`@${author}`)}
+                        size="small"
+                        sx={{ color: "text.secondary", borderColor: "divider" }}
+                        variant="outlined"
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              ) : null}
               {suggestedTags.length ? (
                 <Box>
                   <Typography color="text.secondary" sx={{ mb: 1 }}>

@@ -22,6 +22,14 @@ function articleMatchesToken(article, token) {
     return normalizeArticleSearchText(article?.tags).includes(tagQuery)
   }
 
+  if (token.startsWith("@")) {
+    const authorQuery = token.slice(1).trim()
+
+    if (!authorQuery) return false
+
+    return normalizeArticleSearchText(article?.author).includes(authorQuery)
+  }
+
   const searchTarget = [article?.title, article?.content, article?.author, article?.tags]
     .map(normalizeArticleSearchText)
     .join(" ")

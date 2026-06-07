@@ -43,8 +43,26 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toBeInTheDocument()
+    expect(screen.getByText("著者から探す")).toBeInTheDocument()
     expect(screen.getByText("タグから探す")).toBeInTheDocument()
     expect(screen.queryByTestId("articles-list")).not.toBeInTheDocument()
+  })
+
+  it("検索語が空なら著者候補をタグ候補より上に表示し、クリックで著者検索する", () => {
+    window.history.replaceState(null, "", "/search")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByText("著者から探す").compareDocumentPosition(screen.getByText("タグから探す"))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    expect(screen.getByText("@増田")).toBeInTheDocument()
+    expect(screen.getByText("@その他1")).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText("@その他1"))
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("@その他1")
+    expect(window.location.search).toBe("?q=%40%E3%81%9D%E3%81%AE%E4%BB%961")
   })
 
   it("検索語が空ならランダムなタグ候補を表示し、クリックでタグ検索する", () => {
@@ -75,8 +93,18 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("生活")
+    expect(screen.queryByText("著者から探す")).not.toBeInTheDocument()
     expect(screen.queryByText("タグから探す")).not.toBeInTheDocument()
     expect(screen.queryByText("1件")).not.toBeInTheDocument()
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+  })
+
+  it("@付きの検索語は著者だけを検索対象にする", () => {
+    window.history.replaceState(null, "", "/search?q=%40%E3%81%9D%E3%81%AE%E4%BB%961")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("@その他1")
     expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
   })
 

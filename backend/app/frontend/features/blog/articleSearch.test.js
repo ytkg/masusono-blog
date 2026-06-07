@@ -47,6 +47,17 @@ describe("articleSearch", () => {
     expect(matches("#仕事 前向き")).toBe(false)
   })
 
+  it("@付きトークンは著者だけを検索対象にする", () => {
+    expect(matches("@その他4")).toBe(true)
+    expect(matches("@母")).toBe(false)
+  })
+
+  it("@付きトークンを AND/OR 検索で使える", () => {
+    expect(matches("@その他4 #家族")).toBe(true)
+    expect(matches("@増田 #家族 OR @その他4 #内省")).toBe(true)
+    expect(matches("@増田 #家族 OR @その他4 #仕事")).toBe(false)
+  })
+
   it("単語内の or は OR 演算子として扱わない", () => {
     expect(matches("story")).toBe(false)
     expect(matches("その他4")).toBe(true)
