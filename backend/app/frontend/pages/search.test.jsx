@@ -42,7 +42,7 @@ describe("Search page", () => {
 
     render(<Search articles={articles} />)
 
-    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveFocus()
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toBeInTheDocument()
     expect(screen.getByText("タグから探す")).toBeInTheDocument()
     expect(screen.queryByTestId("articles-list")).not.toBeInTheDocument()
   })

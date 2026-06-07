@@ -77,7 +77,6 @@ export default function Search({ articles = [] }) {
       />
       <PageContainer id="search" sx={{ pt: 0 }}>
         <ArticleSearchBox
-          autoFocus
           onChange={setQuery}
           onClear={() => setQuery("")}
           query={query}
