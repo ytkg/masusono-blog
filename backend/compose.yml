@@ -11,6 +11,7 @@ services:
     command: sh -lc "until [ -x /rails/node_modules/.bin/vite ]; do echo 'waiting for vite dependencies...'; sleep 1; done; rm -f /rails/tmp/pids/server.pid; ./bin/rails server -b 0.0.0.0 -p 3000"
     volumes:
       - .:/rails
+      - ${HOME}/.config/gcloud:/home/rails/.config/gcloud:ro
       - bundle_cache:/usr/local/bundle
       - node_modules_cache:/rails/node_modules
     ports:
@@ -20,6 +21,8 @@ services:
       BUNDLE_WITHOUT: ""
       BUNDLE_DEPLOYMENT: "0"
       BUNDLE_PATH: /usr/local/bundle
+      BIGQUERY_DATASET_ID: ${BIGQUERY_DATASET_ID:-}
+      BIGQUERY_PROJECT_ID: ${BIGQUERY_PROJECT_ID:-}
       RAILS_LOG_TO_STDOUT: "1"
     tty: true
     stdin_open: true

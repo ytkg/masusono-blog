@@ -85,6 +85,55 @@ docker compose up --build
 - `GET /feed.xml`
   - ブログ記事全件のRSSフィードを返す
 
+## 記事バックアップ
+
+microCMS の記事を BigQuery に全件バックアップできます。BigQuery へは load job で投入し、`microcms_articles_backup` テーブルを毎回全件置き換えます。`tags` は microCMS のカンマ区切り文字列をそのまま保存します。
+
+事前にホストで Application Default Credentials を設定してください。
+
+```bash
+gcloud auth application-default login
+gcloud auth application-default set-quota-project YOUR_PROJECT_ID
+```
+
+`~/.config/gcloud/application_default_credentials.json` が作成されていることを確認してください。通常の `gcloud auth login` だけでは Application Default Credentials は作成されません。
+
+Docker Compose から実行する場合、ホストの `~/.config/gcloud` がコンテナの `/home/rails/.config/gcloud` に read-only でマウントされます。
+
+```bash
+cd backend
+BIGQUERY_PROJECT_ID=YOUR_PROJECT_ID \
+BIGQUERY_DATASET_ID=YOUR_DATASET_ID \
+docker compose run --rm backend bundle exec rails articles:backup_to_bigquery
+```
+
+初回実行時に dataset と table がなければ自動作成します。dataset location は `asia-northeast1` です。
+
+タグ付け候補を確認する場合は、BigQuery から `tags` が空の記事、タグ付き既存記事、既存タグの件数を JSON で出力します。`articles:prepare_tagging` はバックアップ後に候補ファイルとレビュー用テンプレートを `tmp/tagging/` 配下へ作成します。
+タグは記事同士の具体的なつながりを作るために使います。`日常` は広すぎるため原則使わず、`生活`、`人間関係`、`食べ物`、`飲み会`、`娯楽`、`イベント`、`健康`、`料理` など、より具体的なタグを優先します。
+
+```bash
+cd backend
+BIGQUERY_PROJECT_ID=YOUR_PROJECT_ID \
+BIGQUERY_DATASET_ID=YOUR_DATASET_ID \
+docker compose run --rm backend bundle exec rails articles:prepare_tagging
+```
+
+生成されるファイルは以下です。
+
+- `tmp/tagging/candidates.json`: 候補記事、タグ付き既存記事、既存タグ件数
+- `tmp/tagging/tag-updates.json`: 適用用 JSON。初期値は `{"tag_updates":[]}`
+- `tmp/tagging/review.md`: レビュー用テンプレート
+
+確認済みのタグ案を microCMS に反映する場合は、`tmp/tagging/tag-updates.json` に `id` と `tags` を書いてから適用します。適用後は自動で BigQuery へ再バックアップし、残り候補件数を表示します。
+
+```bash
+cd backend
+BIGQUERY_PROJECT_ID=YOUR_PROJECT_ID \
+BIGQUERY_DATASET_ID=YOUR_DATASET_ID \
+docker compose run --rm backend bundle exec rails articles:apply_tag_updates_from_file
+```
+
 ## キャッシュ方針
 
 キャッシュ最適化は採用せず、Cloud Run のウォーム維持を主戦略とします。

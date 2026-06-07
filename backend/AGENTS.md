@@ -59,6 +59,17 @@ This agent must execute the following steps **before starting any task**, regard
 - Frontend test setup lives in `app/frontend/test/setup.js`.
 - When using `import.meta.glob` for frontend pages, exclude `*.test.jsx` / `*.spec.jsx` so Vite build does not treat test files as app entry pages.
 - microCMS fetch uses Faraday.
+- Article backups to BigQuery are run manually with `articles:backup_to_bigquery`.
+- BigQuery tag review input is exported manually with `articles:export_tagging_candidates`.
+- Confirmed article tags are applied to microCMS with `articles:apply_tag_updates` and `TAG_UPDATES_JSON`.
+- For Docker Compose BigQuery backups, pass `BIGQUERY_PROJECT_ID` and `BIGQUERY_DATASET_ID`; Compose mounts host ADC from `~/.config/gcloud` to `/home/rails/.config/gcloud:ro`.
+- When asked to tag new articles (e.g. "新規記事にタグ付けをして"), follow this workflow:
+  1. Run `articles:prepare_tagging` to sync the latest microCMS articles to BigQuery and write `tmp/tagging/candidates.json`, `tmp/tagging/tag-updates.json`, and `tmp/tagging/review.md`.
+  2. Read `tmp/tagging/candidates.json` and propose tag updates before applying them. Tags should connect at least two articles, each article should have at most three tags, and existing article tag replacements may be proposed when needed.
+  3. Do not use the `日常` tag by default. It is too broad to show article relationships; prefer more specific tags such as `生活`, `人間関係`, `食べ物`, `飲み会`, `娯楽`, `イベント`, `健康`, or `料理`.
+  4. Include `add` / `remove` differences and final `id,tags` values in the proposal.
+  5. After user confirmation, write final updates to `tmp/tagging/tag-updates.json`.
+  6. Run `articles:apply_tag_updates_from_file` to apply updates, sync BigQuery, and confirm remaining candidate count.
 - `/sitemap.xml` is generated from static routes plus microCMS articles.
 - CORS is handled by rack-cors; allowed origins include localhost:5173 and masusono.com/static.
 - Prefer rbenv shims for Ruby/Rails/Bundler (e.g. `~/.rbenv/shims/rails`); avoid `/usr/bin/rails`.
