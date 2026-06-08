@@ -62,34 +62,33 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
   const isListPlain = isPlain && mode === "list"
   const shouldCollapseBody = isListPlain
   const action = article.id ? <ArticleActions article={article} /> : undefined
-  const meta =
-    isListPlain ? (
-      <Box
-        component="span"
-        data-testid="article-list-meta"
-        sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, width: "100%" }}
-      >
-        <Box component="span" sx={{ minWidth: 0 }}>
-          <Box
-            component={authorHref ? Link : "span"}
-            href={authorHref}
-            data-testid="article-meta-author"
-            sx={{
-              color: "text.primary",
-              fontWeight: 700,
-              textDecoration: "none",
-              "&:hover": authorHref ? { textDecoration: "underline" } : undefined,
-            }}
-          >
-            {author}
-          </Box>{" "}
-          {date}
-        </Box>
-        <Box component="span" sx={{ flex: "0 0 auto", ml: 1 }}>
-          {action}
-        </Box>
+  const meta = isListPlain ? (
+    <Box
+      component="span"
+      data-testid="article-list-meta"
+      sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, width: "100%" }}
+    >
+      <Box component="span" sx={{ minWidth: 0 }}>
+        <Box
+          component={authorHref ? Link : "span"}
+          href={authorHref}
+          data-testid="article-meta-author"
+          sx={{
+            color: "text.primary",
+            fontWeight: 700,
+            textDecoration: "none",
+            "&:hover": authorHref ? { textDecoration: "underline" } : undefined,
+          }}
+        >
+          {author}
+        </Box>{" "}
+        {date}
       </Box>
-    ) : undefined
+      <Box component="span" sx={{ flex: "0 0 auto", ml: 1 }}>
+        {action}
+      </Box>
+    </Box>
+  ) : undefined
   const content = (
     <ContentItemCard
       title={article.title}

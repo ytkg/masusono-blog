@@ -48,12 +48,7 @@ export default function Home({ articles = [] }) {
               borderColor: "divider",
             }}
           >
-            <Tabs
-              value={mode}
-              onChange={handleModeChange}
-              aria-label="トップページの表示切り替え"
-              variant="fullWidth"
-            >
+            <Tabs value={mode} onChange={handleModeChange} aria-label="トップページの表示切り替え" variant="fullWidth">
               <Tab label="フィード" value={HOME_MODES.feed} />
               <Tab label="おすすめ" value={HOME_MODES.recommended} />
             </Tabs>

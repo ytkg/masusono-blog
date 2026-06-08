@@ -5,12 +5,7 @@ import IconButton from "@mui/material/IconButton"
 import InputAdornment from "@mui/material/InputAdornment"
 import TextField from "@mui/material/TextField"
 
-export default function ArticleSearchBox({
-  autoFocus = false,
-  onChange,
-  onClear,
-  query,
-}) {
+export default function ArticleSearchBox({ autoFocus = false, onChange, onClear, query }) {
   return (
     <Box
       sx={{

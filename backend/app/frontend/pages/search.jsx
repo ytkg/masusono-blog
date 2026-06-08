@@ -30,11 +30,7 @@ export default function Search({ articles = [] }) {
         canonicalPath={isSearching ? `/search?q=${encodeURIComponent(query)}` : "/search"}
       />
       <PageContainer id="search" sx={{ pt: 0 }}>
-        <ArticleSearchBox
-          onChange={setQuery}
-          onClear={() => setQuery("")}
-          query={query}
-        />
+        <ArticleSearchBox onChange={setQuery} onClear={() => setQuery("")} query={query} />
         <Box sx={{ pt: 1 }}>
           {isSearching ? (
             <ArticlesList articles={filteredArticles} variant="divided" emptyMessage="該当する記事はありません。" />
