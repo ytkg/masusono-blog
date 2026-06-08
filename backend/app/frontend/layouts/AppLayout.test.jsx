@@ -6,12 +6,8 @@ vi.mock("../components/Header", () => ({
   default: () => <div>Header</div>,
 }))
 
-vi.mock("../components/Footer", () => ({
-  default: () => <div>Footer</div>,
-}))
-
-vi.mock("../components/PwaInstallButton", () => ({
-  default: () => <div>PwaInstallButton</div>,
+vi.mock("../components/FloatingBottomNavigation", () => ({
+  default: () => <div>FloatingBottomNavigation</div>,
 }))
 
 describe("AppLayout", () => {
@@ -24,7 +20,6 @@ describe("AppLayout", () => {
 
     expect(screen.getByText("Header")).toBeInTheDocument()
     expect(screen.getByText("MainContent")).toBeInTheDocument()
-    expect(screen.getByText("PwaInstallButton")).toBeInTheDocument()
-    expect(screen.getByText("Footer")).toBeInTheDocument()
+    expect(screen.getByText("FloatingBottomNavigation")).toBeInTheDocument()
   })
 })

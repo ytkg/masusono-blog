@@ -8,7 +8,7 @@
 - `layouts/`: Page layout components that wrap Inertia pages.
 - `pages/`: Inertia page components. Keep routing-level composition here.
 - `features/`: Domain or feature-specific UI, hooks, and logic.
-- `components/`: Application shell components used across the whole app, such as header, footer, and install prompts.
+- `components/`: Application shell components used across the whole app, such as header and bottom navigation.
 - `shared/`: Reusable UI and frontend utilities that are not tied to one feature or route.
 - `assets/`: Site-wide assets. Feature-only assets should live under that feature directory.
 - `styles/`: Global CSS.
