@@ -49,7 +49,7 @@ describe("ArticleCard", () => {
 
     expect(screen.getByRole("link", { name: "Hello" })).toHaveAttribute("href", "/articles/hello-world")
     expect(screen.getByText("本文です")).toBeInTheDocument()
-    expect(screen.getByText("2026/03/09 増田")).toBeInTheDocument()
+    expect(screen.getByText("増田 2026/03/09")).toBeInTheDocument()
   })
 
   it("記事メニューから記事URLをコピーできる", async () => {
@@ -162,7 +162,7 @@ describe("ArticleCard", () => {
     const meta = screen.getByTestId("article-list-meta")
     const title = screen.getByRole("link", { name: "Hello" })
 
-    expect(meta).toHaveTextContent("増田 2026/03/09")
+    expect(meta).toHaveTextContent("増田2026/03/09")
     expect(meta.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
@@ -201,6 +201,43 @@ describe("ArticleCard", () => {
     expect(screen.getByTestId("article-meta-author")).toHaveAttribute("href", "/authors/9wgrey2lh3")
   })
 
+  it("plain presentation では日付付近に文字数と読了目安を表示する", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          characterCount: 1234,
+          readingTimeMinutes: 4,
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId("article-list-meta")).toHaveTextContent("増田2026/03/09 ・ 1,234字・約4分")
+  })
+
+  it("カード表示では文字数と読了目安をメタ情報として表示する", () => {
+    render(
+      <ArticleCard
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          characterCount: 1234,
+          readingTimeMinutes: 4,
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByText("増田 2026/03/09 ・ 1,234字・約4分")).toBeInTheDocument()
+  })
+
   it("plain presentation では著者アイコンから著者ページへ遷移できる", () => {
     render(
       <ArticleCard
@@ -236,6 +273,7 @@ describe("ArticleCard", () => {
     )
 
     expect(screen.getByRole("img", { name: "増田" })).toHaveAttribute("src", "/author.webp")
+    expect(screen.getByRole("link", { name: "増田の著者ページへ" })).toHaveStyle({ width: "48px", height: "48px" })
   })
 
   it("plain presentation の一覧では抜粋を表示し、その場で全文を展開できる", () => {
@@ -317,8 +355,28 @@ describe("ArticleCard", () => {
 
     expect(author).toHaveAttribute("href", "/authors/9wgrey2lh3")
     expect(screen.getByText("2026/03/09")).toBeInTheDocument()
-    expect(meta).toHaveStyle({ display: "flex" })
+    expect(meta).toHaveStyle({ display: "grid" })
     expect(author.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it("詳細の plain presentation では著者情報付近に文字数と読了目安を表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          characterCount: 1234,
+          readingTimeMinutes: 4,
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId("article-detail-meta")).toHaveTextContent("増田2026/03/09 ・ 1,234字・約4分")
   })
 
   it("タイトルと本文の間にタグを表示する", () => {

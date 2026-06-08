@@ -2,7 +2,7 @@ import { Link } from "@inertiajs/react"
 import Avatar from "@mui/material/Avatar"
 import Box from "@mui/material/Box"
 
-export default function ArticleAuthorAvatar({ author, authorHref, avatarSrc, sx }) {
+export default function ArticleAuthorAvatar({ author, authorHref, avatarSrc, size = 48, sx }) {
   return (
     <Box
       component={authorHref ? Link : "div"}
@@ -10,8 +10,8 @@ export default function ArticleAuthorAvatar({ author, authorHref, avatarSrc, sx 
       aria-label={authorHref ? `${author}の著者ページへ` : undefined}
       sx={{
         display: "block",
-        width: 40,
-        height: 40,
+        width: size,
+        height: size,
         borderRadius: "50%",
         textDecoration: "none",
         "&:focus-visible": {
@@ -26,8 +26,8 @@ export default function ArticleAuthorAvatar({ author, authorHref, avatarSrc, sx 
         src={avatarSrc}
         alt={author}
         sx={{
-          width: 40,
-          height: 40,
+          width: size,
+          height: size,
           boxSizing: "border-box",
           border: "1px solid",
           borderColor: "divider",

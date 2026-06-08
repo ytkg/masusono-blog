@@ -28,7 +28,10 @@ export default function ContentItemCard({
   children,
   sx,
 }) {
-  const normalizedMetaParts = (metaParts ?? []).map((part) => String(part).trim()).filter((part) => part.length > 0)
+  const normalizedMetaParts = (metaParts ?? [])
+    .filter((part) => part !== null && part !== undefined)
+    .map((part) => String(part).trim())
+    .filter((part) => part.length > 0)
   const resolvedMeta = meta ?? (normalizedMetaParts.length ? normalizedMetaParts.join(metaSeparator) : undefined)
   const Container = presentation === "plain" ? Box : ContentCard
 

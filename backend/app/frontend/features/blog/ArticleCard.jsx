@@ -42,6 +42,55 @@ function ArticleTags({ tags }) {
   )
 }
 
+function formatArticleStats(article) {
+  const characterCount = Number(article.characterCount)
+  const readingTimeMinutes = Number(article.readingTimeMinutes)
+
+  if (!Number.isFinite(characterCount) || characterCount <= 0) {
+    return undefined
+  }
+
+  const formattedCharacterCount = new Intl.NumberFormat("ja-JP").format(characterCount)
+  const formattedReadingTime =
+    Number.isFinite(readingTimeMinutes) && readingTimeMinutes > 0 ? `・約${readingTimeMinutes}分` : ""
+
+  return `${formattedCharacterCount}字${formattedReadingTime}`
+}
+
+function ArticleMetaText({ articleStats, author, authorHref, date, mode = "list" }) {
+  const AuthorComponent = (
+    <Box
+      component={authorHref ? Link : "span"}
+      href={authorHref}
+      data-testid={mode === "detail" ? "article-detail-author" : "article-meta-author"}
+      sx={{
+        color: "text.primary",
+        fontWeight: 700,
+        lineHeight: 1.35,
+        textDecoration: "none",
+        "&:hover": authorHref ? { textDecoration: "underline" } : undefined,
+      }}
+    >
+      {author}
+    </Box>
+  )
+  const secondaryParts = [date, articleStats].filter(Boolean)
+
+  return (
+    <Box
+      data-testid={mode === "detail" ? "article-detail-meta" : "article-list-meta-text"}
+      sx={{ minWidth: 0, display: "grid", gap: 0.25 }}
+    >
+      {AuthorComponent}
+      {secondaryParts.length ? (
+        <Typography variant="body2" color="text.secondary" sx={{ m: 0, lineHeight: 1.45 }}>
+          {secondaryParts.join(" ・ ")}
+        </Typography>
+      ) : null}
+    </Box>
+  )
+}
+
 export default function ArticleCard({ article, mode = "list", presentation = "card", sx }) {
   if (!article) {
     return (
@@ -54,6 +103,7 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
   const html = article.content ?? ""
   const author = article.author ?? "不明"
   const date = article.publishedDate ?? ""
+  const articleStats = formatArticleStats(article)
   const hasBody = Boolean(html.trim())
   const avatarSrc = article.authorImageUrl
   const authorHref = getAuthorHref(article)
@@ -64,27 +114,11 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
   const action = article.id ? <ArticleActions article={article} /> : undefined
   const meta = isListPlain ? (
     <Box
-      component="span"
       data-testid="article-list-meta"
       sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, width: "100%" }}
     >
-      <Box component="span" sx={{ minWidth: 0 }}>
-        <Box
-          component={authorHref ? Link : "span"}
-          href={authorHref}
-          data-testid="article-meta-author"
-          sx={{
-            color: "text.primary",
-            fontWeight: 700,
-            textDecoration: "none",
-            "&:hover": authorHref ? { textDecoration: "underline" } : undefined,
-          }}
-        >
-          {author}
-        </Box>{" "}
-        {date}
-      </Box>
-      <Box component="span" sx={{ flex: "0 0 auto", ml: 1 }}>
+      <ArticleMetaText articleStats={articleStats} author={author} authorHref={authorHref} date={date} />
+      <Box sx={{ flex: "0 0 auto", ml: 1 }}>
         {action}
       </Box>
     </Box>
@@ -96,7 +130,7 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
       titleComponent={mode === "detail" ? "h1" : "h3"}
       titleTo={mode === "list" ? `/articles/${article.id}` : undefined}
       meta={isListPlain ? undefined : meta}
-      metaParts={isPlain ? undefined : [date, author]}
+      metaParts={isPlain ? undefined : [author, [date, articleStats].filter(Boolean).join(" ・ ")]}
       metaPlacement={isListPlain ? "above" : "below"}
       action={isPlain ? undefined : action}
       presentation={presentation}
@@ -131,27 +165,15 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
             }}
           >
             <Box
-              data-testid="article-detail-meta"
-              sx={{ minWidth: 0, display: "flex", alignItems: "baseline", gap: 0.75, flexWrap: "wrap" }}
+              sx={{ minWidth: 0 }}
             >
-              <Box
-                component={authorHref ? Link : "span"}
-                href={authorHref}
-                data-testid="article-detail-author"
-                sx={{
-                  color: "text.primary",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                  "&:hover": authorHref ? { textDecoration: "underline" } : undefined,
-                }}
-              >
-                {author}
-              </Box>
-              {date ? (
-                <Typography variant="body2" color="text.secondary" sx={{ m: 0 }}>
-                  {date}
-                </Typography>
-              ) : null}
+              <ArticleMetaText
+                articleStats={articleStats}
+                author={author}
+                authorHref={authorHref}
+                date={date}
+                mode="detail"
+              />
             </Box>
             <Box sx={{ flex: "0 0 auto" }}>{action}</Box>
           </Box>
