@@ -1,33 +1,52 @@
 module Numbers
   class MetricsIndexUsecase
+    CACHE_KEY = "numbers/metrics_index".freeze
+    CACHE_EXPIRES_IN = 10.minutes
+    CACHE = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
+
     def self.call
       new.call
     end
 
     def call
-      source_data = fetch_source_data
-      article_summary = ArticleMetricsSummary.call(articles: source_data.fetch(:articles))
-
-      {
-        metrics: MetricsPayloadBuilder.call(source_data:, article_summary:),
-        status: :ok
-      }
+      CACHE.fetch(CACHE_KEY, expires_in: CACHE_EXPIRES_IN) do
+        build_result
+      end
     end
 
     private
 
-    def fetch_source_data
+    def build_result
+      source_data = fetch_source_data
+      article_summary = ArticleMetricsSummary.call(articles: source_data.fetch(:articles))
+      metrics = MetricsPayloadBuilder.call(source_data:, article_summary:)
+      metrics[:trend] = MetricsTrendBuilder.call(
+        articles: source_data.fetch(:articles),
+        masuda_run_rankings: source_data.fetch(:masuda_run_rankings),
+        start_date: MetricsPayloadBuilder::LAUNCH_DATE
+      )
+
       {
-        articles: ::Article.all,
-        masuda_run_total_plays: fetch_masuda_run_total_plays
+        metrics:,
+        status: :ok
       }
     end
 
-    def fetch_masuda_run_total_plays
-      ::MasudaRunRanking.total_count
+    def fetch_source_data
+      masuda_run_rankings = fetch_masuda_run_rankings
+
+      {
+        articles: ::Article.all,
+        masuda_run_rankings:,
+        masuda_run_total_plays: masuda_run_rankings&.size
+      }
+    end
+
+    def fetch_masuda_run_rankings
+      ::MasudaRunRanking.all
     rescue ::Microcms::FetchContentsService::FetchError, ::Faraday::Error => error
       Rails.logger.warn(
-        "[Numbers::MetricsIndexUsecase] failed to fetch masuda run total plays: #{error.class}: #{error.message}"
+        "[Numbers::MetricsIndexUsecase] failed to fetch masuda run rankings: #{error.class}: #{error.message}"
       )
       nil
     end
