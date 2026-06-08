@@ -59,10 +59,11 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
   const authorHref = getAuthorHref(article)
   const isPlain = presentation === "plain"
   const isDetailPlain = isPlain && mode === "detail"
-  const shouldCollapseBody = isPlain && mode === "list"
+  const isListPlain = isPlain && mode === "list"
+  const shouldCollapseBody = isListPlain
   const action = article.id ? <ArticleActions article={article} /> : undefined
   const meta =
-    isPlain && !isDetailPlain ? (
+    isListPlain ? (
       <Box
         component="span"
         data-testid="article-list-meta"
@@ -95,9 +96,9 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
       titleVariant="h6"
       titleComponent={mode === "detail" ? "h1" : "h3"}
       titleTo={mode === "list" ? `/articles/${article.id}` : undefined}
-      meta={meta}
+      meta={isListPlain ? undefined : meta}
       metaParts={isPlain ? undefined : [date, author]}
-      metaPlacement={isPlain && !isDetailPlain ? "above" : "below"}
+      metaPlacement={isListPlain ? "above" : "below"}
       action={isPlain ? undefined : action}
       presentation={presentation}
       sx={isPlain ? { minWidth: 0 } : sx}
@@ -163,25 +164,18 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
 
   if (isPlain) {
     return (
-      <Box
-        sx={[
-          {
-            display: "grid",
-            gridTemplateColumns: "40px minmax(0, 1fr)",
-            gap: 1.5,
-            alignItems: "start",
-          },
-          sx,
-        ]}
-      >
-        <ArticleAuthorAvatar
-          author={author}
-          authorHref={authorHref}
-          avatarSrc={avatarSrc}
-          sx={{
-            mt: 0.25,
-          }}
-        />
+      <Box sx={[{ display: "grid", gap: 1.5 }, sx]}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+          <ArticleAuthorAvatar
+            author={author}
+            authorHref={authorHref}
+            avatarSrc={avatarSrc}
+            sx={{
+              flex: "0 0 auto",
+            }}
+          />
+          {meta}
+        </Box>
         {content}
       </Box>
     )

@@ -159,7 +159,7 @@ describe("ArticleCard", () => {
       />,
     )
 
-    const meta = screen.getByTestId("article-meta-author").closest("p")
+    const meta = screen.getByTestId("article-list-meta")
     const title = screen.getByRole("link", { name: "Hello" })
 
     expect(meta).toHaveTextContent("増田 2026/03/09")
