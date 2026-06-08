@@ -145,12 +145,7 @@ export default function NumbersTrendChart({ trend }) {
 
       <Box
         sx={{
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 2,
-          px: 1,
-          py: 1.25,
-          bgcolor: "background.paper",
+          py: 0.5,
         }}
       >
         <Box
