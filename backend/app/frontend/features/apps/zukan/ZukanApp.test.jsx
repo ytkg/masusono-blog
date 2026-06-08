@@ -23,6 +23,13 @@ const authors = [
     bio: "プロフィール本文",
     imageUrl: "/masuda.webp",
   },
+  {
+    id: "other-1",
+    name: "その他1",
+    title: "生活を検証する考察エンジニア",
+    bio: "その他プロフィール本文",
+    imageUrl: "/other-1.webp",
+  },
 ]
 
 describe("ZukanContent", () => {
@@ -44,5 +51,14 @@ describe("ZukanContent", () => {
         `/authors/${member.id}`,
       )
     }
+  })
+
+  it("最後の項目には次要素用の下余白を付けない", () => {
+    render(<ZukanContent authors={authors} />)
+
+    const profiles = screen.getAllByTestId("zukan-member-profile")
+
+    expect(profiles[0]).toHaveStyle({ paddingBottom: "20px" })
+    expect(profiles[1]).toHaveStyle({ paddingBottom: "0px" })
   })
 })

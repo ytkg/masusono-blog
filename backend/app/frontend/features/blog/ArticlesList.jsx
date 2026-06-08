@@ -19,7 +19,7 @@ export default function ArticlesList({ articles, emptyMessage = "記事があり
               borderBottom: index < articles.length - 1 ? "1px solid" : 0,
               borderColor: "divider",
               pt: index === 0 ? 0 : 2.5,
-              pb: 2.5,
+              pb: index < articles.length - 1 ? 2.5 : 0,
             }}
           />
         ))}

@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from "vitest"
 import ArticlesList from "./ArticlesList"
 
 vi.mock("./ArticleCard", () => ({
-  default: ({ article, presentation }) => (
-    <div>
+  default: ({ article, presentation, sx }) => (
+    <div data-testid={`article-${article.id}`} style={{ paddingBottom: sx?.pb }}>
       {article.title}:{presentation ?? "card"}
     </div>
   ),
@@ -50,5 +50,7 @@ describe("ArticlesList", () => {
 
     expect(screen.getByText("記事1:plain")).toBeInTheDocument()
     expect(screen.getByText("記事2:plain")).toBeInTheDocument()
+    expect(screen.getByTestId("article-a1")).toHaveStyle({ paddingBottom: "2.5px" })
+    expect(screen.getByTestId("article-a2")).toHaveStyle({ paddingBottom: "0px" })
   })
 })

@@ -24,12 +24,14 @@ function MemberProfile({ member, isLast }) {
 
   return (
     <Box
+      data-testid="zukan-member-profile"
       sx={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         gap: { xs: 1.25, sm: 1.5 },
-        py: 2.5,
+        pt: 2.5,
+        pb: isLast ? 0 : 2.5,
         borderBottom: isLast ? "none" : "1px solid",
         borderColor: "divider",
         textAlign: "center",
