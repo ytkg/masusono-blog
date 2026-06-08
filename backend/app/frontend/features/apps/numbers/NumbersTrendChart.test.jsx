@@ -13,7 +13,8 @@ const trend = {
   points: [
     { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3, masudaRunTotalPlays: 0 },
     { date: "2025-10-06", label: "2025/10/06", totalArticles: 2, totalChars: 5, masudaRunTotalPlays: 2 },
-    { date: "2025-10-07", label: "2025/10/07", totalArticles: 4, totalChars: 12, masudaRunTotalPlays: 3 },
+    { date: "2025-10-07", label: "2025/10/07", totalArticles: 3, totalChars: 8, masudaRunTotalPlays: 2 },
+    { date: "2025-10-08", label: "2025/10/08", totalArticles: 4, totalChars: 12, masudaRunTotalPlays: 3 },
   ],
 }
 
@@ -29,7 +30,26 @@ describe("NumbersTrendChart", () => {
     expect(screen.getByText("12 字")).toBeInTheDocument()
     expect(screen.getByText("増田RUN総プレイ回数")).toBeInTheDocument()
     expect(screen.getByText("3 回")).toBeInTheDocument()
-    expect(screen.getByText("線は各指標の最大値に合わせて表示しています。")).toBeInTheDocument()
+    expect(screen.getByText("総文字数は1/300、増田RUN総プレイ回数は1/10で表示しています。")).toBeInTheDocument()
+    expect(screen.getByText("'25/10/05")).toBeInTheDocument()
+    expect(screen.getByText("'25/10/06")).toBeInTheDocument()
+    expect(screen.getByText("'25/10/07")).toBeInTheDocument()
+    expect(screen.getByText("'25/10/08")).toBeInTheDocument()
+    expect(screen.getAllByTestId("trend-date-grid-line")).toHaveLength(4)
+  })
+
+  it("増田RUNの先頭の0区間は線を描かない", () => {
+    render(<NumbersTrendChart trend={trend} />)
+
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", expect.stringMatching(/^M 18 /))
+    expect(screen.getByTestId("trend-line-masudaRunTotalPlays")).toHaveAttribute("d", expect.stringMatching(/^M 126 /))
+  })
+
+  it("総文字数は1/300、増田RUNは1/10スケールで描画する", () => {
+    render(<NumbersTrendChart trend={trend} />)
+
+    expect(screen.getByTestId("trend-line-totalChars")).toHaveAttribute("d", expect.stringMatching(/182\.34$/))
+    expect(screen.getByTestId("trend-line-masudaRunTotalPlays")).toHaveAttribute("d", expect.stringMatching(/171\.55$/))
   })
 
   it("推移データがなければ何も表示しない", () => {

@@ -6,6 +6,10 @@ const CHART_WIDTH = 360
 const CHART_HEIGHT = 220
 const CHART_PADDING = { top: 18, right: 18, bottom: 36, left: 18 }
 const SERIES_COLORS = ["#2563eb", "#16a34a", "#f97316"]
+const MASUDA_RUN_SERIES_KEY = "masudaRunTotalPlays"
+const MASUDA_RUN_SCALE = 10
+const TOTAL_CHARS_SERIES_KEY = "totalChars"
+const TOTAL_CHARS_SCALE = 300
 
 function chartBounds() {
   return {
@@ -16,28 +20,56 @@ function chartBounds() {
   }
 }
 
-function normalizePoints(points, seriesKey) {
-  const values = points.map((point) => point[seriesKey]).filter((value) => Number.isFinite(value))
-  const maxValue = Math.max(...values, 0)
-  if (values.length === 0) return []
+function normalizePoints(points, seriesKey, maxChartValue) {
+  const visiblePoints = visibleSeriesPoints(points, seriesKey)
+  if (visiblePoints.length === 0 || maxChartValue <= 0) return []
 
   const bounds = chartBounds()
   const usableWidth = bounds.right - bounds.left
   const usableHeight = bounds.bottom - bounds.top
   const denominator = Math.max(points.length - 1, 1)
 
-  return points
-    .map((point, index) => {
-      const value = point[seriesKey]
+  return visiblePoints
+    .map(({ point, index }) => {
+      const value = scaledSeriesValue(point, seriesKey)
       if (!Number.isFinite(value)) return null
 
-      const ratio = maxValue > 0 ? value / maxValue : 0
+      const ratio = value / maxChartValue
       return {
         x: bounds.left + (usableWidth * index) / denominator,
         y: bounds.bottom - usableHeight * ratio,
       }
     })
     .filter(Boolean)
+}
+
+function maxChartValue(points, series) {
+  return Math.max(
+    ...series.flatMap(({ key }) =>
+      visibleSeriesPoints(points, key)
+        .map(({ point }) => scaledSeriesValue(point, key))
+        .filter((value) => Number.isFinite(value)),
+    ),
+    0,
+  )
+}
+
+function scaledSeriesValue(point, seriesKey) {
+  const value = point[seriesKey]
+  if (!Number.isFinite(value)) return value
+
+  if (seriesKey === MASUDA_RUN_SERIES_KEY) return value / MASUDA_RUN_SCALE
+  if (seriesKey === TOTAL_CHARS_SERIES_KEY) return value / TOTAL_CHARS_SCALE
+
+  return value
+}
+
+function visibleSeriesPoints(points, seriesKey) {
+  const indexedPoints = points.map((point, index) => ({ point, index }))
+  if (seriesKey !== MASUDA_RUN_SERIES_KEY) return indexedPoints
+
+  const firstPositiveIndex = points.findIndex((point) => point[seriesKey] > 0)
+  return firstPositiveIndex >= 0 ? indexedPoints.slice(firstPositiveIndex) : []
 }
 
 function smoothPath(points) {
@@ -67,6 +99,26 @@ function midpoint(a, b) {
   }
 }
 
+function chartDateLabels(points) {
+  const bounds = chartBounds()
+  const denominator = Math.max(points.length - 1, 1)
+  const indexes = [0, Math.round(denominator / 3), Math.round((denominator * 2) / 3), denominator]
+
+  return [...new Set(indexes)].map((index) => {
+    const point = points[index]
+    return {
+      key: point.date,
+      label: shortDateLabel(point.label ?? point.date),
+      x: bounds.left + ((bounds.right - bounds.left) * index) / denominator,
+      textAnchor: index === 0 ? "start" : index === denominator ? "end" : "middle",
+    }
+  })
+}
+
+function shortDateLabel(label) {
+  return String(label).replace(/^(\d{2})(\d{2})\//, "'$2/")
+}
+
 function hasTrendData(trend) {
   return (
     Array.isArray(trend?.points) && trend.points.length > 0 && Array.isArray(trend?.series) && trend.series.length > 0
@@ -77,8 +129,8 @@ export default function NumbersTrendChart({ trend }) {
   if (!hasTrendData(trend)) return null
 
   const bounds = chartBounds()
-  const startLabel = trend.points[0]?.label
-  const endLabel = trend.points.at(-1)?.label
+  const chartMaxValue = maxChartValue(trend.points, trend.series)
+  const dateLabels = chartDateLabels(trend.points)
 
   return (
     <Stack spacing={1.5} data-testid="numbers-trend">
@@ -117,15 +169,27 @@ export default function NumbersTrendChart({ trend }) {
             y2={(bounds.top + bounds.bottom) / 2}
             stroke="#f3f4f6"
           />
+          {dateLabels.map((dateLabel) => (
+            <line
+              key={`grid-${dateLabel.key}`}
+              data-testid="trend-date-grid-line"
+              x1={dateLabel.x}
+              y1={bounds.top}
+              x2={dateLabel.x}
+              y2={bounds.bottom}
+              stroke="#f3f4f6"
+            />
+          ))}
 
           {trend.series.map((series, index) => {
-            const points = normalizePoints(trend.points, series.key)
+            const points = normalizePoints(trend.points, series.key, chartMaxValue)
             const path = smoothPath(points)
             if (!path) return null
 
             return (
               <path
                 key={series.key}
+                data-testid={`trend-line-${series.key}`}
                 d={path}
                 fill="none"
                 stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
@@ -136,12 +200,18 @@ export default function NumbersTrendChart({ trend }) {
             )
           })}
 
-          <text x={bounds.left} y={CHART_HEIGHT - 12} fill="#6b7280" fontSize="11">
-            {startLabel}
-          </text>
-          <text x={bounds.right} y={CHART_HEIGHT - 12} fill="#6b7280" fontSize="11" textAnchor="end">
-            {endLabel}
-          </text>
+          {dateLabels.map((dateLabel) => (
+            <text
+              key={dateLabel.key}
+              x={dateLabel.x}
+              y={CHART_HEIGHT - 12}
+              fill="#6b7280"
+              fontSize="11"
+              textAnchor={dateLabel.textAnchor}
+            >
+              {dateLabel.label}
+            </text>
+          ))}
         </Box>
 
         <Stack spacing={0.75} sx={{ px: 1, pb: 0.5 }}>
@@ -171,7 +241,7 @@ export default function NumbersTrendChart({ trend }) {
       </Box>
 
       <Typography variant="caption" color="text.secondary">
-        線は各指標の最大値に合わせて表示しています。
+        総文字数は1/300、増田RUN総プレイ回数は1/10で表示しています。
       </Typography>
     </Stack>
   )
