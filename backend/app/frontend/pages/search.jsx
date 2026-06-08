@@ -9,13 +9,18 @@ import PageContainer from "../shared/PageContainer"
 import SeoHead from "../shared/SeoHead"
 
 export default function Search({ articles = [] }) {
-  const [query, setQuery] = useArticleSearchQuery()
+  const [query, setQuery, pushQuery] = useArticleSearchQuery()
   const normalizedQuery = normalizeArticleSearchText(query)
   const isSearching = Boolean(normalizedQuery)
   const filteredArticles = useMemo(
     () => articles.filter((article) => articleMatchesQuery(article, normalizedQuery)),
     [articles, normalizedQuery],
   )
+
+  function handleSuggestionSelect(nextQuery) {
+    pushQuery(nextQuery)
+    window.scrollTo({ top: 0 })
+  }
 
   return (
     <>
@@ -34,7 +39,7 @@ export default function Search({ articles = [] }) {
           {isSearching ? (
             <ArticlesList articles={filteredArticles} variant="divided" emptyMessage="該当する記事はありません。" />
           ) : (
-            <ArticleSearchSuggestions articles={articles} onSelect={setQuery} />
+            <ArticleSearchSuggestions articles={articles} onSelect={handleSuggestionSelect} />
           )}
         </Box>
       </PageContainer>

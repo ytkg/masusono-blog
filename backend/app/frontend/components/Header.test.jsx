@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import Header from "./Header"
 import { usePage } from "@inertiajs/react"
+import { LOCATION_CHANGE_EVENT } from "@/shared/lib/locationEvents"
 
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
@@ -62,6 +63,38 @@ describe("Header", () => {
     render(<Header />)
 
     expect(screen.getByRole("button", { name: "前のページに戻る" })).toBeInTheDocument()
+  })
+
+  it("検索結果ページでは戻るボタンを表示する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/search?q=%23%E8%AA%AD%E6%9B%B8" })
+
+    render(<Header />)
+
+    expect(screen.getByRole("button", { name: "前のページに戻る" })).toBeInTheDocument()
+  })
+
+  it("検索候補ページでは戻るボタンを表示しない", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/search" })
+
+    render(<Header />)
+
+    expect(screen.queryByRole("button", { name: "前のページに戻る" })).not.toBeInTheDocument()
+  })
+
+  it("検索ページ内でURLが検索結果に変わったら戻るボタンを表示する", async () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/search" })
+    window.history.replaceState(null, "", "/search")
+
+    render(<Header />)
+
+    expect(screen.queryByRole("button", { name: "前のページに戻る" })).not.toBeInTheDocument()
+
+    window.history.pushState(null, "", "/search?q=%23%E8%AA%AD%E6%9B%B8")
+    window.dispatchEvent(new Event(LOCATION_CHANGE_EVENT))
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "前のページに戻る" })).toBeInTheDocument()
+    })
   })
 
   it("ヘッダー右側に設定リンクを表示しない", () => {

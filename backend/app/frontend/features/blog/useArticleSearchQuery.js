@@ -1,4 +1,10 @@
 import { useEffect, useState } from "react"
+import { notifyLocationChange } from "@/shared/lib/locationEvents"
+
+const HISTORY_MODES = {
+  push: "push",
+  replace: "replace",
+}
 
 function readInitialQuery() {
   if (typeof window === "undefined") {
@@ -8,7 +14,7 @@ function readInitialQuery() {
   return new URLSearchParams(window.location.search).get("q") ?? ""
 }
 
-function writeQueryToUrl(query) {
+function writeQueryToUrl(query, mode = HISTORY_MODES.replace) {
   if (typeof window === "undefined") {
     return
   }
@@ -20,15 +26,41 @@ function writeQueryToUrl(query) {
     url.searchParams.delete("q")
   }
 
-  window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`)
+  const nextUrl = `${url.pathname}${url.search}${url.hash}`
+  if (mode === HISTORY_MODES.push) {
+    window.history.pushState(window.history.state, "", nextUrl)
+    notifyLocationChange()
+    return
+  }
+
+  window.history.replaceState(window.history.state, "", nextUrl)
+  notifyLocationChange()
 }
 
 export default function useArticleSearchQuery() {
   const [query, setQuery] = useState(readInitialQuery)
 
-  useEffect(() => {
-    writeQueryToUrl(query)
-  }, [query])
+  function replaceQuery(nextQuery) {
+    writeQueryToUrl(nextQuery, HISTORY_MODES.replace)
+    setQuery(nextQuery)
+  }
 
-  return [query, setQuery]
+  function pushQuery(nextQuery) {
+    writeQueryToUrl(nextQuery, HISTORY_MODES.push)
+    setQuery(nextQuery)
+  }
+
+  useEffect(() => {
+    function handlePopState() {
+      setQuery(readInitialQuery())
+    }
+
+    window.addEventListener("popstate", handlePopState)
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState)
+    }
+  }, [])
+
+  return [query, replaceQuery, pushQuery]
 }

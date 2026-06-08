@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import Search from "./search"
 
 vi.mock("../shared/SeoHead", () => ({
@@ -31,6 +31,10 @@ describe("Search page", () => {
       content: "<p>本と生活の話です</p>",
     },
   ]
+
+  beforeEach(() => {
+    window.scrollTo = vi.fn()
+  })
 
   afterEach(() => {
     vi.restoreAllMocks()
@@ -87,6 +91,26 @@ describe("Search page", () => {
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#タグ0")
     expect(window.location.search).toBe("?q=%23%E3%82%BF%E3%82%B00")
+  })
+
+  it("候補クリックは履歴を積み、ブラウザバックで候補画面に戻る", () => {
+    window.history.replaceState(null, "", "/search")
+
+    render(<Search articles={articles} />)
+
+    fireEvent.click(screen.getByText("#本"))
+
+    expect(window.location.search).toBe("?q=%23%E6%9C%AC")
+    expect(screen.queryByText("タグから探す")).not.toBeInTheDocument()
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 })
+
+    window.history.replaceState(null, "", "/search")
+    fireEvent.popState(window)
+
+    expect(window.location.pathname).toBe("/search")
+    expect(window.location.search).toBe("")
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("")
+    expect(screen.getByText("タグから探す")).toBeInTheDocument()
   })
 
   it("URLの q を初期検索語に使って記事を絞り込む", () => {
