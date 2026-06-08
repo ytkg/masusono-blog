@@ -116,15 +116,7 @@ module Numbers
     end
 
     def article_char_count(article)
-      strip_html(article[:content].to_s).length
-    end
-
-    def strip_html(text)
-      html_sanitizer.sanitize(text)
-    end
-
-    def html_sanitizer
-      @html_sanitizer ||= Rails::Html::FullSanitizer.new
+      ArticleCharacterCounter.call(article[:content])
     end
 
     def parse_date(value)
