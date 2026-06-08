@@ -28,6 +28,9 @@ export default function ArticleAuthorAvatar({ author, authorHref, avatarSrc, sx 
         sx={{
           width: 40,
           height: 40,
+          boxSizing: "border-box",
+          border: "1px solid",
+          borderColor: "divider",
           bgcolor: "primary.light",
           color: "primary.contrastText",
           fontWeight: 700,
