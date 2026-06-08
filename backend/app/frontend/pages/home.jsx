@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Tab from "@mui/material/Tab"
 import Tabs from "@mui/material/Tabs"
@@ -12,21 +12,69 @@ const HOME_MODES = {
   recommended: "recommended",
 }
 
+const SWIPE_MIN_DISTANCE = 35
+const SWIPE_AXIS_RATIO = 1.25
+const HOME_TAB_HEIGHT = 38
+
+const compactTabSx = {
+  minHeight: HOME_TAB_HEIGHT,
+  py: 0.75,
+}
+
 function pickRandomArticles(articles, count) {
   return [...articles].sort(() => Math.random() - 0.5).slice(0, count)
+}
+
+function getSwipeMode(start, end) {
+  if (!start) return null
+
+  const deltaX = end.x - start.x
+  const deltaY = end.y - start.y
+  const absX = Math.abs(deltaX)
+  const absY = Math.abs(deltaY)
+
+  if (absX < SWIPE_MIN_DISTANCE || absX < absY * SWIPE_AXIS_RATIO) return null
+
+  return deltaX < 0 ? HOME_MODES.recommended : HOME_MODES.feed
 }
 
 export default function Home({ articles = [] }) {
   const [mode, setMode] = useState(HOME_MODES.feed)
   const [recommendedArticles] = useState(() => pickRandomArticles(articles, 5))
+  const swipeStartRef = useRef(null)
 
   useEffect(() => {
     ensureUserIdCookie()
   }, [])
 
-  function handleModeChange(_, nextMode) {
+  function changeMode(nextMode) {
+    if (nextMode === mode) return
+
     setMode(nextMode)
     window.scrollTo({ top: 0 })
+  }
+
+  function handleModeChange(_, nextMode) {
+    changeMode(nextMode)
+  }
+
+  function handlePointerDown(event) {
+    swipeStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+    }
+  }
+
+  function handlePointerUp(event) {
+    const swipeStart = swipeStartRef.current
+    swipeStartRef.current = null
+
+    const nextMode = getSwipeMode(swipeStart, {
+      x: event.clientX,
+      y: event.clientY,
+    })
+
+    if (nextMode) changeMode(nextMode)
   }
 
   return (
@@ -48,12 +96,26 @@ export default function Home({ articles = [] }) {
               borderColor: "divider",
             }}
           >
-            <Tabs value={mode} onChange={handleModeChange} aria-label="トップページの表示切り替え" variant="fullWidth">
-              <Tab label="フィード" value={HOME_MODES.feed} />
-              <Tab label="おすすめ" value={HOME_MODES.recommended} />
+            <Tabs
+              value={mode}
+              onChange={handleModeChange}
+              aria-label="トップページの表示切り替え"
+              variant="fullWidth"
+              sx={{ minHeight: HOME_TAB_HEIGHT }}
+            >
+              <Tab label="フィード" value={HOME_MODES.feed} sx={compactTabSx} />
+              <Tab label="おすすめ" value={HOME_MODES.recommended} sx={compactTabSx} />
             </Tabs>
           </Box>
-          <Box sx={{ pt: 1 }}>
+          <Box
+            data-testid="home-articles-swipe-area"
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={() => {
+              swipeStartRef.current = null
+            }}
+            sx={{ pt: 1 }}
+          >
             <ArticlesList
               articles={mode === HOME_MODES.feed ? articles : recommendedArticles}
               variant="divided"
