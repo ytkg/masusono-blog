@@ -51,8 +51,9 @@ function formatArticleStats(article) {
   }
 
   const formattedCharacterCount = new Intl.NumberFormat("ja-JP").format(characterCount)
+  const formattedReadingTimeMinutes = String(readingTimeMinutes)
   const formattedReadingTime =
-    Number.isFinite(readingTimeMinutes) && readingTimeMinutes > 0 ? `・約${readingTimeMinutes}分` : ""
+    Number.isFinite(readingTimeMinutes) && readingTimeMinutes > 0 ? `・約${formattedReadingTimeMinutes}分` : ""
 
   return `${formattedCharacterCount}字${formattedReadingTime}`
 }

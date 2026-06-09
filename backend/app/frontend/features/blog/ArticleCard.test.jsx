@@ -220,6 +220,25 @@ describe("ArticleCard", () => {
     expect(screen.getByTestId("article-list-meta")).toHaveTextContent("増田2026/03/09 ・ 1,234字・約4分")
   })
 
+  it("読了目安は0.5分刻みで表示する", () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          characterCount: 120,
+          readingTimeMinutes: 0.5,
+          author: "増田",
+          content: "<p>本文です</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId("article-list-meta")).toHaveTextContent("120字・約0.5分")
+  })
+
   it("カード表示では文字数と読了目安をメタ情報として表示する", () => {
     render(
       <ArticleCard

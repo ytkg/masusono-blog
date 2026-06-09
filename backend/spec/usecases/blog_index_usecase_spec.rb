@@ -46,7 +46,7 @@ RSpec.describe BlogIndexUsecase do
               content: "<p>first body</p>",
               tags: "旅行,日記",
               characterCount: 9,
-              readingTimeMinutes: 1,
+              readingTimeMinutes: 0.5,
               author: "増田太郎",
               authorId: "9wgrey2lh3",
               authorImageUrl: "https://images.microcms-assets.io/assets/masuda.webp"
@@ -58,7 +58,7 @@ RSpec.describe BlogIndexUsecase do
               content: "<p>second body</p>",
               tags: nil,
               characterCount: 10,
-              readingTimeMinutes: 1,
+              readingTimeMinutes: 0.5,
               author: nil,
               authorId: nil,
               authorImageUrl: nil
