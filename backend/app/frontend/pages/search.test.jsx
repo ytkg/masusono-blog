@@ -21,6 +21,7 @@ describe("Search page", () => {
       id: "article-1",
       title: "増田の遠足",
       author: "増田",
+      readingTimeMinutes: 1,
       content: "<p>朝から歩いた記事です</p>",
     },
     {
@@ -28,6 +29,7 @@ describe("Search page", () => {
       title: "読書メモ",
       author: "その他1",
       tags: "本,暮らし",
+      readingTimeMinutes: 5.5,
       content: "<p>本と生活の話です</p>",
     },
   ]
@@ -49,6 +51,7 @@ describe("Search page", () => {
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toBeInTheDocument()
     expect(screen.getByText("著者から探す")).toBeInTheDocument()
     expect(screen.getByText("タグから探す")).toBeInTheDocument()
+    expect(screen.getByText("読了目安から探す")).toBeInTheDocument()
     expect(screen.queryByTestId("articles-list")).not.toBeInTheDocument()
   })
 
@@ -91,6 +94,24 @@ describe("Search page", () => {
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#タグ0")
     expect(window.location.search).toBe("?q=%23%E3%82%BF%E3%82%B00")
+  })
+
+  it("検索語が空なら読了目安候補を表示し、クリックで読了目安検索する", () => {
+    window.history.replaceState(null, "", "/search")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByText("読了目安から探す")).toBeInTheDocument()
+    expect(screen.getByText("~1分")).toBeInTheDocument()
+    expect(screen.getByText("1~2分")).toBeInTheDocument()
+    expect(screen.getByText("2~3分")).toBeInTheDocument()
+    expect(screen.getByText("3~5分")).toBeInTheDocument()
+    expect(screen.getByText("5分~")).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText("~1分"))
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("read:1")
+    expect(window.location.search).toBe("?q=read%3A1")
   })
 
   it("候補クリックは履歴を積み、ブラウザバックで候補画面に戻る", () => {
@@ -198,5 +219,37 @@ describe("Search page", () => {
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#生活")
     expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:0 variant:divided")
+  })
+
+  it("read:N は読了目安がN分以内の記事だけを検索対象にする", () => {
+    window.history.replaceState(null, "", "/search?q=read%3A1")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("read:1")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+  })
+
+  it("read:N+ は読了目安がN分以上の記事だけを検索対象にする", () => {
+    window.history.replaceState(null, "", "/search?q=read%3A5%2B")
+
+    render(<Search articles={articles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("read:5+")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+  })
+
+  it("read:N-M は読了目安がN分より長くM分以内の記事だけを検索対象にする", () => {
+    const rangedArticles = [
+      { id: "short", title: "短い", author: "増田", readingTimeMinutes: 1, content: "<p>本文</p>" },
+      { id: "middle", title: "中くらい", author: "増田", readingTimeMinutes: 1.5, content: "<p>本文</p>" },
+      { id: "long", title: "長い", author: "増田", readingTimeMinutes: 2.5, content: "<p>本文</p>" },
+    ]
+    window.history.replaceState(null, "", "/search?q=read%3A1-2")
+
+    render(<Search articles={rangedArticles} />)
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("read:1-2")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
   })
 })

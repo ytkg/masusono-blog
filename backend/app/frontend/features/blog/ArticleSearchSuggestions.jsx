@@ -2,6 +2,14 @@ import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
 import Typography from "@mui/material/Typography"
 
+const READING_TIME_SUGGESTIONS = [
+  { label: "~1分", query: "read:1" },
+  { label: "1~2分", query: "read:1-2" },
+  { label: "2~3分", query: "read:2-3" },
+  { label: "3~5分", query: "read:3-5" },
+  { label: "5分~", query: "read:5+" },
+]
+
 function extractArticleTags(articles) {
   const tags = new Set()
   articles.forEach((article) => {
@@ -35,12 +43,13 @@ function SearchSuggestionSection({ items, label, prefix, onSelect }) {
       </Typography>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
         {items.map((item) => {
-          const query = `${prefix}${item}`
+          const itemLabel = typeof item === "string" ? `${prefix}${item}` : item.label
+          const query = typeof item === "string" ? `${prefix}${item}` : item.query
 
           return (
             <Chip
-              key={item}
-              label={query}
+              key={query}
+              label={itemLabel}
               onClick={() => onSelect(query)}
               size="small"
               sx={{ color: "text.secondary", borderColor: "divider" }}
@@ -61,6 +70,12 @@ export default function ArticleSearchSuggestions({ articles, onSelect }) {
     <Box sx={{ display: "grid", gap: 1.5 }}>
       <SearchSuggestionSection items={suggestedAuthors} label="著者から探す" prefix="@" onSelect={onSelect} />
       <SearchSuggestionSection items={suggestedTags} label="タグから探す" prefix="#" onSelect={onSelect} />
+      <SearchSuggestionSection
+        items={READING_TIME_SUGGESTIONS}
+        label="読了目安から探す"
+        prefix="read:"
+        onSelect={onSelect}
+      />
     </Box>
   )
 }

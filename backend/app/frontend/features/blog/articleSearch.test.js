@@ -6,6 +6,7 @@ describe("articleSearch", () => {
     title: "母に同感",
     author: "その他4",
     tags: "家族,内省,生き方",
+    readingTimeMinutes: 1.5,
     content: "<p>明るく前向きでいなきゃいけない雰囲気に距離を置く話。</p>",
   }
 
@@ -56,6 +57,22 @@ describe("articleSearch", () => {
     expect(matches("@その他4 #家族")).toBe(true)
     expect(matches("@増田 #家族 OR @その他4 #内省")).toBe(true)
     expect(matches("@増田 #家族 OR @その他4 #仕事")).toBe(false)
+  })
+
+  it("read:N は読了目安だけを検索対象にする", () => {
+    expect(matches("read:2")).toBe(true)
+    expect(matches("read:1")).toBe(false)
+    expect(matches("read:1.5")).toBe(true)
+  })
+
+  it("read:N-M はN分より長くM分以内の読了目安だけを検索対象にする", () => {
+    expect(matches("read:1-2")).toBe(true)
+    expect(matches("read:0.5-1")).toBe(false)
+  })
+
+  it("read:N+ はN分以上の読了目安だけを検索対象にする", () => {
+    expect(matches("read:1+")).toBe(true)
+    expect(matches("read:2+")).toBe(false)
   })
 
   it("単語内の or は OR 演算子として扱わない", () => {
