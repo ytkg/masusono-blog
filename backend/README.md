@@ -102,20 +102,20 @@ Docker Compose から実行する場合、ホストの `~/.config/gcloud` がコ
 
 ```bash
 cd backend
-BIGQUERY_PROJECT_ID=YOUR_PROJECT_ID \
-BIGQUERY_DATASET_ID=YOUR_DATASET_ID \
+BIGQUERY_PROJECT_ID=masusono \
+BIGQUERY_DATASET_ID=blog \
 docker compose run --rm backend bundle exec rails articles:backup_to_bigquery
 ```
 
 初回実行時に dataset と table がなければ自動作成します。dataset location は `asia-northeast1` です。
 
 タグ付け候補を確認する場合は、BigQuery から `tags` が空の記事、タグ付き既存記事、既存タグの件数を JSON で出力します。`articles:prepare_tagging` はバックアップ後に候補ファイルとレビュー用テンプレートを `tmp/tagging/` 配下へ作成します。
-タグは記事同士の具体的なつながりを作るために使います。既存タグは参考情報であり、制約ではありません。2記事以上に自然に紐づくなら新しいタグを作って構いません。`日常`、`生活`、`生き方`、`人間関係`、`内省` のような広いタグは、より具体的なタグで置き換えられるなら置き換えます。
+タグは記事同士の具体的なつながりを作るために使います。既存タグは参考情報であり、制約ではありません。2記事以上に自然に紐づくなら新しいタグを積極的に作って構いません。新規タグを作る場合は、そのタグでつながる既存記事も `tag-updates.json` に含め、既存記事側のタグ更新を忘れないようにします。`日常`、`生活`、`生き方`、`人間関係`、`内省` のような広いタグは、より具体的なタグで置き換えられるなら置き換えます。
 
 ```bash
 cd backend
-BIGQUERY_PROJECT_ID=YOUR_PROJECT_ID \
-BIGQUERY_DATASET_ID=YOUR_DATASET_ID \
+BIGQUERY_PROJECT_ID=masusono \
+BIGQUERY_DATASET_ID=blog \
 docker compose run --rm backend bundle exec rails articles:prepare_tagging
 ```
 
@@ -129,8 +129,8 @@ docker compose run --rm backend bundle exec rails articles:prepare_tagging
 
 ```bash
 cd backend
-BIGQUERY_PROJECT_ID=YOUR_PROJECT_ID \
-BIGQUERY_DATASET_ID=YOUR_DATASET_ID \
+BIGQUERY_PROJECT_ID=masusono \
+BIGQUERY_DATASET_ID=blog \
 docker compose run --rm backend bundle exec rails articles:apply_tag_updates_from_file
 ```
 
