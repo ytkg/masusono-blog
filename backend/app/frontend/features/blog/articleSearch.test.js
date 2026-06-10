@@ -43,6 +43,16 @@ describe("articleSearch", () => {
     expect(matches("#前向き")).toBe(false)
   })
 
+  it("#付きトークンはタグの完全一致だけを対象にする", () => {
+    const articleWithRubyKaigi = {
+      ...article,
+      tags: "RubyKaigi,技術",
+    }
+
+    expect(articleMatchesQuery(articleWithRubyKaigi, normalizeArticleSearchText("#AI"))).toBe(false)
+    expect(articleMatchesQuery(articleWithRubyKaigi, normalizeArticleSearchText("#RubyKaigi"))).toBe(true)
+  })
+
   it("#付きトークンと通常トークンを混在できる", () => {
     expect(matches("#家族 前向き")).toBe(true)
     expect(matches("#仕事 前向き")).toBe(false)

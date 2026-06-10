@@ -13,6 +13,13 @@ function parseSearchQuery(normalizedQuery) {
     .filter((group) => group.length)
 }
 
+function articleTags(article) {
+  return String(article?.tags ?? "")
+    .split(",")
+    .map((tag) => normalizeArticleSearchText(tag))
+    .filter((tag) => tag.length > 0)
+}
+
 function articleMatchesToken(article, token) {
   if (token.startsWith("read:")) {
     const readingTimeQuery = token.slice(5).trim()
@@ -44,7 +51,7 @@ function articleMatchesToken(article, token) {
 
     if (!tagQuery) return false
 
-    return normalizeArticleSearchText(article?.tags).includes(tagQuery)
+    return articleTags(article).includes(tagQuery)
   }
 
   if (token.startsWith("@")) {
