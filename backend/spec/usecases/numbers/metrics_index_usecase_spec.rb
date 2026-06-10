@@ -54,6 +54,10 @@ RSpec.describe Numbers::MetricsIndexUsecase do
     let(:blocks) { result[:metrics][:blocks] }
     let(:trend) { result[:metrics][:trend] }
 
+    it do
+      expect(described_class::CACHE_EXPIRES_IN).to eq(1.hour)
+    end
+
     describe "起算日" do
       it do
         expect(result[:status]).to eq(:ok)

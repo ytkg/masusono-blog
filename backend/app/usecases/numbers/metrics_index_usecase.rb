@@ -1,7 +1,7 @@
 module Numbers
   class MetricsIndexUsecase
     CACHE_KEY = "numbers/metrics_index".freeze
-    CACHE_EXPIRES_IN = 10.minutes
+    CACHE_EXPIRES_IN = 1.hour
     CACHE = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
 
     def self.call
