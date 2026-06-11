@@ -53,11 +53,12 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
   const excerpt = truncateText(plainText)
   const canExpand = shouldCollapse && (plainText.length > EXCERPT_MAX_LENGTH || RICH_HTML_PATTERN.test(html))
   const showsHtml = !shouldCollapse || isExpanded || !canExpand
+  const showsRubyRunner = enableRubyRunner && showsHtml
 
   return (
     <Box sx={{ display: "grid", gap: 1 }}>
       {showsHtml ? (
-        <ArticleHtml enableRubyRunner={enableRubyRunner} html={html} />
+        <ArticleHtml enableRubyRunner={showsRubyRunner} html={html} />
       ) : (
         <Typography color="text.secondary" sx={{ lineHeight: 1.8, overflowWrap: "anywhere" }}>
           {excerpt}

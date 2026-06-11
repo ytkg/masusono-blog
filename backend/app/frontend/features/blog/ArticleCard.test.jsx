@@ -235,6 +235,47 @@ describe("ArticleCard", () => {
     expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
   })
 
+  it("plain presentation の一覧では続きを読むで展開したRubyコードブロックを実行できる", async () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: `<p>${"あ".repeat(100)}</p><pre><code class="language-ruby">puts :hello</code></pre>`,
+        }}
+      />,
+    )
+
+    expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("button", { name: "続きを読む" }))
+
+    expect(await screen.findByTestId("ruby-code-runner")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "▶ 実行" })).toBeInTheDocument()
+  })
+
+  it("plain presentation の一覧では短いRubyコードブロックも実行できる", async () => {
+    render(
+      <ArticleCard
+        presentation="plain"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: '<pre><code class="language-ruby">puts :hello</code></pre>',
+        }}
+      />,
+    )
+
+    expect(screen.queryByRole("button", { name: "続きを読む" })).not.toBeInTheDocument()
+    expect(await screen.findByTestId("ruby-code-runner")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "▶ 実行" })).toBeInTheDocument()
+  })
+
   it("plain presentation ではカード枠を消す", () => {
     const { container } = render(
       <ArticleCard
