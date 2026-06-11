@@ -128,6 +128,110 @@ describe("ArticleCard", () => {
     expect(screen.getByRole("img", { name: "本文画像" })).toHaveStyle({ borderRadius: "12px" })
   })
 
+  it("通常コードブロックを読みやすく表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: "<pre><code>const value = 1</code></pre>",
+        }}
+      />,
+    )
+
+    const code = screen.getByText("const value = 1")
+    const pre = code.closest("pre")
+
+    expect(pre).toHaveStyle({ backgroundColor: "rgb(247, 247, 247)", overflowX: "auto", whiteSpace: "pre" })
+    expect(pre.querySelector("[data-code-line-number]")).not.toBeInTheDocument()
+  })
+
+  it("言語指定付きコードブロックに言語名を表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: '<pre><code class="language-javascript">console.log("hello")</code></pre>',
+        }}
+      />,
+    )
+
+    const lineContent = screen.getByText('console.log("hello")')
+    const pre = lineContent.closest("pre")
+
+    expect(pre).toHaveAttribute("data-code-language", "JavaScript")
+    expect(pre.querySelector("[data-code-line-number]")).toHaveTextContent("1")
+  })
+
+  it("インラインコードを本文中で読みやすく表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: "<p><code>bundle install</code> を実行する</p>",
+        }}
+      />,
+    )
+
+    expect(screen.getByText("bundle install")).toHaveStyle({
+      backgroundColor: "rgb(247, 247, 247)",
+      color: "rgba(0, 0, 0, 0.87)",
+    })
+  })
+
+  it("詳細ではRubyコードブロックに実行UIを表示する", async () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: '<p>Rubyサンプル</p><pre><code class="language-ruby">puts :hello\nputs :world</code></pre>',
+        }}
+      />,
+    )
+
+    const runner = await screen.findByTestId("ruby-code-runner")
+    const lineContent = screen.getByText("puts :hello")
+    const pre = lineContent.closest("pre")
+
+    expect(runner).toBeInTheDocument()
+    expect(pre).toHaveAttribute("data-code-language", "Ruby")
+    expect(pre.querySelectorAll("[data-code-line-number]")).toHaveLength(2)
+    expect(screen.getByText("puts :world")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "▶ 実行" })).toBeInTheDocument()
+  })
+
+  it("一覧でもRubyコードブロックを通常コードブロックとして表示する", () => {
+    render(
+      <ArticleCard
+        article={{
+          id: "hello-world",
+          title: "Hello",
+          publishedDate: "2026/03/09",
+          author: "増田",
+          content: '<p>Rubyサンプル</p><pre><code class="language-ruby">puts :hello</code></pre>',
+        }}
+      />,
+    )
+
+    expect(screen.getByText("puts :hello")).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
+  })
+
   it("plain presentation ではカード枠を消す", () => {
     const { container } = render(
       <ArticleCard

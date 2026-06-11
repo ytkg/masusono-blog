@@ -138,7 +138,7 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
       sx={isPlain ? { minWidth: 0 } : sx}
     >
       <ArticleTags tags={article.tags} />
-      <ArticleBody html={html} hasBody={hasBody} shouldCollapse={shouldCollapseBody} />
+      <ArticleBody enableRubyRunner={mode === "detail"} html={html} hasBody={hasBody} shouldCollapse={shouldCollapseBody} />
     </ContentItemCard>
   )
 
