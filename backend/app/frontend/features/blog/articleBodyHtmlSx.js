@@ -40,17 +40,46 @@ export const articleBodyHtmlSx = {
     display: "block",
   },
   "& [data-code-line]": {
-    columnGap: 1.25,
     display: "grid",
-    gridTemplateColumns: "3ch minmax(0, 1fr)",
+    gridTemplateColumns: "4.75ch minmax(0, 1fr)",
   },
   "& [data-code-line-number]": {
+    borderRight: "1px solid",
+    borderColor: "divider",
     color: "text.disabled",
+    mr: 1.25,
+    pr: 1,
     textAlign: "right",
     userSelect: "none",
   },
   "& [data-code-line-content]": {
     minWidth: 0,
+    pl: 0,
+  },
+  "& [data-code-token='comment']": {
+    color: "#8a8a8a",
+  },
+  "& [data-code-token='constant']": {
+    color: "#9a5b13",
+  },
+  "& [data-code-token='keyword']": {
+    color: "#9b3f78",
+    fontWeight: 700,
+  },
+  "& [data-code-token='number']": {
+    color: "#a15c24",
+  },
+  "& [data-code-token='property']": {
+    color: "#2f6f86",
+  },
+  "& [data-code-token='string']": {
+    color: "#4f7a28",
+  },
+  "& [data-code-token='symbol']": {
+    color: "#9a5b13",
+  },
+  "& [data-code-token='tag']": {
+    color: "#9b3f78",
   },
   "& code": {
     backgroundColor: "#f7f7f7",

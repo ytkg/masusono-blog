@@ -18,7 +18,7 @@ describe("RubyExecutableCodeBlock", () => {
       />,
     )
 
-    const pre = screen.getByText("puts :hello").closest("pre")
+    const pre = screen.getByText(":hello").closest("pre")
     expect(pre).toHaveAttribute("data-code-language", "Ruby")
     expect(pre.querySelectorAll("[data-code-line-number]")).toHaveLength(2)
 

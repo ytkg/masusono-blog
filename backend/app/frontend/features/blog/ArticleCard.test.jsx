@@ -158,16 +158,18 @@ describe("ArticleCard", () => {
           title: "Hello",
           publishedDate: "2026/03/09",
           author: "増田",
-          content: '<pre><code class="language-javascript">console.log("hello")</code></pre>',
+          content: '<pre><code class="language-javascript">const message = "hello"</code></pre>',
         }}
       />,
     )
 
-    const lineContent = screen.getByText('console.log("hello")')
+    const lineContent = screen.getByText("const")
     const pre = lineContent.closest("pre")
 
     expect(pre).toHaveAttribute("data-code-language", "JavaScript")
-    expect(pre.querySelector("[data-code-line-number]")).toHaveTextContent("1")
+    expect(pre.querySelector("[data-code-line-number]")).toHaveTextContent("001")
+    expect(pre.querySelector("[data-code-token='keyword']")).toHaveTextContent("const")
+    expect(pre.querySelector("[data-code-token='string']")).toHaveTextContent('"hello"')
   })
 
   it("インラインコードを本文中で読みやすく表示する", () => {
@@ -205,13 +207,14 @@ describe("ArticleCard", () => {
     )
 
     const runner = await screen.findByTestId("ruby-code-runner")
-    const lineContent = screen.getByText("puts :hello")
+    const lineContent = screen.getByText(":hello")
     const pre = lineContent.closest("pre")
 
     expect(runner).toBeInTheDocument()
     expect(pre).toHaveAttribute("data-code-language", "Ruby")
     expect(pre.querySelectorAll("[data-code-line-number]")).toHaveLength(2)
-    expect(screen.getByText("puts :world")).toBeInTheDocument()
+    expect(pre.querySelector("[data-code-token='symbol']")).toHaveTextContent(":hello")
+    expect(screen.getByText(":world")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "▶ 実行" })).toBeInTheDocument()
   })
 
@@ -228,7 +231,7 @@ describe("ArticleCard", () => {
       />,
     )
 
-    expect(screen.getByText("puts :hello")).toBeInTheDocument()
+    expect(screen.getByText(":hello")).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
   })
 
