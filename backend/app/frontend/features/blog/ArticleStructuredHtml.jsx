@@ -1,23 +1,31 @@
 import Box from "@mui/material/Box"
 import { articleBodyHtmlSx } from "./articleBodyHtmlSx"
-import { annotateCodeBlockLanguages } from "./articleCodeBlocks"
+import CodeBlock from "./CodeBlock"
+import { buildCodeBlockDataFromHtml } from "./codeBlockData"
 import RubyExecutableCodeBlock from "./RubyExecutableCodeBlock"
 
-const PLACEHOLDER_ATTRIBUTE = "data-ruby-executable-placeholder"
-const PLACEHOLDER_PATTERN = /<div data-ruby-executable-placeholder="(\d+)"><\/div>/g
+const PLACEHOLDER_ATTRIBUTE = "data-structured-code-block-placeholder"
+const PLACEHOLDER_PATTERN = /<div data-structured-code-block-placeholder="(\d+)"><\/div>/g
 
-function buildExecutableHtmlParts(html) {
+function buildHtmlParts(html) {
   const document = new DOMParser().parseFromString(html, "text/html")
   const blocks = []
 
-  document.body.querySelectorAll("pre > code.language-ruby").forEach((codeElement) => {
+  document.body.querySelectorAll("pre > code").forEach((codeElement) => {
     const preElement = codeElement.parentElement
+    if (!preElement) return
+
+    const blockHtml = preElement.outerHTML
+    const block = buildCodeBlockDataFromHtml(blockHtml)
+    if (!block) return
+
     const placeholder = document.createElement("div")
     const blockId = String(blocks.length)
 
     blocks.push({
-      code: codeElement.textContent ?? "",
-      html: preElement.outerHTML,
+      block,
+      html: blockHtml,
+      isRuby: block.languageKey === "ruby",
     })
     placeholder.setAttribute(PLACEHOLDER_ATTRIBUTE, blockId)
     preElement.replaceWith(placeholder)
@@ -32,7 +40,8 @@ function buildExecutableHtmlParts(html) {
     if (match.index > lastIndex) {
       parts.push({ type: "html", html: rewrittenHtml.slice(lastIndex, match.index) })
     }
-    parts.push({ type: "ruby", block: blocks[Number(match[1])] })
+
+    parts.push({ type: "code", block: blocks[Number(match[1])] })
     lastIndex = match.index + match[0].length
   }
 
@@ -43,20 +52,24 @@ function buildExecutableHtmlParts(html) {
   return parts
 }
 
-export default function RubyExecutableArticleHtml({ html }) {
-  const parts = buildExecutableHtmlParts(html)
+export default function ArticleStructuredHtml({ enableRubyRunner = false, html }) {
+  const parts = buildHtmlParts(html)
 
   return (
     <Box data-testid="article-body-html" sx={articleBodyHtmlSx}>
       {parts.map((part, index) =>
-        part.type === "ruby" ? (
-          <RubyExecutableCodeBlock key={index} code={part.block.code} html={part.block.html} />
+        part.type === "code" ? (
+          part.block.isRuby && enableRubyRunner ? (
+            <RubyExecutableCodeBlock key={index} code={part.block.block.code} html={part.block.html} />
+          ) : (
+            <CodeBlock key={index} block={part.block.block} />
+          )
         ) : (
           <Box
             key={index}
             component="span"
             sx={{ display: "contents" }}
-            dangerouslySetInnerHTML={{ __html: annotateCodeBlockLanguages(part.html) }}
+            dangerouslySetInnerHTML={{ __html: part.html }}
           />
         ),
       )}

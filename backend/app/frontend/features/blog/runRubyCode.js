@@ -1,67 +1,44 @@
-import { File, OpenFile, PreopenDirectory, WASI } from "@bjorn3/browser_wasi_shim"
-import rubyWasmUrl from "@ruby/4.0-wasm-wasi/dist/ruby+stdlib.wasm?url"
-import { RubyVM, consolePrinter } from "@ruby/wasm-wasi"
-
-let rubyModulePromise
-
-function rubyModule() {
-  rubyModulePromise ??= fetch(rubyWasmUrl)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Ruby WASM の読み込みに失敗しました: ${response.status}`)
-      }
-
-      return response.arrayBuffer()
-    })
-    .then((bytes) => WebAssembly.compile(bytes))
-
-  return rubyModulePromise
-}
-
-function createWasi() {
-  const fds = [
-    new OpenFile(new File([])),
-    new OpenFile(new File([])),
-    new OpenFile(new File([])),
-    new PreopenDirectory("/", new Map()),
-  ]
-
-  return new WASI([], [], fds, { debug: false })
-}
-
 function formatError(error) {
   return error instanceof Error ? error.message : String(error)
 }
 
 export async function runRubyCode(code) {
-  let stdout = ""
-  let stderr = ""
-  const wasi = createWasi()
-  const printer = consolePrinter({
-    stdout: (text) => {
-      stdout += text
-    },
-    stderr: (text) => {
-      stderr += text
-    },
-  })
-
-  try {
-    const { vm } = await RubyVM.instantiateModule({
-      module: await rubyModule(),
-      wasip1: wasi,
-      addToImports: (imports) => {
-        printer.addToImports(imports)
-      },
-      setMemory: (memory) => {
-        printer.setMemory(memory)
-      },
-    })
-
-    vm.eval(code)
-
-    return { stderr, stdout }
-  } catch (error) {
-    return { error: formatError(error), stderr, stdout }
+  if (typeof Worker === "undefined") {
+    return { error: "この環境では Ruby 実行に対応していません。", stderr: "", stdout: "" }
   }
+
+  return new Promise((resolve) => {
+    const worker = new Worker(new URL("./rubyCodeRunner.worker.js", import.meta.url), { type: "module" })
+
+    const finish = (result) => {
+      worker.terminate()
+      resolve(result)
+    }
+
+    worker.addEventListener(
+      "message",
+      (event) => {
+        finish(event.data)
+      },
+      { once: true },
+    )
+
+    worker.addEventListener(
+      "messageerror",
+      () => {
+        finish({ error: "Ruby 実行結果の受信に失敗しました。", stderr: "", stdout: "" })
+      },
+      { once: true },
+    )
+
+    worker.addEventListener(
+      "error",
+      (event) => {
+        finish({ error: formatError(event.error ?? event.message), stderr: "", stdout: "" })
+      },
+      { once: true },
+    )
+
+    worker.postMessage({ code })
+  })
 }

@@ -18,9 +18,10 @@ describe("RubyExecutableCodeBlock", () => {
       />,
     )
 
-    const pre = screen.getByText(":hello").closest("pre")
-    expect(pre).toHaveAttribute("data-code-language", "Ruby")
-    expect(pre.querySelectorAll("[data-code-line-number]")).toHaveLength(2)
+    const pre = document.querySelector('[data-testid="ruby-code-runner"] pre')
+    const shell = pre?.closest("[data-code-block-shell]")
+    expect(pre?.querySelector('[data-code-language="Ruby"]')).toBeInTheDocument()
+    expect(shell?.querySelectorAll(".react-syntax-highlighter-line-number")).toHaveLength(2)
 
     fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
 

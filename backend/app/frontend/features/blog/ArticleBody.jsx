@@ -1,16 +1,15 @@
-import { lazy, Suspense, useState } from "react"
+import { useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
+import ArticleStructuredHtml from "./ArticleStructuredHtml"
 import { articleBodyHtmlSx } from "./articleBodyHtmlSx"
-import { annotateCodeBlockLanguages } from "./articleCodeBlocks"
 import { extractTextFromHtml } from "./articleHtmlText"
 
 const EXCERPT_MAX_LENGTH = 80
 const RICH_HTML_PATTERN = /<(img|figure|iframe|video|audio|table|ul|ol|blockquote)\b/i
-const RUBY_CODE_PATTERN = /<pre\b[^>]*>\s*<code\b[^>]*class=["'][^"']*\blanguage-ruby\b/i
+const LANGUAGE_CODE_PATTERN = /<pre\b[^>]*>\s*<code\b[^>]*class=["'][^"']*\b(?:language|lang)-/i
 const supportingTextSx = { fontSize: "12px", fontWeight: 700, letterSpacing: 0, lineHeight: 1.5 }
-const RubyExecutableArticleHtml = lazy(() => import("./RubyExecutableArticleHtml"))
 
 function truncateText(text, maxLength = EXCERPT_MAX_LENGTH) {
   if (text.length <= maxLength) {
@@ -21,22 +20,12 @@ function truncateText(text, maxLength = EXCERPT_MAX_LENGTH) {
 }
 
 function ArticleRawHtml({ html }) {
-  return (
-    <Box
-      data-testid="article-body-html"
-      sx={articleBodyHtmlSx}
-      dangerouslySetInnerHTML={{ __html: annotateCodeBlockLanguages(html) }}
-    />
-  )
+  return <Box data-testid="article-body-html" sx={articleBodyHtmlSx} dangerouslySetInnerHTML={{ __html: html }} />
 }
 
 function ArticleHtml({ enableRubyRunner, html }) {
-  if (enableRubyRunner && RUBY_CODE_PATTERN.test(html)) {
-    return (
-      <Suspense fallback={<ArticleRawHtml html={html} />}>
-        <RubyExecutableArticleHtml html={html} />
-      </Suspense>
-    )
+  if (LANGUAGE_CODE_PATTERN.test(html)) {
+    return <ArticleStructuredHtml enableRubyRunner={enableRubyRunner} html={html} />
   }
 
   return <ArticleRawHtml html={html} />

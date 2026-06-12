@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
-import { articleBodyHtmlSx } from "./articleBodyHtmlSx"
-import { annotateCodeBlockLanguages } from "./articleCodeBlocks"
+import CodeBlock, { CodeBlockRunButton } from "./CodeBlock"
+import { buildCodeBlockDataFromHtml } from "./codeBlockData"
 import { runRubyCode } from "./runRubyCode"
 
 const RUNNING_WARNING_DELAY_MS = 3000
@@ -15,21 +14,6 @@ const runnerSx = (hasDetails) => ({
   mb: hasDetails ? 1 : 0,
   mt: 0,
 })
-
-const codeBlockSx = (hasDetails) => [articleBodyHtmlSx, hasDetails ? { "& pre": { mb: 0 } } : null]
-
-const runButtonSx = {
-  color: "text.secondary",
-  fontSize: "11px",
-  fontWeight: 700,
-  minWidth: 0,
-  px: 0.5,
-  py: 0,
-  position: "absolute",
-  right: 10,
-  top: 9,
-  "&:hover": { bgcolor: "transparent", color: "text.primary" },
-}
 
 const outputSx = {
   bgcolor: "#f7f7f7",
@@ -90,19 +74,16 @@ export default function RubyExecutableCodeBlock({ code, html }) {
 
   const outputText = buildOutputText(result)
   const hasDetails = Boolean(result || showsRunningWarning)
+  const block = buildCodeBlockDataFromHtml(html)
 
   return (
     <Box data-testid="ruby-code-runner" sx={runnerSx(hasDetails)}>
-      <Box sx={{ position: "relative" }}>
-        <Box
-          data-testid="ruby-code-runner-code"
-          sx={codeBlockSx(hasDetails)}
-          dangerouslySetInnerHTML={{ __html: annotateCodeBlockLanguages(html) }}
+      {block ? (
+        <CodeBlock
+          block={block}
+          action={<CodeBlockRunButton disabled={isRunning} isRunning={isRunning} onClick={handleRun} />}
         />
-        <Button disabled={isRunning} onClick={handleRun} size="small" variant="text" sx={runButtonSx}>
-          {isRunning ? "実行中" : "▶ 実行"}
-        </Button>
-      </Box>
+      ) : null}
       {showsRunningWarning ? (
         <Typography color="text.secondary" sx={{ fontSize: "12px" }}>
           実行が長引いています。停止できない場合はページを再読み込みしてください。

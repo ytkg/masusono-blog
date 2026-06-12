@@ -19,8 +19,11 @@
     "@mui/material": "^7.3.5",
     "@ruby/4.0-wasm-wasi": "^2.9.3-2.9.4",
     "@ruby/wasm-wasi": "^2.9.3-2.9.4",
+    "prism-react-renderer": "^2.4.1",
+    "prismjs": "^1.30.0",
     "react": "^19.1.0",
     "react-dom": "^19.2.5",
+    "react-syntax-highlighter": "^16.1.1",
     "swr": "^2.4.1"
   },
   "devDependencies": {
