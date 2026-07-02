@@ -7,15 +7,13 @@ module Numbers
 
     UNITS = {
       articles: "本",
-      chars: "字",
-      plays: "回"
+      chars: "字"
     }.freeze
 
     LABELS = {
       launch: "増田とその他！始動から",
       total_articles: "総記事数",
       total_chars: "総文字数",
-      masuda_run_total_plays: "増田RUN総プレイ回数",
       total_count: "総件数"
     }.freeze
 
@@ -37,8 +35,7 @@ module Numbers
       {
         blocks: [
           build_launch_block,
-          *build_blog_metric_blocks,
-          build_masuda_run_block
+          *build_blog_metric_blocks
         ]
       }
     end
@@ -73,14 +70,6 @@ module Numbers
       author_rows.map do |name, data|
         { label: "#{name}の#{label(label_key)}", value: format_count(data.fetch(metric_key), unit(metric_key)) }
       end
-    end
-
-    def build_masuda_run_block
-      build_count_block(
-        label_key: :masuda_run_total_plays,
-        value: source_data.fetch(:masuda_run_total_plays),
-        unit_key: :plays
-      )
     end
 
     def build_block(label:, value:, children: nil)

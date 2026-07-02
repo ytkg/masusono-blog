@@ -5,9 +5,7 @@ import Typography from "@mui/material/Typography"
 const CHART_WIDTH = 360
 const CHART_HEIGHT = 220
 const CHART_PADDING = { top: 18, right: 18, bottom: 36, left: 18 }
-const SERIES_COLORS = ["#2563eb", "#16a34a", "#f97316"]
-const MASUDA_RUN_SERIES_KEY = "masudaRunTotalPlays"
-const MASUDA_RUN_SCALE = 10
+const SERIES_COLORS = ["#2563eb", "#16a34a"]
 const TOTAL_CHARS_SERIES_KEY = "totalChars"
 const TOTAL_CHARS_SCALE = 300
 
@@ -58,18 +56,13 @@ function scaledSeriesValue(point, seriesKey) {
   const value = point[seriesKey]
   if (!Number.isFinite(value)) return value
 
-  if (seriesKey === MASUDA_RUN_SERIES_KEY) return value / MASUDA_RUN_SCALE
   if (seriesKey === TOTAL_CHARS_SERIES_KEY) return value / TOTAL_CHARS_SCALE
 
   return value
 }
 
-function visibleSeriesPoints(points, seriesKey) {
-  const indexedPoints = points.map((point, index) => ({ point, index }))
-  if (seriesKey !== MASUDA_RUN_SERIES_KEY) return indexedPoints
-
-  const firstPositiveIndex = points.findIndex((point) => point[seriesKey] > 0)
-  return firstPositiveIndex >= 0 ? indexedPoints.slice(firstPositiveIndex) : []
+function visibleSeriesPoints(points, _seriesKey) {
+  return points.map((point, index) => ({ point, index }))
 }
 
 function smoothPath(points) {
@@ -152,7 +145,7 @@ export default function NumbersTrendChart({ trend }) {
           component="svg"
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
           role="img"
-          aria-label="総記事数、総文字数、増田RUN総プレイ回数の累積推移"
+          aria-label="総記事数、総文字数の累積推移"
           sx={{ display: "block", width: "100%", height: "auto" }}
         >
           <line x1={bounds.left} y1={bounds.bottom} x2={bounds.right} y2={bounds.bottom} stroke="#e5e7eb" />
@@ -236,7 +229,7 @@ export default function NumbersTrendChart({ trend }) {
       </Box>
 
       <Typography variant="caption" color="text.secondary">
-        総文字数は1/300、増田RUN総プレイ回数は1/10で表示しています。
+        総文字数は1/300で表示しています。
       </Typography>
     </Stack>
   )
