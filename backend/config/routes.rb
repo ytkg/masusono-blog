@@ -11,7 +11,6 @@ Rails.application.routes.draw do
   get "search", to: "search#index"
   get "authors", to: "authors#index"
   get "zukan", to: redirect("/authors")
-  mount ActionCable.server => "/cable"
   get "numbers", to: "numbers#index"
   get "authors/:author_id", to: "authors#show"
   get "articles/:article_id", to: "blog#show"
