@@ -8,7 +8,8 @@ class BlogShowUsecase
   end
 
   def call
-    article = BlogIndexUsecase.call.dig(:props, :articles)&.find { |item| item[:id] == @article_id }
+    article = Article.find(@article_id)
+    article = ArticlePayloadBuilder.call(article:) if article
 
     {
       props: {

@@ -8,12 +8,11 @@ class AuthorShowUsecase
   end
 
   def call
-    author = AuthorsIndexUsecase.call.dig(:props, :authors).to_a.find { |item| item[:id] == @author_id }
+    author = Author.find(@author_id)
+    author = AuthorPayloadBuilder.call(author:) if author
     return { props: { author: nil, articles: [] }, status: :not_found } if author.nil?
 
-    articles = BlogIndexUsecase.call.dig(:props, :articles).to_a.select do |article|
-      article[:authorId] == author.fetch(:id)
-    end
+    articles = Article.for_author(author.fetch(:id)).map { |article| ArticlePayloadBuilder.call(article:) }
 
     {
       props: {

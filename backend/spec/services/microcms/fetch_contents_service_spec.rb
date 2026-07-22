@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Microcms::FetchContentsService do
   describe ".execute" do
-    subject(:result) { service_class.execute }
+    subject(:result) { service_class.execute(filters:, ids:) }
 
     let(:service_class) do
       klass = Class.new(described_class)
@@ -11,7 +11,14 @@ RSpec.describe Microcms::FetchContentsService do
     end
     let(:endpoint) { service_class::ENDPOINT }
     let(:logger) { instance_double(Logger, warn: nil) }
-    let(:first_page_query) { { "limit" => "100", "offset" => "0", "orders" => "-publishedAt" } }
+    let(:filters) { nil }
+    let(:ids) { nil }
+    let(:first_page_query) do
+      { "limit" => "100", "offset" => "0", "orders" => "-publishedAt" }.tap do |query|
+        query["filters"] = filters if filters
+        query["ids"] = ids if ids
+      end
+    end
     let(:first_page_status) { 200 }
     let(:first_page_response_headers) { json_response_headers }
     let(:first_page_contents) do
@@ -83,6 +90,22 @@ RSpec.describe Microcms::FetchContentsService do
             { id: "first" }
           ]
         )
+      end
+    end
+
+    context "フィルタを指定する場合" do
+      let(:filters) { "author[equals]author-1" }
+
+      it do
+        expect(result).to eq([ { id: "first" } ])
+      end
+    end
+
+    context "コンテンツIDを指定する場合" do
+      let(:ids) { "content-1" }
+
+      it do
+        expect(result).to eq([ { id: "first" } ])
       end
     end
 

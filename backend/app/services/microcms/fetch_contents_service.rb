@@ -16,11 +16,11 @@ module Microcms
       end
     end
 
-    def self.execute(api_key: nil, faraday: nil, response: nil)
-      new(api_key: api_key, faraday: faraday).execute(response: response)
+    def self.execute(api_key: nil, faraday: nil, filters: nil, ids: nil, response: nil)
+      new(api_key: api_key, faraday: faraday, filters: filters, ids: ids).execute(response: response)
     end
 
-    def initialize(api_key: nil, faraday: nil)
+    def initialize(api_key: nil, faraday: nil, filters: nil, ids: nil)
       @api_key = api_key || Rails.application.credentials.dig(:microcms, :api_key)
       raise "MICROCMS api key is missing (credentials: microcms.api_key)" if @api_key.nil? || @api_key.empty?
 
@@ -28,6 +28,8 @@ module Microcms
         f.options.timeout = 10
         f.options.open_timeout = 5
       end
+      @filters = filters
+      @ids = ids
     end
 
     def execute(response: nil)
@@ -157,8 +159,23 @@ module Microcms
 
     def microcms_uri(limit:, offset:)
       uri = URI(self.class::ENDPOINT)
-      uri.query = URI.encode_www_form(limit: limit, offset: offset, orders: "-publishedAt")
+      uri.query = URI.encode_www_form(query_params(limit:, offset:))
       uri
+    end
+
+    def query_params(limit:, offset:)
+      { limit:, offset:, orders: "-publishedAt" }.tap do |params|
+        params[:filters] = filters if filters
+        params[:ids] = ids if ids
+      end
+    end
+
+    def filters
+      @filters
+    end
+
+    def ids
+      @ids
     end
 
     def deep_symbolize(value)

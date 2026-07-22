@@ -58,4 +58,52 @@ RSpec.describe Article do
       expect(articles.first[:content]).to include("fit=crop")
     end
   end
+
+  describe ".find" do
+    subject(:result) { described_class.find(article_id) }
+
+    let(:article_id) { "article-1" }
+
+    before do
+      allow(Microcms::FetchArticlesService).to receive(:execute)
+        .with(ids: "article-1")
+        .and_return([ { id: article_id, content: "<p>本文</p>" } ])
+    end
+
+    it do
+      expect(result).to eq({ id: article_id, content: "<p>本文</p>" })
+    end
+
+    context "IDが空の場合" do
+      let(:article_id) { "" }
+
+      it do
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe ".for_author" do
+    subject(:result) { described_class.for_author(author_id) }
+
+    let(:author_id) { "author-1" }
+
+    before do
+      allow(Microcms::FetchArticlesService).to receive(:execute)
+        .with(filters: "author[equals]author-1")
+        .and_return([ { id: "article-1", content: "<p>本文</p>" } ])
+    end
+
+    it do
+      expect(result).to eq([ { id: "article-1", content: "<p>本文</p>" } ])
+    end
+
+    context "著者IDが空の場合" do
+      let(:author_id) { "" }
+
+      it do
+        expect(result).to eq([])
+      end
+    end
+  end
 end

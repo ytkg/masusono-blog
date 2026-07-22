@@ -4,10 +4,8 @@ module Microcms
 
     private
 
-    def microcms_uri(limit:, offset:)
-      uri = URI(self.class::ENDPOINT)
-      uri.query = URI.encode_www_form(limit: limit, offset: offset, orders: "publishedAt")
-      uri
+    def query_params(limit:, offset:)
+      super.merge(orders: "publishedAt")
     end
   end
 end

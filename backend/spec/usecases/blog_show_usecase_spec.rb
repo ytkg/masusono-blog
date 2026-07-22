@@ -7,20 +7,13 @@ RSpec.describe BlogShowUsecase do
     let(:article_id) { "article-1" }
 
     before do
-      allow(BlogIndexUsecase).to receive(:call).and_return(
+      allow(Article).to receive(:find).with(article_id).and_return(
         {
-          props: {
-            articles: [
-              {
-                id: "article-1",
-                title: "記事1",
-                publishedDate: "2026/02/10",
-                content: "<p>本文</p>",
-                author: "著者"
-              }
-            ]
-          },
-          status: :ok
+          id: "article-1",
+          title: "記事1",
+          publishedAt: "2026-02-10T00:00:00.000Z",
+          content: "<p>本文</p>",
+          author: "著者"
         }
       )
     end
@@ -34,7 +27,12 @@ RSpec.describe BlogShowUsecase do
               title: "記事1",
               publishedDate: "2026/02/10",
               content: "<p>本文</p>",
-              author: "著者"
+              tags: nil,
+              characterCount: 2,
+              readingTimeMinutes: 0.5,
+              author: "著者",
+              authorId: nil,
+              authorImageUrl: nil
             }
           },
           status: :ok
@@ -44,6 +42,10 @@ RSpec.describe BlogShowUsecase do
 
     context "記事が見つからない場合" do
       let(:article_id) { "missing" }
+
+      before do
+        allow(Article).to receive(:find).with(article_id).and_return(nil)
+      end
 
       it do
         expect(result).to eq(
