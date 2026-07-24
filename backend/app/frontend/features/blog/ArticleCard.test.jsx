@@ -182,7 +182,8 @@ describe("ArticleCard", () => {
           title: "Hello",
           publishedDate: "2026/03/09",
           author: "増田",
-          content: '<pre><code class="language-javascript">const veryLongVariableName = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"</code></pre>',
+          content:
+            '<pre><code class="language-javascript">const veryLongVariableName = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"</code></pre>',
         }}
       />,
     )
@@ -255,7 +256,9 @@ describe("ArticleCard", () => {
       />,
     )
 
-    expect(screen.getByText((_, element) => element?.tagName === "PRE" && element.textContent?.includes("puts :hello"))).toBeInTheDocument()
+    expect(
+      screen.getByText((_, element) => element?.tagName === "PRE" && element.textContent?.includes("puts :hello")),
+    ).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
   })
 

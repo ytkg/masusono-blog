@@ -34,7 +34,12 @@ describe("RubyExecutableCodeBlock", () => {
   it("実行結果が長い場合に出力欄をスクロールできる", async () => {
     vi.mocked(runRubyCode).mockResolvedValue({ stdout: `${Array(100).fill("h").join("\n")}\n`, stderr: "" })
 
-    render(<RubyExecutableCodeBlock code="100.times { p :h }" html={'<pre><code class="language-ruby">100.times { p :h }</code></pre>'} />)
+    render(
+      <RubyExecutableCodeBlock
+        code="100.times { p :h }"
+        html={'<pre><code class="language-ruby">100.times { p :h }</code></pre>'}
+      />,
+    )
 
     fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
 
@@ -45,7 +50,12 @@ describe("RubyExecutableCodeBlock", () => {
   it("実行エラーを表示する", async () => {
     vi.mocked(runRubyCode).mockResolvedValue({ error: "boom", stdout: "", stderr: "" })
 
-    render(<RubyExecutableCodeBlock code="raise 'boom'" html={'<pre><code class="language-ruby">raise \'boom\'</code></pre>'} />)
+    render(
+      <RubyExecutableCodeBlock
+        code="raise 'boom'"
+        html={"<pre><code class=\"language-ruby\">raise 'boom'</code></pre>"}
+      />,
+    )
 
     fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
 

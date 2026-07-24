@@ -119,9 +119,7 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
       sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, width: "100%" }}
     >
       <ArticleMetaText articleStats={articleStats} author={author} authorHref={authorHref} date={date} />
-      <Box sx={{ flex: "0 0 auto", ml: 1 }}>
-        {action}
-      </Box>
+      <Box sx={{ flex: "0 0 auto", ml: 1 }}>{action}</Box>
     </Box>
   ) : undefined
   const content = (
@@ -138,7 +136,12 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
       sx={isPlain ? { minWidth: 0 } : sx}
     >
       <ArticleTags tags={article.tags} />
-      <ArticleBody enableRubyRunner={mode === "detail" || isListPlain} html={html} hasBody={hasBody} shouldCollapse={shouldCollapseBody} />
+      <ArticleBody
+        enableRubyRunner={mode === "detail" || isListPlain}
+        html={html}
+        hasBody={hasBody}
+        shouldCollapse={shouldCollapseBody}
+      />
     </ContentItemCard>
   )
 
@@ -165,9 +168,7 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
               gap: 1,
             }}
           >
-            <Box
-              sx={{ minWidth: 0 }}
-            >
+            <Box sx={{ minWidth: 0 }}>
               <ArticleMetaText
                 articleStats={articleStats}
                 author={author}

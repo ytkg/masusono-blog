@@ -47,7 +47,8 @@ const headerSx = {
 
 const labelSx = {
   color: "text.secondary",
-  fontFamily: "'M PLUS Rounded 1c', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'YuGothic', Meiryo, system-ui, sans-serif",
+  fontFamily:
+    "'M PLUS Rounded 1c', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'YuGothic', Meiryo, system-ui, sans-serif",
   fontSize: "11px",
   fontWeight: 700,
   lineHeight: 1,

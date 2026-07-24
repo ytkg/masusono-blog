@@ -15,8 +15,11 @@ const LANGUAGE_CONFIGS = {
 
 function codeLanguage(codeElement) {
   const classNames = Array.from(codeElement.classList)
-  const languageClass = classNames.find((className) => className.startsWith("language-") || className.startsWith("lang-"))
-  const rawLanguage = languageClass?.replace(/^(language|lang)-/, "") || classNames.find((className) => LANGUAGE_CONFIGS[className])
+  const languageClass = classNames.find(
+    (className) => className.startsWith("language-") || className.startsWith("lang-"),
+  )
+  const rawLanguage =
+    languageClass?.replace(/^(language|lang)-/, "") || classNames.find((className) => LANGUAGE_CONFIGS[className])
   const normalizedLanguage = rawLanguage?.toLowerCase()
   const config = LANGUAGE_CONFIGS[normalizedLanguage]
 
