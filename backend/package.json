@@ -14,7 +14,7 @@
     "@bjorn3/browser_wasi_shim": "^0.4.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@inertiajs/react": "^2.2.15",
+    "@inertiajs/react": "^3.6.1",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "@ruby/4.0-wasm-wasi": "^2.9.3-2.9.4",
