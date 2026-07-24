@@ -23,8 +23,6 @@ describe("SettingsContent", () => {
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith("/api/app/users/cookie-user.json", {
-        method: "GET",
-        headers: { Accept: "application/json" },
         cache: "no-store",
       })
     })
@@ -53,6 +51,7 @@ describe("SettingsContent", () => {
 
     await waitFor(() => {
       expect(fetch).toHaveBeenLastCalledWith("/api/app/users.json", {
+        cache: "no-store",
         method: "POST",
         headers: {
           "Content-Type": "application/json",

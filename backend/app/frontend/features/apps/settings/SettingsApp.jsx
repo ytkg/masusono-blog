@@ -6,48 +6,14 @@ import SettingsIcon from "@mui/icons-material/Settings"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useCallback, useEffect, useState } from "react"
+import { getUserIdFromCookie } from "@/shared/lib/userId"
+import { fetchJson, postJson } from "@/shared/lib/fetchJson"
 import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
 
 const DEFAULT_NAME = "NO NAME"
 const labelTextSx = { fontSize: "14px" }
 const valueSx = { fontWeight: 700, fontSize: "22px" }
 const fieldHeight = 40
-
-function getCookie(name) {
-  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`))
-  return match ? decodeURIComponent(match[2]) : null
-}
-
-async function fetchCurrentUser(userId) {
-  const response = await fetch(`/api/app/users/${encodeURIComponent(userId)}.json`, {
-    method: "GET",
-    headers: { Accept: "application/json" },
-    cache: "no-store",
-  })
-
-  if (!response.ok) {
-    throw new Error(`Load failed with ${response.status}`)
-  }
-
-  return response.json()
-}
-
-async function createUser(name, userId) {
-  const response = await fetch("/api/app/users.json", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({ name, userId }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Save failed with ${response.status}`)
-  }
-
-  return response.json()
-}
 
 function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onSave, onDraftChange }) {
   return (
@@ -110,11 +76,11 @@ export function SettingsContent({ loadOnMount = false }) {
   const loadCurrentUser = useCallback(async () => {
     if (isEditing) return
 
-    const userId = getCookie("user_id")
+    const userId = getUserIdFromCookie()
     if (!userId) return
 
     try {
-      const current = await fetchCurrentUser(userId)
+      const current = await fetchJson(`/api/app/users/${encodeURIComponent(userId)}.json`)
       const fetchedName = current?.name?.toString()?.trim() || DEFAULT_NAME
       setName(fetchedName)
       setDraftName(fetchedName)
@@ -143,7 +109,7 @@ export function SettingsContent({ loadOnMount = false }) {
       return
     }
 
-    const userId = getCookie("user_id")
+    const userId = getUserIdFromCookie()
     if (!userId) {
       setErrorMessage("ユーザーIDが見つかりません")
       return
@@ -153,7 +119,7 @@ export function SettingsContent({ loadOnMount = false }) {
     setErrorMessage("")
 
     try {
-      await createUser(trimmed, userId)
+      await postJson("/api/app/users.json", { name: trimmed, userId })
       setName(trimmed)
       setIsEditing(false)
     } catch (_error) {
