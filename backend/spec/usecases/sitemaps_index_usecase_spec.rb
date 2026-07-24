@@ -9,6 +9,8 @@ RSpec.describe SitemapsIndexUsecase do
         {
           id: "hello-world",
           publishedAt: "2025-10-05T12:34:56+09:00",
+          updatedAt: "2025-10-06T12:34:56+09:00",
+          revisedAt: "2025-10-07T12:34:56+09:00",
           title: "hello world",
           content: "<p>content</p>",
           author: "増田太郎"
@@ -64,7 +66,7 @@ RSpec.describe SitemapsIndexUsecase do
       expect(xml).not_to include("<loc>https://masusono.com/zukan</loc>")
       expect(xml).not_to include("<loc>https://masusono.com/settings</loc>")
       expect(xml).to include("<loc>https://masusono.com/articles/hello-world</loc>")
-      expect(xml).to include("<lastmod>2025-10-05T03:34:56Z</lastmod>")
+      expect(xml).to include("<lastmod>2025-10-07T03:34:56Z</lastmod>")
       expect(xml).to include("<loc>https://masusono.com/articles/broken-date</loc>")
       expect(xml).not_to include("<loc>https://masusono.com/articles/</loc>")
 
