@@ -49,11 +49,17 @@ module Articles
       raise ConfigurationError, "tag update must be an object" unless update.is_a?(Hash)
 
       id = update[:id].to_s.strip
-      tags = update[:tags].to_s.strip
+      tags = normalize_tags(update[:tags])
       raise ConfigurationError, "tag update id is required" if id.blank?
       raise ConfigurationError, "tag update tags is required for article #{id}" if tags.blank?
 
       { id:, tags: }
+    end
+
+    def normalize_tags(value)
+      return value.filter_map { |tag| tag.to_s.strip.presence }.join(",") if value.is_a?(Array)
+
+      value.to_s.strip
     end
   end
 end

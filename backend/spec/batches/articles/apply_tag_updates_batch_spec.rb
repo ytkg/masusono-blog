@@ -49,6 +49,23 @@ RSpec.describe Articles::ApplyTagUpdatesBatch do
       end
     end
 
+    context "tags が配列の場合" do
+      let(:updates_json) do
+        {
+          tag_updates: [
+            { id: "flrqcz-944", tags: [ "本", "街", "思い出" ] }
+          ]
+        }.to_json
+      end
+
+      it do
+        expect(result.updated_articles).to eq([
+          { id: "flrqcz-944", tags: "本,街,思い出" }
+        ])
+        expect(update_service).to have_received(:execute).with(article_id: "flrqcz-944", tags: "本,街,思い出")
+      end
+    end
+
     context "JSON が空の場合" do
       let(:updates_json) { "" }
 
