@@ -6,6 +6,7 @@ import {
   drawGround,
   drawObstacles,
   drawPlayer,
+  drawSky,
   drawStateText,
   getNow,
   maybeSpawnCloud,
@@ -70,8 +71,7 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
   const draw = useCallback(
     (ctx, W, H) => {
       const w = worldRef.current
-      ctx.fillStyle = "#fff"
-      ctx.fillRect(0, 0, W, H)
+      drawSky(ctx, W, H)
 
       for (const c of w.clouds) {
         ctx.save()
