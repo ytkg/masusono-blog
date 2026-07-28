@@ -28,6 +28,8 @@ RSpec.describe "WebHome", type: :request do
       expect(inertia).to be_inertia_response
       expect(inertia).to render_component("home")
       expect(response.body).to include('<script data-page="app" type="application/json">')
+      expect(response.body).not_to include("fonts.googleapis.com")
+      expect(response.body).not_to include("fonts.gstatic.com")
       expect(inertia.props).to include("app", "flash")
       expect(inertia.props.dig("articles", 0, "id")).to eq("article-1")
     end

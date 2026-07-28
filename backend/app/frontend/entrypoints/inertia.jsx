@@ -3,7 +3,8 @@ import { createInertiaApp } from "@inertiajs/react"
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
 import theme from "../theme"
-import "../styles/index.css"
+
+void import("../styles/fonts.css")
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return
