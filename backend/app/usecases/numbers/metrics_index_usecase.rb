@@ -19,7 +19,7 @@ module Numbers
     def build_result
       source_data = fetch_source_data
       article_summary = ArticleMetricsSummary.call(articles: source_data.fetch(:articles))
-      metrics = MetricsPayloadBuilder.call(source_data:, article_summary:)
+      metrics = MetricsPayloadBuilder.call(article_summary:)
       metrics[:trend] = MetricsTrendBuilder.call(
         articles: source_data.fetch(:articles),
         start_date: MetricsPayloadBuilder::LAUNCH_DATE

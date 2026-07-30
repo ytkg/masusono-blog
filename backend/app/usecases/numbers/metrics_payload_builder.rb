@@ -22,12 +22,11 @@ module Numbers
       { metric_key: :chars, label_key: :total_chars }
     ].freeze
 
-    def self.call(source_data:, article_summary:)
-      new(source_data: source_data, article_summary: article_summary).call
+    def self.call(article_summary:)
+      new(article_summary:).call
     end
 
-    def initialize(source_data:, article_summary:)
-      @source_data = source_data
+    def initialize(article_summary:)
       @article_summary = article_summary
     end
 
@@ -42,7 +41,7 @@ module Numbers
 
     private
 
-    attr_reader :source_data, :article_summary
+    attr_reader :article_summary
 
     def build_launch_block
       build_block(label: launch_label, value: days_since_launch_text)
