@@ -2,12 +2,12 @@ import { Fragment } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 
-const childRowsGridSx = {
+const childRowsGridSx = Object.freeze({
   display: "grid",
   gridTemplateColumns: "1fr auto",
   columnGap: 2,
   rowGap: 1.25,
-}
+})
 
 const indentSx = [{ pl: 2 }, { pl: 2 }, { pl: 4 }]
 const valueSx = { fontWeight: 700, fontSize: "22px", textAlign: "right", justifySelf: "end" }
