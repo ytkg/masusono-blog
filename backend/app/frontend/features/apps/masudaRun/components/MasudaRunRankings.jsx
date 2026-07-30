@@ -12,11 +12,11 @@ const TOP_RANKINGS_LIMIT = 10
 const containerSx = { border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }
 const titleSx = { mb: 1 }
 const monoSx = { fontVariantNumeric: "tabular-nums" }
-const ERROR_MESSAGES_BY_CODE = {
+const ERROR_MESSAGES_BY_CODE = Object.freeze({
   upstream_timeout: "ランキング取得がタイムアウトしました。少し待ってから再度お試しください。",
   upstream_rate_limited: "ランキングへのアクセスが集中しています。少し待ってから再度お試しください。",
   upstream_connection_error: "ランキング取得に失敗しました。接続を確認して再度お試しください。",
-}
+})
 
 const formatScore = (score) => Math.floor(score).toLocaleString("ja-JP")
 
