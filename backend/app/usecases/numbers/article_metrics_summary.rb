@@ -72,7 +72,7 @@ module Numbers
     end
 
     def article_char_count(article)
-      ArticleCharacterCounter.call(article[:content])
+      ArticleMetric.character_count(article)
     end
   end
 end
