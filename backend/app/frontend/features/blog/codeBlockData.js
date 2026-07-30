@@ -1,4 +1,4 @@
-const LANGUAGE_CONFIGS = {
+const LANGUAGE_CONFIGS = Object.freeze({
   bash: { label: "Bash", prismLanguage: "bash" },
   css: { label: "CSS", prismLanguage: "css" },
   html: { label: "HTML", prismLanguage: "markup" },
@@ -11,7 +11,7 @@ const LANGUAGE_CONFIGS = {
   sql: { label: "SQL", prismLanguage: "sql" },
   ts: { label: "TypeScript", prismLanguage: "typescript" },
   typescript: { label: "TypeScript", prismLanguage: "typescript" },
-}
+})
 
 function codeLanguage(codeElement) {
   const classNames = Array.from(codeElement.classList)
