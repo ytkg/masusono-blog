@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography"
 
 const CHART_WIDTH = 360
 const CHART_HEIGHT = 220
-const CHART_PADDING = { top: 18, right: 18, bottom: 36, left: 18 }
+const CHART_PADDING = Object.freeze({ top: 18, right: 18, bottom: 36, left: 18 })
 const SERIES_COLORS = ["#2563eb", "#16a34a"]
 const TOTAL_CHARS_SERIES_KEY = "totalChars"
 const TOTAL_CHARS_SCALE = 300
