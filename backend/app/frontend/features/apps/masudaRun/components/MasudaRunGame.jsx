@@ -40,11 +40,11 @@ const canvasWrapSx = {
 const canvasStyle = { width: "100%", height: "auto", display: "block", outline: "none" }
 
 const SCORE_PAD = 5
-const BUTTON_LABELS = {
+const BUTTON_LABELS = Object.freeze({
   ready: "スタート",
   playing: "ジャンプ",
   gameover: "リスタート",
-}
+})
 
 export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
   const canvasRef = useRef(null)
