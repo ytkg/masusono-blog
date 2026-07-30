@@ -2,13 +2,15 @@ import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
 import Typography from "@mui/material/Typography"
 
-const READING_TIME_SUGGESTIONS = [
-  { label: "~1分", query: "read:1" },
-  { label: "1~2分", query: "read:1-2" },
-  { label: "2~3分", query: "read:2-3" },
-  { label: "3~5分", query: "read:3-5" },
-  { label: "5分~", query: "read:5+" },
-]
+const READING_TIME_SUGGESTIONS = Object.freeze(
+  [
+    { label: "~1分", query: "read:1" },
+    { label: "1~2分", query: "read:1-2" },
+    { label: "2~3分", query: "read:2-3" },
+    { label: "3~5分", query: "read:3-5" },
+    { label: "5分~", query: "read:5+" },
+  ].map(Object.freeze),
+)
 
 function extractArticleTags(articles) {
   const tags = new Set()
