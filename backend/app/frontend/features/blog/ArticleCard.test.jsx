@@ -257,7 +257,9 @@ describe("ArticleCard", () => {
     )
 
     expect(
-      await screen.findByText((_, element) => element?.tagName === "PRE" && element.textContent?.includes("puts :hello")),
+      await screen.findByText(
+        (_, element) => element?.tagName === "PRE" && element.textContent?.includes("puts :hello"),
+      ),
     ).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
   })

@@ -34,7 +34,14 @@ export function drawCloud(ctx, x, y, w, h) {
   ctx.fillStyle = bodyGradient
   ctx.fill()
 
-  const highlightGradient = ctx.createRadialGradient(x + 0.44 * w, y + 0.31 * h, 0, x + 0.44 * w, y + 0.31 * h, 0.34 * w)
+  const highlightGradient = ctx.createRadialGradient(
+    x + 0.44 * w,
+    y + 0.31 * h,
+    0,
+    x + 0.44 * w,
+    y + 0.31 * h,
+    0.34 * w,
+  )
 
   highlightGradient.addColorStop(0, "rgba(255, 255, 255, 0.9)")
   highlightGradient.addColorStop(1, "rgba(255, 255, 255, 0)")
