@@ -1,13 +1,13 @@
 const HTML_TAG_PATTERN = /<[^>]*>/g
 const HTML_ENTITY_PATTERN = /&(#x[\da-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi
-const HTML_ENTITIES = {
+const HTML_ENTITIES = Object.freeze({
   amp: "&",
   lt: "<",
   gt: ">",
   quot: '"',
   apos: "'",
   nbsp: " ",
-}
+})
 
 function decodeHtmlEntity(entity) {
   const normalizedEntity = entity.toLowerCase()
