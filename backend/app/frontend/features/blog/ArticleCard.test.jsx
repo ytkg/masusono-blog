@@ -163,9 +163,9 @@ describe("ArticleCard", () => {
       />,
     )
 
-    const lineContent = await screen.findByText("const")
-    const pre = lineContent.closest("pre")
-    const shell = pre?.closest("[data-code-block-shell]")
+    const languageLabel = await screen.findByText("JavaScript", {}, { timeout: 5000 })
+    const shell = languageLabel.closest("[data-code-block-shell]")
+    const pre = shell?.querySelector("pre")
 
     expect(pre?.querySelector('[data-code-language="JavaScript"]')).toBeInTheDocument()
     expect(shell?.querySelector("[data-code-language-label]")).toHaveTextContent("JavaScript")
@@ -188,7 +188,8 @@ describe("ArticleCard", () => {
       />,
     )
 
-    const pre = (await screen.findByText(/veryLongVariableName/)).closest("pre")
+    const languageLabel = await screen.findByText("JavaScript", {}, { timeout: 5000 })
+    const pre = languageLabel.closest("[data-code-block-shell]")?.querySelector("pre")
     const scroller = pre?.parentElement
 
     expect(scroller).toHaveStyle({ overflowX: "auto" })
