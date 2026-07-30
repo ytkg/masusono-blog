@@ -7,10 +7,10 @@ import ArticlesList from "../features/blog/ArticlesList"
 import PageContainer from "../shared/PageContainer"
 import SeoHead from "../shared/SeoHead"
 
-const HOME_MODES = {
+const HOME_MODES = Object.freeze({
   feed: "feed",
   recommended: "recommended",
-}
+})
 
 const SWIPE_MIN_DISTANCE = 35
 const SWIPE_AXIS_RATIO = 1.25
