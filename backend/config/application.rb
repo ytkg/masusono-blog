@@ -25,5 +25,6 @@ module Backend
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.api_only = false
+    config.middleware.use Rack::Deflater
   end
 end

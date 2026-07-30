@@ -36,7 +36,7 @@ RSpec.describe AuthorsIndexUsecase do
                 name: "増田",
                 title: "友達と行事に全力で参加する人",
                 bio: "プロフィール本文",
-                imageUrl: "https://images.microcms-assets.io/assets/masuda.webp"
+                imageUrl: "https://images.microcms-assets.io/assets/masuda.webp?fit=crop&w=192&h=192"
               }
             ]
           },

@@ -1,4 +1,6 @@
 class AuthorPayloadBuilder
+  include AuthorNameExtractor
+
   def self.call(author:)
     new(author:).call
   end
@@ -17,19 +19,11 @@ class AuthorPayloadBuilder
       name:,
       title: author[:title],
       bio: author[:bio],
-      imageUrl: extract_image_url
+      imageUrl: extract_author_image_url(author)
     }
   end
 
   private
 
   attr_reader :author
-
-  def extract_image_url
-    image = author[:icon] || author[:image] || author[:imageUrl] || author[:profileImage]
-    return image if image.is_a?(String)
-    return image[:url] if image.is_a?(Hash)
-
-    nil
-  end
 end

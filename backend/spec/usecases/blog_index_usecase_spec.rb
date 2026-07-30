@@ -49,7 +49,7 @@ RSpec.describe BlogIndexUsecase do
               readingTimeMinutes: 0.5,
               author: "増田太郎",
               authorId: "9wgrey2lh3",
-              authorImageUrl: "https://images.microcms-assets.io/assets/masuda.webp"
+              authorImageUrl: "https://images.microcms-assets.io/assets/masuda.webp?fit=crop&w=192&h=192"
             },
             {
               id: "second",

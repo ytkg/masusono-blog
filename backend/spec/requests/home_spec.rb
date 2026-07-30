@@ -33,6 +33,13 @@ RSpec.describe "WebHome", type: :request do
       expect(inertia.props).to include("app", "flash")
       expect(inertia.props.dig("articles", 0, "id")).to eq("article-1")
     end
+
+    it "gzip圧縮したHTMLを返す" do
+      get "/", headers: html_headers.merge("HTTP_ACCEPT_ENCODING" => "gzip")
+
+      expect(response.headers["content-encoding"]).to eq("gzip")
+      expect(response.headers["vary"]).to include("Accept-Encoding")
+    end
   end
 
   describe "GET /about" do
