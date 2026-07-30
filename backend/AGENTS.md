@@ -1,113 +1,94 @@
-# AGENTS.md
+# Backend contributor guide
 
-This agent must execute the following steps **before starting any task**, regardless of the type or content of the user’s instruction.
+`backend/` は Rails 8.1 / Ruby 4.0.1 のアプリケーションです。公開ページは
+Inertia + React/Vite で提供し、一部の機能は JSON API、RSS、サイトマップとして
+提供しています。このファイルは、このディレクトリ配下で作業するエージェント向けの
+実装・検証ルールです。
 
-- The pre-task action must be performed **for every task/interaction**, not just the first one in a session.
+## 作業の基本
 
----
+- 変更前に、対象の実装・テスト・設定・関連ドキュメントを読み、既存の命名と設計に
+  合わせる。無関係なリファクタリングやロックファイルの更新は含めない。
+- Ruby は `.ruby-version` で固定された **4.0.1** を使う。ホストのシステム Ruby
+  （macOS では 2.6 のことがある）や `/usr/bin/bundle` は使わない。
+- ホストで Ruby を実行する場合は `rbenv exec` を使う。環境差を避けたい場合は、以下の
+  Docker Compose コマンドを `backend/` で実行する。
+- 秘密情報（`config/master.key`、`RAILS_MASTER_KEY`、microCMS キー、ADC の内容）を
+  表示・コミット・ログ出力しない。値が必要な作業は、変数名と設定方法だけを案内する。
+- デプロイ、データ削除、microCMS の更新、BigQuery への書き込みなど外部状態を変える
+  操作は、ユーザーが明示的に依頼した場合だけ実行する。実行前に対象と影響範囲を確認する。
 
-## 1. Mandatory Pre-Task Action
+## ローカル開発
 
-- **Always change the bulb color to blue first.**  
-  The bulb control must be performed through the MCP server.
-- This step is the highest priority and absolutely required.  
-  The agent must NOT begin any task unless this pre-task action has been completed.
+すべて `backend/` で実行する。
 
-※ This rule applies **without exception**, including instructions such as  
-“read this code,” “analyze,” “review,” or “explain,” even if they do not involve code generation.
+```bash
+docker compose up --build
+```
 
----
+Rails は `http://localhost:3000`、Vite は `http://localhost:3036` で起動する。
+Docker を使わない場合は、rbenv で `bin/dev` を実行し、別ターミナルで Node.js 22 により
+`npm run dev` を実行する。依存関係の更新では lockfile に従い `npm ci` を優先し、意図しない
+`package-lock.json` の差分を作らない。
 
-## 2. Task Execution Rules
+## 実装方針
 
-- Only after the pre-task action is fully completed, the agent may proceed with the user’s instruction.
-- All responses must be written in **concise and polite Japanese** unless the user requests otherwise.
-- For backend code changes, always run both lint and tests before reporting completion:
-  - `docker compose run --rm backend bundle exec rubocop`
-  - `docker compose run --rm backend bundle exec rspec`
+- HTML ページは Inertia の props を返す。ページ固有のデータ整形は `app/usecases/`、表示は
+  `app/frontend/` に置き、コントローラは usecase 呼び出しと render に留める。
+- JSON API のレスポンス整形も usecase が担う。API を変更する場合は
+  `docs/api-response-contract.md` と request spec を同じ変更で更新する。
+- API は `ApiController` の共通エラー形式、`Cache-Control: no-store`、request ID を維持する。
+  upstream（microCMS）エラーを個別コントローラで握りつぶしたり、成功レスポンスとして返したりしない。
+- 外部 HTTP は既存の `Microcms::*` サービスを再利用し、テストでは WebMock でネットワークを
+  無効化する。実ネットワークに依存するテストは追加しない。
+- `import.meta.glob` でページを読み込む箇所では、`*.test.jsx` と `*.spec.jsx` を除外する。
+- 公開 URL、API、RSS、サイトマップに関わる変更では、ルート、関連ドキュメント、テストを
+  まとめて見直す。
 
----
+## テストの規約
 
-## 3. Prohibited Behaviors
+- RSpec の usecase spec は原則として `subject(:result) { described_class.call }` を使う。
+- 共通の mock/stub は外側の `before` に置き、`context` では差分だけを `let` などで上書きする。
+- 戻り値または例外を検証しているときは、同じ振る舞いに対する冗長な interaction expectation を
+  追加しない。
+- `before` 内だけで使う値はローカル変数にし、上書きが必要なテストデータだけを `let` にする。
 
-- Skipping the pre-task action (changing the bulb to blue).
-- Deciding whether to perform the pre-task action based on the type or content of the user’s instruction.
+## 検証
 
-## 3.5. Post-Task Note
+変更範囲に応じて、少なくとも対応するチェックを実行する。Ruby とフロントエンドの両方に
+影響する変更、またはリリース前の確認では `bin/ci` を優先する。
 
-- After completing work, update `AGENTS.md` if necessary.
+```bash
+# Ruby の静的解析とテスト（Docker）
+docker compose run --rm backend bundle exec rubocop
+docker compose run --rm backend bundle exec rspec
 
-## 4. Project-Specific Notes
+# ホスト環境（Ruby 4.0.1 と Node.js 22 が準備済みの場合）
+bin/ci
 
-- Rails backend lives in `backend/` and is API mode.
-- Dev environment uses Docker Compose at `backend/compose.yml` (run from `backend/`): `docker compose up --build`.
-- `backend/Dockerfile` is shared for development and production; dev uses build args to override envs.
-- Ruby version is pinned to 4.0.1 in `backend/.ruby-version` and `backend/Gemfile`.
-- Running `bundle exec rubocop` on host may fail if host Ruby/Bundler differs (e.g. lockfile requires Bundler 4.0.6 while system Ruby is 2.6.x).
-- Prefer RuboCop in container from `backend/`: `docker compose run --rm backend bundle exec rubocop`.
-- Prefer RSpec in container from `backend/`: `docker compose run --rm backend bundle exec rspec`.
-- For auto-fix, run: `docker compose run --rm backend bundle exec rubocop -A`.
-- If images are stale or missing gems, retry with build: `docker compose run --rm --build backend bundle exec rubocop`.
-- In sandboxed agent environments, Docker daemon access may require escalation approval.
-- Compose sets `INSTALL_DEV_TOOLS=1` so native gems can compile during `bundle install`.
-- Cloud Run expects the app to listen on `$PORT` (default 8080); `backend/Dockerfile` uses `${PORT:-8080}`.
-- Current focus is Inertia Rails app consolidation in `backend`.
-- Frontend data loading may use either Inertia props or dedicated JSON endpoints; choose based on freshness, performance, and operational simplicity.
-- Frontend unit/UI tests use Vitest + React Testing Library.
-- Run frontend lint from `backend/` with: `npm run lint`.
-- Run frontend tests from `backend/` with: `npm test`.
-- Frontend test setup lives in `app/frontend/test/setup.js`.
-- When using `import.meta.glob` for frontend pages, exclude `*.test.jsx` / `*.spec.jsx` so Vite build does not treat test files as app entry pages.
-- microCMS fetch uses Faraday.
-- Article backups to BigQuery are run manually with `articles:backup_to_bigquery`.
-- BigQuery tag review input is exported manually with `articles:export_tagging_candidates`.
-- Confirmed article tags are applied to microCMS with `articles:apply_tag_updates` and `TAG_UPDATES_JSON`.
-- For Docker Compose BigQuery backups, pass `BIGQUERY_PROJECT_ID` and `BIGQUERY_DATASET_ID`; Compose mounts host ADC from `~/.config/gcloud` to `/home/rails/.config/gcloud:ro`.
-- When asked to tag new articles (e.g. "新規記事にタグ付けをして"), follow this workflow:
-  1. Run `articles:prepare_tagging` to sync the latest microCMS articles to BigQuery and write `tmp/tagging/candidates.json`, `tmp/tagging/tag-updates.json`, and `tmp/tagging/review.md`.
-  2. Read `tmp/tagging/candidates.json` and propose tag updates before applying them. Tags should connect at least two articles, each article should have at most three tags, and existing article tag replacements may be proposed when needed.
-  3. Do not use the `日常` tag by default. It is too broad to show article relationships; prefer more specific tags such as `生活`, `人間関係`, `食べ物`, `飲み会`, `娯楽`, `イベント`, `健康`, or `料理`.
-  4. Include `add` / `remove` differences and final `id,tags` values in the proposal.
-  5. After user confirmation, write final updates to `tmp/tagging/tag-updates.json`.
-  6. Run `articles:apply_tag_updates_from_file` to apply updates, sync BigQuery, and confirm remaining candidate count.
-- `/sitemap.xml` is generated from static routes plus microCMS articles.
-- CORS is handled by rack-cors; allowed origins include localhost:5173 and masusono.com/static.
-- Prefer rbenv shims for Ruby/Rails/Bundler (e.g. `~/.rbenv/shims/rails`); avoid `/usr/bin/rails`.
-- In non-interactive agent shells, `ruby`/`bundle` may resolve to `/usr/bin/*` (system Ruby 2.6). For backend commands, always use one of:
-  - `source ~/.zshrc && cd backend && bundle ...`
-  - `cd backend && RBENV_VERSION=4.0.1 rbenv exec bundle ...`
-- Never use `/usr/bin/bundle` for this project.
-- No DB service is configured yet; compose is app-only for now.
+# フロントエンドだけを変更した場合
+npm run lint
+npm run format:check
+npm test
+```
 
-## 5. Test Coding Rules
+RSpec がデータベース準備を必要とする環境では、先に
+`RAILS_ENV=test bin/rails db:prepare` を実行する。検証できない場合は、実行していない
+コマンドとその理由を完了報告に明記する。自動修正コマンドは、対象外の差分を生まないことを
+確認してから使う。
 
-- In RSpec usecase specs, place mocks/stubs (e.g. `allow(...).to receive(...)`) in a `before` block by default.
-- In RSpec usecase specs, define `subject(:result) { described_class.call }` and use `result` in expectations.
-- In RSpec, omit `it` descriptions when the expectation is obvious from the code.
-- Keep shared stubs in an outer `before`; in nested `context`s, override only differing parts via `let`.
-- If return values/errors are asserted, avoid extra interaction assertions like `have_received` or `have_been_made`.
-- Values used only inside `before` should be local variables in `before`; use `let` for overridable test data.
-- For model specs that depend on external APIs, use WebMock and keep network calls disabled.
+## 運用タスク
 
-## Skills
-A skill is a set of local instructions to follow that is stored in a `SKILL.md` file. Below is the list of skills that can be used. Each entry includes a name, description, and file path so you can open the source for full instructions when using a specific skill.
-### Available skills
-- skill-creator: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Codex's capabilities with specialized knowledge, workflows, or tool integrations. (file: /Users/ytkg/.codex/skills/.system/skill-creator/SKILL.md)
-- skill-installer: Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos). (file: /Users/ytkg/.codex/skills/.system/skill-installer/SKILL.md)
-### How to use skills
-- Discovery: The list above is the skills available in this session (name + description + file path). Skill bodies live on disk at the listed paths.
-- Trigger rules: If the user names a skill (with `$SkillName` or plain text) OR the task clearly matches a skill's description shown above, you must use that skill for that turn. Multiple mentions mean use them all. Do not carry skills across turns unless re-mentioned.
-- Missing/blocked: If a named skill isn't in the list or the path can't be read, say so briefly and continue with the best fallback.
-- How to use a skill (progressive disclosure):
-  1) After deciding to use a skill, open its `SKILL.md`. Read only enough to follow the workflow.
-  2) If `SKILL.md` points to extra folders such as `references/`, load only the specific files needed for the request; don't bulk-load everything.
-  3) If `scripts/` exist, prefer running or patching them instead of retyping large code blocks.
-  4) If `assets/` or templates exist, reuse them instead of recreating from scratch.
-- Coordination and sequencing:
-  - If multiple skills apply, choose the minimal set that covers the request and state the order you'll use them.
-  - Announce which skill(s) you're using and why (one short line). If you skip an obvious skill, say why.
-- Context hygiene:
-  - Keep context small: summarize long sections instead of pasting them; only load extra files when needed.
-  - Avoid deep reference-chasing: prefer opening only files directly linked from `SKILL.md` unless you're blocked.
-  - When variants exist (frameworks, providers, domains), pick only the relevant reference file(s) and note that choice.
-- Safety and fallback: If a skill can't be applied cleanly (missing files, unclear instructions), state the issue, pick the next-best approach, and continue.
+- 記事のタグ更新は `README.md` の「記事バックアップ」の手順に従う。候補を確認して
+  `add` / `remove` と最終タグを提案し、ユーザーの承認後にだけ microCMS へ適用する。
+- BigQuery 操作には `BIGQUERY_PROJECT_ID` と `BIGQUERY_DATASET_ID`、およびホストの ADC が必要。
+  認証情報をリポジトリ内へコピーしない。
+- Cloud Run へのデプロイは `deploy.sh` を使うが、これは本番環境を変更する操作であるため、
+  明示依頼と確認なしに実行しない。
+
+## 参考
+
+- ローカル起動・API・記事運用: `README.md`
+- API 契約: `docs/api-response-contract.md`
+- Cloud Run のウォーム維持: `docs/cloud-run-warmup-strategy.md`
+- GitHub Actions と同等のチェック: `config/ci.rb`
