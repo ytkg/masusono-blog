@@ -9,7 +9,7 @@ const childRowsGridSx = Object.freeze({
   rowGap: 1.25,
 })
 
-const indentSx = [{ pl: 2 }, { pl: 2 }, { pl: 4 }]
+const indentSx = Object.freeze([Object.freeze({ pl: 2 }), Object.freeze({ pl: 2 }), Object.freeze({ pl: 4 })])
 const valueSx = { fontWeight: 700, fontSize: "22px", textAlign: "right", justifySelf: "end" }
 const childValueSx = { fontWeight: 700, fontSize: "17px", textAlign: "right", justifySelf: "end" }
 const labelTextSx = { fontSize: "14px" }
