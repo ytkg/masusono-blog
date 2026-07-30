@@ -23,7 +23,8 @@ module Microcms
         end
 
         raise_on_error!(response)
-        JSON.parse(response.body).fetch("contents", [])
+        contents = JSON.parse(response.body).fetch("contents", [])
+        contents.is_a?(Array) ? contents : []
       rescue JSON::ParserError
         []
       end
