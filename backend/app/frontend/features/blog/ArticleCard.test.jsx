@@ -149,7 +149,7 @@ describe("ArticleCard", () => {
     expect(pre.querySelector("[data-code-line-number]")).not.toBeInTheDocument()
   })
 
-  it("言語指定付きコードブロックに言語名を表示する", () => {
+  it("言語指定付きコードブロックに言語名を表示する", async () => {
     render(
       <ArticleCard
         mode="detail"
@@ -163,7 +163,7 @@ describe("ArticleCard", () => {
       />,
     )
 
-    const lineContent = screen.getByText("const")
+    const lineContent = await screen.findByText("const")
     const pre = lineContent.closest("pre")
     const shell = pre?.closest("[data-code-block-shell]")
 
@@ -173,7 +173,7 @@ describe("ArticleCard", () => {
     expect(pre).toHaveTextContent('const message = "hello"')
   })
 
-  it("長い言語指定付きコードブロックは横スクロールできる", () => {
+  it("長い言語指定付きコードブロックは横スクロールできる", async () => {
     render(
       <ArticleCard
         mode="detail"
@@ -188,7 +188,7 @@ describe("ArticleCard", () => {
       />,
     )
 
-    const pre = screen.getByText(/veryLongVariableName/).closest("pre")
+    const pre = (await screen.findByText(/veryLongVariableName/)).closest("pre")
     const scroller = pre?.parentElement
 
     expect(scroller).toHaveStyle({ overflowX: "auto" })
@@ -243,7 +243,7 @@ describe("ArticleCard", () => {
     expect(screen.getByRole("button", { name: "▶ 実行" })).toBeInTheDocument()
   })
 
-  it("一覧でもRubyコードブロックを通常コードブロックとして表示する", () => {
+  it("一覧でもRubyコードブロックを通常コードブロックとして表示する", async () => {
     render(
       <ArticleCard
         article={{
@@ -257,7 +257,7 @@ describe("ArticleCard", () => {
     )
 
     expect(
-      screen.getByText((_, element) => element?.tagName === "PRE" && element.textContent?.includes("puts :hello")),
+      await screen.findByText((_, element) => element?.tagName === "PRE" && element.textContent?.includes("puts :hello")),
     ).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
   })

@@ -43,6 +43,10 @@ RSpec.describe Article do
         'src="https://images.microcms-assets.io/assets/article.webp?foo=bar&amp;fit=max&amp;w=800&amp;h=800"'
       )
       expect(first_article[:content]).to include(
+        'srcset="https://images.microcms-assets.io/assets/article.webp?foo=bar&amp;fit=max&amp;w=400&amp;h=400 400w, https://images.microcms-assets.io/assets/article.webp?foo=bar&amp;fit=max&amp;w=800&amp;h=800 800w"'
+      )
+      expect(first_article[:content]).to include('sizes="(max-width: 800px) 100vw, 800px" decoding="async"')
+      expect(first_article[:content]).to include(
         'src="https://example.com/assets/article.webp"'
       )
       expect(first_article.dig(:author, :icon, :url)).to eq(

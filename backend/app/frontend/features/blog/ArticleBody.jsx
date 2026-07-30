@@ -1,10 +1,11 @@
-import { useState } from "react"
+import { lazy, Suspense, useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
-import ArticleStructuredHtml from "./ArticleStructuredHtml"
 import { articleBodyHtmlSx } from "./articleBodyHtmlSx"
 import { extractTextFromHtml } from "./articleHtmlText"
+
+const ArticleStructuredHtml = lazy(() => import("./ArticleStructuredHtml"))
 
 const EXCERPT_MAX_LENGTH = 80
 const RICH_HTML_PATTERN = /<(img|figure|iframe|video|audio|table|ul|ol|blockquote)\b/i
@@ -25,7 +26,11 @@ function ArticleRawHtml({ html }) {
 
 function ArticleHtml({ enableRubyRunner, html }) {
   if (LANGUAGE_CODE_PATTERN.test(html)) {
-    return <ArticleStructuredHtml enableRubyRunner={enableRubyRunner} html={html} />
+    return (
+      <Suspense fallback={<ArticleRawHtml html={html} />}>
+        <ArticleStructuredHtml enableRubyRunner={enableRubyRunner} html={html} />
+      </Suspense>
+    )
   }
 
   return <ArticleRawHtml html={html} />

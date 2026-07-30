@@ -7,6 +7,8 @@ class ArticleContentImageUrlOptimizer
     "w" => "800",
     "h" => "800"
   }.freeze
+  RESPONSIVE_IMAGE_WIDTHS = [ 400, 800 ].freeze
+  RESPONSIVE_IMAGE_SIZES = "(max-width: 800px) 100vw, 800px".freeze
 
   def self.call(content)
     new(content).call
@@ -23,7 +25,12 @@ class ArticleContentImageUrlOptimizer
     fragment = Nokogiri::HTML5.fragment(content)
 
     fragment.css("img[src]").each do |image|
-      image["src"] = optimized_url(image["src"])
+      attributes = optimized_attributes(image["src"])
+      next unless attributes
+
+      attributes.each do |attribute, value|
+        image[attribute] = value
+      end
     end
 
     fragment.to_html
@@ -33,25 +40,42 @@ class ArticleContentImageUrlOptimizer
 
   attr_reader :content
 
-  def optimized_url(url)
-    uri = URI.parse(url)
-    return url unless microcms_image_url?(uri)
-
-    uri.query = optimized_query(uri.query)
-    uri.to_s
-  rescue URI::InvalidURIError
-    url
-  end
-
   def microcms_image_url?(uri)
     uri.is_a?(URI::HTTPS) && uri.host == MICROCMS_IMAGE_HOST
   end
 
-  def optimized_query(query)
+  def optimized_attributes(url)
+    uri = URI.parse(url)
+    return unless microcms_image_url?(uri)
+
+    {
+      "src" => optimized_url(uri),
+      "srcset" => responsive_srcset(uri),
+      "sizes" => RESPONSIVE_IMAGE_SIZES,
+      "decoding" => "async"
+    }
+  rescue URI::InvalidURIError
+    nil
+  end
+
+  def responsive_srcset(uri)
+    RESPONSIVE_IMAGE_WIDTHS.map do |width|
+      "#{optimized_url(uri, width:)} #{width}w"
+    end.join(", ")
+  end
+
+  def optimized_url(uri, width: OPTIMIZED_IMAGE_PARAMS.fetch("w").to_i)
+    optimized_uri = uri.dup
+    optimized_uri.query = optimized_query(optimized_uri.query, width:)
+    optimized_uri.to_s
+  end
+
+  def optimized_query(query, width: OPTIMIZED_IMAGE_PARAMS.fetch("w").to_i)
     params = URI.decode_www_form(query.to_s).reject do |key, _value|
       OPTIMIZED_IMAGE_PARAMS.key?(key)
     end
 
-    URI.encode_www_form(params + OPTIMIZED_IMAGE_PARAMS.to_a)
+    optimized_params = OPTIMIZED_IMAGE_PARAMS.merge("w" => width.to_s, "h" => width.to_s)
+    URI.encode_www_form(params + optimized_params.to_a)
   end
 end
