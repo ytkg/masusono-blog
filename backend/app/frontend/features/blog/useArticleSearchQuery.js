@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { notifyLocationChange } from "@/shared/lib/locationEvents"
 
-const HISTORY_MODES = {
+const HISTORY_MODES = Object.freeze({
   push: "push",
   replace: "replace",
-}
+})
 
 function readInitialQuery() {
   if (typeof window === "undefined") {
