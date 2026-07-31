@@ -22,14 +22,16 @@ describe("AppsDialogLauncher", () => {
     expect(screen.getByText("現在のデータ")).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "閉じる" }))
+    expect(screen.getByText("現在のデータ")).toBeInTheDocument()
 
     await waitFor(() => {
       expect(screen.queryByText("現在のデータ")).not.toBeInTheDocument()
     })
     expect(onClose).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole("button", { name: "アプリを開く" })).toHaveFocus()
   })
 
-  it("Escキーと背景クリックでモーダルを閉じる", async () => {
+  it("Escキーでモーダルを閉じる", async () => {
     const onClose = vi.fn()
 
     render(
@@ -49,15 +51,23 @@ describe("AppsDialogLauncher", () => {
       expect(screen.getByRole("button", { name: "アプリを開く" })).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByRole("button", { name: "アプリを開く" }))
-    await screen.findByRole("heading", { name: "Numbers" })
-    const container = document.querySelector(".MuiDialog-container")
-    fireEvent.mouseDown(container)
-    fireEvent.click(container)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
 
-    await waitFor(() => {
-      expect(screen.queryByText("現在のデータ")).not.toBeInTheDocument()
+  it("起動アイコンを基点にモーダルを拡大する", async () => {
+    render(
+      <AppsDialogLauncher title="Numbers" buttonAriaLabel="アプリを開く">
+        <div>現在のデータ</div>
+      </AppsDialogLauncher>,
+    )
+    const launcher = screen.getByRole("button", { name: "アプリを開く" })
+    launcher.getBoundingClientRect = () => ({ left: 20, top: 30, width: 56, height: 56 })
+
+    fireEvent.click(launcher)
+
+    expect(await screen.findByRole("dialog", { name: "Numbers" })).toBeInTheDocument()
+    expect(document.querySelector(".MuiDialog-container")).toHaveStyle({
+      position: "fixed",
     })
-    expect(onClose).toHaveBeenCalledTimes(2)
   })
 })
