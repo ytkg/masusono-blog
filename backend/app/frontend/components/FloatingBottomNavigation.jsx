@@ -3,6 +3,7 @@ import BottomNavigation from "@mui/material/BottomNavigation"
 import BottomNavigationAction from "@mui/material/BottomNavigationAction"
 import Paper from "@mui/material/Paper"
 import { MAIN_NAVIGATION_LINKS } from "../shared/mainNavigationLinks"
+import { requestHomeFeed } from "../shared/lib/homeNavigation"
 
 const INDICATOR_HALF_WIDTH = 16
 const INDICATOR_TRANSITION_DURATION = 280
@@ -118,6 +119,7 @@ export default function FloatingBottomNavigation() {
             component={Link}
             href={tab.href}
             prefetch
+            onClick={tab.href === "/" ? requestHomeFeed : undefined}
           />
         ))}
       </BottomNavigation>

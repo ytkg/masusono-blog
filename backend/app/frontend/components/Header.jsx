@@ -6,6 +6,7 @@ import Toolbar from "@mui/material/Toolbar"
 import { Link, usePage } from "@inertiajs/react"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { currentLocationPath, LOCATION_CHANGE_EVENT } from "@/shared/lib/locationEvents"
+import { requestHomeFeed } from "@/shared/lib/homeNavigation"
 import logo from "../assets/logo.webp"
 
 function goBack() {
@@ -74,6 +75,7 @@ export default function Header() {
           component={Link}
           href="/"
           prefetch
+          onClick={requestHomeFeed}
           sx={{
             display: "inline-flex",
             alignItems: "flex-end",
