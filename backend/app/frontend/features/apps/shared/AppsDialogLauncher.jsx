@@ -64,6 +64,11 @@ const dialogHeaderSx = {
   borderColor: "divider",
 }
 
+const dialogBodyBaseSx = {
+  flexGrow: 1,
+  overflow: "auto",
+}
+
 const closeButtonSx = {
   width: 44,
   height: 44,
@@ -158,6 +163,7 @@ export default function AppsDialogLauncher({
   buttonSx,
   buttonIcon,
   paperSx,
+  contentSx,
   showLauncherLabel = true,
   titleAccessory,
 }) {
@@ -176,6 +182,8 @@ export default function AppsDialogLauncher({
   const launcherLabelText = launcherLabel ?? title
   const iconButtonSx = buttonSx ? [iconButtonBaseSx, buttonSx] : iconButtonBaseSx
   const dialogPaperSx = paperSx ? [dialogPaperBaseSx, paperSx] : dialogPaperBaseSx
+  const interactionSx = { pointerEvents: isTransitioning ? "none" : "auto" }
+  const dialogBodySx = contentSx ? [dialogBodyBaseSx, contentSx, interactionSx] : [dialogBodyBaseSx, interactionSx]
 
   const updateTransitionOrigin = () => {
     const rect = launcherButtonRef.current?.getBoundingClientRect()
@@ -206,6 +214,7 @@ export default function AppsDialogLauncher({
 
   const handleEntered = () => {
     setIsTransitioning(false)
+    window.dispatchEvent(new Event("resize"))
   }
 
   const handleExited = () => {
@@ -255,7 +264,7 @@ export default function AppsDialogLauncher({
               </IconButton>
             </Box>
           </Box>
-          <Box sx={{ flexGrow: 1, overflow: "auto", pointerEvents: isTransitioning ? "none" : "auto" }}>{children}</Box>
+          <Box sx={dialogBodySx}>{children}</Box>
         </Box>
       </Dialog>
     </Box>

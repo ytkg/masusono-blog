@@ -17,6 +17,8 @@ const containerSx = {
   flexDirection: "column",
   gap: 1,
   width: "100%",
+  height: "100%",
+  minHeight: 0,
 }
 
 const headerSx = {
@@ -30,11 +32,22 @@ const headerSx = {
 const scoreTextSx = { fontSize: 16 }
 
 const canvasWrapSx = {
+  width: "100%",
+  aspectRatio: `${CFG.BASE_W} / ${CFG.BASE_H}`,
+  flex: "0 1 auto",
+  minHeight: 0,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+}
+
+const canvasFrameSx = {
+  width: "fit-content",
+  maxWidth: "100%",
   border: "1px solid",
   borderColor: "divider",
   borderRadius: 1,
   overflow: "hidden",
-  width: "100%",
 }
 
 const canvasStyle = { width: "100%", height: "auto", display: "block", outline: "none" }
@@ -160,9 +173,11 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
         </Typography>
       </Box>
       <Box ref={canvasWrapRef} sx={canvasWrapSx}>
-        <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={canvasStyle} />
+        <Box sx={canvasFrameSx}>
+          <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={canvasStyle} />
+        </Box>
       </Box>
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ width: "100%", flexShrink: 0 }}>
         <Button
           fullWidth
           variant="contained"
@@ -184,7 +199,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
           {BUTTON_LABELS[state]}
         </Button>
       </Box>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
       <MasudaRunRankings

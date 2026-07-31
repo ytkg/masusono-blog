@@ -36,6 +36,7 @@ export default function MasudaRunApp() {
       buttonAriaLabel="増田RUNを開く"
       buttonIcon={<DirectionsRunIcon />}
       onOpen={loadRankings}
+      contentSx={{ display: "flex", minHeight: 0, overflow: "hidden" }}
     >
       <MasudaRunGame
         rankings={rankings}

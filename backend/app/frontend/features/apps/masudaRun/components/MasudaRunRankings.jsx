@@ -9,8 +9,19 @@ import TableRow from "@mui/material/TableRow"
 import { getApiErrorDisplayMessage } from "@/shared/lib/fetchJson"
 
 const TOP_RANKINGS_LIMIT = 10
-const containerSx = { border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }
+const containerSx = {
+  border: "1px solid",
+  borderColor: "divider",
+  borderRadius: 1,
+  p: 2,
+  display: "flex",
+  flexDirection: "column",
+  flex: "1 1 0",
+  minHeight: 120,
+  overflow: "hidden",
+}
 const titleSx = { mb: 1 }
+const tableContainerSx = { flexGrow: 1, minHeight: 0, overflow: "auto" }
 const monoSx = { fontVariantNumeric: "tabular-nums" }
 const ERROR_MESSAGES_BY_CODE = Object.freeze({
   upstream_timeout: "ランキング取得がタイムアウトしました。少し待ってから再度お試しください。",
@@ -45,7 +56,7 @@ export default function MasudaRunRankings({ rankings, isLoading, hasError, error
         </Typography>
       ) : null}
       {topRankings.length > 0 ? (
-        <TableContainer>
+        <TableContainer sx={tableContainerSx}>
           <Table size="small" aria-label="増田RUNランキング">
             <TableHead>
               <TableRow>
