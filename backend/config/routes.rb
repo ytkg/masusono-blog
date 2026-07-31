@@ -15,8 +15,9 @@ Rails.application.routes.draw do
   get "authors/:author_id", to: "authors#show"
   get "articles/:article_id", to: "blog#show"
   get "blog", to: "blog#index"
-  get "blog/365", to: "blog#three_sixty_five"
-  get "blog/:article_id", to: redirect("/articles/%{article_id}")
+  constraints(lambda { |request| request.path_parameters[:article_id] != "365" }) do
+    get "blog/:article_id", to: redirect("/articles/%{article_id}")
+  end
   namespace :api do
     namespace :app do
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }

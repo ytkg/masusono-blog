@@ -13,6 +13,10 @@ RSpec.describe "Web routes", type: :routing do
     expect(get: "/blog").to route_to("blog#index")
   end
 
+  it "does not route the retired /blog/365 page" do
+    expect(get: "/blog/365").not_to be_routable
+  end
+
   it "routes /search to search#index" do
     expect(get: "/search").to route_to("search#index")
   end
@@ -23,10 +27,6 @@ RSpec.describe "Web routes", type: :routing do
 
   it "routes /authors/:author_id to authors#show" do
     expect(get: "/authors/9wgrey2lh3").to route_to("authors#show", author_id: "9wgrey2lh3")
-  end
-
-  it "routes /blog/365 to blog#three_sixty_five" do
-    expect(get: "/blog/365").to route_to("blog#three_sixty_five")
   end
 
   it "routes /articles/:article_id to blog#show" do
