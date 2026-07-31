@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
-import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
+import AppsDialogLauncher from "../shared/AppsDialogLauncher"
 import MasudaRunGame from "./components/MasudaRunGame"
 import useRankings from "./hooks/useRankings"
 import { getUserIdFromCookie } from "@/shared/lib/userId"
@@ -31,7 +31,7 @@ export default function MasudaRunApp() {
   )
 
   return (
-    <AppsDrawerLauncher
+    <AppsDialogLauncher
       title="増田RUN"
       buttonAriaLabel="増田RUNを開く"
       buttonIcon={<DirectionsRunIcon />}
@@ -44,6 +44,6 @@ export default function MasudaRunApp() {
         rankingsError={rankingsError}
         onScoreSubmit={handleScoreSubmit}
       />
-    </AppsDrawerLauncher>
+    </AppsDialogLauncher>
   )
 }

@@ -12,7 +12,7 @@ vi.mock("./hooks/useRankings", () => ({
   default: vi.fn(),
 }))
 
-vi.mock("../shared/AppsDrawerLauncher", () => ({
+vi.mock("../shared/AppsDialogLauncher", () => ({
   default: ({ title, onOpen, children }) => (
     <div>
       <button onClick={() => void onOpen()}>{title}</button>

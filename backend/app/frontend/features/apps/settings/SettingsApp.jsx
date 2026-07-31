@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography"
 import { useCallback, useEffect, useState } from "react"
 import { getUserIdFromCookie } from "@/shared/lib/userId"
 import { fetchJson, postJson } from "@/shared/lib/fetchJson"
-import AppsDrawerLauncher from "../shared/AppsDrawerLauncher"
+import AppsDialogLauncher from "../shared/AppsDialogLauncher"
 
 const DEFAULT_NAME = "NO NAME"
 const labelTextSx = { fontSize: "14px" }
@@ -151,8 +151,8 @@ export function SettingsContent({ loadOnMount = false }) {
 
 export default function SettingsApp() {
   return (
-    <AppsDrawerLauncher title="設定" launcherLabel="設定" buttonAriaLabel="設定を開く" buttonIcon={<SettingsIcon />}>
+    <AppsDialogLauncher title="設定" launcherLabel="設定" buttonAriaLabel="設定を開く" buttonIcon={<SettingsIcon />}>
       <SettingsContent loadOnMount />
-    </AppsDrawerLauncher>
+    </AppsDialogLauncher>
   )
 }
