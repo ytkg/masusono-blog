@@ -30,9 +30,11 @@ describe("drawCloud", () => {
       createRadialGradient: vi.fn(() => highlightGradient),
     }
 
-    drawCloud(ctx, 10, 20, 100, 40)
+    drawCloud(ctx, 10, 20, 100, 40, { leftPuffX: 0.3, leftPuffY: 0.5, centerPuffY: 0.15, rightPuffY: 0.2 })
 
     expect(ctx.bezierCurveTo).toHaveBeenCalledTimes(6)
+    expect(ctx.bezierCurveTo).toHaveBeenNthCalledWith(1, 17, 42, 30, 36.8, 40, 40)
+    expect(ctx.bezierCurveTo).toHaveBeenNthCalledWith(2, 44, 28.8, 58, 26, 70, 30.8)
     expect(ctx.createLinearGradient).toHaveBeenCalledWith(10, 20, 10, 60)
     expect(bodyGradient.addColorStop).toHaveBeenCalledTimes(3)
     expect(ctx.createRadialGradient).toHaveBeenCalledTimes(1)
@@ -53,7 +55,7 @@ describe("drawSky", () => {
     drawSky(ctx, 900, 300)
 
     expect(ctx.createLinearGradient).toHaveBeenCalledWith(0, 0, 0, 300)
-    expect(skyGradient.addColorStop).toHaveBeenCalledTimes(5)
+    expect(skyGradient.addColorStop).toHaveBeenCalledTimes(7)
     expect(ctx.fillRect).toHaveBeenCalledWith(0, 0, 900, 300)
   })
 })

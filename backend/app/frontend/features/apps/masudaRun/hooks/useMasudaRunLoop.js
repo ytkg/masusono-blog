@@ -76,7 +76,7 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
       for (const c of w.clouds) {
         ctx.save()
         ctx.globalAlpha = c.alpha
-        drawCloud(ctx, c.x, c.y, c.w, c.h)
+        drawCloud(ctx, c.x, c.y, c.w, c.h, c.shape)
         ctx.restore()
       }
       drawGround(ctx, w, W)

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
 import { drawCenterText } from "./draw"
-import { CHAR_H, CHAR_W } from "./constants"
+import { CFG, CHAR_H, CHAR_W } from "./constants"
 import { drawGround, drawObstacles, drawPlayer, drawStateText } from "./render"
 
 vi.mock("./draw", () => ({
@@ -8,9 +8,10 @@ vi.mock("./draw", () => ({
 }))
 
 describe("drawGround", () => {
-  it("地面の線を引く", () => {
+  it("地面の線から下を黄土色で塗り、線を引く", () => {
     const ctx = {
       beginPath: vi.fn(),
+      fillRect: vi.fn(),
       moveTo: vi.fn(),
       lineTo: vi.fn(),
       stroke: vi.fn(),
@@ -18,6 +19,9 @@ describe("drawGround", () => {
 
     drawGround(ctx, { groundY: 240 }, 900)
 
+    expect(ctx.fillStyle).toBe("#EBCB72")
+    expect(ctx.fillRect).toHaveBeenCalledWith(0, 240, 900, CFG.BASE_H - 240)
+    expect(ctx.strokeStyle).toBe("#C8B37D")
     expect(ctx.moveTo).toHaveBeenCalledWith(0, 240.5)
     expect(ctx.lineTo).toHaveBeenCalledWith(900, 240.5)
     expect(ctx.stroke).toHaveBeenCalledTimes(1)

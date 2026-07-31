@@ -2,7 +2,9 @@ import { CFG, CHAR_H, CHAR_W } from "./constants"
 import { drawCenterText } from "./draw"
 
 export const drawGround = (ctx, w, W) => {
-  ctx.strokeStyle = "#000"
+  ctx.fillStyle = "#EBCB72"
+  ctx.fillRect(0, w.groundY, W, CFG.BASE_H - w.groundY)
+  ctx.strokeStyle = "#C8B37D"
   ctx.beginPath()
   ctx.moveTo(0, w.groundY + 0.5)
   ctx.lineTo(W, w.groundY + 0.5)

@@ -96,6 +96,11 @@ describe("maybeSpawnCloud", () => {
       .mockReturnValueOnce(0.75)
       .mockReturnValueOnce(0.4)
       .mockReturnValueOnce(0.6)
+      .mockReturnValueOnce(0.1)
+      .mockReturnValueOnce(0.2)
+      .mockReturnValueOnce(0.3)
+      .mockReturnValueOnce(0.4)
+      .mockReturnValueOnce(0.5)
     const world = {
       nextCloud: 0,
       groundY: 220,
@@ -106,6 +111,12 @@ describe("maybeSpawnCloud", () => {
 
     expect(world.clouds).toHaveLength(1)
     expect(world.clouds[0].x).toBe(920)
+    expect(world.clouds[0].shape).toEqual({
+      leftPuffX: 0.28800000000000003,
+      leftPuffY: 0.41200000000000003,
+      centerPuffY: 0.10200000000000001,
+      rightPuffY: 0.124,
+    })
     expect(world.nextCloud).toBeGreaterThan(0)
   })
 })
