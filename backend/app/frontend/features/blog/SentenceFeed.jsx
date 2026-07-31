@@ -1,29 +1,20 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import { Link, router, useRemember } from "@inertiajs/react"
+import { router, useRemember } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { rememberInCurrentHistoryEntry } from "@/shared/lib/rememberedState"
+import SentenceFeedCard from "./SentenceFeedCard"
 import {
   appendSentenceItems,
   createInitialSentenceState,
   markSentenceItemsRevealed,
   prepareSentenceArticles,
-  SENTENCE_REVEAL_DURATION_MS,
   SENTENCE_REVEAL_SETTLE_MS,
 } from "./sentenceFeedData"
+import { sentenceFeedLayout } from "./sentenceFeedLayout"
 
 const INFINITE_SCROLL_THRESHOLD = 2600
 const SENTENCE_STATE_KEY = "home-beginnings"
-
-function fontSizeFor(length) {
-  if (length <= 5) return "1.82rem"
-  if (length <= 12) return "1.56rem"
-  if (length <= 20) return "1.34rem"
-  if (length <= 32) return "1.12rem"
-  if (length <= 50) return "0.98rem"
-
-  return "0.88rem"
-}
 
 export default function SentenceFeed({ articles = [] }) {
   const sourceRef = useRef([])
@@ -69,21 +60,19 @@ export default function SentenceFeed({ articles = [] }) {
     if (!container || items.length === 0) return undefined
 
     function layout() {
-      const isNarrow = window.matchMedia("(max-width: 720px)").matches
-      const preferredColumnWidth = isNarrow ? 58 : 72
-      const gap = isNarrow ? 12 : Math.min(22, Math.max(12, window.innerWidth * 0.018))
-      const columnCount = Math.max(1, Math.floor((container.clientWidth + gap) / (preferredColumnWidth + gap)))
-      const columnWidth = (container.clientWidth - gap * (columnCount - 1)) / columnCount
-      const columnHeights = Array.from({ length: columnCount }, () => 0)
-
-      Array.from(container.querySelectorAll(".sentence-card")).forEach((item) => {
-        const columnIndex = columnHeights.indexOf(Math.min(...columnHeights))
-        item.style.width = `${columnWidth}px`
-        item.style.transform = `translate(${columnIndex * (columnWidth + gap)}px, ${columnHeights[columnIndex]}px)`
-        columnHeights[columnIndex] += item.offsetHeight + gap
+      const cardElements = Array.from(container.querySelectorAll(".sentence-card"))
+      const nextLayout = sentenceFeedLayout({
+        containerWidth: container.clientWidth,
+        itemHeights: cardElements.map((card) => card.offsetHeight),
+        viewportWidth: window.innerWidth,
       })
 
-      setHeight(Math.max(...columnHeights) - gap)
+      cardElements.forEach((card, index) => {
+        const { left, top, width } = nextLayout.items[index]
+        card.style.width = `${width}px`
+        card.style.transform = `translate(${left}px, ${top}px)`
+      })
+      setHeight(nextLayout.height)
     }
 
     layout()
@@ -95,7 +84,8 @@ export default function SentenceFeed({ articles = [] }) {
   useEffect(() => {
     function appendWhenNearBottom() {
       const distanceToBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY
-      if (isAppendingRef.current || distanceToBottom > INFINITE_SCROLL_THRESHOLD || sourceRef.current.length === 0) return
+      if (isAppendingRef.current || distanceToBottom > INFINITE_SCROLL_THRESHOLD || sourceRef.current.length === 0)
+        return
 
       isAppendingRef.current = true
       window.requestAnimationFrame(() => {
@@ -132,61 +122,13 @@ export default function SentenceFeed({ articles = [] }) {
       sx={{ position: "relative", minHeight: height, overflowX: "clip", px: { xs: 0, sm: 1.5 } }}
     >
       {items.map(({ article, hasRevealed, key, sentence, revealDelay }) => (
-        <Box
-          component={Link}
-          className="sentence-card"
-          href={`/articles/${article.id}`}
+        <SentenceFeedCard
+          article={article}
+          hasRevealed={hasRevealed}
           key={key}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            p: { xs: "0.32rem 0.22rem", sm: "0.38rem 0.28rem" },
-            border: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            color: "text.primary",
-            textDecoration: "none",
-            WebkitTapHighlightColor: "transparent",
-            transition: "background-color 120ms ease, border-color 120ms ease",
-            opacity: hasRevealed ? 1 : 0,
-            filter: hasRevealed ? "none" : "blur(5px)",
-            animation: hasRevealed ? "none" : `sentence-reveal ${SENTENCE_REVEAL_DURATION_MS}ms ease forwards`,
-            animationDelay: `${revealDelay}ms`,
-            "@media (hover: hover)": {
-              "&:hover": { borderColor: "text.primary", bgcolor: "background.default" },
-            },
-            "&:focus-visible": {
-              borderColor: "text.primary",
-              bgcolor: "background.default",
-              outline: "2px solid",
-              outlineColor: "secondary.main",
-              outlineOffset: 3,
-            },
-            "&:active": { borderColor: "text.primary", bgcolor: "#f5f5f5" },
-            "@keyframes sentence-reveal": { to: { opacity: 1, filter: "blur(0)" } },
-            "@media (prefers-reduced-motion: reduce)": { animation: "none", filter: "none", opacity: 1 },
-          }}
-        >
-          <Box
-            component="span"
-            sx={{
-              writingMode: "vertical-rl",
-              textOrientation: "upright",
-              fontFamily: '"Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", serif',
-              fontSize: fontSizeFor(sentence.length),
-              lineHeight: { xs: 1.75, sm: 1.95 },
-              letterSpacing: "0.07em",
-              textAlign: "center",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {sentence}
-          </Box>
-        </Box>
+          revealDelay={revealDelay}
+          sentence={sentence}
+        />
       ))}
     </Box>
   )

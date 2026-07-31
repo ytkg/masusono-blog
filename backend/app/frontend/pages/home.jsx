@@ -59,7 +59,11 @@ function normalizeHomeState(state, fallbackState) {
 export default function Home({ articles = [] }) {
   const initialRecommendedArticleIds = useMemo(() => pickRandomArticleIds(articles, 5), [articles])
   const initialHomeState = useMemo(
-    () => ({ mode: DEFAULT_HOME_TAB_ID, recommendedArticleIds: initialRecommendedArticleIds, version: HOME_STATE_VERSION }),
+    () => ({
+      mode: DEFAULT_HOME_TAB_ID,
+      recommendedArticleIds: initialRecommendedArticleIds,
+      version: HOME_STATE_VERSION,
+    }),
     [initialRecommendedArticleIds],
   )
   const [shouldStartOnFeed, setShouldStartOnFeed] = useState(consumeHomeFeedIntent)
@@ -172,7 +176,10 @@ export default function Home({ articles = [] }) {
             }}
             sx={{ pt: 1 }}
           >
-            {HOME_TABS.find((tab) => tab.id === displayedHomeState.mode)?.renderContent({ articles, recommendedArticles })}
+            {HOME_TABS.find((tab) => tab.id === displayedHomeState.mode)?.renderContent({
+              articles,
+              recommendedArticles,
+            })}
           </Box>
         </Box>
       </PageContainer>

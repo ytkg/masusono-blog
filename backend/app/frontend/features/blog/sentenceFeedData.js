@@ -13,7 +13,10 @@ export function firstSentenceFromHtml(html = "") {
   template.content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"))
   template.content.querySelectorAll("p, h1, h2, h3, h4, h5, h6, li").forEach((element) => element.append("\n"))
 
-  const text = template.content.textContent.replace(/[ \t\f\v]+/g, " ").replace(/\n{2,}/g, "\n").trim()
+  const text = template.content.textContent
+    .replace(/[ \t\f\v]+/g, " ")
+    .replace(/\n{2,}/g, "\n")
+    .trim()
   const match = [...text.matchAll(SENTENCE_END_PATTERN)].find((candidate) => {
     const end = candidate[0]
     const nextCharacter = text[candidate.index + end.length] || ""
