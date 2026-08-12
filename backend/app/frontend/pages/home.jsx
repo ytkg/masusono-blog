@@ -10,8 +10,6 @@ import { DEFAULT_HOME_TAB_ID, HOME_TABS, isHomeTabId } from "../features/blog/Ho
 import PageContainer from "../shared/PageContainer"
 import SeoHead from "../shared/SeoHead"
 
-const SWIPE_MIN_DISTANCE = 35
-const SWIPE_AXIS_RATIO = 1.25
 const HOME_TAB_HEIGHT = 38
 const HOME_STATE_KEY = "home-state"
 const HOME_STATE_VERSION = 1
@@ -26,22 +24,6 @@ function pickRandomArticleIds(articles, count) {
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
     .map((article) => article.id)
-}
-
-function getSwipeMode(mode, start, end) {
-  if (!start) return null
-
-  const deltaX = end.x - start.x
-  const deltaY = end.y - start.y
-  const absX = Math.abs(deltaX)
-  const absY = Math.abs(deltaY)
-
-  if (absX < SWIPE_MIN_DISTANCE || absX < absY * SWIPE_AXIS_RATIO) return null
-
-  const currentIndex = HOME_TABS.findIndex((tab) => tab.id === mode)
-  const nextIndex = currentIndex + (deltaX < 0 ? 1 : -1)
-
-  return HOME_TABS[nextIndex]?.id ?? null
 }
 
 function normalizeHomeState(state, fallbackState) {
@@ -77,7 +59,6 @@ export default function Home({ articles = [] }) {
 
     return displayedHomeState.recommendedArticleIds.map((id) => articlesById.get(id)).filter(Boolean)
   }, [articles, displayedHomeState.recommendedArticleIds])
-  const swipeStartRef = useRef(null)
 
   const commitHomeState = useCallback(
     (nextState) => {
@@ -117,25 +98,6 @@ export default function Home({ articles = [] }) {
     changeMode(nextMode)
   }
 
-  function handlePointerDown(event) {
-    swipeStartRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-    }
-  }
-
-  function handlePointerUp(event) {
-    const swipeStart = swipeStartRef.current
-    swipeStartRef.current = null
-
-    const nextMode = getSwipeMode(displayedHomeState.mode, swipeStart, {
-      x: event.clientX,
-      y: event.clientY,
-    })
-
-    if (nextMode) changeMode(nextMode)
-  }
-
   return (
     <>
       <SeoHead
@@ -167,15 +129,7 @@ export default function Home({ articles = [] }) {
               ))}
             </Tabs>
           </Box>
-          <Box
-            data-testid="home-articles-swipe-area"
-            onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={() => {
-              swipeStartRef.current = null
-            }}
-            sx={{ pt: 1 }}
-          >
+          <Box sx={{ pt: 1 }}>
             {HOME_TABS.find((tab) => tab.id === displayedHomeState.mode)?.renderContent({
               articles,
               recommendedArticles,
