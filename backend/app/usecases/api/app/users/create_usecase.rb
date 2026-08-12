@@ -2,6 +2,8 @@ module Api
   module App
     module Users
       class CreateUsecase
+        include ::RequiredUserId
+
         def self.call(name:, user_id:)
           new.call(name:, user_id:)
         end
@@ -26,12 +28,6 @@ module Api
         end
 
         private
-
-        def validate_user_id!(user_id)
-          return unless user_id.to_s.strip.empty?
-
-          raise ArgumentError, "user_id is required"
-        end
 
         def normalize_name(name)
           normalized = name.to_s.strip

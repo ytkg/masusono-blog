@@ -2,6 +2,8 @@ module Api
   module App
     module MasudaRun
       class RankingsCreateUsecase
+        include ::RequiredUserId
+
         def self.call(score:, user_id:)
           new.call(score:, user_id:)
         end
@@ -26,12 +28,6 @@ module Api
         end
 
         private
-
-        def validate_user_id!(user_id)
-          return unless user_id.to_s.strip.empty?
-
-          raise ArgumentError, "user_id is required"
-        end
 
         def normalize_score(score)
           normalized = Integer(score, exception: false)

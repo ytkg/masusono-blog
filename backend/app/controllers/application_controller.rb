@@ -18,7 +18,9 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def render_inertia_result(result)
+  def render_inertia_result(result, component: nil)
+    return render inertia: component, props: result.fetch(:props), status: result.fetch(:status) if component
+
     render inertia: result.fetch(:props), status: result.fetch(:status)
   end
 

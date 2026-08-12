@@ -1,6 +1,8 @@
 require "time"
 
 class SitemapXmlBuilder
+  include XmlEscaper
+
   def self.call(entries)
     new(entries).call
   end
@@ -32,15 +34,6 @@ class SitemapXmlBuilder
   private
 
   attr_reader :entries
-
-  def escape_xml(value)
-    value.to_s
-      .gsub("&", "&amp;")
-      .gsub("<", "&lt;")
-      .gsub(">", "&gt;")
-      .gsub('"', "&quot;")
-      .gsub("'", "&apos;")
-  end
 
   def normalize_date(value)
     return nil if value.nil? || value == ""

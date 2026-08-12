@@ -36,14 +36,15 @@ module Microcms
       initial_response = response || self.response
       raise_on_error!(initial_response)
 
+      first_page = parse_page(initial_response.body)
       contents = []
-      first_page_append_result = append_contents(contents, parse_contents(initial_response.body))
+      first_page_append_result = append_contents(contents, first_page.fetch(:contents))
       if first_page_append_result == :max_total_count_reached
         log_pagination_warning("max total count reached on first page (max_total_count=#{max_total_count})")
         return contents
       end
 
-      meta = parse_meta(initial_response.body)
+      meta = first_page.fetch(:meta)
       return contents unless pageable?(meta)
       unless valid_pagination_meta?(meta)
         log_pagination_warning("invalid pagination meta detected: #{meta.inspect}")
@@ -63,7 +64,8 @@ module Microcms
         offset += limit
         res = fetch_response(limit: limit, offset: offset)
         raise_on_error!(res)
-        append_result = append_contents(contents, parse_contents(res.body))
+        page = parse_page(res.body)
+        append_result = append_contents(contents, page.fetch(:contents))
         page_count += 1
         if append_result == :max_total_count_reached
           log_pagination_warning("max total count reached (max_total_count=#{max_total_count})")
@@ -86,19 +88,11 @@ module Microcms
     end
 
     def parse_contents(body)
-      json = deep_symbolize(JSON.parse(body))
-      contents = json[:contents]
-      return [] unless contents.is_a?(Array)
-      contents
+      contents_from(parse_payload(body))
     end
 
     def parse_meta(body)
-      json = deep_symbolize(JSON.parse(body))
-      {
-        total_count: json[:totalCount],
-        limit: json[:limit],
-        offset: json[:offset]
-      }
+      meta_from(parse_payload(body))
     rescue JSON::ParserError
       {}
     end
@@ -111,6 +105,28 @@ module Microcms
       return if response.success?
 
       raise FetchError.new(status: response.status, body: response.body)
+    end
+
+    def parse_page(body)
+      json = parse_payload(body)
+      { contents: contents_from(json), meta: meta_from(json) }
+    end
+
+    def parse_payload(body)
+      deep_symbolize(JSON.parse(body))
+    end
+
+    def contents_from(json)
+      contents = json[:contents]
+      contents.is_a?(Array) ? contents : []
+    end
+
+    def meta_from(json)
+      {
+        total_count: json[:totalCount],
+        limit: json[:limit],
+        offset: json[:offset]
+      }
     end
 
     def pageable?(meta)

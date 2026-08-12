@@ -1,6 +1,8 @@
 require "time"
 
 class RssXmlBuilder
+  include XmlEscaper
+
   def self.call(title:, link:, description:, feed_url:, items:)
     new(title:, link:, description:, feed_url:, items:).call
   end
@@ -50,15 +52,6 @@ class RssXmlBuilder
     lines << "      <dc:creator>#{escape_xml(item[:author])}</dc:creator>" unless item[:author].to_s.empty?
     lines << "    </item>"
     lines
-  end
-
-  def escape_xml(value)
-    value.to_s
-      .gsub("&", "&amp;")
-      .gsub("<", "&lt;")
-      .gsub(">", "&gt;")
-      .gsub('"', "&quot;")
-      .gsub("'", "&apos;")
   end
 
   def normalize_pub_date(value)

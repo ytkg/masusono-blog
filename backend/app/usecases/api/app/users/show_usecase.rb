@@ -2,6 +2,8 @@ module Api
   module App
     module Users
       class ShowUsecase
+        include ::RequiredUserId
+
         def self.call(user_id:)
           new.call(user_id:)
         end
@@ -21,12 +23,6 @@ module Api
         end
 
         private
-
-        def validate_user_id!(user_id)
-          return unless user_id.to_s.strip.empty?
-
-          raise ArgumentError, "user_id is required"
-        end
       end
     end
   end
