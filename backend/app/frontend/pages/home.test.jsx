@@ -31,7 +31,7 @@ vi.mock("../shared/SeoHead", () => ({
 }))
 
 vi.mock("../features/blog/ArticlesList", () => ({
-  default: ({ articles, emptyMessage, variant }) => (
+  default: ({ articles, emptyMessage }) => (
     <div data-testid="articles-list">
       <a href="/articles/article-1" onClick={(event) => event.preventDefault()}>
         記事へ
@@ -39,7 +39,7 @@ vi.mock("../features/blog/ArticlesList", () => ({
       <a href="/authors/author-1" onClick={(event) => event.preventDefault()}>
         著者へ
       </a>
-      articles:{articles.length} variant:{variant}
+      articles:{articles.length}
       {emptyMessage ? ` empty:${emptyMessage}` : null}
     </div>
   ),
@@ -68,7 +68,7 @@ describe("Home page", () => {
     expect(ensureUserIdCookie).toHaveBeenCalledTimes(1)
     expect(screen.getByText("seo")).toBeInTheDocument()
     expect(screen.queryByRole("heading", { name: "ブログ" })).not.toBeInTheDocument()
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
     expect(screen.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
     expect(screen.getByRole("tab", { name: "書き出し" })).toHaveAttribute("aria-selected", "false")
     expect(screen.queryByRole("textbox", { name: "記事を検索" })).not.toBeInTheDocument()

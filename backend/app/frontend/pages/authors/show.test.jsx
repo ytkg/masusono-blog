@@ -11,9 +11,9 @@ vi.mock("../../shared/SeoHead", () => ({
 }))
 
 vi.mock("../../features/blog/ArticlesList", () => ({
-  default: ({ articles, variant }) => (
+  default: ({ articles }) => (
     <div>
-      articles:{articles.length} variant:{variant}
+      articles:{articles.length}
     </div>
   ),
 }))
@@ -41,6 +41,6 @@ describe("AuthorShow page", () => {
     expect(screen.getByRole("img", { name: "増田のアイコン" })).toHaveAttribute("src", "/masuda.webp")
     expect(screen.getByRole("heading", { name: "投稿" })).toBeInTheDocument()
     expect(screen.getByText("1件")).toBeInTheDocument()
-    expect(screen.getByText("articles:1 variant:divided")).toBeInTheDocument()
+    expect(screen.getByText("articles:1")).toBeInTheDocument()
   })
 })

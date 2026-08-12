@@ -33,7 +33,7 @@ export default function Search({ articles = [] }) {
         <ArticleSearchBox onChange={setQuery} onClear={() => setQuery("")} query={query} />
         <Box sx={{ pt: 1 }}>
           {isSearching ? (
-            <ArticlesList articles={filteredArticles} variant="divided" emptyMessage="該当する記事はありません。" />
+            <ArticlesList articles={filteredArticles} emptyMessage="該当する記事はありません。" />
           ) : (
             <ArticleSearchSuggestions articles={articles} onSelect={handleSuggestionSelect} />
           )}

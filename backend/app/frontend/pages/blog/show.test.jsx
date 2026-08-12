@@ -24,9 +24,7 @@ vi.mock("../../shared/SeoHead", () => ({
 }))
 
 vi.mock("../../features/blog/ArticleCard", () => ({
-  default: ({ article, mode, presentation }) => (
-    <div>{`article:${mode}:${presentation}:${article?.title ?? "missing"}`}</div>
-  ),
+  default: ({ article, mode }) => <div>{`article:${mode}:${article?.title ?? "missing"}`}</div>,
 }))
 
 describe("BlogDetail page", () => {
@@ -46,7 +44,7 @@ describe("BlogDetail page", () => {
     expect(description).toBe(`${"あ".repeat(120)}…`)
     expect(canonicalPath).toBe("/articles/hello-world")
     expect(screen.queryByRole("heading", { name: "ブログ" })).not.toBeInTheDocument()
-    expect(screen.getByText("article:detail:plain:Hello")).toBeInTheDocument()
+    expect(screen.getByText("article:detail:Hello")).toBeInTheDocument()
   })
 
   it("article がなければトップページ canonical に戻す", () => {

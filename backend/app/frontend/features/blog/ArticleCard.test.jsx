@@ -49,7 +49,7 @@ describe("ArticleCard", () => {
 
     expect(screen.getByRole("link", { name: "Hello" })).toHaveAttribute("href", "/articles/hello-world")
     expect(screen.getByText("本文です")).toBeInTheDocument()
-    expect(screen.getByText("増田 2026/03/09")).toBeInTheDocument()
+    expect(screen.getByTestId("article-list-meta")).toHaveTextContent("増田2026/03/09")
   })
 
   it("記事メニューから記事URLをコピーできる", async () => {
@@ -57,7 +57,6 @@ describe("ArticleCard", () => {
 
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -244,31 +243,9 @@ describe("ArticleCard", () => {
     expect(screen.getByRole("button", { name: "▶ 実行" })).toBeInTheDocument()
   })
 
-  it("一覧でもRubyコードブロックを通常コードブロックとして表示する", async () => {
-    render(
-      <ArticleCard
-        article={{
-          id: "hello-world",
-          title: "Hello",
-          publishedDate: "2026/03/09",
-          author: "増田",
-          content: '<p>Rubyサンプル</p><pre><code class="language-ruby">puts :hello</code></pre>',
-        }}
-      />,
-    )
-
-    expect(
-      await screen.findByText(
-        (_, element) => element?.tagName === "PRE" && element.textContent?.includes("puts :hello"),
-      ),
-    ).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "▶ 実行" })).not.toBeInTheDocument()
-  })
-
   it("plain presentation の一覧では続きを読むで展開したRubyコードブロックを実行できる", async () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -290,7 +267,6 @@ describe("ArticleCard", () => {
   it("plain presentation の一覧では短いRubyコードブロックも実行できる", async () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -309,7 +285,6 @@ describe("ArticleCard", () => {
   it("plain presentation ではカード枠を消す", () => {
     const { container } = render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -326,7 +301,6 @@ describe("ArticleCard", () => {
   it("plain presentation では著者と日付をタイトルより上に表示する", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -347,7 +321,6 @@ describe("ArticleCard", () => {
   it("plain presentation では著者名を日付より目立たせる", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -364,7 +337,6 @@ describe("ArticleCard", () => {
   it("plain presentation では著者名から著者ページへ遷移できる", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -382,7 +354,6 @@ describe("ArticleCard", () => {
   it("plain presentation では日付付近に文字数と読了目安を表示する", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -401,7 +372,6 @@ describe("ArticleCard", () => {
   it("読了目安は0.5分刻みで表示する", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -417,28 +387,9 @@ describe("ArticleCard", () => {
     expect(screen.getByTestId("article-list-meta")).toHaveTextContent("120字・約0.5分")
   })
 
-  it("カード表示では文字数と読了目安をメタ情報として表示する", () => {
-    render(
-      <ArticleCard
-        article={{
-          id: "hello-world",
-          title: "Hello",
-          publishedDate: "2026/03/09",
-          characterCount: 1234,
-          readingTimeMinutes: 4,
-          author: "増田",
-          content: "<p>本文です</p>",
-        }}
-      />,
-    )
-
-    expect(screen.getByText("増田 2026/03/09 ・ 1,234字・約4分")).toBeInTheDocument()
-  })
-
   it("plain presentation では著者アイコンから著者ページへ遷移できる", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -456,7 +407,6 @@ describe("ArticleCard", () => {
   it("plain presentation ではAPI由来の著者画像URLをアイコンに使う", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -478,7 +428,6 @@ describe("ArticleCard", () => {
 
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -503,7 +452,6 @@ describe("ArticleCard", () => {
   it("plain presentation の一覧では展開前に本文画像を描画しない", () => {
     render(
       <ArticleCard
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -534,7 +482,6 @@ describe("ArticleCard", () => {
     render(
       <ArticleCard
         mode="detail"
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -560,7 +507,6 @@ describe("ArticleCard", () => {
     render(
       <ArticleCard
         mode="detail"
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",
@@ -580,7 +526,6 @@ describe("ArticleCard", () => {
     render(
       <ArticleCard
         mode="detail"
-        presentation="plain"
         article={{
           id: "hello-world",
           title: "Hello",

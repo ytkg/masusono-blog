@@ -7,9 +7,9 @@ vi.mock("../shared/SeoHead", () => ({
 }))
 
 vi.mock("../features/blog/ArticlesList", () => ({
-  default: ({ articles, emptyMessage, variant }) => (
+  default: ({ articles, emptyMessage }) => (
     <div data-testid="articles-list">
-      articles:{articles.length} variant:{variant}
+      articles:{articles.length}
       {emptyMessage ? ` empty:${emptyMessage}` : null}
     </div>
   ),
@@ -143,7 +143,7 @@ describe("Search page", () => {
     expect(screen.queryByText("著者から探す")).not.toBeInTheDocument()
     expect(screen.queryByText("タグから探す")).not.toBeInTheDocument()
     expect(screen.queryByText("1件")).not.toBeInTheDocument()
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
   })
 
   it("@付きの検索語は著者だけを検索対象にする", () => {
@@ -152,7 +152,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("@その他1")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
   })
 
   it("空白区切りの AND 検索で記事を絞り込む", () => {
@@ -161,7 +161,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("本 暮らし")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
   })
 
   it("OR 検索で記事を絞り込む", () => {
@@ -170,7 +170,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("遠足 OR 暮らし")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:2 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:2")
   })
 
   it("検索語の変更を URL に反映し、クリアで空状態に戻る", () => {
@@ -183,7 +183,7 @@ describe("Search page", () => {
     expect(window.location.pathname).toBe("/search")
     expect(window.location.search).toBe("?q=%E5%A2%97%E7%94%B0")
     expect(screen.queryByText("1件")).not.toBeInTheDocument()
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
 
     fireEvent.click(screen.getByRole("button", { name: "検索語をクリア" }))
 
@@ -200,7 +200,7 @@ describe("Search page", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "記事を検索" }), { target: { value: "見つからない" } })
 
     expect(screen.queryByText("0件")).not.toBeInTheDocument()
-    expect(screen.getByText("articles:0 variant:divided empty:該当する記事はありません。")).toBeInTheDocument()
+    expect(screen.getByText("articles:0 empty:該当する記事はありません。")).toBeInTheDocument()
   })
 
   it("タグで記事を絞り込む", () => {
@@ -209,7 +209,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#暮らし")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
   })
 
   it("#付きの検索語はタグだけを検索対象にする", () => {
@@ -218,7 +218,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("#生活")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:0 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:0")
   })
 
   it("read:N は読了目安がN分以内の記事だけを検索対象にする", () => {
@@ -227,7 +227,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("read:1")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
   })
 
   it("read:N+ は読了目安がN分以上の記事だけを検索対象にする", () => {
@@ -236,7 +236,7 @@ describe("Search page", () => {
     render(<Search articles={articles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("read:5+")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
   })
 
   it("read:N-M は読了目安がN分より長くM分以内の記事だけを検索対象にする", () => {
@@ -250,6 +250,6 @@ describe("Search page", () => {
     render(<Search articles={rangedArticles} />)
 
     expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("read:1-2")
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
   })
 })

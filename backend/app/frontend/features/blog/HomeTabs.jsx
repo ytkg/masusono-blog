@@ -8,7 +8,7 @@ export const HOME_TABS = Object.freeze([
     id: "feed",
     label: "フィード",
     renderContent: ({ articles }) => (
-      <ArticlesList articles={articles} variant="divided" emptyMessage="記事がありません。" />
+      <ArticlesList articles={articles} emptyMessage="記事がありません。" />
     ),
   },
   {

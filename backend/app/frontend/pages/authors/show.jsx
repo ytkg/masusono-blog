@@ -89,7 +89,7 @@ export default function AuthorShow({ author, articles = [] }) {
           {author ? <AuthorProfile author={author} /> : null}
           <Stack spacing={1.5}>
             <ArticlesSectionHeader count={articles.length} />
-            <ArticlesList articles={articles} variant="divided" emptyMessage="この著者の記事はまだありません。" />
+            <ArticlesList articles={articles} emptyMessage="この著者の記事はまだありません。" />
           </Stack>
         </Stack>
       </PageContainer>

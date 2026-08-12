@@ -26,10 +26,10 @@ function formatArticleStats(article) {
   return `${formattedCharacterCount}字${formattedReadingTime}`
 }
 
-export default function ArticleCard({ article, mode = "list", presentation = "card", sx }) {
+export default function ArticleCard({ article, mode = "list", sx }) {
   if (!article) {
     return (
-      <ContentItemCard title="記事" titleComponent="h3" presentation={presentation} sx={sx}>
+      <ContentItemCard title="記事" titleComponent="h3" sx={sx}>
         <Typography color="text.secondary">記事が見つかりません。</Typography>
       </ContentItemCard>
     )
@@ -42,12 +42,11 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
   const hasBody = Boolean(html.trim())
   const avatarSrc = article.authorImageUrl
   const authorHref = getAuthorHref(article)
-  const isPlain = presentation === "plain"
-  const isDetailPlain = isPlain && mode === "detail"
-  const isListPlain = isPlain && mode === "list"
-  const shouldCollapseBody = isListPlain
+  const isDetail = mode === "detail"
+  const isList = mode === "list"
+  const shouldCollapseBody = isList
   const action = article.id ? <ArticleActions article={article} /> : undefined
-  const plainHeader = isPlain ? (
+  const plainHeader = (
     <ArticlePlainHeader
       action={action}
       articleStats={articleStats}
@@ -57,23 +56,20 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
       date={date}
       mode={mode}
     />
-  ) : undefined
+  )
   const content = (
     <ContentItemCard
       title={article.title}
       titleVariant="h6"
-      titleComponent={mode === "detail" ? "h1" : "h3"}
-      titleTo={mode === "list" ? `/articles/${article.id}` : undefined}
+      titleComponent={isDetail ? "h1" : "h3"}
+      titleTo={isList ? `/articles/${article.id}` : undefined}
       meta={undefined}
-      metaParts={isPlain ? undefined : [author, [date, articleStats].filter(Boolean).join(" ・ ")]}
-      metaPlacement={isListPlain ? "above" : "below"}
-      action={isPlain ? undefined : action}
-      presentation={presentation}
-      sx={isPlain ? { minWidth: 0 } : sx}
+      metaPlacement={isList ? "above" : "below"}
+      sx={{ minWidth: 0 }}
     >
       <ArticleTags tags={article.tags} />
       <ArticleBody
-        enableRubyRunner={mode === "detail" || isListPlain}
+        enableRubyRunner={isDetail || isList}
         html={html}
         hasBody={hasBody}
         shouldCollapse={shouldCollapseBody}
@@ -81,7 +77,7 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
     </ContentItemCard>
   )
 
-  if (isDetailPlain) {
+  if (isDetail) {
     return (
       <Box sx={[{ display: "grid", gap: 2 }, sx]}>
         {plainHeader}
@@ -90,14 +86,10 @@ export default function ArticleCard({ article, mode = "list", presentation = "ca
     )
   }
 
-  if (isPlain) {
-    return (
-      <Box sx={[{ display: "grid", gap: 1.5 }, sx]}>
-        {plainHeader}
-        {content}
-      </Box>
-    )
-  }
-
-  return content
+  return (
+    <Box sx={[{ display: "grid", gap: 1.5 }, sx]}>
+      {plainHeader}
+      {content}
+    </Box>
+  )
 }

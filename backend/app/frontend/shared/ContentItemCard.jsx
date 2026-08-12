@@ -2,7 +2,6 @@ import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
-import ContentCard from "./ContentCard"
 
 const ContentItemTitleLink = styled(Link)(({ theme }) => ({
   color: "inherit",
@@ -24,7 +23,6 @@ export default function ContentItemCard({
   metaPlacement = "below",
   metaSx,
   action,
-  presentation = "card",
   children,
   sx,
 }) {
@@ -33,10 +31,8 @@ export default function ContentItemCard({
     .map((part) => String(part).trim())
     .filter((part) => part.length > 0)
   const resolvedMeta = meta ?? (normalizedMetaParts.length ? normalizedMetaParts.join(metaSeparator) : undefined)
-  const Container = presentation === "plain" ? Box : ContentCard
-
   return (
-    <Container sx={[{ position: "relative" }, sx]}>
+    <Box sx={[{ position: "relative" }, sx]}>
       {action ? <Box sx={{ position: "absolute", top: 0, right: 0 }}>{action}</Box> : null}
       {resolvedMeta && metaPlacement === "above" ? (
         <Typography variant="body2" color="text.secondary" sx={[{ mb: 0.75, pr: action ? 5 : 0 }, metaSx]}>
@@ -63,6 +59,6 @@ export default function ContentItemCard({
         </Typography>
       ) : null}
       {children}
-    </Container>
+    </Box>
   )
 }

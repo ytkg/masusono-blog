@@ -3,9 +3,9 @@ import { describe, expect, it, vi } from "vitest"
 import ArticlesList from "./ArticlesList"
 
 vi.mock("./ArticleCard", () => ({
-  default: ({ article, presentation, sx }) => (
+  default: ({ article, sx }) => (
     <div data-testid={`article-${article.id}`} style={{ paddingBottom: sx?.pb }}>
-      {article.title}:{presentation ?? "card"}
+      {article.title}
     </div>
   ),
 }))
@@ -33,14 +33,13 @@ describe("ArticlesList", () => {
       />,
     )
 
-    expect(screen.getByText("記事1:card")).toBeInTheDocument()
-    expect(screen.getByText("記事2:card")).toBeInTheDocument()
+    expect(screen.getByText("記事1")).toBeInTheDocument()
+    expect(screen.getByText("記事2")).toBeInTheDocument()
   })
 
-  it("区切り線型の記事一覧を描画する", () => {
+  it("区切り線付きの記事一覧を描画する", () => {
     render(
       <ArticlesList
-        variant="divided"
         articles={[
           { id: "a1", title: "記事1" },
           { id: "a2", title: "記事2" },
@@ -48,8 +47,8 @@ describe("ArticlesList", () => {
       />,
     )
 
-    expect(screen.getByText("記事1:plain")).toBeInTheDocument()
-    expect(screen.getByText("記事2:plain")).toBeInTheDocument()
+    expect(screen.getByText("記事1")).toBeInTheDocument()
+    expect(screen.getByText("記事2")).toBeInTheDocument()
     expect(screen.getByTestId("article-a1")).toHaveStyle({ paddingBottom: "2.5px" })
     expect(screen.getByTestId("article-a2")).toHaveStyle({ paddingBottom: "0px" })
   })

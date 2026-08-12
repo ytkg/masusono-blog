@@ -23,7 +23,7 @@ export default function BlogDetail({ article = null }) {
       <SeoHead title={article?.title ?? "ブログ記事"} description={metaDescription} canonicalPath={canonical} />
 
       <PageContainer component="article">
-        <ArticleCard article={article ?? undefined} mode="detail" presentation="plain" />
+        <ArticleCard article={article ?? undefined} mode="detail" />
       </PageContainer>
     </>
   )
