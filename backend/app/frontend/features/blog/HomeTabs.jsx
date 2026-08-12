@@ -12,13 +12,6 @@ export const HOME_TABS = Object.freeze([
     ),
   },
   {
-    id: "recommended",
-    label: "おすすめ",
-    renderContent: ({ recommendedArticles }) => (
-      <ArticlesList articles={recommendedArticles} variant="divided" emptyMessage="おすすめ記事がありません。" />
-    ),
-  },
-  {
     id: "beginnings",
     label: "書き出し",
     renderContent: ({ articles }) => <SentenceFeed articles={articles} />,

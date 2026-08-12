@@ -70,35 +70,9 @@ describe("Home page", () => {
     expect(screen.queryByRole("heading", { name: "ブログ" })).not.toBeInTheDocument()
     expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1 variant:divided")
     expect(screen.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
-    expect(screen.getByRole("tab", { name: "おすすめ" })).toHaveAttribute("aria-selected", "false")
     expect(screen.getByRole("tab", { name: "書き出し" })).toHaveAttribute("aria-selected", "false")
     expect(screen.queryByRole("textbox", { name: "記事を検索" })).not.toBeInTheDocument()
     expect(screen.queryByText("1件")).not.toBeInTheDocument()
-  })
-
-  it("おすすめタブでは初回表示時に選んだランダム5件を表示し続ける", () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.5)
-    const scrollTo = vi.fn()
-    window.scrollTo = scrollTo
-    const articles = Array.from({ length: 8 }, (_, index) => ({
-      id: `article-${index}`,
-      title: `記事${index}`,
-    }))
-
-    render(<Home articles={articles} />)
-
-    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
-
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:5 variant:divided")
-    expect(Math.random).toHaveBeenCalledTimes(7)
-    expect(scrollTo).toHaveBeenCalledWith({ top: 0 })
-
-    fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
-    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
-
-    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:5 variant:divided")
-    expect(Math.random).toHaveBeenCalledTimes(7)
-    expect(scrollTo).toHaveBeenCalledTimes(3)
   })
 
   it("タブを切り替えた時点でホームの表示状態を履歴へ保存する", async () => {
@@ -110,26 +84,22 @@ describe("Home page", () => {
     fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
     fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
 
-    expect(router.remember).toHaveBeenLastCalledWith(
-      { mode: "feed", recommendedArticleIds: ["article-1"], version: 1 },
-      "home-state",
-    )
+    expect(router.remember).toHaveBeenLastCalledWith({ mode: "feed", version: 2 }, "home-state")
   })
 
   it("履歴から戻ったホームでも直前に選んだタブを復元する", () => {
     const screenOne = render(<Home articles={[{ id: "article-1", title: "記事1" }]} />)
 
-    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
+    fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
     screenOne.unmount()
     render(<Home articles={[{ id: "article-1", title: "記事1" }]} />)
 
-    expect(screen.getByRole("tab", { name: "おすすめ" })).toHaveAttribute("aria-selected", "true")
+    expect(screen.getByRole("tab", { name: "書き出し" })).toHaveAttribute("aria-selected", "true")
   })
 
   it("削除済みタブの履歴状態はフィードへフォールバックする", () => {
     rememberedStates.set("home-state", {
       mode: "retired-tab",
-      recommendedArticleIds: ["article-1"],
       version: 1,
     })
 
@@ -152,7 +122,6 @@ describe("Home page", () => {
   it("別ページからホームを明示的に開く場合はフィードから表示する", () => {
     rememberedStates.set("home-state", {
       mode: "beginnings",
-      recommendedArticleIds: ["article-1"],
       version: 1,
     })
     requestHomeFeed()
@@ -170,7 +139,6 @@ describe("Home page", () => {
   it("明示的なホーム遷移の初期化後も、次の戻るではフィードを復元する", () => {
     rememberedStates.set("home-state", {
       mode: "beginnings",
-      recommendedArticleIds: ["article-1"],
       version: 1,
     })
     requestHomeFeed()
@@ -181,5 +149,4 @@ describe("Home page", () => {
 
     expect(screen.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
   })
-
 })

@@ -12,41 +12,28 @@ import SeoHead from "../shared/SeoHead"
 
 const HOME_TAB_HEIGHT = 38
 const HOME_STATE_KEY = "home-state"
-const HOME_STATE_VERSION = 1
+const HOME_STATE_VERSION = 2
 
 const compactTabSx = {
   minHeight: HOME_TAB_HEIGHT,
   py: 0.75,
 }
 
-function pickRandomArticleIds(articles, count) {
-  return [...articles]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, count)
-    .map((article) => article.id)
-}
-
 function normalizeHomeState(state, fallbackState) {
   return {
     ...fallbackState,
-    ...state,
     mode: isHomeTabId(state?.mode) ? state.mode : DEFAULT_HOME_TAB_ID,
-    recommendedArticleIds: Array.isArray(state?.recommendedArticleIds)
-      ? state.recommendedArticleIds
-      : fallbackState.recommendedArticleIds,
     version: HOME_STATE_VERSION,
   }
 }
 
 export default function Home({ articles = [] }) {
-  const initialRecommendedArticleIds = useMemo(() => pickRandomArticleIds(articles, 5), [articles])
   const initialHomeState = useMemo(
     () => ({
       mode: DEFAULT_HOME_TAB_ID,
-      recommendedArticleIds: initialRecommendedArticleIds,
       version: HOME_STATE_VERSION,
     }),
-    [initialRecommendedArticleIds],
+    [],
   )
   const [shouldStartOnFeed, setShouldStartOnFeed] = useState(consumeHomeFeedIntent)
   const [homeState, setHomeState] = useRemember(initialHomeState, HOME_STATE_KEY)
@@ -54,12 +41,6 @@ export default function Home({ articles = [] }) {
   const displayedHomeState = shouldStartOnFeed ? initialHomeState : normalizedHomeState
   const homeStateRef = useRef(displayedHomeState)
   const hasAppliedHomeFeedIntentRef = useRef(false)
-  const recommendedArticles = useMemo(() => {
-    const articlesById = new Map(articles.map((article) => [article.id, article]))
-
-    return displayedHomeState.recommendedArticleIds.map((id) => articlesById.get(id)).filter(Boolean)
-  }, [articles, displayedHomeState.recommendedArticleIds])
-
   const commitHomeState = useCallback(
     (nextState) => {
       const versionedState = { ...nextState, version: HOME_STATE_VERSION }
@@ -132,7 +113,6 @@ export default function Home({ articles = [] }) {
           <Box sx={{ pt: 1 }}>
             {HOME_TABS.find((tab) => tab.id === displayedHomeState.mode)?.renderContent({
               articles,
-              recommendedArticles,
             })}
           </Box>
         </Box>
