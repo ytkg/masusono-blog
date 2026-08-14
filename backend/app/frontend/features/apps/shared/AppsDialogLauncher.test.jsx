@@ -18,7 +18,7 @@ describe("AppsDialogLauncher", () => {
     fireEvent.click(screen.getByRole("button", { name: "アプリを開く" }))
 
     expect(onOpen).toHaveBeenCalledTimes(1)
-    expect(await screen.findByRole("heading", { name: "Numbers" })).toBeInTheDocument()
+    expect(await screen.findByRole("heading", { name: "Numbers" }, { timeout: 2_000 })).toBeInTheDocument()
     expect(screen.getByText("現在のデータ")).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "閉じる" }))
@@ -41,7 +41,7 @@ describe("AppsDialogLauncher", () => {
     )
 
     fireEvent.click(screen.getByRole("button", { name: "アプリを開く" }))
-    await screen.findByRole("heading", { name: "Numbers" })
+    await screen.findByRole("heading", { name: "Numbers" }, { timeout: 2_000 })
     fireEvent.keyDown(document.querySelector(".MuiDialog-root"), { key: "Escape" })
 
     await waitFor(() => {
@@ -86,7 +86,7 @@ describe("AppsDialogLauncher", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("app-content")).toBeVisible()
-    })
+    }, { timeout: 2_000 })
     expect(loadingIndicator).not.toBeVisible()
   })
 })

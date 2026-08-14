@@ -10,8 +10,8 @@ import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Transition } from "react-transition-group"
 
-const animationDuration = { enter: 350, exit: 250 }
-const animationEasing = "cubic-bezier(0.2, 0.8, 0.2, 1)"
+const animationDuration = { enter: 500, exit: 300 }
+const animationEasing = "cubic-bezier(0.16, 1, 0.3, 1)"
 const completionDisplayDuration = 500
 
 const launcherContainerSx = {
@@ -155,7 +155,6 @@ const LauncherZoomTransition = forwardRef(function LauncherZoomTransition(
             transition: `opacity ${isVisible ? 180 : 120}ms ${animationEasing} ${isVisible ? 110 : 0}ms`,
           },
         })
-
         return cloneElement(children, {
           ref: setTransitionRef,
           children: surface,
