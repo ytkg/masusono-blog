@@ -70,4 +70,23 @@ describe("AppsDialogLauncher", () => {
       position: "fixed",
     })
   })
+
+  it("拡大中は起動アイコンを表示し、完了後にアプリ本体を表示する", async () => {
+    render(
+      <AppsDialogLauncher title="Numbers" buttonAriaLabel="アプリを開く">
+        <div>現在のデータ</div>
+      </AppsDialogLauncher>,
+    )
+
+    fireEvent.click(screen.getByRole("button", { name: "アプリを開く" }))
+
+    const loadingIndicator = screen.getByRole("status", { name: "Numbersを読み込み中" })
+    expect(loadingIndicator).toBeVisible()
+    expect(screen.getByTestId("app-content")).not.toBeVisible()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("app-content")).toBeVisible()
+    })
+    expect(loadingIndicator).not.toBeVisible()
+  })
 })

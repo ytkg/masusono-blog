@@ -1,16 +1,18 @@
-import { cloneElement, forwardRef, useId, useRef, useState } from "react"
+import { cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from "react"
 import AppsIcon from "@mui/icons-material/Apps"
 import CloseIcon from "@mui/icons-material/Close"
 import Box from "@mui/material/Box"
 import Dialog from "@mui/material/Dialog"
 import Fade from "@mui/material/Fade"
 import IconButton from "@mui/material/IconButton"
+import LinearProgress from "@mui/material/LinearProgress"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Transition } from "react-transition-group"
 
 const animationDuration = { enter: 350, exit: 250 }
 const animationEasing = "cubic-bezier(0.2, 0.8, 0.2, 1)"
+const completionDisplayDuration = 500
 
 const launcherContainerSx = {
   display: "flex",
@@ -73,6 +75,30 @@ const closeButtonSx = {
   width: 44,
   height: 44,
   "&:hover": { bgcolor: "transparent" },
+}
+
+const loadingIconSx = {
+  width: "50%",
+  aspectRatio: "1",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: 4,
+  bgcolor: "common.white",
+  color: "common.black",
+  "& svg": { width: "60%", height: "60%", fontSize: "inherit" },
+}
+
+const visuallyHiddenSx = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  p: 0,
+  m: -1,
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0,
 }
 
 function setRef(ref, value) {
@@ -169,6 +195,10 @@ export default function AppsDialogLauncher({
 }) {
   const [open, setOpen] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isTransitionComplete, setIsTransitionComplete] = useState(false)
+  const [isContentVisible, setIsContentVisible] = useState(false)
+  const [loadingTasks, setLoadingTasks] = useState({})
+  const loadingTaskIdRef = useRef(0)
   const [transitionOrigin, setTransitionOrigin] = useState({
     left: 0,
     top: 0,
@@ -198,15 +228,34 @@ export default function AppsDialogLauncher({
     })
   }
 
+  const registerLoadingTask = useCallback((task) => {
+    const taskId = loadingTaskIdRef.current
+    loadingTaskIdRef.current += 1
+    setLoadingTasks((tasks) => ({ ...tasks, [taskId]: false }))
+
+    Promise.resolve(task)
+      .catch(() => {
+        // 失敗した読み込みも完了として扱い、起動画面に留まり続けないようにする
+      })
+      .finally(() => {
+        setLoadingTasks((tasks) => (Object.hasOwn(tasks, taskId) ? { ...tasks, [taskId]: true } : tasks))
+      })
+  }, [])
+
   const handleOpen = () => {
     updateTransitionOrigin()
+    setIsTransitionComplete(false)
+    setIsContentVisible(false)
+    setLoadingTasks({})
     setIsTransitioning(true)
-    onOpen?.()
+    onOpen?.(registerLoadingTask)
     setOpen(true)
   }
 
   const handleClose = () => {
     updateTransitionOrigin()
+    setIsTransitionComplete(false)
+    setIsContentVisible(false)
     setIsTransitioning(true)
     setOpen(false)
     onClose?.()
@@ -214,6 +263,7 @@ export default function AppsDialogLauncher({
 
   const handleEntered = () => {
     setIsTransitioning(false)
+    setIsTransitionComplete(true)
     window.dispatchEvent(new Event("resize"))
   }
 
@@ -221,6 +271,22 @@ export default function AppsDialogLauncher({
     setIsTransitioning(false)
     launcherButtonRef.current?.focus()
   }
+
+  const loadingTaskCount = Object.keys(loadingTasks).length
+  const completedTaskCount = Object.values(loadingTasks).filter(Boolean).length
+  const isLoadingComplete = isTransitionComplete && completedTaskCount === loadingTaskCount
+  const progressValue = loadingTaskCount === 0 ? 0 : Math.round((completedTaskCount / loadingTaskCount) * 100)
+  const appChildren = isValidElement(children) ? cloneElement(children, { registerLoadingTask }) : children
+
+  useEffect(() => {
+    if (!isLoadingComplete) {
+      setIsContentVisible(false)
+      return undefined
+    }
+
+    const timer = window.setTimeout(() => setIsContentVisible(true), completionDisplayDuration)
+    return () => window.clearTimeout(timer)
+  }, [isLoadingComplete])
 
   return (
     <Box sx={launcherContainerSx}>
@@ -252,7 +318,49 @@ export default function AppsDialogLauncher({
         }}
         PaperProps={{ sx: dialogPaperSx }}
       >
-        <Box sx={dialogContentSx}>
+        <Box
+          role="status"
+          aria-label={`${title}を読み込み中`}
+          aria-live="polite"
+          aria-hidden={isContentVisible}
+          sx={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 3,
+            color: "common.white",
+            opacity: isContentVisible ? 0 : 1,
+            transition: "opacity 180ms ease",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        >
+          <Box sx={loadingIconSx}>{buttonIcon ?? <AppsIcon />}</Box>
+          <Box sx={{ width: "50%" }}>
+            <LinearProgress
+              variant="determinate"
+              value={progressValue}
+              aria-label={`${title}の読み込み進捗`}
+              aria-valuetext={`${completedTaskCount} / ${loadingTaskCount}`}
+              sx={{ height: 10, borderRadius: 5 }}
+            />
+          </Box>
+          <Box component="span" sx={visuallyHiddenSx}>{`${title}を読み込み中`}</Box>
+        </Box>
+        <Box
+          data-testid="app-content"
+          aria-hidden={!isContentVisible}
+          inert={isContentVisible ? undefined : ""}
+          sx={{
+            ...dialogContentSx,
+            opacity: isContentVisible ? 1 : 0,
+            transition: "opacity 180ms ease",
+            pointerEvents: isContentVisible ? "auto" : "none",
+          }}
+        >
           <Box sx={dialogHeaderSx}>
             <Typography id={titleId} variant="h5" component="h2" sx={{ fontWeight: 600 }}>
               {title}
@@ -264,7 +372,7 @@ export default function AppsDialogLauncher({
               </IconButton>
             </Box>
           </Box>
-          <Box sx={dialogBodySx}>{children}</Box>
+          <Box sx={dialogBodySx}>{appChildren}</Box>
         </Box>
       </Dialog>
     </Box>

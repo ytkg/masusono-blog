@@ -66,7 +66,7 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
   )
 }
 
-export function SettingsContent({ loadOnMount = false }) {
+export function SettingsContent({ loadOnMount = false, registerLoadingTask }) {
   const [name, setName] = useState(DEFAULT_NAME)
   const [draftName, setDraftName] = useState(name)
   const [isEditing, setIsEditing] = useState(false)
@@ -93,8 +93,11 @@ export function SettingsContent({ loadOnMount = false }) {
   useEffect(() => {
     if (!loadOnMount) return
 
-    void loadCurrentUser()
-  }, [loadCurrentUser, loadOnMount])
+    const task = loadCurrentUser()
+    if (registerLoadingTask) {
+      registerLoadingTask(task)
+    }
+  }, [loadCurrentUser, loadOnMount, registerLoadingTask])
 
   const startEditing = () => {
     setDraftName(name)

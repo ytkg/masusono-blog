@@ -59,7 +59,14 @@ const BUTTON_LABELS = Object.freeze({
   gameover: "リスタート",
 })
 
-export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
+export default function MasudaRunGame({
+  rankings,
+  rankingsLoading,
+  rankingsError,
+  rankingsFetchError,
+  onScoreSubmit,
+  registerLoadingTask,
+}) {
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
   const scaleRef = useRef(1)
@@ -74,6 +81,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
   const [restartReadyAt, setRestartReadyAt] = useState(0)
   const roundIdRef = useRef(0)
   const submittedRoundIdRef = useRef(0)
+  const rankingsLoadingTaskRef = useRef(null)
 
   const world = useRef(createInitialWorld())
 
@@ -86,7 +94,24 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
     obsShortRef,
     obsTallRef,
     sources: { player: charImgSrc, short: obsShortSrc, tall: obsTallSrc },
+    registerLoadingTask,
   })
+
+  useEffect(() => {
+    if (rankingsLoading && !rankingsLoadingTaskRef.current) {
+      let finishLoading
+      const task = new Promise((resolve) => {
+        finishLoading = resolve
+      })
+      rankingsLoadingTaskRef.current = finishLoading
+      registerLoadingTask?.(task)
+    }
+
+    if (!rankingsLoading && rankingsLoadingTaskRef.current) {
+      rankingsLoadingTaskRef.current()
+      rankingsLoadingTaskRef.current = null
+    }
+  }, [rankingsLoading, registerLoadingTask])
 
   const startOrRestart = useCallback(() => {
     const now = getNow()
