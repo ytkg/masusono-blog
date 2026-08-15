@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react"
 import { getUserIdFromCookie } from "@/shared/lib/userId"
 import { fetchJson, postJson } from "@/shared/lib/fetchJson"
 import AppsDialogLauncher from "../shared/AppsDialogLauncher"
+import { useAppLoading } from "../shared/AppsLoadingContext"
 
 const DEFAULT_NAME = "NO NAME"
 const labelTextSx = { fontSize: "14px" }
@@ -66,7 +67,8 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
   )
 }
 
-export function SettingsContent({ loadOnMount = false, registerLoadingTask }) {
+export function SettingsContent({ loadOnMount = false }) {
+  const registerLoadingTask = useAppLoading()
   const [name, setName] = useState(DEFAULT_NAME)
   const [draftName, setDraftName] = useState(name)
   const [isEditing, setIsEditing] = useState(false)
@@ -94,9 +96,7 @@ export function SettingsContent({ loadOnMount = false, registerLoadingTask }) {
     if (!loadOnMount) return
 
     const task = loadCurrentUser()
-    if (registerLoadingTask) {
-      registerLoadingTask(task)
-    }
+    registerLoadingTask(task)
   }, [loadCurrentUser, loadOnMount, registerLoadingTask])
 
   const startEditing = () => {

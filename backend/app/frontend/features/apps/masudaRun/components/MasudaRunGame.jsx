@@ -11,6 +11,7 @@ import { useMasudaRunLoop } from "../hooks/useMasudaRunLoop"
 import { useMasudaRunRestartCooldown } from "../hooks/useMasudaRunRestartCooldown"
 import MasudaRunRankings from "./MasudaRunRankings"
 import { CFG, createInitialWorld, getNow, getStoredHighScore } from "../lib"
+import { useAppLoading } from "../../shared/AppsLoadingContext"
 
 const containerSx = {
   display: "flex",
@@ -65,8 +66,8 @@ export default function MasudaRunGame({
   rankingsError,
   rankingsFetchError,
   onScoreSubmit,
-  registerLoadingTask,
 }) {
+  const registerLoadingTask = useAppLoading()
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
   const scaleRef = useRef(1)

@@ -1,5 +1,7 @@
 import { useEffect } from "react"
 
+const noop = () => {}
+
 const initImageRef = (ref, src) => {
   const img = new Image()
   const loaded = new Promise((resolve) => {
@@ -10,25 +12,24 @@ const initImageRef = (ref, src) => {
     img.onerror = resolve
   })
   img.src = src
-  const cleanup = () => {
+  const dispose = () => {
     ref.current = null
   }
-  cleanup.loaded = loaded
-  return cleanup
+  return { loaded, dispose }
 }
 
-export const useMasudaRunAssets = ({ imgRef, obsShortRef, obsTallRef, sources, registerLoadingTask }) => {
+export const useMasudaRunAssets = ({ imgRef, obsShortRef, obsTallRef, sources, registerLoadingTask = noop }) => {
   useEffect(() => {
     const assets = [
       initImageRef(imgRef, sources.player),
       initImageRef(obsShortRef, sources.short),
       initImageRef(obsTallRef, sources.tall),
     ]
-    for (const asset of assets) registerLoadingTask?.(asset.loaded)
+    for (const asset of assets) registerLoadingTask(asset.loaded)
     return () => {
-      for (const cleanup of assets) {
-        cleanup()
+      for (const asset of assets) {
+        asset.dispose()
       }
     }
-  }, [imgRef, obsShortRef, obsTallRef, sources.player, sources.short, sources.tall])
+  }, [imgRef, obsShortRef, obsTallRef, registerLoadingTask, sources.player, sources.short, sources.tall])
 }

@@ -1,4 +1,4 @@
-import { cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from "react"
+import { cloneElement, forwardRef, useCallback, useEffect, useId, useRef, useState } from "react"
 import AppsIcon from "@mui/icons-material/Apps"
 import CloseIcon from "@mui/icons-material/Close"
 import Box from "@mui/material/Box"
@@ -9,6 +9,7 @@ import LinearProgress from "@mui/material/LinearProgress"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Transition } from "react-transition-group"
+import { AppsLoadingProvider } from "./AppsLoadingContext"
 
 const animationDuration = { enter: 500, exit: 300 }
 const animationEasing = "cubic-bezier(0.16, 1, 0.3, 1)"
@@ -275,7 +276,6 @@ export default function AppsDialogLauncher({
   const completedTaskCount = Object.values(loadingTasks).filter(Boolean).length
   const isLoadingComplete = isTransitionComplete && completedTaskCount === loadingTaskCount
   const progressValue = loadingTaskCount === 0 ? 0 : Math.round((completedTaskCount / loadingTaskCount) * 100)
-  const appChildren = isValidElement(children) ? cloneElement(children, { registerLoadingTask }) : children
 
   useEffect(() => {
     if (!isLoadingComplete) {
@@ -371,7 +371,9 @@ export default function AppsDialogLauncher({
               </IconButton>
             </Box>
           </Box>
-          <Box sx={dialogBodySx}>{appChildren}</Box>
+          <AppsLoadingProvider value={registerLoadingTask}>
+            <Box sx={dialogBodySx}>{children}</Box>
+          </AppsLoadingProvider>
         </Box>
       </Dialog>
     </Box>
