@@ -15,7 +15,7 @@ export default function ArticleTags({ tags }) {
   if (!normalizedTags.length) return null
 
   return (
-    <Box data-testid="article-tags" sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mb: 1.5 }}>
+    <Box data-testid="article-tags" sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mb: 1 }}>
       {normalizedTags.map((tag) => (
         <Chip
           key={tag}

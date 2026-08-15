@@ -4,7 +4,7 @@ import ArticlesList from "./ArticlesList"
 
 vi.mock("./ArticleCard", () => ({
   default: ({ article, sx }) => (
-    <div data-testid={`article-${article.id}`} style={{ paddingBottom: sx?.pb }}>
+    <div data-testid={`article-${article.id}`} style={{ paddingTop: sx?.pt, paddingBottom: sx?.pb }}>
       {article.title}
     </div>
   ),
@@ -49,7 +49,7 @@ describe("ArticlesList", () => {
 
     expect(screen.getByText("記事1")).toBeInTheDocument()
     expect(screen.getByText("記事2")).toBeInTheDocument()
-    expect(screen.getByTestId("article-a1")).toHaveStyle({ paddingBottom: "2.5px" })
-    expect(screen.getByTestId("article-a2")).toHaveStyle({ paddingBottom: "0px" })
+    expect(screen.getByTestId("article-a1")).toHaveStyle({ paddingTop: "0px", paddingBottom: "1.5px" })
+    expect(screen.getByTestId("article-a2")).toHaveStyle({ paddingTop: "1.5px", paddingBottom: "0px" })
   })
 })

@@ -62,6 +62,7 @@ export default function ArticleCard({ article, mode = "list", sx }) {
       title={article.title}
       titleVariant="h6"
       titleComponent={isDetail ? "h1" : "h3"}
+      titleSx={{ mb: 0.5 }}
       titleTo={isList ? `/articles/${article.id}` : undefined}
       meta={undefined}
       metaPlacement={isList ? "above" : "below"}
