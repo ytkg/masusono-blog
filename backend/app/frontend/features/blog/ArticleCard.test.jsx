@@ -93,7 +93,7 @@ describe("ArticleCard", () => {
     expect(screen.getByRole("link", { name: "本文リンク" })).toHaveStyle({ textDecoration: "underline" })
   })
 
-  it("ブログ本文は薄めの色で表示する", () => {
+  it("ブログ本文は主文字色で表示する", () => {
     render(
       <ArticleCard
         mode="detail"
@@ -107,7 +107,7 @@ describe("ArticleCard", () => {
       />,
     )
 
-    expect(screen.getByTestId("article-body-html")).toHaveStyle({ color: "rgba(0, 0, 0, 0.6)" })
+    expect(screen.getByTestId("article-body-html")).toHaveStyle({ color: "rgba(0, 0, 0, 0.87)" })
   })
 
   it("本文内画像には角丸スタイルを付ける", () => {

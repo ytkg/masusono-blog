@@ -1,5 +1,5 @@
 export const articleBodyHtmlSx = {
-  color: "text.secondary",
+  color: "text.primary",
   "& img": { maxWidth: "100%", height: "auto", borderRadius: "12px" },
   "& p": { margin: "0 0 1em" },
   overflowWrap: "anywhere",

@@ -54,7 +54,7 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
       {showsHtml ? (
         <ArticleHtml enableRubyRunner={showsRubyRunner} html={html} />
       ) : (
-        <Typography color="text.secondary" sx={{ lineHeight: 1.8, overflowWrap: "anywhere" }}>
+        <Typography sx={{ color: "text.primary", lineHeight: 1.8, overflowWrap: "anywhere" }}>
           {excerpt}
         </Typography>
       )}

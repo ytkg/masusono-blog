@@ -14,12 +14,16 @@ describe("ArticleBody", () => {
 
     render(<ArticleBody html={html} hasBody shouldCollapse />)
 
-    expect(screen.getByText(`${"あ".repeat(80)}…`)).toBeInTheDocument()
+    const excerpt = screen.getByText(`${"あ".repeat(80)}…`)
+
     expect(screen.queryByTestId("article-body-html")).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "続きを読む" }))
 
-    expect(screen.getByTestId("article-body-html")).toHaveTextContent("あ".repeat(81))
+    const expandedBody = screen.getByTestId("article-body-html")
+
+    expect(expandedBody).toHaveTextContent("あ".repeat(81))
+    expect(getComputedStyle(excerpt).color).toBe(getComputedStyle(expandedBody).color)
     expect(screen.getByRole("button", { name: "閉じる" })).toBeInTheDocument()
   })
 
