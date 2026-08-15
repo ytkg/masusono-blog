@@ -84,9 +84,12 @@ describe("AppsDialogLauncher", () => {
     expect(loadingIndicator).toBeVisible()
     expect(screen.getByTestId("app-content")).not.toBeVisible()
 
-    await waitFor(() => {
-      expect(screen.getByTestId("app-content")).toBeVisible()
-    }, { timeout: 2_000 })
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("app-content")).toBeVisible()
+      },
+      { timeout: 2_000 },
+    )
     expect(loadingIndicator).not.toBeVisible()
   })
 })

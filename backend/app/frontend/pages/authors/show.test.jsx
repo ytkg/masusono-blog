@@ -11,11 +11,7 @@ vi.mock("../../shared/SeoHead", () => ({
 }))
 
 vi.mock("../../features/blog/ArticlesList", () => ({
-  default: ({ articles }) => (
-    <div>
-      articles:{articles.length}
-    </div>
-  ),
+  default: ({ articles }) => <div>articles:{articles.length}</div>,
 }))
 
 describe("AuthorShow page", () => {

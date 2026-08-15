@@ -60,13 +60,7 @@ const BUTTON_LABELS = Object.freeze({
   gameover: "リスタート",
 })
 
-export default function MasudaRunGame({
-  rankings,
-  rankingsLoading,
-  rankingsError,
-  rankingsFetchError,
-  onScoreSubmit,
-}) {
+export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
   const registerLoadingTask = useAppLoading()
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)

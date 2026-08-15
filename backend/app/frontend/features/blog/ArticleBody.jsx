@@ -54,9 +54,7 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
       {showsHtml ? (
         <ArticleHtml enableRubyRunner={showsRubyRunner} html={html} />
       ) : (
-        <Typography sx={{ color: "text.primary", lineHeight: 1.8, overflowWrap: "anywhere" }}>
-          {excerpt}
-        </Typography>
+        <Typography sx={{ color: "text.primary", lineHeight: 1.8, overflowWrap: "anywhere" }}>{excerpt}</Typography>
       )}
       {canExpand ? (
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
