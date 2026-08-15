@@ -25,6 +25,7 @@ export default function ArticleTags({ tags }) {
           size="small"
           variant="outlined"
           clickable
+          sx={{ color: "text.secondary", borderColor: "divider" }}
         />
       ))}
     </Box>
