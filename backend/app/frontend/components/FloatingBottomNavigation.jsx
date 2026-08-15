@@ -9,6 +9,7 @@ const INDICATOR_HALF_WIDTH = 16
 const INDICATOR_TRANSITION_DURATION = 280
 const NAVIGATION_HEIGHT = 56
 const NAVIGATION_LABEL_FONT_SIZE = "0.72rem"
+const NAVIGATION_PREFETCH_MODES = Object.freeze(["hover", "mount"])
 
 function matchesNavigationPath(path, href) {
   if (href === "/") return path === "/"
@@ -22,6 +23,10 @@ function currentNavigationIndex(path) {
 
 function navigationPathFromUrl(url) {
   return String(url || "/").split("?")[0]
+}
+
+function prefetchModesForNavigation(tab, active) {
+  return tab.value === active ? false : NAVIGATION_PREFETCH_MODES
 }
 
 export default function FloatingBottomNavigation() {
@@ -118,7 +123,7 @@ export default function FloatingBottomNavigation() {
             icon={tab.icon}
             component={Link}
             href={tab.href}
-            prefetch
+            prefetch={prefetchModesForNavigation(tab, active)}
             onClick={tab.href === "/" ? requestHomeFeed : undefined}
           />
         ))}

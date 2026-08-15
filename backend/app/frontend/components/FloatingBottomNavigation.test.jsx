@@ -6,9 +6,9 @@ import FloatingBottomNavigation from "./FloatingBottomNavigation"
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
   return {
-    Link: React.forwardRef(function MockLink({ href, prefetch: _prefetch, children, ...props }, ref) {
+    Link: React.forwardRef(function MockLink({ href, prefetch, children, ...props }, ref) {
       return (
-        <a ref={ref} href={href} {...props}>
+        <a ref={ref} href={href} data-prefetch={prefetch ? JSON.stringify(prefetch) : undefined} {...props}>
           {children}
         </a>
       )
@@ -32,6 +32,20 @@ describe("FloatingBottomNavigation", () => {
     expect(screen.getByText("ホーム").closest(".Mui-selected")).not.toBeNull()
     expect(screen.queryByText(/©/)).not.toBeInTheDocument()
     expect(screen.queryByText("増田とその他！")).not.toBeInTheDocument()
+  })
+
+  it("現在のページ以外を表示時とホバー時に先読みする", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/search" })
+
+    render(<FloatingBottomNavigation />)
+
+    expect(screen.getByText("検索").closest("a")).not.toHaveAttribute("data-prefetch")
+
+    const prefetchedLabels = ["ホーム", "著者", "数字", "その他！"]
+
+    prefetchedLabels.forEach((label) => {
+      expect(screen.getByText(label).closest("a")).toHaveAttribute("data-prefetch", '["hover","mount"]')
+    })
   })
 
   it("画面下部に固定された pill 型ナビゲーションとして表示する", () => {
