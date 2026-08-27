@@ -141,6 +141,50 @@ docker compose run --rm backend bundle exec rails articles:apply_tag_updates_fro
 - `ApiController` 配下のレスポンスは `Cache-Control: no-store` を返します
 - Cloud Run のウォーム維持方針は `docs/cloud-run-warmup-strategy.md` を参照してください
 
+## Web Push
+
+ブラウザの「その他」→「設定」から通知を有効にすると、端末ごとのPush subscriptionをmicroCMSへ保存します。通知の許可は、利用者が「通知を受け取る」を押した場合にのみ要求します。
+
+### microCMSの準備
+
+複数コンテンツ形式で `web_push_subscriptions` APIを作成し、次のテキストフィールドを追加します。
+
+- `endpoint`
+- `p256dh`
+- `auth`
+
+このAPIは管理用データなので、コンテンツAPIキーは公開せず、Rails credentialsの既存 `microcms.api_key` だけでアクセスします。
+
+### VAPID鍵の準備
+
+次のコマンドで鍵ペアを生成し、標準出力をRails credentialsへ保存します。出力される秘密鍵はコミット・共有しません。
+
+```bash
+cd backend
+rbenv exec bin/rails web_push:generate_vapid_keys
+rbenv exec bin/rails credentials:edit
+```
+
+credentialsには次の形で設定します。`vapid_subject` は運用連絡先のメールアドレスまたはHTTPS URLです。
+
+```yaml
+web_push:
+  vapid_public_key: "..."
+  vapid_private_key: "..."
+  vapid_subject: "mailto:YOUR_EMAIL@example.com"
+```
+
+### 通知の送信
+
+デプロイ済み環境で、管理者だけが次のコマンドを実行します。`URL` はサイト内の絶対パスを指定します。
+
+```bash
+cd backend
+TITLE='お知らせ' BODY='好きな本文を送れます' URL='/articles/example' rbenv exec bin/rails web_push:send
+```
+
+有効な全購読端末へ送信し、配信先から無効と判断された購読はmicroCMSから自動削除します。
+
 ## APIエラーレスポンス仕様
 
 API で例外が発生した場合、レスポンス形式は次に統一します。

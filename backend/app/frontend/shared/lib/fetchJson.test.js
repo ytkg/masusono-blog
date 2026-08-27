@@ -19,6 +19,14 @@ describe("fetchJson", () => {
     expect(response.json).toHaveBeenCalledTimes(1)
   })
 
+  it("204 No Content は JSON として解析せず null を返す", async () => {
+    const response = { ok: true, status: 204, json: vi.fn() }
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response))
+
+    await expect(fetchJson("/api/example.json")).resolves.toBeNull()
+    expect(response.json).not.toHaveBeenCalled()
+  })
+
   it("HTTP エラー時は例外を投げる", async () => {
     vi.stubGlobal(
       "fetch",

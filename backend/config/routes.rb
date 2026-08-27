@@ -22,6 +22,11 @@ Rails.application.routes.draw do
     namespace :app do
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }
 
+      namespace :web_push do
+        resource :vapid_key, only: :show, controller: "vapid_keys", defaults: { format: :json }
+        resource :subscription, only: %i[create destroy], controller: "subscriptions", defaults: { format: :json }
+      end
+
       namespace :masuda_run do
         resources :rankings, only: %i[index create]
       end

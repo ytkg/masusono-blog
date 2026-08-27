@@ -2,7 +2,7 @@
 
 この文書は現行 backend API のレスポンス契約の正本です。
 
-- 対象: `GET /api/app/numbers/metrics.json`, `GET /api/app/masuda_run/rankings.json`, `GET /sitemap.xml`, `GET /feed.xml`
+- 対象: `GET /api/app/numbers/metrics.json`, `GET /api/app/masuda_run/rankings.json`, Web Push API, `GET /sitemap.xml`, `GET /feed.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
 ## GET /api/app/numbers/metrics.json
@@ -39,6 +39,24 @@
 | `score` | `Numeric` | No | スコア |
 | `rankedAt` | `String` | No | 形式: `YYYY/MM/DD` |
 | `rank` | `Integer` | No | 順位 |
+
+## Web Push API
+
+### GET /api/app/web_push/vapid_key.json
+
+| key | type | nullable | note |
+| --- | --- | --- | --- |
+| `publicKey` | `String` | No | VAPID公開鍵。Push subscriptionの作成にだけ使用する |
+
+### POST /api/app/web_push/subscription.json
+
+- Request: `{ "subscription": { "endpoint": "String", "keys": { "p256dh": "String", "auth": "String" } } }`
+- Response (`201 Created`): `{ "id": "String" }`
+
+### DELETE /api/app/web_push/subscription.json
+
+- Request: `{ "endpoint": "String" }`
+- Response: `204 No Content`
 
 ## GET /sitemap.xml
 

@@ -95,3 +95,31 @@ self.addEventListener("activate", (event) => {
 })
 
 self.addEventListener("fetch", onFetch)
+
+self.addEventListener("push", (event) => {
+  const payload = event.data?.json() || {}
+  const title = typeof payload.title === "string" && payload.title.trim() ? payload.title : "増田とその他！"
+  const body = typeof payload.body === "string" ? payload.body : ""
+  const url = typeof payload.url === "string" && payload.url.startsWith("/") ? payload.url : "/"
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url },
+    }),
+  )
+})
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close()
+  const targetUrl = new URL(event.notification.data?.url || "/", self.location.origin).href
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      const existing = clients.find((client) => client.url === targetUrl)
+      return existing ? existing.focus() : self.clients.openWindow(targetUrl)
+    }),
+  )
+})

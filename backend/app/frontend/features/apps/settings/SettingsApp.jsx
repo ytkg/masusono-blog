@@ -10,6 +10,7 @@ import { getUserIdFromCookie } from "@/shared/lib/userId"
 import { fetchJson, postJson } from "@/shared/lib/fetchJson"
 import AppsDialogLauncher from "../shared/AppsDialogLauncher"
 import { useAppLoading } from "../shared/AppsLoadingContext"
+import { getWebPushState, subscribeToWebPush, unsubscribeFromWebPush } from "./webPush"
 
 const DEFAULT_NAME = "NO NAME"
 const labelTextSx = { fontSize: "14px" }
@@ -67,6 +68,58 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
   )
 }
 
+function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUnsubscribe }) {
+  if (!state.supported) {
+    return (
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
+            通知
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            このブラウザは通知に対応していません。
+          </Typography>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const denied = state.permission === "denied"
+  return (
+    <Card variant="outlined">
+      <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.25, py: 1.5 }}>
+        <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
+          通知
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {state.subscribed ? "新しいお知らせを通知で受け取ります。" : "新しいお知らせを通知で受け取れます。"}
+        </Typography>
+        {denied ? (
+          <Typography variant="body2" color="text.secondary">
+            ブラウザのサイト設定から通知を許可してください。
+          </Typography>
+        ) : (
+          <Box>
+            <Button
+              variant={state.subscribed ? "outlined" : "contained"}
+              size="small"
+              disabled={isSaving}
+              onClick={state.subscribed ? onUnsubscribe : onSubscribe}
+            >
+              {isSaving ? "更新中..." : state.subscribed ? "通知を停止" : "通知を受け取る"}
+            </Button>
+          </Box>
+        )}
+        {errorMessage ? (
+          <Typography variant="body2" color="error">
+            {errorMessage}
+          </Typography>
+        ) : null}
+      </CardContent>
+    </Card>
+  )
+}
+
 export function SettingsContent({ loadOnMount = false }) {
   const registerLoadingTask = useAppLoading()
   const [name, setName] = useState(DEFAULT_NAME)
@@ -74,6 +127,9 @@ export function SettingsContent({ loadOnMount = false }) {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [webPushState, setWebPushState] = useState({ supported: true, subscribed: false, permission: "default" })
+  const [isUpdatingWebPush, setIsUpdatingWebPush] = useState(false)
+  const [webPushError, setWebPushError] = useState("")
 
   const loadCurrentUser = useCallback(async () => {
     if (isEditing) return
@@ -98,6 +154,17 @@ export function SettingsContent({ loadOnMount = false }) {
     const task = loadCurrentUser()
     registerLoadingTask(task)
   }, [loadCurrentUser, loadOnMount, registerLoadingTask])
+
+  useEffect(() => {
+    if (!loadOnMount) return
+
+    const task = getWebPushState()
+      .then(setWebPushState)
+      .catch(() => {
+        setWebPushState({ supported: false, subscribed: false, permission: "unsupported" })
+      })
+    registerLoadingTask(task)
+  }, [loadOnMount, registerLoadingTask])
 
   const startEditing = () => {
     setDraftName(name)
@@ -132,6 +199,18 @@ export function SettingsContent({ loadOnMount = false }) {
     }
   }
 
+  const updateWebPush = async (operation) => {
+    setIsUpdatingWebPush(true)
+    setWebPushError("")
+    try {
+      setWebPushState(await operation())
+    } catch (_error) {
+      setWebPushError("通知設定の更新に失敗しました")
+    } finally {
+      setIsUpdatingWebPush(false)
+    }
+  }
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
       <NameSection
@@ -142,6 +221,13 @@ export function SettingsContent({ loadOnMount = false }) {
         onStartEditing={startEditing}
         onSave={saveName}
         onDraftChange={setDraftName}
+      />
+      <NotificationsSection
+        state={webPushState}
+        isSaving={isUpdatingWebPush}
+        errorMessage={webPushError}
+        onSubscribe={() => updateWebPush(subscribeToWebPush)}
+        onUnsubscribe={() => updateWebPush(unsubscribeFromWebPush)}
       />
       {errorMessage ? (
         <Typography variant="body2" color="error">

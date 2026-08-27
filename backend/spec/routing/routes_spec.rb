@@ -49,6 +49,18 @@ RSpec.describe "Web routes", type: :routing do
     expect(post: "/api/app/users.json").to route_to("api/app/users#create", format: "json")
   end
 
+  it "routes GET /api/app/web_push/vapid_key.json to api/app/web_push/vapid_keys#show" do
+    expect(get: "/api/app/web_push/vapid_key.json").to route_to("api/app/web_push/vapid_keys#show", format: "json")
+  end
+
+  it "routes POST /api/app/web_push/subscription.json to api/app/web_push/subscriptions#create" do
+    expect(post: "/api/app/web_push/subscription.json").to route_to("api/app/web_push/subscriptions#create", format: "json")
+  end
+
+  it "routes DELETE /api/app/web_push/subscription.json to api/app/web_push/subscriptions#destroy" do
+    expect(delete: "/api/app/web_push/subscription.json").to route_to("api/app/web_push/subscriptions#destroy", format: "json")
+  end
+
   it "routes /sitemap.xml to sitemaps#index" do
     expect(get: "/sitemap.xml").to route_to("sitemaps#index")
   end
