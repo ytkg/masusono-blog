@@ -49,7 +49,7 @@ jobs:
 
       - id: deploy
         env:
-          GITHUB_REF_NAME: ${{ github.head_ref }}
+          DEPLOY_BRANCH: ${{ github.head_ref }}
         run: ./deploy.sh
 
       - uses: actions/github-script@v8

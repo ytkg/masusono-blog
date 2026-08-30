@@ -7,7 +7,7 @@ PRODUCTION_BRANCH="main"
 PRODUCTION_SERVICE="masusono"
 RAILS_MASTER_KEY_SECRET="rails-master-key:latest"
 
-CURRENT_BRANCH="${GITHUB_REF_NAME:-$(git branch --show-current)}"
+CURRENT_BRANCH="${DEPLOY_BRANCH:-${GITHUB_REF_NAME:-$(git branch --show-current)}}"
 
 if [[ -z "${CURRENT_BRANCH}" ]]; then
   echo "Error: デタッチされたHEADではデプロイできません。ブランチをチェックアウトしてください。" >&2
