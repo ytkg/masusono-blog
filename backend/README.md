@@ -296,7 +296,8 @@ gcloud run deploy <ブランチに対応するサービス名> \
   --region asia-northeast1 \
   --allow-unauthenticated \
   --max-instances 1 \
-  --set-secrets RAILS_MASTER_KEY=rails-master-key:latest
+  --remove-env-vars RAILS_MASTER_KEY \
+  --update-secrets RAILS_MASTER_KEY=rails-master-key:latest
 ```
 
 前提条件:
