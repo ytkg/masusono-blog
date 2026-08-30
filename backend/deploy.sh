@@ -43,3 +43,10 @@ SERVICE_URL="$(gcloud run services describe "${SERVICE_NAME}" \
   --format='value(status.url)')"
 
 echo "デプロイ完了: ${SERVICE_NAME} (${SERVICE_URL})"
+
+if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+  {
+    echo "service_name=${SERVICE_NAME}"
+    echo "service_url=${SERVICE_URL}"
+  } >> "${GITHUB_OUTPUT}"
+fi
