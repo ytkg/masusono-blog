@@ -34,7 +34,8 @@ gcloud run deploy "${SERVICE_NAME}" \
   --region "${REGION}" \
   --allow-unauthenticated \
   --max-instances 1 \
-  --set-secrets "RAILS_MASTER_KEY=${RAILS_MASTER_KEY_SECRET}"
+  --remove-env-vars RAILS_MASTER_KEY \
+  --update-secrets "RAILS_MASTER_KEY=${RAILS_MASTER_KEY_SECRET}"
 
 SERVICE_URL="$(gcloud run services describe "${SERVICE_NAME}" \
   --project "${PROJECT_ID}" \
