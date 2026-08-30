@@ -21,7 +21,7 @@ module Microcms
     end
 
     def self.create(attributes:, api_key: nil, faraday: nil)
-      response = connection(api_key:, faraday:).post(ENDPOINT) do |request|
+      response = client(api_key:, faraday:).post(ENDPOINT) do |request|
         write_request(request, attributes, api_key:)
       end
       raise_on_error!(response)
@@ -30,7 +30,7 @@ module Microcms
     end
 
     def self.update(id:, attributes:, api_key: nil, faraday: nil)
-      response = connection(api_key:, faraday:).patch("#{ENDPOINT}/#{id}") do |request|
+      response = client(api_key:, faraday:).patch("#{ENDPOINT}/#{id}") do |request|
         write_request(request, attributes, api_key:)
       end
       raise_on_error!(response)
@@ -39,13 +39,13 @@ module Microcms
     end
 
     def self.delete(id:, api_key: nil, faraday: nil)
-      response = connection(api_key:, faraday:).delete("#{ENDPOINT}/#{id}") do |request|
+      response = client(api_key:, faraday:).delete("#{ENDPOINT}/#{id}") do |request|
         request.headers["X-MICROCMS-API-KEY"] = resolved_api_key(api_key)
       end
       raise_on_error!(response)
     end
 
-    def self.connection(api_key:, faraday:)
+    def self.client(api_key:, faraday:)
       return faraday if faraday
 
       Faraday.new do |connection|
@@ -53,7 +53,7 @@ module Microcms
         connection.options.open_timeout = 5
       end
     end
-    private_class_method :connection
+    private_class_method :client
 
     def self.write_request(request, attributes, api_key:)
       request.headers["X-MICROCMS-API-KEY"] = resolved_api_key(api_key)
