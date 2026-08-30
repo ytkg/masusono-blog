@@ -310,10 +310,23 @@ docker compose run --rm backend npm run format
 ./deploy.sh
 ```
 
+デプロイ先はチェックアウト中の Git ブランチで決まります。
+
+- `main`: 本番サービス `masusono` へデプロイ
+- その他のブランチ: ステージングサービス `masusono-<ブランチ名>` へデプロイ
+
+ステージングのサービス名では、ブランチ名を英小文字化し、英数字以外の連続を `-` に置換します。
+たとえば `feature/login` は `masusono-feature-login` になります。Cloud Run の63文字制限に
+収めるため、ブランチ名由来の部分は54文字までです。デプロイ完了時には対象サービス名と
+Cloud Run URL が表示されます。
+
+ステージングは本番と同じ Rails credentials および外部サービス接続先を使います。書き込みを
+伴う動作確認は本番データへ影響する点に注意してください。
+
 `deploy.sh` では以下を実行します:
 
 ```bash
-gcloud run deploy masusono \
+gcloud run deploy <ブランチに対応するサービス名> \
   --source . \
   --project masusono \
   --region asia-northeast1 \
