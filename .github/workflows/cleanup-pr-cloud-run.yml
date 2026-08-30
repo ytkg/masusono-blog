@@ -1,0 +1,79 @@
+name: cleanup-pr-cloud-run
+
+on:
+  pull_request:
+    types: [closed]
+  delete:
+
+concurrency:
+  group: cloud-run-staging-${{ github.event.pull_request.head.ref || github.event.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    if: >-
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'delete' && github.event.ref_type == 'branch' && github.event.ref != 'main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/332902117625/locations/global/workloadIdentityPools/github-actions/providers/masusono-blog
+          service_account: gha-cloud-run-deployer@masusono.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - id: cleanup
+        env:
+          DEPLOY_BRANCH: ${{ github.event.pull_request.head.ref || github.event.ref }}
+        run: ./deploy.sh delete
+
+      - uses: actions/github-script@v8
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref || github.event.ref }}
+          SERVICE_NAME: ${{ steps.cleanup.outputs.service_name }}
+        with:
+          script: |
+            const marker = "<!-- cloud-run-staging -->";
+            let issueNumbers;
+
+            if (context.eventName === "pull_request") {
+              issueNumbers = [context.payload.pull_request.number];
+            } else {
+              const pullRequests = await github.paginate(github.rest.pulls.list, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "all",
+                head: `${context.repo.owner}:${process.env.BRANCH_NAME}`,
+                sort: "updated",
+                direction: "desc",
+              });
+              issueNumbers = pullRequests.slice(0, 1).map((pullRequest) => pullRequest.number);
+            }
+
+            for (const issue_number of issueNumbers) {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number,
+              });
+              const comment = comments.find((item) => item.user.type === "Bot" && item.body.includes(marker));
+              if (!comment) continue;
+
+              const body = `${marker}\n### Cloud Run ステージング（削除済み）\n\n- サービス: \`${process.env.SERVICE_NAME}\`\n- 削除日時: ${new Date().toISOString()}`;
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
+                body,
+              });
+            }
