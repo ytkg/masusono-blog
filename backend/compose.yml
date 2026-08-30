@@ -15,7 +15,7 @@ services:
       - bundle_cache:/usr/local/bundle
       - node_modules_cache:/rails/node_modules
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT:-3000}:3000"
     environment:
       RAILS_ENV: development
       BUNDLE_WITHOUT: ""
@@ -35,7 +35,7 @@ services:
       - .:/rails
       - node_modules_cache:/rails/node_modules
     ports:
-      - "3036:3036"
+      - "${VITE_PORT:-3036}:3036"
     tty: true
     stdin_open: true
 volumes:
