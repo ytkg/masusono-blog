@@ -1,0 +1,4 @@
+interface:
+  display_name: "Masusono Worktree"
+  short_description: "Create isolated worktrees and Docker environments"
+  default_prompt: "Use $masusono-worktree to start this Masusono task in an isolated worktree."
