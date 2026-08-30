@@ -1,0 +1,84 @@
+name: deploy-pr-cloud-run
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - backend/**
+      - .github/workflows/deploy-pr-cloud-run.yml
+
+concurrency:
+  group: cloud-run-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: backend
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libsqlite3-dev sqlite3 libvips
+      - run: npm ci
+      - run: bin/ci
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/332902117625/locations/global/workloadIdentityPools/github-actions/providers/masusono-blog
+          service_account: gha-cloud-run-deployer@masusono.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - id: deploy
+        env:
+          DEPLOY_BRANCH: ${{ github.head_ref }}
+        run: ./deploy.sh
+
+      - uses: actions/github-script@v8
+        env:
+          SERVICE_NAME: ${{ steps.deploy.outputs.service_name }}
+          SERVICE_URL: ${{ steps.deploy.outputs.service_url }}
+        with:
+          script: |
+            const marker = "<!-- cloud-run-staging -->";
+            const body = `${marker}\n### Cloud Run ステージング\n\n- サービス: \`${process.env.SERVICE_NAME}\`\n- URL: ${process.env.SERVICE_URL}\n- コミット: ${context.payload.pull_request.head.sha}`;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const comment = comments.find((item) => item.user.type === "Bot" && item.body.includes(marker));
+
+            if (comment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

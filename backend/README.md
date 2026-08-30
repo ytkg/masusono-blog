@@ -287,6 +287,10 @@ Rails credentials の復号鍵はSecret Managerの `rails-master-key` からClou
 成功してから、OIDC / Workload Identity FederationでGCPへ認証し、本番サービスへデプロイします。
 認証対象はGitHubリポジトリ `ytkg/masusono-blog` の `main` ブランチに限定されています。
 
+`.github/workflows/deploy-pr-cloud-run.yml` は、同一リポジトリのPRを開く・再オープンする・更新する
+たびに全CI後のステージングデプロイを行い、PRコメントへ最新URLを書き込みます。フォークからのPRは
+デプロイ対象外です。
+
 `deploy.sh` では以下を実行します:
 
 ```bash
