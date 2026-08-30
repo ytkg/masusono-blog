@@ -266,19 +266,39 @@ docker compose run --rm backend npm run format
 ./deploy.sh
 ```
 
+デプロイ先はチェックアウト中の Git ブランチで決まります。GitHub Actions では
+`GITHUB_REF_NAME` を使うため、checkoutがデタッチされたHEADでも同じ規則で動作します。
+
+- `main`: 本番サービス `masusono` へデプロイ
+- その他のブランチ: ステージングサービス `masusono-<ブランチ名>` へデプロイ
+
+ステージングのサービス名では、ブランチ名を英小文字化し、英数字以外の連続を `-` に置換します。
+たとえば `feature/login` は `masusono-feature-login` になります。Cloud Run の63文字制限に
+収めるため、ブランチ名由来の部分は54文字までです。デプロイ完了時には対象サービス名と
+Cloud Run URL が表示されます。
+
+Rails credentials の復号鍵はSecret Managerの `rails-master-key` からCloud Runへ注入します。
+ローカルの `config/master.key` は手動デプロイに不要です。
+
+### GitHub Actionsによる本番デプロイ
+
+`.github/workflows/deploy-cloud-run.yml` は、`backend/` またはworkflow自身に関係する変更が
+`main` へpush（PRマージを含む）されたときに起動します。`backend/bin/ci` の全チェックが
+成功してから、OIDC / Workload Identity FederationでGCPへ認証し、本番サービスへデプロイします。
+認証対象はGitHubリポジトリ `ytkg/masusono-blog` の `main` ブランチに限定されています。
+
 `deploy.sh` では以下を実行します:
 
 ```bash
-gcloud run deploy masusono \
+gcloud run deploy <ブランチに対応するサービス名> \
   --source . \
   --project masusono \
   --region asia-northeast1 \
   --allow-unauthenticated \
   --max-instances 1 \
-  --set-env-vars RAILS_MASTER_KEY=$(cat config/master.key)
+  --set-secrets RAILS_MASTER_KEY=rails-master-key:latest
 ```
 
 前提条件:
 
 - `gcloud` CLI がインストール済みで、認証済みであること
-- `config/master.key` が存在すること
