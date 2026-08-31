@@ -9,18 +9,21 @@ module Api
         end
 
         def call(name:, user_id:)
-          validate_user_id!(user_id)
+          normalized_user_id = ::Microcms::Users::Identity.normalize(user_id)
+          validate_user_id!(normalized_user_id)
           normalized_name = normalize_name(name)
+          content_id = ::Microcms::Users::Identity.content_id(normalized_user_id)
 
-          created = ::Microcms::Users::CreateService.execute(
-            user_id: user_id,
+          ::Microcms::Users::UpsertByContentIdService.execute(
+            content_id: content_id,
+            user_id: normalized_user_id,
             name: normalized_name
           )
 
           {
             json: {
-              id: created[:id],
-              userId: user_id,
+              id: content_id,
+              userId: normalized_user_id,
               name: normalized_name
             },
             status: :created

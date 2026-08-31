@@ -37,7 +37,7 @@ RSpec.describe "Api::App::Users", type: :request do
       allow(Api::App::Users::CreateUsecase).to receive(:call).and_return(
         {
           json: {
-            id: "new-user-id",
+            id: "u-e329d2ee785ead849d97f03f875fd338",
             userId: "cookie-user",
             name: "表示名太郎"
           },
@@ -55,7 +55,7 @@ RSpec.describe "Api::App::Users", type: :request do
       expect(response.headers["Cache-Control"]).to eq("no-store")
       expect(JSON.parse(response.body)).to eq(
         {
-          "id" => "new-user-id",
+          "id" => "u-e329d2ee785ead849d97f03f875fd338",
           "userId" => "cookie-user",
           "name" => "表示名太郎"
         }
