@@ -2,29 +2,22 @@
 
 この文書は現行 backend API のレスポンス契約の正本です。
 
-- 対象: `GET /api/app/numbers/metrics.json`, `GET /api/app/masuda_run/rankings.json`, Web Push API, `GET /sitemap.xml`, `GET /feed.xml`
+- 対象: Users API、`GET /api/app/masuda_run/rankings.json`、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
-## GET /api/app/numbers/metrics.json
+## Users API
 
-- Response: `Metrics`
-
-### Metrics
+### GET /api/app/users/:user_id.json
 
 | key | type | nullable | note |
 | --- | --- | --- | --- |
-| `blocks` | `Array<MetricBlock>` | No | 表示ブロック |
+| `userId` | `String` | No | リクエストしたユーザーID |
+| `name` | `String` | Yes | 表示名。未登録の場合は `null` |
 
-補足:
-- 現在の表示項目には `増田RUN総プレイ回数` を含む
+### POST /api/app/users.json
 
-### MetricBlock
-
-| key | type | nullable | note |
-| --- | --- | --- | --- |
-| `label` | `String` | No | 表示用タイトル |
-| `value` | `String` | Yes | メトリクス値 |
-| `children` | `Array<MetricBlock>` | Yes | 子ブロック |
+- Request: `{ "userId": "String", "name": "String" }`
+- Response (`201 Created`): `{ "id": "String", "userId": "String", "name": "String" }`
 
 ## GET /api/app/masuda_run/rankings.json
 
@@ -95,17 +88,16 @@
 
 - エラー時も `Cache-Control: no-store`
 
-## README / Inertia移行計画 との整合性チェック
+## README との整合性チェック
 
-APIパスは次の3ファイルで一致させる。
+APIパスは次の2ファイルで一致させる。
 
 - `README.md`
-- `docs/inertia-migration-plan.md`
 - `docs/api-response-contract.md`
 
 確認コマンド（`backend/` で実行）:
 
 ```bash
-git grep -nE "(/api/app/numbers/metrics\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md
-git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md || true
+git grep -nE "(/api/app/users/:user_id\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/api-response-contract.md
+git grep -nE '(^|`)/app/(users|masuda_run/rankings)\.json' -- README.md docs/api-response-contract.md || true
 ```

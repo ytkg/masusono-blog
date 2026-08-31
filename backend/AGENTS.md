@@ -13,6 +13,9 @@ Inertia + React/Vite で提供し、一部の機能は JSON API、RSS、サイ�
   （macOS では 2.6 のことがある）や `/usr/bin/bundle` は使わない。
 - ホストで Ruby を実行する場合は `rbenv exec` を使う。環境差を避けたい場合は、以下の
   Docker Compose コマンドを `backend/` で実行する。
+- worktree で作業する場合は、リポジトリルートの
+  `.codex/skills/masusono-worktree/scripts/compose.sh` を使う。以降の `docker compose`
+  の例は通常の `backend/` 作業用であり、worktree では同じ引数をこのラッパーへ渡す。
 - 秘密情報（`config/master.key`、`RAILS_MASTER_KEY`、microCMS キー、ADC の内容）を
   表示・コミット・ログ出力しない。値が必要な作業は、変数名と設定方法だけを案内する。
 - デプロイ、データ削除、microCMS の更新、BigQuery への書き込みなど外部状態を変える
