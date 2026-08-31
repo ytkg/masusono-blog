@@ -20,6 +20,10 @@ Cloud Run のサービス URL は `gcloud run services describe <service> --form
 で確認できます。URL が上記の形式に一致しない場合は、許可範囲を広げず、Cloud Run の URL 形式・
 リージョン・プロジェクト番号を確認してから正規表現を更新してください。
 
+PR のステージングコメントは、`deploy.sh` が決定的 URL
+`https://<service>-332902117625.asia-northeast1.run.app` を出力します。`status.url` が返す
+非決定的な `*.a.run.app` URL は allowlist に含めないでください。
+
 ## `/up` とヘルスチェック
 
 `/up` に Host Authorization の例外はありません。例外を置くと、不正な Host ヘッダーであっても
