@@ -14,15 +14,20 @@ docker compose up --build
 - Rails: http://localhost:3000
 - Vite: http://localhost:3036
 
-よく使う検証コマンドです。
+よく使う検証コマンドです。リポジトリルートからは、Compose 定義を
+`backend/compose.yml` として明示します。
 
 ```bash
-cd backend
-docker compose run --rm backend bundle exec rspec
-docker compose run --rm backend bundle exec rubocop
-docker compose run --rm backend npm run lint
-docker compose run --rm backend npm run format:check
+docker compose -f backend/compose.yml run --rm backend bundle exec rspec
+docker compose -f backend/compose.yml run --rm backend bundle exec rubocop
+docker compose -f backend/compose.yml run --rm backend npm run lint
+docker compose -f backend/compose.yml run --rm backend npm run format:check
+docker compose -f backend/compose.yml run --rm backend npm test
 ```
+
+`backend/` に移動して実行する場合は、従来どおり `docker compose` だけで同じコマンドを実行できます。
+Git worktree で作業中は、ポートとボリュームを分離するため、上記の代わりに
+`.codex/skills/masusono-worktree/scripts/compose.sh run --rm backend ...` を使います。
 
 アプリの構成、microCMS・BigQueryの運用、API、ユーザーコンテンツID移行は [backend/README.md](backend/README.md) を参照してください。
 
