@@ -12,7 +12,11 @@ module Microcms
       def initialize(status:, body:)
         @status = status
         @body = body
-        super("microCMS request failed: status=#{status}, body=#{body}")
+        StructuredLogging::EventLogger.microcms_failure(
+          error_type: "upstream_http_error",
+          upstream_status: status
+        )
+        super("microCMS request failed: status=#{status}")
       end
     end
 
@@ -40,14 +44,14 @@ module Microcms
       contents = []
       first_page_append_result = append_contents(contents, first_page.fetch(:contents))
       if first_page_append_result == :max_total_count_reached
-        log_pagination_warning("max total count reached on first page (max_total_count=#{max_total_count})")
+        log_pagination_warning("max_total_count_reached")
         return contents
       end
 
       meta = first_page.fetch(:meta)
       return contents unless pageable?(meta)
       unless valid_pagination_meta?(meta)
-        log_pagination_warning("invalid pagination meta detected: #{meta.inspect}")
+        log_pagination_warning("invalid_pagination_meta")
         return contents
       end
 
@@ -57,7 +61,7 @@ module Microcms
       page_count = 1
       while offset + limit < total_count
         if page_count >= max_pages
-          log_pagination_warning("max pages reached (max_pages=#{max_pages})")
+          log_pagination_warning("max_pages_reached")
           break
         end
 
@@ -68,7 +72,7 @@ module Microcms
         append_result = append_contents(contents, page.fetch(:contents))
         page_count += 1
         if append_result == :max_total_count_reached
-          log_pagination_warning("max total count reached (max_total_count=#{max_total_count})")
+          log_pagination_warning("max_total_count_reached")
           break
         end
       end
@@ -169,8 +173,8 @@ module Microcms
       parsed
     end
 
-    def log_pagination_warning(message)
-      Rails.logger.warn("[Microcms::FetchContentsService] #{message}")
+    def log_pagination_warning(error_type)
+      StructuredLogging::EventLogger.microcms_warning(error_type:)
     end
 
     def microcms_uri(limit:, offset:)

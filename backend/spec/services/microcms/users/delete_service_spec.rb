@@ -29,7 +29,7 @@ RSpec.describe Microcms::Users::DeleteService do
 
       expect { result }.to raise_error(
         Microcms::FetchContentsService::FetchError,
-        "microCMS request failed: status=503, body=upstream unavailable"
+          "microCMS request failed: status=503"
       )
     end
   end
