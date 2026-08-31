@@ -1,16 +1,18 @@
 # masusono-blog バックエンド
 
-masusono-blog の Rails API バックエンドです。
+masusono-blog の Rails アプリケーションです。公開ページは Inertia + React/Vite で提供し、一部の機能を JSON API、RSS、サイトマップとして提供します。
 
 ## ローカル開発
 
-`backend/` で実行します:
+以下はすべて `backend/` で実行します。
 
 ```bash
 docker compose up --build
 ```
 
-ホスト環境で Docker を使わずに動かす場合は、Rails と Vite を別々に起動します。
+初回は Vite の依存関係インストールに少し時間がかかります。Rails は `http://localhost:3000`、Vite は `http://localhost:3036` で起動します。
+
+Dockerを使わない場合は、Rails と Vite を別々に起動します。
 
 ```bash
 cd backend
@@ -24,62 +26,22 @@ cd backend
 npm run dev
 ```
 
-補足:
-- `bin/dev` は Rails サーバーのみを起動します
-- 画面確認で Inertia/Vite のJS配信が必要なため、`npm run dev` を同時起動してください
-- Ruby/Bundler は `rbenv` 経由を前提にしてください
-
-## Inertia ページ開発（`/about` PoC）
-
-`/about` は Inertia Rails で返すようにしています。開発時は Rails に加えて Vite を起動してください。
-
-```bash
-cd backend
-docker compose up --build
-```
-
-補足:
-- 画面データは主に Inertia のサーバーサイド props で返します。
-
-### Docker での起動
-
-`compose.yml` には Rails (`backend`) と Vite (`vite`) の 2 サービスを定義しています。
-依存インストールは `vite` サービスのみが担当し、`backend` は依存準備完了を待ってから起動します。
-Rails 側は起動前に `tmp/pids/server.pid` を削除して重複起動エラーを回避します。
-
-```bash
-cd backend
-docker compose up --build
-```
-
-- Rails: `http://localhost:3000`
-- Vite dev server: `http://localhost:3036`
-
-`/about` は Rails 経由で表示し、JS は Vite から配信されます。
-初回起動時は `vite` コンテナで `npm install` が実行されるため、立ち上がりに時間がかかる場合があります。
-`npm install` で権限エラーが出た場合は、`node_modules_cache` ボリュームを再作成してください。
-
-```bash
-cd backend
-docker compose down -v
-docker compose up --build
-```
-
-`ENOSPC: no space left on device` が出る場合は Docker のディスク不足です。以下を実行して空き容量を作ってから再実行してください。
-
-```bash
-docker system prune -af --volumes
-docker builder prune -af
-cd backend
-docker compose up --build
-```
+`bin/dev` は Rails サーバーのみを起動するため、画面確認では `npm run dev` も必要です。Ruby/Bundler は `rbenv` 経由で実行してください。
 
 ## エンドポイント
 
-- `GET /api/app/numbers/metrics.json`
-  - Numbersアプリ用メトリクス（`blocks`）を返す
+- `GET /api/app/users/:user_id.json`
+  - `user_id` に対応するユーザー情報を返す
+- `POST /api/app/users.json`
+  - ユーザー情報を登録する
 - `GET /api/app/masuda_run/rankings.json`
   - 増田RUNアプリ用ランキング配列を返す
+- `POST /api/app/masuda_run/rankings.json`
+  - 増田RUNのランキングを登録する
+- `GET /api/app/web_push/vapid_key.json`
+  - Web Push公開鍵を返す
+- `POST` / `DELETE /api/app/web_push/subscription.json`
+  - Web Pushの購読を登録・解除する
 - `GET /sitemap.xml`
   - 公開用サイトマップXMLを返す
 - `GET /feed.xml`
@@ -259,22 +221,21 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 
 ## ドキュメント相互整合性チェック（APIパス）
 
-次の3ファイルで API パスをそろえる:
+次の2ファイルで API パスをそろえる:
 
 - `README.md`
-- `docs/inertia-migration-plan.md`
 - `docs/api-response-contract.md`
 
 確認コマンド（`backend/` で実行）:
 
 ```bash
-git grep -nE "(/api/app/numbers/metrics\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md
-git grep -nE '(^|`)/app/(numbers/metrics|masuda_run/rankings)\.json' -- README.md docs/inertia-migration-plan.md docs/api-response-contract.md || true
+git grep -nE "(/api/app/users/:user_id\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/api-response-contract.md
+git grep -nE '(^|`)/app/(users|masuda_run/rankings)\.json' -- README.md docs/api-response-contract.md || true
 ```
 
 判定:
 
-- 1本目のコマンドは3ファイルすべてにヒットすること
+- 1本目のコマンドは2ファイルすべてにヒットすること
 - 2本目のコマンドはヒットしないこと
 
 ## 運用メモ
@@ -351,11 +312,13 @@ Rails credentials の復号鍵はSecret Managerの `rails-master-key` からClou
 たびに全CI後のステージングデプロイを行い、PRコメントへ最新URLを書き込みます。フォークからのPRは
 デプロイ対象外です。
 
-`deploy.sh` では以下を実行します:
+GitHub Actions は Artifact Registry へイメージをビルド・pushしてから、`deploy.sh` 経由でそのイメージをCloud Runへデプロイします。成果物はPR終了時に削除し、本番イメージとCloud Runソース用バケットには保持ポリシーを設定しています。
+
+手動で `deploy.sh` を実行する場合は、`IMAGE_URI` が未指定ならソースデプロイ、指定した場合はイメージデプロイになります。
 
 ```bash
 gcloud run deploy <ブランチに対応するサービス名> \
-  --source . \
+  --image "$IMAGE_URI" \
   --project masusono \
   --region asia-northeast1 \
   --allow-unauthenticated \
