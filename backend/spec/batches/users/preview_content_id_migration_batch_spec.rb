@@ -44,4 +44,22 @@ RSpec.describe Users::PreviewContentIdMigrationBatch do
       expect(result.skipped_records).to be_empty
     end
   end
+
+  context "正規コンテンツIDのレコードがすでにある場合" do
+    let(:records) do
+      [
+        { id: "legacy", user_id: "alice", name: "旧名", updatedAt: "2026-01-01T00:00:00Z" },
+        { id: "u-2bd806c97f0e00af1a1fc3328fa763a9", user_id: "alice", name: "新名", updatedAt: "2026-02-01T00:00:00Z" }
+      ]
+    end
+
+    it "正規コンテンツIDを削除対象から除外する" do
+      result = described_class.call(user_fetcher:)
+
+      expect(result.migrations.first).to include(
+        source_ids: [ "legacy", "u-2bd806c97f0e00af1a1fc3328fa763a9" ],
+        delete_ids: [ "legacy" ]
+      )
+    end
+  end
 end

@@ -19,7 +19,7 @@ module Users
           content_id: Microcms::Users::Identity.content_id(user_id),
           name: value(selected, :name).to_s.strip,
           source_ids: records.map { |record| value(record, :id) }.compact,
-          delete_ids: records.map { |record| value(record, :id) }.compact
+          delete_ids: records.map { |record| value(record, :id) }.compact - [ Microcms::Users::Identity.content_id(user_id) ]
         }
       end.sort_by { |migration| migration[:user_id] }
 
