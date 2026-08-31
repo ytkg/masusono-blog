@@ -155,6 +155,16 @@ docker compose run --rm backend bundle exec rails articles:apply_tag_updates_fro
 
 このAPIは管理用データなので、コンテンツAPIキーは公開せず、Rails credentialsの既存 `microcms.api_key` だけでアクセスします。
 
+### ユーザーコンテンツID移行（フェーズ1）
+
+`users` APIのコンテンツIDは、前後空白を除去した `user_id` のSHA-256先頭32文字に `u-` を付けた値を正規IDとして使用します。microCMSの `users` APIで、コンテンツIDに英小文字・数字・`-` を許可し、`GET`・`PUT`・`DELETE` 権限を付与してください。
+
+次のコマンドはデータを変更せず、移行候補・削除予定・要確認レコードをJSONで出力します。
+
+```bash
+docker compose run --rm backend bin/rails users:preview_content_id_migration
+```
+
 ### VAPID鍵の準備
 
 次のコマンドで鍵ペアを生成し、標準出力をRails credentialsへ保存します。出力される秘密鍵はコミット・共有しません。
