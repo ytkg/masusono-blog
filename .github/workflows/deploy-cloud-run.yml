@@ -58,5 +58,23 @@ jobs:
       - name: Set up Google Cloud CLI
         uses: google-github-actions/setup-gcloud@v3
 
+      - name: Resolve deployment names
+        id: deployment
+        env:
+          DEPLOY_BRANCH: main
+        run: ./deploy.sh service-name
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
+
+      - name: Build and push image
+        env:
+          IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
+        run: |
+          docker build --tag "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
+
       - name: Deploy to Cloud Run
+        env:
+          IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
         run: ./deploy.sh

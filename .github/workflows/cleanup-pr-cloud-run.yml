@@ -37,6 +37,19 @@ jobs:
           DEPLOY_BRANCH: ${{ github.event.pull_request.head.ref || github.event.ref }}
         run: ./deploy.sh delete
 
+      - name: Delete staging image package
+        env:
+          IMAGE_PACKAGE: ${{ steps.cleanup.outputs.image_package }}
+        run: |
+          if DELETE_OUTPUT="$(gcloud artifacts packages delete "${IMAGE_PACKAGE}" --project masusono --location asia-northeast1 --repository cloud-run-source-deploy --quiet 2>&1)"; then
+            echo "削除完了: ${IMAGE_PACKAGE}"
+          elif [[ "${DELETE_OUTPUT}" == *"NOT_FOUND"* || "${DELETE_OUTPUT}" == *"not be found"* ]]; then
+            echo "削除不要: ${IMAGE_PACKAGE} はすでに存在しません"
+          else
+            printf '%s\n' "${DELETE_OUTPUT}" >&2
+            exit 1
+          fi
+
       - uses: actions/github-script@v8
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref || github.event.ref }}
