@@ -31,4 +31,17 @@ RSpec.describe Users::PreviewContentIdMigrationBatch do
       expect(result.skipped_records).to eq([ { id: "invalid", reason: "user_id is blank" } ])
     end
   end
+
+  context "microCMSのシンボルキーのレコードがある場合" do
+    let(:records) do
+      [ { id: "symbol-id", user_id: "alice", name: "表示名", updatedAt: "2026-02-01T00:00:00Z" } ]
+    end
+
+    it "移行候補として扱う" do
+      result = described_class.call(user_fetcher:)
+
+      expect(result.migrations.first).to include(user_id: "alice", name: "表示名", source_ids: [ "symbol-id" ])
+      expect(result.skipped_records).to be_empty
+    end
+  end
 end
