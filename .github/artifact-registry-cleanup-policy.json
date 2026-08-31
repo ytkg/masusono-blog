@@ -1,0 +1,18 @@
+[
+  {
+    "name": "delete-old-images",
+    "action": { "type": "Delete" },
+    "condition": {
+      "tagState": "any",
+      "olderThan": "30d"
+    }
+  },
+  {
+    "name": "keep-production-images",
+    "action": { "type": "Keep" },
+    "mostRecentVersions": {
+      "packageNamePrefixes": ["production"],
+      "keepCount": 3
+    }
+  }
+]

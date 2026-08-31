@@ -9,8 +9,8 @@ RAILS_MASTER_KEY_SECRET="rails-master-key:latest"
 
 COMMAND="${1:-deploy}"
 
-if [[ "${COMMAND}" != "deploy" && "${COMMAND}" != "delete" ]]; then
-  echo "Usage: $0 [deploy|delete]" >&2
+if [[ "${COMMAND}" != "deploy" && "${COMMAND}" != "delete" && "${COMMAND}" != "service-name" ]]; then
+  echo "Usage: $0 [deploy|delete|service-name]" >&2
   exit 1
 fi
 
@@ -40,6 +40,26 @@ else
   fi
 fi
 
+if [[ "${CURRENT_BRANCH}" == "${PRODUCTION_BRANCH}" ]]; then
+  IMAGE_PACKAGE="production"
+else
+  IMAGE_PACKAGE="staging-${SERVICE_NAME}"
+fi
+
+if [[ "${COMMAND}" == "service-name" ]]; then
+  echo "サービス名: ${SERVICE_NAME}"
+  echo "イメージパッケージ: ${IMAGE_PACKAGE}"
+
+  if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+    {
+      echo "service_name=${SERVICE_NAME}"
+      echo "image_package=${IMAGE_PACKAGE}"
+    } >> "${GITHUB_OUTPUT}"
+  fi
+
+  exit 0
+fi
+
 if [[ "${COMMAND}" == "delete" ]]; then
   if [[ "${CURRENT_BRANCH}" == "${PRODUCTION_BRANCH}" ]]; then
     echo "Error: 本番サービス '${PRODUCTION_SERVICE}' は削除できません。" >&2
@@ -59,14 +79,22 @@ if [[ "${COMMAND}" == "delete" ]]; then
   fi
 
   if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-    echo "service_name=${SERVICE_NAME}" >> "${GITHUB_OUTPUT}"
+    {
+      echo "service_name=${SERVICE_NAME}"
+      echo "image_package=${IMAGE_PACKAGE}"
+    } >> "${GITHUB_OUTPUT}"
   fi
 
   exit 0
 fi
 
+DEPLOY_TARGET=(--source .)
+if [[ -n "${IMAGE_URI:-}" ]]; then
+  DEPLOY_TARGET=(--image "${IMAGE_URI}")
+fi
+
 gcloud run deploy "${SERVICE_NAME}" \
-  --source . \
+  "${DEPLOY_TARGET[@]}" \
   --project "${PROJECT_ID}" \
   --region "${REGION}" \
   --allow-unauthenticated \
@@ -83,7 +111,8 @@ echo "デプロイ完了: ${SERVICE_NAME} (${SERVICE_URL})"
 
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   {
-    echo "service_name=${SERVICE_NAME}"
+      echo "service_name=${SERVICE_NAME}"
+      echo "image_package=${IMAGE_PACKAGE}"
     echo "service_url=${SERVICE_URL}"
   } >> "${GITHUB_OUTPUT}"
 fi
