@@ -21,6 +21,7 @@
 ## 運用
 
 - [Cloud Run ウォーム維持戦略](./cloud-run-warmup-strategy.md)
+- [本番 HTTPS と Host Authorization](./production-https-host-authorization.md)
   - キャッシュではなくウォーム維持で運用する前提と監視方針
 - [Service Worker 更新手順](./service-worker-versioning.md)
   - PWA キャッシュを切り替えるときの更新ルール

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 PROJECT_ID="masusono"
+PROJECT_NUMBER="332902117625"
 REGION="asia-northeast1"
 PRODUCTION_BRANCH="main"
 PRODUCTION_SERVICE="masusono"
@@ -102,10 +103,9 @@ gcloud run deploy "${SERVICE_NAME}" \
   --remove-env-vars RAILS_MASTER_KEY \
   --update-secrets "RAILS_MASTER_KEY=${RAILS_MASTER_KEY_SECRET}"
 
-SERVICE_URL="$(gcloud run services describe "${SERVICE_NAME}" \
-  --project "${PROJECT_ID}" \
-  --region "${REGION}" \
-  --format='value(status.url)')"
+# Use the deterministic URL because Rails allows this project's Cloud Run hosts.
+# `status.url` can return a non-deterministic *.a.run.app hostname instead.
+SERVICE_URL="https://${SERVICE_NAME}-${PROJECT_NUMBER}.${REGION}.run.app"
 
 echo "デプロイ完了: ${SERVICE_NAME} (${SERVICE_URL})"
 
