@@ -18,6 +18,13 @@
 
 `main` で直接変更せず、未追跡ファイルや他の worktree の変更にも触れません。マージ済みで clean な worktree は、ユーザーの承認後にだけ削除します。
 
+## Issue対応とPull Request
+
+GitHub Issue に対する実装依頼では、ユーザーから停止指示、レビューのみの依頼、または
+PR作成不要の指定がない限り、実装・必要な検証・コミット・push・Pull Request作成までを
+一連の作業として完了する。Pull Request には対応する Issue を `Closes #<番号>` で紐づけ、
+実行した検証を記載する。
+
 ## 実装と検証
 
 - バックエンド固有の実装・テスト規約は [backend/AGENTS.md](backend/AGENTS.md) に従う。
