@@ -76,7 +76,7 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
       it do
         expect { result }.to raise_error(
           Microcms::FetchContentsService::FetchError,
-          "microCMS request failed: status=503, body=upstream unavailable"
+          "microCMS request failed: status=503"
         )
       end
     end

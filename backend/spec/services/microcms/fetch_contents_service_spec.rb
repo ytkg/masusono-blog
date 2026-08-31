@@ -10,7 +10,7 @@ RSpec.describe Microcms::FetchContentsService do
       stub_const("Microcms::TestFetchContentsService", klass)
     end
     let(:endpoint) { service_class::ENDPOINT }
-    let(:logger) { instance_double(Logger, warn: nil) }
+    let(:logger) { instance_double(Logger, info: nil, warn: nil, error: nil) }
     let(:filters) { nil }
     let(:ids) { nil }
     let(:first_page_query) do
@@ -130,7 +130,7 @@ RSpec.describe Microcms::FetchContentsService do
 
       it do
         expect(result.map { |content| content[:id] }).to eq(%w[first])
-        expect(logger).to have_received(:warn).with(include("invalid pagination meta"))
+        expect(logger).to have_received(:warn).with(include("error_type=invalid_pagination_meta"))
         expect(a_request(:get, endpoint).with(query: first_page_query, headers: microcms_request_headers)).to have_been_made.once
       end
     end
@@ -144,7 +144,7 @@ RSpec.describe Microcms::FetchContentsService do
 
       it do
         expect(result.map { |content| content[:id] }).to eq(%w[first])
-        expect(logger).to have_received(:warn).with(include("max pages reached"))
+        expect(logger).to have_received(:warn).with(include("error_type=max_pages_reached"))
         expect(a_request(:get, endpoint).with(query: first_page_query, headers: microcms_request_headers)).to have_been_made.once
       end
     end
@@ -173,7 +173,7 @@ RSpec.describe Microcms::FetchContentsService do
 
       it do
         expect(result.map { |content| content[:id] }).to eq(%w[first second third])
-        expect(logger).to have_received(:warn).with(include("max total count reached"))
+        expect(logger).to have_received(:warn).with(include("error_type=max_total_count_reached"))
       end
     end
 
@@ -185,7 +185,10 @@ RSpec.describe Microcms::FetchContentsService do
       it do
         expect { result }.to raise_error(
           described_class::FetchError,
-          "microCMS request failed: status=500, body=#{body}"
+          "microCMS request failed: status=500"
+        )
+        expect(logger).to have_received(:error).with(
+          include("microcms_request_failed", "upstream_status=500")
         )
       end
     end
@@ -200,7 +203,10 @@ RSpec.describe Microcms::FetchContentsService do
       it do
         expect { result }.to raise_error(
           described_class::FetchError,
-          "microCMS request failed: status=503, body=#{body}"
+          "microCMS request failed: status=503"
+        )
+        expect(logger).to have_received(:error).with(
+          include("microcms_request_failed", "upstream_status=503")
         )
       end
     end

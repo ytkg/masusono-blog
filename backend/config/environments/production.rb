@@ -30,9 +30,17 @@ Rails.application.configure do
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
-  # Log to STDOUT with the current request id as a default log tag.
-  config.log_tags = [ :request_id ]
-  config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
+  require Rails.root.join("lib/structured_logging/event_logger")
+  require Rails.root.join("lib/structured_logging/json_formatter")
+  require Rails.root.join("lib/structured_logging/request_context")
+  require Rails.root.join("lib/structured_logging/request_subscriber")
+
+  # Emit JSON to STDOUT so Cloud Logging can parse request and application events.
+  config.log_tags = []
+  config.logger = ActiveSupport::Logger.new(STDOUT)
+  config.logger.formatter = StructuredLogging::JsonFormatter.new
+  config.middleware.insert_before 0, StructuredLogging::RequestContext
+  StructuredLogging::RequestSubscriber.install!
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
