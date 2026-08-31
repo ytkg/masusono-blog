@@ -8,7 +8,7 @@ on:
       - .github/workflows/deploy-pr-cloud-run.yml
 
 concurrency:
-  group: cloud-run-pr-${{ github.event.pull_request.number }}
+  group: cloud-run-staging-${{ github.event.pull_request.head.ref }}
   cancel-in-progress: true
 
 jobs:

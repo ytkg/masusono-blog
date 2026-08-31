@@ -7,6 +7,13 @@ PRODUCTION_BRANCH="main"
 PRODUCTION_SERVICE="masusono"
 RAILS_MASTER_KEY_SECRET="rails-master-key:latest"
 
+COMMAND="${1:-deploy}"
+
+if [[ "${COMMAND}" != "deploy" && "${COMMAND}" != "delete" ]]; then
+  echo "Usage: $0 [deploy|delete]" >&2
+  exit 1
+fi
+
 CURRENT_BRANCH="${DEPLOY_BRANCH:-${GITHUB_REF_NAME:-$(git branch --show-current)}}"
 
 if [[ -z "${CURRENT_BRANCH}" ]]; then
@@ -24,8 +31,38 @@ else
     exit 1
   fi
 
-  # Cloud Run のサービス名は63文字以下。
-  SERVICE_NAME="${PRODUCTION_SERVICE}-${BRANCH_SLUG:0:54}"
+  # Cloud Run のサービス名は63文字以下。長いブランチ名はハッシュを付けて衝突を防ぐ。
+  if (( ${#BRANCH_SLUG} > 54 )); then
+    BRANCH_HASH="$(printf '%s' "${CURRENT_BRANCH}" | shasum -a 256 | cut -c1-8)"
+    SERVICE_NAME="${PRODUCTION_SERVICE}-${BRANCH_SLUG:0:45}-${BRANCH_HASH}"
+  else
+    SERVICE_NAME="${PRODUCTION_SERVICE}-${BRANCH_SLUG}"
+  fi
+fi
+
+if [[ "${COMMAND}" == "delete" ]]; then
+  if [[ "${CURRENT_BRANCH}" == "${PRODUCTION_BRANCH}" ]]; then
+    echo "Error: 本番サービス '${PRODUCTION_SERVICE}' は削除できません。" >&2
+    exit 1
+  fi
+
+  if DELETE_OUTPUT="$(gcloud run services delete "${SERVICE_NAME}" \
+    --project "${PROJECT_ID}" \
+    --region "${REGION}" \
+    --quiet 2>&1)"; then
+    echo "削除完了: ${SERVICE_NAME}"
+  elif [[ "${DELETE_OUTPUT}" == *"NOT_FOUND"* || "${DELETE_OUTPUT}" == *"not found"* ]]; then
+    echo "削除不要: ${SERVICE_NAME} はすでに存在しません"
+  else
+    printf '%s\n' "${DELETE_OUTPUT}" >&2
+    exit 1
+  fi
+
+  if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+    echo "service_name=${SERVICE_NAME}" >> "${GITHUB_OUTPUT}"
+  fi
+
+  exit 0
 fi
 
 gcloud run deploy "${SERVICE_NAME}" \
