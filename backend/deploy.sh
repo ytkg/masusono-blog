@@ -51,7 +51,7 @@ if [[ "${COMMAND}" == "delete" ]]; then
     --region "${REGION}" \
     --quiet 2>&1)"; then
     echo "削除完了: ${SERVICE_NAME}"
-  elif [[ "${DELETE_OUTPUT}" == *"NOT_FOUND"* || "${DELETE_OUTPUT}" == *"not found"* ]]; then
+  elif [[ "${DELETE_OUTPUT}" == *"NOT_FOUND"* || "${DELETE_OUTPUT}" == *"not found"* || "${DELETE_OUTPUT}" == *"not be found"* ]]; then
     echo "削除不要: ${SERVICE_NAME} はすでに存在しません"
   else
     printf '%s\n' "${DELETE_OUTPUT}" >&2
