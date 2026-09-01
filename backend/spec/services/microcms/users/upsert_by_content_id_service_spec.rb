@@ -33,6 +33,23 @@ RSpec.describe Microcms::Users::UpsertByContentIdService do
       expect(result).to eq({ id: content_id, user_id:, name: })
     end
 
+    it "コンテンツIDが既存の場合はPATCHで更新する" do
+      stub_request(:put, endpoint)
+        .to_return(status: 400, body: "Content is already exists. If you want update, please use PATCH request.")
+      stub_request(:patch, endpoint)
+        .with(
+          headers: {
+            "Accept" => "application/json",
+            "Content-Type" => "application/json",
+            "X-MICROCMS-API-KEY" => "test-api-key"
+          },
+          body: { user_id:, name: }.to_json
+        )
+        .to_return(status: 200, body: { id: content_id }.to_json, headers: json_response_headers)
+
+      expect(result).to eq({ id: content_id, user_id:, name: })
+    end
+
     it "microCMSのエラーを送出する" do
       stub_request(:put, endpoint).to_return(status: 503, body: "upstream unavailable", headers: json_response_headers)
 

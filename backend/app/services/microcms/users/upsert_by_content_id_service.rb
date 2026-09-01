@@ -21,12 +21,8 @@ module Microcms
       end
 
       def execute(content_id:, user_id:, name:)
-        response = faraday.put("#{self.class::ENDPOINT}/#{content_id}") do |request|
-          request.headers["X-MICROCMS-API-KEY"] = api_key
-          request.headers["Content-Type"] = "application/json"
-          request.headers["Accept"] = "application/json"
-          request.body = JSON.generate(user_id:, name:)
-        end
+        response = create(content_id:, user_id:, name:)
+        response = update(content_id:, user_id:, name:) if existing_content?(response)
 
         raise_on_error!(response)
         { id: content_id, user_id:, name: }
@@ -35,6 +31,29 @@ module Microcms
       private
 
       attr_reader :api_key, :faraday
+
+      def create(content_id:, user_id:, name:)
+        faraday.put("#{self.class::ENDPOINT}/#{content_id}") do |request|
+          write_request(request, user_id:, name:)
+        end
+      end
+
+      def update(content_id:, user_id:, name:)
+        faraday.patch("#{self.class::ENDPOINT}/#{content_id}") do |request|
+          write_request(request, user_id:, name:)
+        end
+      end
+
+      def existing_content?(response)
+        response.status == 400 && response.body.include?("Content is already exists")
+      end
+
+      def write_request(request, user_id:, name:)
+        request.headers["X-MICROCMS-API-KEY"] = api_key
+        request.headers["Content-Type"] = "application/json"
+        request.headers["Accept"] = "application/json"
+        request.body = JSON.generate(user_id:, name:)
+      end
 
       def raise_on_error!(response)
         return if response.success?
