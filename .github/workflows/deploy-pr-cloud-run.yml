@@ -2,10 +2,7 @@ name: deploy-pr-cloud-run
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
-    paths:
-      - backend/**
-      - .github/workflows/deploy-pr-cloud-run.yml
+    types: [labeled, reopened, synchronize]
 
 concurrency:
   group: cloud-run-staging-${{ github.event.pull_request.head.ref }}
@@ -13,7 +10,9 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(github.event.pull_request.labels.*.name, 'ステージングデプロイ')
     runs-on: ubuntu-latest
     permissions:
       contents: read
