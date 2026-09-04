@@ -150,6 +150,7 @@ web_push:
   vapid_public_key: "..."
   vapid_private_key: "..."
   vapid_subject: "mailto:YOUR_EMAIL@example.com"
+  microcms_webhook_secret: "..."
 ```
 
 ### 通知の送信
@@ -162,6 +163,16 @@ TITLE='お知らせ' BODY='好きな本文を送れます' URL='/articles/exampl
 ```
 
 有効な全購読端末へ送信し、配信先から無効と判断された購読はmicroCMSから自動削除します。
+
+### 新規記事公開時の自動通知
+
+microCMSの `articles` APIで「カスタム通知」を追加し、通知先を次に設定します。
+
+```
+https://masusono.com/webhooks/microcms/articles
+```
+
+タイミングは「コンテンツの公開時・更新時」を選び、上記credentialsの `microcms_webhook_secret` と同じシークレットを設定します。Webhookの `type` が `new` の場合だけ通知するため、公開済み記事の更新では通知されません。Webhook署名は `x-microcms-signature` で検証し、記事情報はコンテンツIDからmicroCMSへ再取得します。
 
 ## APIエラーレスポンス仕様
 
