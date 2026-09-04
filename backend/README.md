@@ -319,9 +319,10 @@ Rails credentials の復号鍵はSecret Managerの `rails-master-key` からClou
 成功してから、OIDC / Workload Identity FederationでGCPへ認証し、本番サービスへデプロイします。
 認証対象はGitHubリポジトリ `ytkg/masusono-blog` の `main` ブランチに限定されています。
 
-`.github/workflows/deploy-pr-cloud-run.yml` は、同一リポジトリのPRを開く・再オープンする・更新する
-たびに全CI後のステージングデプロイを行い、PRコメントへ最新URLを書き込みます。フォークからのPRは
-デプロイ対象外です。
+`.github/workflows/deploy-pr-cloud-run.yml` は、同一リポジトリのPRへ `ステージングデプロイ` ラベルを
+付けたとき、またはそのラベルが付いたPRを再オープン・更新したときに、全CI後のステージングデプロイを
+行い、PRコメントへ最新URLを書き込みます。フォークからのPRはデプロイ対象外です。ラベルを外しても
+サービスは削除されず、PRのマージまたはブランチ削除時に削除されます。
 
 GitHub Actions は Artifact Registry へイメージをビルド・pushしてから、`deploy.sh` 経由でそのイメージをCloud Runへデプロイします。成果物はPR終了時に削除し、本番イメージとCloud Runソース用バケットには保持ポリシーを設定しています。
 
