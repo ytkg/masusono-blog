@@ -324,7 +324,7 @@ Rails credentials の復号鍵はSecret Managerの `rails-master-key` からClou
 行い、PRコメントへ最新URLを書き込みます。フォークからのPRはデプロイ対象外です。ラベルを外しても
 サービスは削除されず、PRのマージまたはブランチ削除時に削除されます。
 
-GitHub Actions は Artifact Registry へイメージをビルド・pushしてから、`deploy.sh` 経由でそのイメージをCloud Runへデプロイします。成果物はPR終了時に削除し、本番イメージとCloud Runソース用バケットには保持ポリシーを設定しています。
+GitHub Actions は Artifact Registry へイメージをビルド・pushしてから、`deploy.sh` 経由でそのイメージをCloud Runへデプロイします。成果物はPR終了時に削除し、残ったイメージも3日後に自動削除します。本番イメージは最新3世代を保持します。Cloud Runソース用バケットにも保持ポリシーを設定しています。
 
 手動で `deploy.sh` を実行する場合は、`IMAGE_URI` が未指定ならソースデプロイ、指定した場合はイメージデプロイになります。
 
