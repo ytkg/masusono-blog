@@ -24,7 +24,7 @@ module WebPush
     attr_reader :article, :logger, :notification_service, :subscriptions_service
 
     def deliver(subscription, counts)
-      notification_service.call(subscription:, title: article.fetch(:title), body: "新しい記事を公開しました", url: "/articles/#{article.fetch(:id)}")
+      notification_service.call(subscription:, title: notification_title, body: article.fetch(:title), url: "/articles/#{article.fetch(:id)}")
       counts[:sent] += 1
     rescue ::WebPush::ExpiredSubscription, ::WebPush::InvalidSubscription
       remove_expired_subscription(subscription, counts)
@@ -43,6 +43,13 @@ module WebPush
 
     def log_failure(subscription, error)
       logger.warn("[WebPush::ArticlePublishedNotifier] delivery failed subscription_id=#{subscription[:id]} error=#{error.class}")
+    end
+
+    def notification_title
+      author_name = article.dig(:author, :name)
+      return "新しい記事が公開されたよ" if author_name.blank?
+
+      "#{author_name}が新しい記事を書いたよ"
     end
   end
 end
