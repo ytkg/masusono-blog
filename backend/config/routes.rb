@@ -15,6 +15,11 @@ Rails.application.routes.draw do
   get "authors/:author_id", to: "authors#show"
   get "articles/:article_id", to: "blog#show"
   get "blog", to: "blog#index"
+  namespace :webhooks do
+    namespace :microcms do
+      resources :articles, only: :create
+    end
+  end
   constraints(lambda { |request| request.path_parameters[:article_id] != "365" }) do
     get "blog/:article_id", to: redirect("/articles/%{article_id}")
   end
