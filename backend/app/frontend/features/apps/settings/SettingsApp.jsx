@@ -3,6 +3,7 @@ import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import SettingsIcon from "@mui/icons-material/Settings"
+import Switch from "@mui/material/Switch"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useCallback, useEffect, useState } from "react"
@@ -69,47 +70,35 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
 }
 
 function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUnsubscribe }) {
-  if (!state.supported) {
-    return (
-      <Card variant="outlined">
-        <CardContent>
-          <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
-            通知
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            このブラウザは通知に対応していません。
-          </Typography>
-        </CardContent>
-      </Card>
-    )
-  }
-
   const denied = state.permission === "denied"
+  const disabled = !state.supported || denied || isSaving
+  const description = !state.supported
+    ? "このブラウザは通知に対応していません。"
+    : denied
+      ? "ブラウザのサイト設定から通知を許可してください。"
+      : state.subscribed
+        ? "新しい記事が公開されたときに通知を受け取ります。"
+        : "新しい記事が公開されたときに通知を受け取れます。"
+
   return (
     <Card variant="outlined">
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.25, py: 1.5 }}>
         <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
-          通知
+          新着記事の通知
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {state.subscribed ? "新しいお知らせを通知で受け取ります。" : "新しいお知らせを通知で受け取れます。"}
-        </Typography>
-        {denied ? (
-          <Typography variant="body2" color="text.secondary">
-            ブラウザのサイト設定から通知を許可してください。
-          </Typography>
-        ) : (
-          <Box>
-            <Button
-              variant={state.subscribed ? "outlined" : "contained"}
-              size="small"
-              disabled={isSaving}
-              onClick={state.subscribed ? onUnsubscribe : onSubscribe}
-            >
-              {isSaving ? "更新中..." : state.subscribed ? "通知を停止" : "通知を受け取る"}
-            </Button>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              {description}
+            </Typography>
           </Box>
-        )}
+          <Switch
+            checked={state.subscribed}
+            disabled={disabled}
+            slotProps={{ input: { "aria-label": "新着記事の通知" } }}
+            onChange={state.subscribed ? onUnsubscribe : onSubscribe}
+          />
+        </Box>
         {errorMessage ? (
           <Typography variant="body2" color="error">
             {errorMessage}
