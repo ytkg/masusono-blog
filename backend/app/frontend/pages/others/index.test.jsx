@@ -10,6 +10,10 @@ vi.mock("../../features/apps/masudaRun/MasudaRunApp", () => ({
   default: () => <div>MasudaRunApp</div>,
 }))
 
+vi.mock("../../features/apps/wiki/WikiApp", () => ({
+  default: () => <div>WikiApp</div>,
+}))
+
 vi.mock("../../features/apps/settings/SettingsApp", () => ({
   default: () => <div>SettingsApp</div>,
 }))
@@ -21,6 +25,7 @@ describe("Others page", () => {
     expect(screen.getByText("seo:増田とその他のその他！:/others")).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "増田とその他のその他！" })).toBeInTheDocument()
     expect(await screen.findByText("MasudaRunApp")).toBeInTheDocument()
+    expect(await screen.findByText("WikiApp")).toBeInTheDocument()
     expect(await screen.findByText("SettingsApp")).toBeInTheDocument()
   })
 })
