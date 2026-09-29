@@ -1,6 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { router } from "@inertiajs/react"
 import { describe, expect, it, vi } from "vitest"
 import AppsDialogLauncher from "./AppsDialogLauncher"
+
+vi.mock("@inertiajs/react", () => ({ router: { visit: vi.fn() } }))
 
 describe("AppsDialogLauncher", () => {
   it("起動ボタンでモーダルを開き、閉じると子要素を隠す", async () => {
@@ -91,5 +94,21 @@ describe("AppsDialogLauncher", () => {
       { timeout: 2_000 },
     )
     expect(loadingIndicator).not.toBeVisible()
+  })
+
+  it("画面遷移するミニアプリも拡大してから移動する", async () => {
+    render(
+      <AppsDialogLauncher title="管理" buttonAriaLabel="管理を開く" navigationHref="/admin">
+        <div>管理画面</div>
+      </AppsDialogLauncher>,
+    )
+
+    const launcher = screen.getByRole("link", { name: "管理を開く" })
+    expect(launcher).toHaveAttribute("href", "/admin")
+    fireEvent.click(launcher)
+
+    expect(screen.getByRole("status", { name: "管理を読み込み中" })).toBeVisible()
+    await waitFor(() => expect(router.visit).toHaveBeenCalledWith("/admin", expect.any(Object)))
+    expect(screen.getByTestId("app-content")).not.toBeVisible()
   })
 })

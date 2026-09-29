@@ -1,4 +1,5 @@
 import { cloneElement, forwardRef, useCallback, useEffect, useId, useRef, useState } from "react"
+import { router } from "@inertiajs/react"
 import AppsIcon from "@mui/icons-material/Apps"
 import CloseIcon from "@mui/icons-material/Close"
 import Box from "@mui/material/Box"
@@ -192,6 +193,7 @@ export default function AppsDialogLauncher({
   contentSx,
   showLauncherLabel = true,
   titleAccessory,
+  navigationHref,
 }) {
   const [open, setOpen] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -242,7 +244,12 @@ export default function AppsDialogLauncher({
       })
   }, [])
 
-  const handleOpen = () => {
+  const handleOpen = (event) => {
+    if (navigationHref && (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) {
+      return
+    }
+
+    event.preventDefault()
     updateTransitionOrigin()
     setIsTransitionComplete(false)
     setIsContentVisible(false)
@@ -265,6 +272,9 @@ export default function AppsDialogLauncher({
     setIsTransitioning(false)
     setIsTransitionComplete(true)
     window.dispatchEvent(new Event("resize"))
+    if (navigationHref) {
+      router.visit(navigationHref, { onFinish: handleClose })
+    }
   }
 
   const handleExited = () => {
@@ -274,7 +284,7 @@ export default function AppsDialogLauncher({
 
   const loadingTaskCount = Object.keys(loadingTasks).length
   const completedTaskCount = Object.values(loadingTasks).filter(Boolean).length
-  const isLoadingComplete = isTransitionComplete && completedTaskCount === loadingTaskCount
+  const isLoadingComplete = !navigationHref && isTransitionComplete && completedTaskCount === loadingTaskCount
   const progressValue = loadingTaskCount === 0 ? 0 : Math.round((completedTaskCount / loadingTaskCount) * 100)
 
   useEffect(() => {
@@ -290,7 +300,14 @@ export default function AppsDialogLauncher({
   return (
     <Box sx={launcherContainerSx}>
       <Box sx={launcherSx}>
-        <IconButton ref={launcherButtonRef} aria-label={buttonAriaLabel} onClick={handleOpen} sx={iconButtonSx}>
+        <IconButton
+          ref={launcherButtonRef}
+          component={navigationHref ? "a" : "button"}
+          href={navigationHref}
+          aria-label={buttonAriaLabel}
+          onClick={handleOpen}
+          sx={iconButtonSx}
+        >
           {buttonIcon ?? <AppsIcon />}
         </IconButton>
         {showLauncherLabel ? (

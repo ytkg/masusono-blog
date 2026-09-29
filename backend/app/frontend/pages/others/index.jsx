@@ -1,8 +1,7 @@
 import { lazy, Suspense } from "react"
 import Box from "@mui/material/Box"
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
-import Typography from "@mui/material/Typography"
-import { Link } from "@inertiajs/react"
+import AppsDialogLauncher from "../../features/apps/shared/AppsDialogLauncher"
 import PageContainer from "../../shared/PageContainer"
 import SectionHeading from "../../shared/SectionHeading"
 import SeoHead from "../../shared/SeoHead"
@@ -44,35 +43,12 @@ export default function OthersIndex() {
             <MasudaRunApp />
             <SettingsApp />
           </Suspense>
-          <Box
-            component={Link}
-            href="/admin"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 0.5,
-              textDecoration: "none",
-              color: "inherit",
-            }}
-          >
-            <Box
-              sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 2,
-                bgcolor: "common.black",
-                color: "common.white",
-                display: "grid",
-                placeItems: "center",
-              }}
-            >
-              <AdminPanelSettingsIcon />
-            </Box>
-            <Typography variant="caption" color="text.secondary">
-              管理
-            </Typography>
-          </Box>
+          <AppsDialogLauncher
+            title="管理"
+            buttonAriaLabel="管理を開く"
+            buttonIcon={<AdminPanelSettingsIcon />}
+            navigationHref="/admin"
+          />
         </Box>
       </PageContainer>
     </>
