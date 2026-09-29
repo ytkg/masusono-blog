@@ -15,6 +15,12 @@ Rails.application.routes.draw do
   get "authors/:author_id", to: "authors#show"
   get "articles/:article_id", to: "blog#show"
   get "blog", to: "blog#index"
+  namespace :admin do
+    get "login", to: "sessions#new"
+    post "login", to: "sessions#create"
+    root "dashboard#index"
+    resources :media, only: :index
+  end
   namespace :webhooks do
     namespace :microcms do
       resources :articles, only: :create
