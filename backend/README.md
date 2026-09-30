@@ -337,7 +337,7 @@ Rails credentials の復号鍵はSecret Managerの `rails-master-key` からClou
 認証対象はGitHubリポジトリ `ytkg/masusono-blog` の `main` ブランチに限定されています。
 
 `.github/workflows/deploy-pr-cloud-run.yml` は、同一リポジトリのPRへ `ステージングデプロイ` ラベルを
-付けたとき、またはそのラベルが付いたPRを再オープン・更新したときに、通常のCIとVisual Regression成功後のステージングデプロイを
+付けたとき、またはそのラベルが付いたPRを再オープン・更新したときに、全CI後のステージングデプロイを
 行い、PRコメントへ最新URLを書き込みます。フォークからのPRはデプロイ対象外です。ラベルを外しても
 サービスは削除されず、PRのマージまたはブランチ削除時に削除されます。
 
