@@ -1,0 +1,36 @@
+services:
+  backend:
+    user: "0:0"
+    environment:
+      VISUAL_TEST: "1"
+      TZ: Asia/Tokyo
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/up"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  vite:
+    user: "0:0"
+    command: sh -lc "npm ci --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 3036"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3036/"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  visual:
+    build:
+      context: .
+      dockerfile: Dockerfile.visual
+    network_mode: service:backend
+    working_dir: /rails
+    command: npm run test:visual
+    environment:
+      CI: "1"
+    volumes:
+      - .:/rails
+      - node_modules_cache:/rails/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+      vite:
+        condition: service_healthy

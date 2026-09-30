@@ -1,0 +1,29 @@
+name: frontend-visual
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+      - name: Start visual test server
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml up --build -d backend vite
+      - name: Compare screenshots
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml run --build --rm visual
+      - name: Upload screenshot differences
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-test-results
+          path: |
+            backend/test-results
+            backend/playwright-report
+          if-no-files-found: ignore
+      - name: Stop visual test server
+        if: always()
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml down
