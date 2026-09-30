@@ -2,7 +2,7 @@
 
 この文書は現行 backend API のレスポンス契約の正本です。
 
-- 対象: Users API、`GET /api/app/masuda_run/rankings.json`、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
+- 対象: Users API、管理ミニアプリ API、`GET /api/app/masuda_run/rankings.json`、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
 ## Users API
@@ -32,6 +32,14 @@
 | `score` | `Numeric` | No | スコア |
 | `rankedAt` | `String` | No | 形式: `YYYY/MM/DD` |
 | `rank` | `Integer` | No | 順位 |
+
+## 管理ミニアプリ API
+
+Rails セッションを使い、認証トークンはレスポンスに含めない。すべて `Cache-Control: no-store` を返し、エラーは下記の共通形式とする。
+
+- `GET /api/app/management/session`: `{ "authenticated": Boolean, "csrf_token": String }`。未ログインでも取得できる。
+- `POST /api/app/management/session`: `{ "username": String, "password": String }` と `X-CSRF-Token` を送る。成功時は GET と同じ形式を返す。
+- `GET /api/app/management/media?page=1&q=...`: ログイン必須。`{ "media": Array, "total_count": Integer, "has_more": Boolean, "page": Integer, "query": String }` を返す。`q` はファイル名検索、`page` は1始まり。各メディアには `id`、`url` と、存在する場合は `width`、`height`、`createdAt`、`updatedAt`、`alt`、`tags` を含む。
 
 ## Web Push API
 

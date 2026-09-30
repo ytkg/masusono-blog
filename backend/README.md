@@ -43,8 +43,8 @@ npm run dev
 画面には送信しません。
 
 管理ミニアプリは、認証状態・ログイン・メディア取得に `/api/app/management/` 以下の
-JSON API を使います。セッションはサーバー側で管理し、ログインリクエストは CSRF トークンで保護します。
-
+JSON API を使います。認証トークンは画面へ返さず Rails セッションに保持し、
+ログインリクエストは CSRF トークンで保護します。
 
 - `GET /api/app/users/:user_id.json`
   - `user_id` に対応するユーザー情報を返す

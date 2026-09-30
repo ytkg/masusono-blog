@@ -22,6 +22,14 @@ function isImage(item) {
   return Number.isFinite(item.width) && Number.isFinite(item.height)
 }
 
+function mediaUrl(page, query) {
+  const params = new URLSearchParams({ page: String(page) })
+  if (query) params.set("q", query)
+  return `/api/app/management/media?${params}`
+}
+
+const loadError = "メディアを取得できませんでした。時間をおいて再度お試しください。"
+
 function MediaPreview({ item }) {
   return isImage(item) ? (
     <Box
@@ -60,10 +68,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
     setItems([])
     setHasMore(false)
     setTotalCount(0)
-    const params = new URLSearchParams({ page: "1" })
-    if (query) params.set("q", query)
-
-    requestJson(`/api/app/management/media?${params}`, { signal: controller.signal })
+    requestJson(mediaUrl(1, query), { signal: controller.signal })
       .then((result) => {
         if (requestId !== requestIdRef.current) return
         setItems(result.media)
@@ -76,7 +81,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
         if (failure.status === 401) {
           onUnauthorized()
         } else {
-          setError("メディアを取得できませんでした。時間をおいて再度お試しください。")
+          setError(loadError)
         }
       })
       .finally(() => {
@@ -94,9 +99,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
     setLoadingMore(true)
     setError(null)
     try {
-      const params = new URLSearchParams({ page: String(page + 1) })
-      if (query) params.set("q", query)
-      const result = await requestJson(`/api/app/management/media?${params}`)
+      const result = await requestJson(mediaUrl(page + 1, query))
       if (requestId !== requestIdRef.current) return
       setItems((current) => [...current, ...result.media])
       setPage(result.page)
@@ -106,7 +109,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
       if (failure.status === 401) {
         onUnauthorized()
       } else {
-        setError("メディアを取得できませんでした。時間をおいて再度お試しください。")
+        setError(loadError)
       }
     } finally {
       setLoadingMore(false)
