@@ -39,6 +39,26 @@ jobs:
       - run: npm ci
       - run: bin/ci
 
+      - name: Start visual test server
+        run: docker compose -f compose.yml -f compose.visual.yml up --build -d backend vite
+
+      - name: Compare screenshots
+        run: docker compose -f compose.yml -f compose.visual.yml run --build --rm visual
+
+      - name: Upload screenshot differences
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-visual-test-results
+          path: |
+            backend/test-results
+            backend/playwright-report
+          if-no-files-found: ignore
+
+      - name: Stop visual test server
+        if: always()
+        run: docker compose -f compose.yml -f compose.visual.yml down
+
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/332902117625/locations/global/workloadIdentityPools/github-actions/providers/masusono-blog
