@@ -23,6 +23,8 @@ worktree のルートから実行します。初回は Playwright の Docker イ
 
 基準画像は [public_pages.visual.js-snapshots](./public_pages.visual.js-snapshots) に保存し、テストコードと一緒に Git で管理します。差分が意図した変更なら、更新された画像を同じ PR でレビューしてください。CI は基準画像を自動更新しません。
 
+画面の見た目を変更した場合は、PR を作成する前に対象画面の通常の比較を実行してください。対象画面が未登録なら、比較テストも追加します。差分が意図した変更だった場合に限り基準画像を更新し、もう一度通常の比較を成功させてからコミットします。GitHub Actions の `frontend-visual` はステージングデプロイの有無にかかわらず全 PR で比較を実行します。失敗時は `visual-test-results` artifact で差分を確認してください。
+
 失敗時の実画像・差分画像・トレースは `backend/test-results/`、HTML レポートは `backend/playwright-report/` に出力されます。CI では `visual-test-results` という成果物から確認できます。
 
 Issue #220 の 17 状態・34 画像を対象にしています。管理ミニアプリのログイン、ダッシュボード、メディア一覧、画像詳細も含みます。管理画面の認証 API と microCMS メディア一覧は撮影用サーバーで固定応答にし、画像はリポジトリ内のアイコンを表示します。
