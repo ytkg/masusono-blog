@@ -60,7 +60,7 @@ Docker を使わない場合は、rbenv で `bin/dev` を実行し、別ター�
 
 変更範囲に応じて、少なくとも対応するチェックを実行する。Ruby とフロントエンドの両方に
 影響する変更、またはリリース前の確認では `bin/ci` を優先する。
-公開ページまたは管理ミニアプリの見た目を変更した場合は、Visual Regression も実行する。差分が意図したものなら、実画像・差分画像を確認して基準画像を同じ PR で更新し、更新後にもう一度比較を成功させる。基準画像の更新だけを目的にコマンドを実行しない。
+画面の見た目を変更した場合は、対象画面の Visual Regression も実行する。差分が意図したものなら、実画像・差分画像を確認して基準画像を同じ PR で更新し、更新後にもう一度比較を成功させる。基準画像の更新だけを目的にコマンドを実行しない。具体的な手順は [Visual Regression README](test/visual/README.md) を参照する。
 
 ```bash
 # Ruby の静的解析とテスト（Docker）
@@ -74,16 +74,6 @@ bin/ci
 npm run lint
 npm run format:check
 npm test
-```
-
-Visual Regression は worktree ルートで実行する。
-
-```bash
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml up --build -d backend vite
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --build --rm visual
-
-# 意図した差分を確認した後だけ実行する
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --build --rm visual npm run test:visual:update
 ```
 
 RSpec がデータベース準備を必要とする環境では、先に
