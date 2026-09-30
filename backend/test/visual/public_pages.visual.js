@@ -73,6 +73,11 @@ for (const [name, button] of [
     await openPage(page, "/others")
     await page.getByRole("button", { name: button }).click()
     await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
+    if (name === "masuda-run") {
+      const rankings = page.getByRole("table", { name: "増田RUNランキング" })
+      await expect(rankings).toBeVisible()
+      await expect(rankings.getByRole("row", { name: /増田愛美/ })).toBeVisible()
+    }
     await screenshot(page, name)
   })
 }

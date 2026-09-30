@@ -54,6 +54,11 @@ module VisualTestFixtures
     }
   }.freeze
 
+  RANKINGS = [
+    { userId: "visual-runner-1", name: "増田愛美", score: 2400, rankedAt: "2026/01/15", rank: 1 },
+    { userId: "visual-runner-2", name: "チャーリー", score: 1800, rankedAt: "2026/01/12", rank: 2 }
+  ].freeze
+
   module Articles
     def all = VisualTestFixtures::ARTICLES
 
@@ -70,5 +75,9 @@ module VisualTestFixtures
 
   module Numbers
     def call = { metrics: VisualTestFixtures::METRICS, status: :ok }
+  end
+
+  module Rankings
+    def call = { json: VisualTestFixtures::RANKINGS, status: :ok }
   end
 end
