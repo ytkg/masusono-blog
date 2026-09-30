@@ -30,6 +30,8 @@ function mediaUrl(page, query, token) {
 }
 
 const loadError = "メディアを取得できませんでした。時間をおいて再度お試しください。"
+const uploadUrl = "/api/app/management/media"
+const maxFileSize = 5 * 1024 * 1024
 
 function MediaPreview({ item }) {
   return isImage(item) ? (
@@ -47,7 +49,7 @@ function MediaPreview({ item }) {
   )
 }
 
-export default function AdminMedia({ onBack, onUnauthorized }) {
+export default function AdminMedia({ csrfToken, onBack, onUnauthorized }) {
   const [items, setItems] = useState([])
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
@@ -60,6 +62,9 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
+  const [uploadError, setUploadError] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef(null)
   const requestIdRef = useRef(0)
 
   useEffect(() => {
@@ -121,6 +126,45 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
     }
   }
 
+  async function uploadFile(file) {
+    if (!file) return
+
+    if (!file.type.startsWith("image/")) {
+      setUploadError("画像ファイルを選択してください。")
+      fileInputRef.current.value = ""
+      return
+    }
+    if (file.size > maxFileSize) {
+      setUploadError("画像ファイルは5MB以下にしてください。")
+      fileInputRef.current.value = ""
+      return
+    }
+
+    setUploading(true)
+    setUploadError(null)
+    const formData = new FormData()
+    formData.append("file", file)
+    try {
+      await requestJson(uploadUrl, {
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-Token": csrfToken },
+        body: formData,
+      })
+      setSearch("")
+      setQuery("")
+      setRefreshKey((current) => current + 1)
+    } catch (failure) {
+      if (failure.status === 401) {
+        onUnauthorized()
+      } else {
+        setUploadError(failure.message || "画像をアップロードできませんでした。時間をおいて再度お試しください。")
+      }
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+  }
+
   return (
     <>
       <Box
@@ -145,6 +189,24 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
       <Typography component="h3" variant="h6" fontWeight={700} sx={{ mb: { xs: 1, sm: 2 } }}>
         メディア一覧
       </Typography>
+      <Box sx={{ mb: { xs: 1, sm: 2 } }}>
+        <Button component="label" variant="contained" disabled={uploading}>
+          {uploading ? "アップロード中…" : "アップロード"}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            disabled={uploading}
+            onChange={(event) => uploadFile(event.target.files?.[0])}
+          />
+        </Button>
+        {uploadError ? (
+          <Typography role="alert" color="error" sx={{ mt: 1 }}>
+            {uploadError}
+          </Typography>
+        ) : null}
+      </Box>
       <Box
         component="form"
         onSubmit={(event) => {
