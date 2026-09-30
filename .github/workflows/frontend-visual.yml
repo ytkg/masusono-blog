@@ -4,43 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - backend/app/frontend/**
-      - backend/app/controllers/**
-      - backend/app/models/**
-      - backend/app/usecases/**
-      - backend/app/views/**
-      - backend/config/routes.rb
-      - backend/config/environments/development.rb
-      - backend/config/initializers/visual_test_fixtures.rb
-      - backend/test/visual/**
-      - backend/compose.yml
-      - backend/compose.visual.yml
-      - backend/Dockerfile.visual
-      - backend/playwright.config.js
-      - backend/package.json
-      - backend/package-lock.json
-      - backend/vite.config.ts
-      - .github/workflows/frontend-visual.yml
   pull_request:
-    paths:
-      - backend/app/frontend/**
-      - backend/app/controllers/**
-      - backend/app/models/**
-      - backend/app/usecases/**
-      - backend/app/views/**
-      - backend/config/routes.rb
-      - backend/config/environments/development.rb
-      - backend/config/initializers/visual_test_fixtures.rb
-      - backend/test/visual/**
-      - backend/compose.yml
-      - backend/compose.visual.yml
-      - backend/Dockerfile.visual
-      - backend/playwright.config.js
-      - backend/package.json
-      - backend/package-lock.json
-      - backend/vite.config.ts
-      - .github/workflows/frontend-visual.yml
 
 jobs:
   screenshots:
