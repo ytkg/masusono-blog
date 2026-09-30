@@ -3,15 +3,11 @@ module Admin
     def index
       result = MediaIndexUsecase.call(query: params[:q].to_s.strip, page: params[:page].presence || 1)
 
-      if request.format.json?
-        render json: result.fetch(:props), status: result.fetch(:status)
-      else
-        render_inertia_result(result, component: "admin/media")
-      end
+      render json: result.fetch(:props), status: result.fetch(:status)
     rescue ArgumentError
-      head :bad_request
+      render_admin_error(status: :bad_request, code: "invalid_request", message: "検索条件が正しくありません。")
     rescue Microcms::FetchMediaService::FetchError
-      render plain: "メディアを取得できません。時間をおいて再度お試しください。", status: :bad_gateway
+      render_admin_error(status: :bad_gateway, code: "media_unavailable", message: "メディアを取得できません。時間をおいて再度お試しください。")
     end
   end
 end

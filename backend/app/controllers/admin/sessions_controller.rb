@@ -1,31 +1,25 @@
 module Admin
-  class SessionsController < ApplicationController
-    after_action :disable_cache
+  class SessionsController < BaseController
+    skip_before_action :require_admin
 
-    def new
-      render inertia: "admin/login", props: { error: nil, csrfToken: form_authenticity_token }
+    def show
+      render json: { authenticated: AuthenticatedSession.valid?(session:), csrf_token: form_authenticity_token }
+    rescue AuthClient::Error
+      render_admin_error(status: :bad_gateway, code: "auth_unavailable", message: "認証サービスに接続できません。")
     end
 
     def create
       tokens = AuthClient.new.login(username: params[:username].to_s, password: params[:password].to_s)
       unless tokens
-        render inertia: "admin/login", props: { error: "ユーザー名またはパスワードが正しくありません。", csrfToken: form_authenticity_token }, status: :unauthorized
+        render_admin_error(status: :unauthorized, code: "invalid_credentials", message: "ユーザー名またはパスワードが正しくありません。")
         return
       end
 
       reset_session
       AuthenticatedSession.start(session:, tokens:)
-      redirect_to admin_root_path
+      render json: { authenticated: true, csrf_token: form_authenticity_token }
     rescue AuthClient::Error
-      render inertia: "admin/login", props: { error: "認証サービスに接続できません。", csrfToken: form_authenticity_token }, status: :bad_gateway
-    end
-
-    private
-
-    def disable_cache
-      response.cache_control.clear
-      response.cache_control[:no_store] = true
-      response.headers["X-Robots-Tag"] = "noindex, nofollow"
+      render_admin_error(status: :bad_gateway, code: "auth_unavailable", message: "認証サービスに接続できません。")
     end
   end
 end

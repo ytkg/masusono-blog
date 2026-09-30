@@ -1,49 +1,75 @@
 require "rails_helper"
 
-RSpec.describe "Admin", type: :request do
+RSpec.describe "Admin mini app", type: :request do
   let(:auth_client) { instance_double(Admin::AuthClient) }
 
   before do
     allow(Admin::AuthClient).to receive(:new).and_return(auth_client)
   end
 
-  it "未ログインではダッシュボードとメディアを表示しない" do
-    get "/admin"
-    expect(response).to redirect_to("/admin/login")
-
-    get "/admin/media.json"
-    expect(response).to redirect_to("/admin/login")
+  around do |example|
+    previous = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    example.run
+  ensure
+    ActionController::Base.allow_forgery_protection = previous
   end
 
-  it "認証サービスでログインしてダッシュボードを表示する" do
+  def login(username:, password:)
+    get "/api/app/management/session"
+    token = response.parsed_body.fetch("csrf_token")
+    post "/api/app/management/session",
+         params: { username:, password: }.to_json,
+         headers: { "CONTENT_TYPE" => "application/json", "X-CSRF-Token" => token }
+  end
+
+  it "未ログインでは状態だけを返し、メディアを公開しない" do
+    get "/api/app/management/session"
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body["authenticated"]).to be(false)
+    expect(response.parsed_body["csrf_token"]).to be_present
+
+    get "/api/app/management/media", headers: { "Accept" => "application/json" }
+    expect(response).to have_http_status(:unauthorized)
+    expect(response.parsed_body.dig("error", "code")).to eq("unauthorized")
+    expect(response.headers["cache-control"]).to include("no-store")
+    expect(response.headers["X-Robots-Tag"]).to eq("noindex, nofollow")
+  end
+
+  it "認証サービスでログインし、ミニアプリ内の状態を取得する" do
     allow(auth_client).to receive(:login).with(username: "owner", password: "correct").and_return(
       { "access_token" => "access", "refresh_token" => "refresh" }
     )
     allow(auth_client).to receive(:verify).with(access_token: "access").and_return(true)
 
-    post "/admin/login", params: { username: "owner", password: "correct" }
-    expect(response).to redirect_to("/admin")
-
-    get "/admin"
+    login(username: "owner", password: "correct")
     expect(response).to have_http_status(:ok)
-    expect(inertia).to render_component("admin/dashboard")
-    expect(inertia.props.to_json).not_to include("access", "refresh")
-    expect(response.headers["cache-control"]).to include("no-store")
-    expect(response.headers["X-Robots-Tag"]).to eq("noindex, nofollow")
+    expect(response.parsed_body["authenticated"]).to be(true)
+    expect(response.body).not_to include("access", "refresh")
+
+    get "/api/app/management/session"
+    expect(response.parsed_body["authenticated"]).to be(true)
   end
 
-  it "認証失敗時は管理画面に入れない" do
+  it "認証失敗時はメディアを取得できない" do
     allow(auth_client).to receive(:login).and_return(nil)
 
-    post "/admin/login", params: { username: "owner", password: "wrong" }
+    login(username: "owner", password: "wrong")
     expect(response).to have_http_status(:unauthorized)
-    expect(inertia).to render_component("admin/login")
+    expect(response.parsed_body.dig("error", "code")).to eq("invalid_credentials")
 
-    get "/admin"
-    expect(response).to redirect_to("/admin/login")
+    get "/api/app/management/media"
+    expect(response).to have_http_status(:unauthorized)
   end
 
-  it "認証後はメディア一覧をJSONでも取得できる" do
+  it "CSRFトークンのないログインを拒否する" do
+    get "/api/app/management/session"
+
+    post "/api/app/management/session", params: { username: "owner", password: "correct" }
+    expect(response).to have_http_status(:unprocessable_content)
+  end
+
+  it "認証後はメディア一覧をJSONで取得する" do
     allow(auth_client).to receive(:login).and_return(
       { "access_token" => "access", "refresh_token" => "refresh" }
     )
@@ -52,28 +78,11 @@ RSpec.describe "Admin", type: :request do
       { props: { media: [ { id: "image-1", url: "https://example.com/sample.png" } ], page: 2, has_more: false }, status: :ok }
     )
 
-    post "/admin/login", params: { username: "owner", password: "correct" }
-    get "/admin/media.json", params: { q: "sample", page: "2" }
+    login(username: "owner", password: "correct")
+    get "/api/app/management/media", params: { q: "sample", page: "2" }
 
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body.dig("media", 0, "id")).to eq("image-1")
     expect(response.headers["cache-control"]).to include("no-store")
-  end
-
-  it "認証後はメディア一覧画面を表示する" do
-    allow(auth_client).to receive(:login).and_return(
-      { "access_token" => "access", "refresh_token" => "refresh" }
-    )
-    allow(auth_client).to receive(:verify).and_return(true)
-    allow(Admin::MediaIndexUsecase).to receive(:call).and_return(
-      { props: { media: [], total_count: 0, has_more: false, page: 1, query: "" }, status: :ok }
-    )
-
-    post "/admin/login", params: { username: "owner", password: "correct" }
-    get "/admin/media"
-
-    expect(response).to have_http_status(:ok)
-    expect(inertia).to render_component("admin/media")
-    expect(inertia.props["media"]).to eq([])
   end
 end

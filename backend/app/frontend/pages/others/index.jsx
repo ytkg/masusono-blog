@@ -1,13 +1,12 @@
 import { lazy, Suspense } from "react"
 import Box from "@mui/material/Box"
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
-import AppsDialogLauncher from "../../features/apps/shared/AppsDialogLauncher"
 import PageContainer from "../../shared/PageContainer"
 import SectionHeading from "../../shared/SectionHeading"
 import SeoHead from "../../shared/SeoHead"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
 const SettingsApp = lazy(() => import("../../features/apps/settings/SettingsApp"))
+const AdminApp = lazy(() => import("../../features/apps/admin/AdminApp"))
 
 function OthersAppFallback() {
   return (
@@ -42,13 +41,8 @@ export default function OthersIndex() {
           <Suspense fallback={<OthersAppFallback />}>
             <MasudaRunApp />
             <SettingsApp />
+            <AdminApp />
           </Suspense>
-          <AppsDialogLauncher
-            title="管理"
-            buttonAriaLabel="管理を開く"
-            buttonIcon={<AdminPanelSettingsIcon />}
-            navigationHref="/admin"
-          />
         </Box>
       </PageContainer>
     </>

@@ -8,14 +8,18 @@ module Admin
     def require_admin
       return if AuthenticatedSession.valid?(session:)
 
-      redirect_to admin_login_path
+      render_admin_error(status: :unauthorized, code: "unauthorized", message: "ログインが必要です。")
     rescue AuthClient::Error
-      render plain: "認証サービスに接続できません。時間をおいて再度お試しください。", status: :bad_gateway
+      render_admin_error(status: :bad_gateway, code: "auth_unavailable", message: "認証サービスに接続できません。")
+    end
+
+    def render_admin_error(status:, code:, message:)
+      disable_cache
+      render json: { error: { code:, message:, request_id: request.request_id } }, status:
     end
 
     def disable_cache
-      response.cache_control.clear
-      response.cache_control[:no_store] = true
+      response.headers["Cache-Control"] = "no-store"
       response.headers["X-Robots-Tag"] = "noindex, nofollow"
     end
   end
