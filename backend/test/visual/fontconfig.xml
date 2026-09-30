@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias>
+    <family>Yu Mincho</family>
+    <prefer><family>Noto Serif CJK JP</family></prefer>
+  </alias>
+  <alias>
+    <family>YuMincho</family>
+    <prefer><family>Noto Serif CJK JP</family></prefer>
+  </alias>
+  <alias>
+    <family>Hiragino Mincho ProN</family>
+    <prefer><family>Noto Serif CJK JP</family></prefer>
+  </alias>
+  <alias>
+    <family>Hiragino Mincho Pro</family>
+    <prefer><family>Noto Serif CJK JP</family></prefer>
+  </alias>
+  <alias>
+    <family>Noto Serif JP</family>
+    <prefer><family>Noto Serif CJK JP</family></prefer>
+  </alias>
+</fontconfig>

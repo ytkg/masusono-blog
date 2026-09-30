@@ -16,6 +16,7 @@ on:
       - backend/test/visual/**
       - backend/compose.yml
       - backend/compose.visual.yml
+      - backend/Dockerfile.visual
       - backend/playwright.config.js
       - backend/package.json
       - backend/package-lock.json
@@ -34,6 +35,7 @@ on:
       - backend/test/visual/**
       - backend/compose.yml
       - backend/compose.visual.yml
+      - backend/Dockerfile.visual
       - backend/playwright.config.js
       - backend/package.json
       - backend/package-lock.json

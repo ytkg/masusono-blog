@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/playwright:v1.63.0-noble
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y fonts-noto-cjk && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY test/visual/fontconfig.xml /etc/fonts/conf.d/99-visual-japanese-fonts.conf
+RUN fc-cache -f

@@ -18,7 +18,10 @@ services:
       timeout: 2s
       retries: 60
   visual:
-    image: mcr.microsoft.com/playwright:v1.63.0-noble
+    build:
+      context: .
+      dockerfile: Dockerfile.visual
+    image: masusono-visual-playwright:1.63.0
     network_mode: service:backend
     working_dir: /rails
     command: npm run test:visual
