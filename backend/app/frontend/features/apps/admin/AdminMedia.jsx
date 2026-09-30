@@ -42,7 +42,7 @@ function MediaPreview({ item }) {
     />
   ) : (
     <Box sx={{ display: "grid", placeItems: "center", width: "100%", height: "100%", bgcolor: "action.hover" }}>
-      <InsertDriveFileIcon sx={{ fontSize: 52 }} />
+      <InsertDriveFileIcon sx={{ fontSize: { xs: 32, sm: 52 } }} />
     </Box>
   )
 }
@@ -132,7 +132,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
           alignItems: "center",
           gap: 0.5,
           color: "inherit",
-          mb: 2,
+          mb: { xs: 1, sm: 2 },
           p: 0,
           border: 0,
           bgcolor: "transparent",
@@ -142,7 +142,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
         <ArrowBackIcon fontSize="small" />
         管理画面
       </Box>
-      <Typography component="h3" variant="h6" fontWeight={700} sx={{ mb: 2 }}>
+      <Typography component="h3" variant="h6" fontWeight={700} sx={{ mb: { xs: 1, sm: 2 } }}>
         メディア一覧
       </Typography>
       <Box
@@ -156,7 +156,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
             setQuery(nextQuery)
           }
         }}
-        sx={{ display: "flex", gap: 1, mb: 2 }}
+        sx={{ display: "flex", gap: 1, mb: { xs: 1, sm: 2 } }}
       >
         <TextField
           label="ファイル名で検索"
@@ -170,11 +170,18 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
           検索
         </Button>
       </Box>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: { xs: 1, sm: 2 } }}>
         {totalCount}件
       </Typography>
       {loading ? <Typography>読み込み中…</Typography> : null}
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 2 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "repeat(4, minmax(0, 1fr))", sm: "repeat(auto-fill, minmax(140px, 1fr))" },
+          gap: { xs: 0.5, sm: 2 },
+          mx: { xs: -1, sm: 0 },
+        }}
+      >
         {items.map((item) => (
           <Box
             component="button"
@@ -186,20 +193,26 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
               p: 0,
               border: "1px solid",
               borderColor: "divider",
-              borderRadius: 2,
+              borderRadius: { xs: 1, sm: 2 },
               overflow: "hidden",
               bgcolor: "background.paper",
               cursor: "pointer",
               textAlign: "left",
             }}
           >
-            <Box sx={{ height: 140 }}>
+            <Box sx={{ aspectRatio: { xs: "1", sm: "auto" }, height: { xs: "auto", sm: 140 } }}>
               <MediaPreview item={item} />
             </Box>
             <Typography
               variant="caption"
               component="span"
-              sx={{ display: "block", p: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+              sx={{
+                display: "block",
+                p: { xs: 0.5, sm: 1 },
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
             >
               {fileName(item.url)}
             </Typography>
