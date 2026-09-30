@@ -7,6 +7,8 @@
     "lint": "eslint app/frontend --ext .js,.jsx",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:visual": "vite build && playwright test",
+    "test:visual:update": "vite build && playwright test --update-snapshots",
     "format": "prettier --write \"app/frontend/**/*.{js,jsx,css,md,json}\"",
     "format:check": "prettier --check \"app/frontend/**/*.{js,jsx,css,md,json}\""
   },
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@playwright/test": "1.63.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^6.0.1",
