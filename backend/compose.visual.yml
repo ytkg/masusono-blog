@@ -13,7 +13,7 @@ services:
     user: "0:0"
     command: sh -lc "npm ci --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 3036"
     healthcheck:
-      test: ["CMD", "test", "-x", "/rails/node_modules/.bin/vite"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:3036/"]
       interval: 2s
       timeout: 2s
       retries: 60
@@ -21,7 +21,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.visual
-    image: masusono-visual-playwright:1.63.0
     network_mode: service:backend
     working_dir: /rails
     command: npm run test:visual

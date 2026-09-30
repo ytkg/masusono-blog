@@ -8,7 +8,7 @@ worktree のルートから実行します。初回は Playwright の Docker イ
 
 ```bash
 .codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml up --build -d backend vite
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --rm visual
+.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --build --rm visual
 ```
 
 通常のリポジトリで実行する場合は、`docker compose -f backend/compose.yml -f backend/compose.visual.yml` に同じ引数を続けます。
@@ -18,7 +18,7 @@ worktree のルートから実行します。初回は Playwright の Docker イ
 画面変更が意図したものか確認したうえで、次を実行します。
 
 ```bash
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --rm visual npm run test:visual:update
+.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --build --rm visual npm run test:visual:update
 ```
 
 基準画像は [public_pages.visual.js-snapshots](./public_pages.visual.js-snapshots) に保存し、テストコードと一緒に Git で管理します。差分が意図した変更なら、更新された画像を同じ PR でレビューしてください。CI は基準画像を自動更新しません。

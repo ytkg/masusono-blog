@@ -14,7 +14,7 @@ jobs:
       - name: Start visual test server
         run: docker compose -f backend/compose.yml -f backend/compose.visual.yml up --build -d backend vite
       - name: Compare screenshots
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml run --rm visual
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml run --build --rm visual
       - name: Upload screenshot differences
         if: failure()
         uses: actions/upload-artifact@v4
