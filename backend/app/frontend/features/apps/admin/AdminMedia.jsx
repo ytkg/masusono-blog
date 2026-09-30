@@ -164,7 +164,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
           size="small"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          fullWidth
+          sx={{ flex: 1, minWidth: 0 }}
         />
         <Button type="submit" variant="contained">
           検索
@@ -179,7 +179,6 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
           display: "grid",
           gridTemplateColumns: { xs: "repeat(4, minmax(0, 1fr))", sm: "repeat(auto-fill, minmax(140px, 1fr))" },
           gap: { xs: 0.5, sm: 2 },
-          mx: { xs: -1, sm: 0 },
         }}
       >
         {items.map((item) => (
@@ -190,6 +189,8 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
             onClick={() => setSelected(item)}
             aria-label={`${fileName(item.url)}の詳細を表示`}
             sx={{
+              minWidth: 0,
+              width: "100%",
               p: 0,
               border: "1px solid",
               borderColor: "divider",
