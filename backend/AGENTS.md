@@ -60,7 +60,6 @@ Docker を使わない場合は、rbenv で `bin/dev` を実行し、別ター�
 
 変更範囲に応じて、少なくとも対応するチェックを実行する。Ruby とフロントエンドの両方に
 影響する変更、またはリリース前の確認では `bin/ci` を優先する。
-公開ページまたは管理ミニアプリの見た目を変更した場合は、Visual Regression も実行する。差分が意図したものなら、実画像・差分画像を確認して基準画像を同じ PR で更新し、更新後にもう一度比較を成功させる。基準画像の更新だけを目的にコマンドを実行しない。
 
 ```bash
 # Ruby の静的解析とテスト（Docker）
@@ -76,16 +75,6 @@ npm run format:check
 npm test
 ```
 
-Visual Regression は worktree ルートで実行する。
-
-```bash
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml up --build -d backend vite
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --build --rm visual
-
-# 意図した差分を確認した後だけ実行する
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --build --rm visual npm run test:visual:update
-```
-
 RSpec がデータベース準備を必要とする環境では、先に
 `RAILS_ENV=test bin/rails db:prepare` を実行する。検証できない場合は、実行していない
 コマンドとその理由を完了報告に明記する。自動修正コマンドは、対象外の差分を生まないことを
@@ -99,7 +88,6 @@ RSpec がデータベース準備を必要とする環境では、先に
   認証情報をリポジトリ内へコピーしない。
 - Cloud Run へのデプロイは `deploy.sh` を使うが、これは本番環境を変更する操作であるため、
   明示依頼と確認なしに実行しない。
-- PR のステージングデプロイは GitHub Actions が Visual Regression を含む事前チェックに成功した場合だけ実行する。失敗時は `visual-test-results` artifact で差分を確認し、意図した UI 変更なら基準画像を更新してから再実行する。
 
 ## 参考
 
