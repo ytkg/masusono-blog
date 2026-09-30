@@ -33,7 +33,7 @@ Git worktree で作業中は、ポートとボリュームを分離するため�
 
 ## デプロイ
 
-`main` への push（PRマージを含む）で GitHub Actions が Cloud Run の本番サービス `masusono` へデプロイします。リポジトリ内のPRは、`ステージングデプロイ` ラベルを付けると専用の Cloud Run ステージング環境へデプロイされ、URLがPRにコメントされます。ラベルが付いたまま更新すると再デプロイします。PRのマージまたはブランチ削除時に、対応するステージングサービスとイメージを削除します。
+`main` への push（PRマージを含む）で GitHub Actions が Cloud Run の本番サービス `masusono` へデプロイします。リポジトリ内のPRは、`ステージングデプロイ` ラベルを付けると、通常の CI と Visual Regression が成功した場合に限り専用の Cloud Run ステージング環境へデプロイされ、URLがPRにコメントされます。ラベルが付いたまま更新すると再デプロイします。PRのマージまたはブランチ削除時に、対応するステージングサービスとイメージを削除します。
 
 Cloud Run・Artifact Registry・GitHub Actions の詳細は [backend/README.md](backend/README.md) を参照してください。
 
