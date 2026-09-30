@@ -15,6 +15,10 @@ Rails.application.routes.draw do
   get "authors/:author_id", to: "authors#show"
   get "articles/:article_id", to: "blog#show"
   get "blog", to: "blog#index"
+  scope "/api/app/management", module: :admin do
+    resource :session, only: %i[show create], defaults: { format: :json }
+    resources :media, only: :index, defaults: { format: :json }
+  end
   namespace :webhooks do
     namespace :microcms do
       resources :articles, only: :create

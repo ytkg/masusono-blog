@@ -22,5 +22,6 @@ describe("Others page", () => {
     expect(screen.getByRole("heading", { name: "増田とその他のその他！" })).toBeInTheDocument()
     expect(await screen.findByText("MasudaRunApp")).toBeInTheDocument()
     expect(await screen.findByText("SettingsApp")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "管理を開く" })).toBeInTheDocument()
   })
 })
