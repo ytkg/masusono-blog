@@ -22,9 +22,10 @@ function isImage(item) {
   return Number.isFinite(item.width) && Number.isFinite(item.height)
 }
 
-function mediaUrl(page, query) {
+function mediaUrl(page, query, token) {
   const params = new URLSearchParams({ page: String(page) })
   if (query) params.set("q", query)
+  if (token) params.set("token", token)
   return `/api/app/management/media?${params}`
 }
 
@@ -50,6 +51,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
   const [items, setItems] = useState([])
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+  const [nextToken, setNextToken] = useState(null)
   const [totalCount, setTotalCount] = useState(0)
   const [search, setSearch] = useState("")
   const [query, setQuery] = useState("")
@@ -67,6 +69,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
     setError(null)
     setItems([])
     setHasMore(false)
+    setNextToken(null)
     setTotalCount(0)
     requestJson(mediaUrl(1, query), { signal: controller.signal })
       .then((result) => {
@@ -74,6 +77,7 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
         setItems(result.media)
         setPage(result.page)
         setHasMore(result.has_more)
+        setNextToken(result.next_token)
         setTotalCount(result.total_count)
       })
       .catch((failure) => {
@@ -99,11 +103,12 @@ export default function AdminMedia({ onBack, onUnauthorized }) {
     setLoadingMore(true)
     setError(null)
     try {
-      const result = await requestJson(mediaUrl(page + 1, query))
+      const result = await requestJson(mediaUrl(page + 1, query, nextToken))
       if (requestId !== requestIdRef.current) return
       setItems((current) => [...current, ...result.media])
       setPage(result.page)
       setHasMore(result.has_more)
+      setNextToken(result.next_token)
     } catch (failure) {
       if (requestId !== requestIdRef.current) return
       if (failure.status === 401) {

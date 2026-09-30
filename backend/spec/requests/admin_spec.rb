@@ -74,12 +74,12 @@ RSpec.describe "Admin mini app", type: :request do
       { "access_token" => "access", "refresh_token" => "refresh" }
     )
     allow(auth_client).to receive(:verify).and_return(true)
-    allow(Admin::MediaIndexUsecase).to receive(:call).with(query: "sample", page: "2").and_return(
+    allow(Admin::MediaIndexUsecase).to receive(:call).with(query: "sample", page: "2", cursor: "next").and_return(
       { props: { media: [ { id: "image-1", url: "https://example.com/sample.png" } ], page: 2, has_more: false }, status: :ok }
     )
 
     login(username: "owner", password: "correct")
-    get "/api/app/management/media", params: { q: "sample", page: "2" }
+    get "/api/app/management/media", params: { q: "sample", page: "2", token: "next" }
 
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body.dig("media", 0, "id")).to eq("image-1")

@@ -1,7 +1,7 @@
 module Admin
   class MediaController < BaseController
     def index
-      result = MediaIndexUsecase.call(query: params[:q].to_s.strip, page: params[:page].presence || 1)
+      result = MediaIndexUsecase.call(query: params[:q].to_s.strip, page: params[:page].presence || 1, cursor: params[:token])
 
       render json: result.fetch(:props), status: result.fetch(:status)
     rescue ArgumentError
