@@ -49,6 +49,11 @@ for (const [name, path, heading] of [
   test(name, async ({ page }) => {
     await openPage(page, path)
     await expect(page.getByRole("heading", { name: heading, exact: true }).first()).toBeVisible()
+    if (name === "others") {
+      for (const button of ["増田RUNを開く", "設定を開く", "管理を開く"]) {
+        await expect(page.getByRole("button", { name: button })).toBeVisible()
+      }
+    }
     await screenshot(page, name)
   })
 }
@@ -86,4 +91,52 @@ test("not found", async ({ page }) => {
   await openPage(page, "/articles/visual-missing", 404)
   await expect(page.getByRole("heading", { name: "ページが見つかりません" })).toBeVisible()
   await screenshot(page, "not-found")
+})
+
+async function openAdmin(page) {
+  await openPage(page, "/others")
+  await page.getByRole("button", { name: "管理を開く" }).click()
+  await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
+}
+
+async function loginAdmin(page) {
+  await openAdmin(page)
+  await page.getByRole("textbox", { name: "ユーザー名" }).fill("visual-owner")
+  await page.getByLabel("パスワード").fill("visual-password")
+  await page.getByRole("button", { name: "ログイン", exact: true }).click()
+  await expect(page.getByRole("button", { name: "メディア一覧へ" })).toBeVisible()
+}
+
+async function openAdminMedia(page) {
+  await loginAdmin(page)
+  await page.getByRole("button", { name: "メディア一覧へ" }).click()
+  await expect(page.getByRole("button", { name: "icon-512.pngの詳細を表示" })).toBeVisible()
+  await page
+    .getByTestId("app-content")
+    .locator("img")
+    .evaluateAll((images) => Promise.all(images.map((image) => image.decode())))
+}
+
+test("admin login", async ({ page }) => {
+  await openAdmin(page)
+  await expect(page.getByRole("heading", { name: "ログイン" })).toBeVisible()
+  await screenshot(page, "admin-login")
+})
+
+test("admin dashboard", async ({ page }) => {
+  await loginAdmin(page)
+  await screenshot(page, "admin-dashboard")
+})
+
+test("admin media", async ({ page }) => {
+  await openAdminMedia(page)
+  await screenshot(page, "admin-media")
+})
+
+test("admin media detail", async ({ page }) => {
+  await openAdminMedia(page)
+  await page.getByRole("button", { name: "icon-512.pngの詳細を表示" }).click()
+  await expect(page.getByRole("dialog", { name: "icon-512.png" })).toBeVisible()
+  await expect(page.getByText("画像サイズ: 512 × 512 px")).toBeVisible()
+  await screenshot(page, "admin-media-detail")
 })

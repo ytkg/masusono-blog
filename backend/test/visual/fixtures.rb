@@ -59,6 +59,27 @@ module VisualTestFixtures
     { userId: "visual-runner-2", name: "チャーリー", score: 1800, rankedAt: "2026/01/12", rank: 2 }
   ].freeze
 
+  ADMIN_MEDIA = [
+    {
+      id: "visual-media-1",
+      url: "http://localhost:3000/icons/icon-512.png",
+      width: 512,
+      height: 512,
+      alt: "増田とその他！のアイコン",
+      createdAt: "2026-01-15T12:00:00+09:00",
+      tags: [ "アイコン" ]
+    },
+    {
+      id: "visual-media-2",
+      url: "http://localhost:3000/favicon.png",
+      width: 64,
+      height: 64,
+      alt: "サイトのファビコン",
+      createdAt: "2026-01-12T12:00:00+09:00",
+      tags: [ "サイト" ]
+    }
+  ].freeze
+
   module Articles
     def all = VisualTestFixtures::ARTICLES
 
@@ -79,5 +100,37 @@ module VisualTestFixtures
 
   module Rankings
     def call = { json: VisualTestFixtures::RANKINGS, status: :ok }
+  end
+
+  module AdminAuth
+    def login(username:, password:)
+      return unless username == "visual-owner" && password == "visual-password"
+
+      { "access_token" => "visual-access", "refresh_token" => "visual-refresh" }
+    end
+
+    def verify(access_token:) = access_token == "visual-access"
+
+    def refresh(refresh_token:)
+      return unless refresh_token == "visual-refresh"
+
+      { "access_token" => "visual-access", "refresh_token" => "visual-refresh" }
+    end
+  end
+
+  module AdminMedia
+    def call(query:, page:, cursor: nil)
+      {
+        props: {
+          media: VisualTestFixtures::ADMIN_MEDIA,
+          total_count: VisualTestFixtures::ADMIN_MEDIA.length,
+          has_more: false,
+          next_token: nil,
+          page: page.to_i,
+          query: query
+        },
+        status: :ok
+      }
+    end
   end
 end

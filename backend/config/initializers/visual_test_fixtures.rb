@@ -6,5 +6,7 @@ if Rails.env.development? && ENV["VISUAL_TEST"] == "1"
     Author.singleton_class.prepend(VisualTestFixtures::Authors)
     Numbers::MetricsIndexUsecase.singleton_class.prepend(VisualTestFixtures::Numbers)
     Api::App::MasudaRun::RankingsIndexUsecase.singleton_class.prepend(VisualTestFixtures::Rankings)
+    Admin::AuthClient.prepend(VisualTestFixtures::AdminAuth)
+    Admin::MediaIndexUsecase.singleton_class.prepend(VisualTestFixtures::AdminMedia)
   end
 end
