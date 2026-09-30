@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   scope "/api/app/management", module: :admin do
     resource :session, only: %i[show create], defaults: { format: :json }
     resources :media, only: :index, defaults: { format: :json }
+    resources :articles, only: :index, defaults: { format: :json }
   end
   namespace :webhooks do
     namespace :microcms do

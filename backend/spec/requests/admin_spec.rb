@@ -23,7 +23,7 @@ RSpec.describe "Admin mini app", type: :request do
          headers: { "CONTENT_TYPE" => "application/json", "X-CSRF-Token" => token }
   end
 
-  it "未ログインでは状態だけを返し、メディアを公開しない" do
+  it "未ログインでは状態だけを返し、管理データを公開しない" do
     get "/api/app/management/session"
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body["authenticated"]).to be(false)
@@ -34,6 +34,10 @@ RSpec.describe "Admin mini app", type: :request do
     expect(response.parsed_body.dig("error", "code")).to eq("unauthorized")
     expect(response.headers["cache-control"]).to include("no-store")
     expect(response.headers["X-Robots-Tag"]).to eq("noindex, nofollow")
+
+    get "/api/app/management/articles", headers: { "Accept" => "application/json" }
+    expect(response).to have_http_status(:unauthorized)
+    expect(response.parsed_body.dig("error", "code")).to eq("unauthorized")
   end
 
   it "認証サービスでログインし、ミニアプリ内の状態を取得する" do
@@ -83,6 +87,23 @@ RSpec.describe "Admin mini app", type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body.dig("media", 0, "id")).to eq("image-1")
+    expect(response.headers["cache-control"]).to include("no-store")
+  end
+
+  it "認証後は記事一覧をJSONで取得する" do
+    allow(auth_client).to receive(:login).and_return(
+      { "access_token" => "access", "refresh_token" => "refresh" }
+    )
+    allow(auth_client).to receive(:verify).and_return(true)
+    allow(Admin::ArticlesIndexUsecase).to receive(:call).with(query: "下書き", status: "published_and_draft", page: "2").and_return(
+      { props: { articles: [ { id: "article-1", title: "下書きタイトル", status: "PUBLISH_AND_DRAFT" } ], page: 2, has_more: false }, status: :ok }
+    )
+
+    login(username: "owner", password: "correct")
+    get "/api/app/management/articles", params: { q: "下書き", status: "published_and_draft", page: "2" }
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body.dig("articles", 0, "title")).to eq("下書きタイトル")
     expect(response.headers["cache-control"]).to include("no-store")
   end
 end

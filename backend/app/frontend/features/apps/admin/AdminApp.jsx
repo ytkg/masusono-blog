@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react"
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import CollectionsIcon from "@mui/icons-material/Collections"
-import Box from "@mui/material/Box"
+import ArticleIcon from "@mui/icons-material/Article"
 import Button from "@mui/material/Button"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography"
 import { requestJson } from "../../../shared/lib/fetchJson"
 import AppsDialogLauncher from "../shared/AppsDialogLauncher"
 import AdminMedia from "./AdminMedia"
+import AdminArticles from "./AdminArticles"
 
 const sessionUrl = "/api/app/management/session"
 
@@ -73,13 +74,16 @@ function Login({ csrfToken, onLogin }) {
   )
 }
 
-function Dashboard({ onMedia }) {
+function Dashboard({ onMedia, onArticles }) {
   return (
-    <Box>
+    <Stack spacing={1} alignItems="flex-start">
       <Button variant="outlined" startIcon={<CollectionsIcon />} onClick={onMedia} sx={{ p: 2 }}>
         メディア一覧へ
       </Button>
-    </Box>
+      <Button variant="outlined" startIcon={<ArticleIcon />} onClick={onArticles} sx={{ p: 2 }}>
+        記事一覧へ
+      </Button>
+    </Stack>
   )
 }
 
@@ -132,8 +136,13 @@ export default function AdminApp() {
       }}
     >
       {view === "login" ? <Login csrfToken={csrfToken} onLogin={handleLogin} /> : null}
-      {view === "dashboard" ? <Dashboard onMedia={() => setView("media")} /> : null}
+      {view === "dashboard" ? (
+        <Dashboard onMedia={() => setView("media")} onArticles={() => setView("articles")} />
+      ) : null}
       {view === "media" ? <AdminMedia onBack={() => setView("dashboard")} onUnauthorized={handleUnauthorized} /> : null}
+      {view === "articles" ? (
+        <AdminArticles onBack={() => setView("dashboard")} onUnauthorized={handleUnauthorized} />
+      ) : null}
       {view === "error" ? (
         <Stack spacing={2} alignItems="flex-start">
           <Typography role="alert">{error}</Typography>
