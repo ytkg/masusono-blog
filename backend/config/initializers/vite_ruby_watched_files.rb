@@ -6,19 +6,26 @@ module ViteRubyWatchedFiles
   FRONTEND_TEST_FILE = %r{(^|/).+\.(test|spec)\.(js|jsx)$}
 
   def watched_files_digest
-    return @last_digest if @last_digest_at && Time.now - @last_digest_at < 1
+    cached = @watched_files_digest_cache
+    return cached.last if cached && Time.now - cached.first < 1
 
-    config.within_root do
-      files = Dir[*config.watched_paths].reject { |path| File.directory?(path) || path.match?(FRONTEND_TEST_FILE) }
-      file_ids = files.sort.filter_map do |path|
-        "#{File.basename(path)}/#{Digest::SHA1.file(path).hexdigest}"
-      rescue Errno::ENOENT, Errno::ENOTDIR
-        nil
-      end
+    root = config.root
+    file_ids = Dir.glob(config.watched_paths, base: root).sort.filter_map do |path|
+      next if path.match?(FRONTEND_TEST_FILE)
 
-      @last_digest_at = Time.now
-      @last_digest = Digest::SHA1.hexdigest(file_ids.join("/"))
+      absolute_path = File.expand_path(path, root)
+      next if File.directory?(absolute_path)
+
+      "#{File.basename(path)}/#{Digest::SHA1.file(absolute_path).hexdigest}"
+    rescue Errno::ENOENT, Errno::ENOTDIR
+      nil
     end
+
+    digest = Digest::SHA1.hexdigest(file_ids.join("/"))
+    # Publish the timestamp and value together; another thread must never see a
+    # fresh timestamp paired with an unfinished digest.
+    @watched_files_digest_cache = [ Time.now, digest ].freeze
+    digest
   end
 end
 
