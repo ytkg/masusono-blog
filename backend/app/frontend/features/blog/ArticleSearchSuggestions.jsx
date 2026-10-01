@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
-import Typography from "@mui/material/Typography"
+import SectionHeading from "@/shared/SectionHeading"
 
 const READING_TIME_SUGGESTIONS = Object.freeze(
   [
@@ -40,9 +40,7 @@ function SearchSuggestionSection({ items, label, prefix, onSelect }) {
 
   return (
     <Box>
-      <Typography color="text.secondary" sx={{ mb: 1 }}>
-        {label}
-      </Typography>
+      <SectionHeading>{label}</SectionHeading>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
         {items.map((item) => {
           const itemLabel = typeof item === "string" ? `${prefix}${item}` : item.label

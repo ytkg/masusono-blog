@@ -1,3 +1,4 @@
+import { itemLabelTextSx, supportingTextSx } from "@/shared/typographyStyles"
 import StatusAlert from "@/shared/components/StatusAlert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -15,7 +16,6 @@ import { useAppLoading } from "../shared/AppsLoadingContext"
 import { getWebPushState, subscribeToWebPush, unsubscribeFromWebPush } from "./webPush"
 
 const DEFAULT_NAME = "NO NAME"
-const labelTextSx = { fontSize: "14px" }
 const valueSx = { fontWeight: 700, fontSize: "22px" }
 const fieldHeight = 40
 
@@ -41,7 +41,7 @@ function NameSection({
   return (
     <Card variant="outlined">
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.25, py: 1.5 }}>
-        <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
+        <Typography variant="body2" sx={itemLabelTextSx}>
           表示名
         </Typography>
         <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
@@ -117,12 +117,12 @@ function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUn
   return (
     <Card variant="outlined">
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.25, py: 1.5 }}>
-        <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
+        <Typography variant="body2" sx={itemLabelTextSx}>
           新着記事の通知
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={supportingTextSx}>
               {description}
             </Typography>
           </Box>

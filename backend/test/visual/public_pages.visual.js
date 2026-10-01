@@ -38,6 +38,13 @@ async function checkAuxiliaryButton(page, button) {
   await expect(button).toHaveCSS("background-color", "rgb(245, 245, 245)")
 }
 
+async function expectSectionHeading(heading) {
+  await expect(heading).toHaveCSS("font-size", "20px")
+  await expect(heading).toHaveCSS("font-weight", "700")
+  await expect(heading).toHaveCSS("line-height", "25px")
+  await expect(heading).toHaveCSS("margin-bottom", "16px")
+}
+
 async function expectPageHeading(page, name) {
   const heading = page.getByRole("heading", { name, level: 1, exact: true })
   await expect(heading).toHaveCSS("font-size", "24px")
@@ -78,7 +85,7 @@ for (const [name, path, heading] of [
   test(name, async ({ page }) => {
     await openPage(page, path)
     await expect(page.getByRole("heading", { name: heading, exact: true }).first()).toBeVisible()
-    if (["about", "authors", "numbers"].includes(name)) {
+    if (["about", "others", "authors", "numbers"].includes(name)) {
       await expectPageHeading(page, heading)
     }
     if (name === "others") {
@@ -142,7 +149,9 @@ test.describe("author profiles", () => {
 
 test("search suggestions", async ({ page }) => {
   await openPage(page, "/search")
-  await expect(page.getByText("著者から探す")).toBeVisible()
+  for (const name of ["著者から探す", "タグから探す", "読了目安から探す"]) {
+    await expectSectionHeading(page.getByRole("heading", { name, level: 2 }))
+  }
   await screenshot(page, "search-suggestions")
 })
 
@@ -210,6 +219,19 @@ for (const [name, button] of [
     await openPage(page, "/others")
     await page.getByRole("button", { name: button }).click()
     await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
+    const title = page.getByRole("dialog").getByRole("heading", { level: 2 }).first()
+    await expect(title).toHaveCSS("font-size", "24px")
+    await expect(title).toHaveCSS("font-weight", "700")
+    await expect(title).toHaveCSS("line-height", "30px")
+    if (name === "settings") {
+      for (const label of ["表示名", "新着記事の通知"]) {
+        const item = page.getByRole("dialog").getByText(label, { exact: true })
+        await expect(item).toHaveCSS("font-size", "14px")
+        await expect(item).toHaveCSS("font-weight", "700")
+        await expect(item).toHaveCSS("line-height", "21px")
+        await expect(item).toHaveCSS("letter-spacing", "normal")
+      }
+    }
     if (name === "masuda-run") {
       const rankings = page.getByRole("table", { name: "増田RUNランキング" })
       await expect(rankings).toBeVisible()
@@ -370,6 +392,7 @@ for (const state of ["input", "save", "notification"]) {
 test("numbers trend", async ({ page }) => {
   await openPage(page, "/numbers")
   const chart = page.getByTestId("numbers-trend")
+  await expectSectionHeading(chart.getByRole("heading", { name: "推移", level: 2 }))
   await chart.scrollIntoViewIfNeeded()
   await expect(chart.getByTestId("trend-line-totalArticles")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.getByTestId("trend-line-totalChars")).toHaveAttribute("stroke-dasharray", "6 4")
