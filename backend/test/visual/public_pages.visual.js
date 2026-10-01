@@ -163,7 +163,24 @@ test("search results", async ({ page }) => {
   await checkAuxiliaryButton(page, menu)
   await menu.click()
   await expect(page.getByRole("menuitem", { name: "記事URLをコピー" })).toBeVisible()
-  await page.keyboard.press("Escape")
+  await expect(page.getByRole("menuitem", { name: "記事全文をコピー" })).toBeVisible()
+  await screenshot(page, "article-copy-menu")
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text) => {
+          window.copiedArticleText = text
+        },
+      },
+    })
+  })
+  await page.getByRole("menuitem", { name: "記事全文をコピー" }).click()
+  await expect(page.getByText("記事全文をコピーしました")).toBeVisible()
+  const copiedText = await page.evaluate(() => window.copiedArticleText)
+  expect(copiedText).toContain("週末の散歩で見つけたもの")
+  expect(copiedText).not.toContain("<p>")
+  await page.getByRole("button", { name: "Close", exact: true }).click()
   const clear = page.getByRole("button", { name: "検索語をクリア" })
   await checkAuxiliaryButton(page, clear)
   await expect(page.locator(".MuiInputBase-root")).toHaveCSS("height", "40px")
