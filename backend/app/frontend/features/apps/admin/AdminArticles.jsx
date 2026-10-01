@@ -1,7 +1,8 @@
+import AdminSectionHeader from "./AdminSectionHeader"
+import AdminSearchForm from "./AdminSearchForm"
+import { AdminLoadingMessage, AdminEmptyMessage, AdminListError, LoadMoreButton } from "./AdminListFeedback"
 import { useEffect, useRef, useState } from "react"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
 import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
@@ -111,43 +112,8 @@ export default function AdminArticles({ onBack, onUnauthorized }) {
 
   return (
     <>
-      <Box
-        component="button"
-        type="button"
-        onClick={onBack}
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 0.5,
-          color: "inherit",
-          mb: { xs: 1, sm: 2 },
-          p: 0,
-          border: 0,
-          bgcolor: "transparent",
-          cursor: "pointer",
-        }}
-      >
-        <ArrowBackIcon fontSize="small" />
-        管理画面
-      </Box>
-      <Typography component="h3" variant="h6" fontWeight={700} sx={{ mb: { xs: 1, sm: 2 } }}>
-        記事一覧
-      </Typography>
-      <Stack
-        component="form"
-        onSubmit={submitSearch}
-        direction={{ xs: "column", sm: "row" }}
-        spacing={1}
-        sx={{ mb: { xs: 1, sm: 2 } }}
-      >
-        <TextField
-          label="タイトルで検索"
-          name="q"
-          size="small"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          sx={{ flex: 1 }}
-        />
+      <AdminSectionHeader title="記事一覧" onBack={onBack} />
+      <AdminSearchForm label="タイトルで検索" value={search} onChange={setSearch} onSubmit={submitSearch}>
         <TextField
           select
           label="公開状態"
@@ -163,15 +129,14 @@ export default function AdminArticles({ onBack, onUnauthorized }) {
             </MenuItem>
           ))}
         </TextField>
-        <Button type="submit" variant="contained">
-          検索
-        </Button>
-      </Stack>
+      </AdminSearchForm>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
         {totalCount}件
       </Typography>
-      {loading ? <Typography>読み込み中…</Typography> : null}
-      {!loading && !error && items.length === 0 ? <Typography>記事が見つかりませんでした。</Typography> : null}
+      <AdminLoadingMessage loading={loading} />
+      <AdminEmptyMessage loading={loading} error={error} count={items.length}>
+        記事が見つかりませんでした。
+      </AdminEmptyMessage>
       <Stack component="ul" spacing={1} sx={{ listStyle: "none", p: 0, m: 0 }}>
         {items.map((item) => (
           <Box
@@ -191,17 +156,8 @@ export default function AdminArticles({ onBack, onUnauthorized }) {
           </Box>
         ))}
       </Stack>
-      {error ? (
-        <Box sx={{ mt: 2 }}>
-          <Typography role="alert">{error}</Typography>
-          <Button onClick={() => setRefreshKey((current) => current + 1)}>再試行</Button>
-        </Box>
-      ) : null}
-      {hasMore ? (
-        <Button onClick={loadMore} disabled={loading || loadingMore} variant="outlined" sx={{ mt: 3 }}>
-          {loadingMore ? "読み込み中…" : "もっと見る"}
-        </Button>
-      ) : null}
+      <AdminListError error={error} onRetry={() => setRefreshKey((current) => current + 1)} />
+      <LoadMoreButton hasMore={hasMore} loading={loading} loadingMore={loadingMore} onClick={loadMore} />
     </>
   )
 }

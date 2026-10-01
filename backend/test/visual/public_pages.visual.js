@@ -290,6 +290,32 @@ test("admin dashboard", async ({ page }) => {
   await screenshot(page, "admin-dashboard")
 })
 
+test.describe("admin articles", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("list and filters", async ({ page }) => {
+    await page.route("**/api/app/management/articles?*", (route) =>
+      route.fulfill({
+        json: {
+          articles: [
+            { id: "published", title: "公開中の記事", status: "PUBLISH", updated_at: "2026-01-02T00:00:00Z" },
+            { id: "draft", title: "下書きの記事", status: "DRAFT", updated_at: "2026-01-01T00:00:00Z" },
+          ],
+          total_count: 3,
+          page: 1,
+          has_more: true,
+        },
+      }),
+    )
+    await loginAdmin(page)
+    await page.getByRole("button", { name: "記事一覧へ" }).click()
+    await expect(page.getByText("公開中の記事", { exact: true })).toBeVisible()
+    await expect(page.getByRole("combobox", { name: "公開状態" })).toBeVisible()
+    await expect(page.getByRole("button", { name: "もっと見る" })).toBeVisible()
+    await screenshot(page, "admin-articles")
+  })
+})
+
 test("admin media", async ({ page }) => {
   await openAdminMedia(page)
   await screenshot(page, "admin-media")

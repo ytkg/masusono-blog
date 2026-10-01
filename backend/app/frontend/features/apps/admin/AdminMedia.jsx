@@ -1,12 +1,13 @@
+import AdminSectionHeader from "./AdminSectionHeader"
+import AdminSearchForm from "./AdminSearchForm"
+import { AdminLoadingMessage, AdminEmptyMessage, AdminListError, LoadMoreButton } from "./AdminListFeedback"
 import { useEffect, useRef, useState } from "react"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import DialogTitle from "@mui/material/DialogTitle"
-import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { requestJson } from "../../../shared/lib/fetchJson"
 
@@ -167,28 +168,7 @@ export default function AdminMedia({ csrfToken, onBack, onUnauthorized }) {
 
   return (
     <>
-      <Box
-        component="button"
-        type="button"
-        onClick={onBack}
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 0.5,
-          color: "inherit",
-          mb: { xs: 1, sm: 2 },
-          p: 0,
-          border: 0,
-          bgcolor: "transparent",
-          cursor: "pointer",
-        }}
-      >
-        <ArrowBackIcon fontSize="small" />
-        管理画面
-      </Box>
-      <Typography component="h3" variant="h6" fontWeight={700} sx={{ mb: { xs: 1, sm: 2 } }}>
-        メディア一覧
-      </Typography>
+      <AdminSectionHeader title="メディア一覧" onBack={onBack} />
       <Box sx={{ mb: { xs: 1, sm: 2 } }}>
         <Button component="label" variant="contained" disabled={uploading}>
           {uploading ? "アップロード中…" : "アップロード"}
@@ -207,8 +187,10 @@ export default function AdminMedia({ csrfToken, onBack, onUnauthorized }) {
           </Typography>
         ) : null}
       </Box>
-      <Box
-        component="form"
+      <AdminSearchForm
+        label="ファイル名で検索"
+        value={search}
+        onChange={setSearch}
         onSubmit={(event) => {
           event.preventDefault()
           const nextQuery = search.trim()
@@ -218,24 +200,11 @@ export default function AdminMedia({ csrfToken, onBack, onUnauthorized }) {
             setQuery(nextQuery)
           }
         }}
-        sx={{ display: "flex", gap: 1, mb: { xs: 1, sm: 2 } }}
-      >
-        <TextField
-          label="ファイル名で検索"
-          name="q"
-          size="small"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          sx={{ flex: 1, minWidth: 0 }}
-        />
-        <Button type="submit" variant="contained">
-          検索
-        </Button>
-      </Box>
+      />
       <Typography variant="body2" color="text.secondary" sx={{ mb: { xs: 1, sm: 2 } }}>
         {totalCount}件
       </Typography>
-      {loading ? <Typography>読み込み中…</Typography> : null}
+      <AdminLoadingMessage loading={loading} />
       <Box
         sx={{
           display: "grid",
@@ -282,18 +251,11 @@ export default function AdminMedia({ csrfToken, onBack, onUnauthorized }) {
           </Box>
         ))}
       </Box>
-      {!loading && !error && items.length === 0 ? <Typography>メディアが見つかりませんでした。</Typography> : null}
-      {error ? (
-        <Box sx={{ mt: 2 }}>
-          <Typography role="alert">{error}</Typography>
-          <Button onClick={() => setRefreshKey((current) => current + 1)}>再試行</Button>
-        </Box>
-      ) : null}
-      {hasMore ? (
-        <Button onClick={loadMore} disabled={loadingMore || loading} variant="outlined" sx={{ mt: 3 }}>
-          {loadingMore ? "読み込み中…" : "もっと見る"}
-        </Button>
-      ) : null}
+      <AdminEmptyMessage loading={loading} error={error} count={items.length}>
+        メディアが見つかりませんでした。
+      </AdminEmptyMessage>
+      <AdminListError error={error} onRetry={() => setRefreshKey((current) => current + 1)} />
+      <LoadMoreButton hasMore={hasMore} loading={loading} loadingMore={loadingMore} onClick={loadMore} />
       <Dialog
         open={Boolean(selected)}
         onClose={() => setSelected(null)}
