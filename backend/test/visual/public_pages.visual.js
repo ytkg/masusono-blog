@@ -70,6 +70,46 @@ test("search results", async ({ page }) => {
   await screenshot(page, "search-results")
 })
 
+test.describe("article titles", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("long article title wraps in list and detail", async ({ page }) => {
+    const title = "週末の散歩で見つけたもの".repeat(5) + "LongUnbrokenArticleTitle".repeat(4)
+    await page.route("**/*", async (route) => {
+      const path = new URL(route.request().url()).pathname
+      if (path !== "/" && path !== "/articles/visual-article-1") return route.continue()
+      const response = await route.fetch()
+      if (response.headers()["content-type"]?.includes("application/json")) {
+        const json = await response.json()
+        if (json.props?.article) json.props.article.title = title
+        await route.fulfill({ response, body: JSON.stringify(json) })
+        return
+      }
+      const body = (await response.text()).replaceAll("週末の散歩で見つけたもの", title)
+      await route.fulfill({ response, body })
+    })
+    await openPage(page, "/")
+    const listTitle = page.getByRole("heading", { name: title, level: 3 })
+    await expect(listTitle).toHaveCSS("font-size", "20px")
+    await expect(listTitle).toHaveCSS("line-height", "25px")
+    await screenshot(page, "article-title-long-list")
+    await page.getByRole("link", { name: title, exact: true }).click()
+    await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
+    const detailTitle = page.getByRole("heading", { name: title, level: 1 })
+    await expect(detailTitle).toHaveCSS("font-size", "24px")
+    await expect(detailTitle).toHaveCSS("line-height", "30px")
+    await expect(detailTitle).toHaveCSS("margin-bottom", "16px")
+    await expect(detailTitle).toHaveCSS("font-weight", "700")
+    await expect(detailTitle).toHaveCSS("letter-spacing", "normal")
+    await expect(detailTitle).toHaveCSS("overflow-wrap", "anywhere")
+    const box = await detailTitle.boundingBox()
+    expect(box.height).toBeGreaterThan(30)
+    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize().width)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(page.viewportSize().width)
+    await screenshot(page, "article-title-long-detail")
+  })
+})
+
 for (const [name, button] of [
   ["masuda-run", "増田RUNを開く"],
   ["settings", "設定を開く"],
