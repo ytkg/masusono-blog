@@ -12,7 +12,8 @@ const childRowsGridSx = Object.freeze({
 const indentSx = Object.freeze([Object.freeze({ pl: 2 }), Object.freeze({ pl: 2 }), Object.freeze({ pl: 4 })])
 const valueSx = Object.freeze({ fontWeight: 700, fontSize: "22px", textAlign: "right", justifySelf: "end" })
 const childValueSx = { fontWeight: 700, fontSize: "17px", textAlign: "right", justifySelf: "end" }
-const labelTextSx = { fontSize: "14px" }
+const labelTextSx = { fontSize: "14px", lineHeight: 1.5, letterSpacing: 0, fontWeight: 400 }
+const primaryLabelTextSx = { ...labelTextSx, fontWeight: 700 }
 
 const flattenMetricRows = (blocks, depth = 0, prefix = "") =>
   blocks.flatMap((block, index) => {
@@ -31,7 +32,7 @@ function MetricRowList({ rows }) {
         return (
           <Fragment key={row.id}>
             <Typography
-              variant="caption"
+              variant="body2"
               color="text.secondary"
               sx={{ ...labelTextSx, ...(indentSx[row.depth] ?? indentSx[indentSx.length - 1]) }}
             >
@@ -63,7 +64,7 @@ function MetricCard({ block, isLast }) {
       }}
     >
       <Box sx={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: 2, alignItems: "baseline" }}>
-        <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
+        <Typography variant="body2" color="text.secondary" sx={primaryLabelTextSx}>
           {block.label}
         </Typography>
         {showValue ? (
