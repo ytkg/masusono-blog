@@ -1,4 +1,4 @@
-import Alert from "@mui/material/Alert"
+import StatusAlert from "@/shared/components/StatusAlert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -21,12 +21,9 @@ const fieldHeight = 40
 
 function SettingsError({ id, children, spacing = 1 }) {
   return (
-    <Alert id={id} severity="error" variant="outlined" sx={{ mt: spacing, fontSize: 14, lineHeight: 1.5 }}>
-      <Box component="span" sx={{ fontWeight: 700 }}>
-        失敗：
-      </Box>
+    <StatusAlert id={id} sx={{ mt: spacing }}>
       {children}
-    </Alert>
+    </StatusAlert>
   )
 }
 

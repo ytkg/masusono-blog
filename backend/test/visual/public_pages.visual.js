@@ -350,3 +350,98 @@ test("numbers trend", async ({ page }) => {
   await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
   await expect(chart).toHaveScreenshot("numbers-trend.png")
 })
+
+for (const state of ["success", "error"]) {
+  test(`copy ${state}`, async ({ page }) => {
+    await page.addInitScript((state) => {
+      Object.defineProperty(navigator, "clipboard", {
+        value: {
+          writeText: async () => {
+            if (state === "error") throw new Error("denied")
+          },
+        },
+      })
+    }, state)
+    await openPage(page, "/articles/visual-article-1")
+    await page.getByRole("button", { name: "記事メニューを開く" }).first().click()
+    await page.getByRole("menuitem", { name: "記事URLをコピー" }).click()
+    await expect(page.getByRole("alert")).toContainText(state === "success" ? "完了" : "失敗")
+    await screenshot(page, `copy-${state}`)
+    if (state === "error") {
+      await page.waitForTimeout(3200)
+      await expect(page.getByRole("alert")).toBeVisible()
+      await page.getByRole("button", { name: "閉じる", exact: true }).click()
+      await expect(page.getByRole("alert")).not.toBeVisible()
+    } else {
+      await expect(page.getByRole("alert")).not.toBeVisible({ timeout: 5000 })
+    }
+  })
+}
+
+for (const state of ["empty", "error"]) {
+  test(`rankings ${state}`, async ({ page }) => {
+    await page.addInitScript((state) => {
+      const originalFetch = window.fetch
+      window.fetch = (url, options) => {
+        if (String(url).includes("/api/app/masuda_run/rankings.json")) {
+          return Promise.resolve(
+            new Response(
+              state === "error" ? JSON.stringify({ error: { message: "ランキングの取得に失敗しました。" } }) : "[]",
+              {
+                status: state === "error" ? 500 : 200,
+                headers: { "Content-Type": "application/json" },
+              },
+            ),
+          )
+        }
+        return originalFetch(url, options)
+      }
+    }, state)
+    await openPage(page, "/others")
+    await page.getByRole("button", { name: "増田RUNを開く" }).click()
+    await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
+    await expect(
+      page.getByText(state === "error" ? "ランキングの取得に失敗しました。" : "まだランキングがありません。"),
+    ).toBeVisible()
+    const message = state === "error" ? page.getByRole("alert") : page.getByText("まだランキングがありません。")
+    await expect(message).toHaveCSS("font-size", "14px")
+    await expect(message).toHaveCSS("line-height", "21px")
+    await expect(message).toHaveCSS("color", state === "error" ? "rgb(0, 0, 0)" : "rgb(102, 102, 102)")
+    await screenshot(page, `rankings-${state}`)
+  })
+}
+
+for (const state of ["loading", "warning", "error"]) {
+  test(`ruby ${state}`, async ({ page }) => {
+    await page.addInitScript((state) => {
+      window.Worker = class {
+        addEventListener(type, listener) {
+          if (type === "message") this.listener = listener
+        }
+        postMessage() {
+          if (state === "error") this.listener({ data: { error: "Ruby の実行に失敗しました。" } })
+        }
+        terminate() {}
+      }
+    }, state)
+    await page.route("**/articles/visual-article-1", async (route) => {
+      const response = await route.fetch()
+      const body = (await response.text()).replaceAll(
+        "ゆっくり過ごした週末の記録です。",
+        JSON.stringify('</p><pre><code class="language-ruby">puts :hello</code></pre><p>').slice(1, -1),
+      )
+      await route.fulfill({ response, body })
+    })
+    await openPage(page, "/articles/visual-article-1")
+    await page.getByRole("button", { name: "▶ 実行" }).click()
+    const runner = page.getByTestId("ruby-code-runner")
+    await runner.scrollIntoViewIfNeeded()
+    if (state === "loading") await expect(runner.getByRole("status")).toBeVisible()
+    else await expect(runner.getByRole("alert")).toContainText(state === "warning" ? "注意" : "失敗")
+    const message = state === "loading" ? runner.getByText("実行中...") : runner.getByRole("alert")
+    await expect(message).toHaveCSS("font-size", "14px")
+    await expect(message).toHaveCSS("line-height", "21px")
+    await expect(message).toHaveCSS("color", state === "loading" ? "rgb(102, 102, 102)" : "rgb(0, 0, 0)")
+    await expect(runner).toHaveScreenshot(`ruby-${state}.png`)
+  })
+}

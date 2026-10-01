@@ -1,4 +1,6 @@
 import { useState } from "react"
+import Button from "@mui/material/Button"
+import StatusAlert from "@/shared/components/StatusAlert"
 import IconButton from "@mui/material/IconButton"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
@@ -15,7 +17,7 @@ function buildArticleUrl(articleId) {
 
 export default function ArticleActions({ article }) {
   const [anchorEl, setAnchorEl] = useState(null)
-  const [message, setMessage] = useState("")
+  const [feedback, setFeedback] = useState(null)
   const isOpen = Boolean(anchorEl)
 
   const handleOpen = (event) => {
@@ -31,9 +33,9 @@ export default function ArticleActions({ article }) {
 
     try {
       await navigator.clipboard.writeText(buildArticleUrl(article.id))
-      setMessage("記事URLをコピーしました")
+      setFeedback({ severity: "success", message: "記事URLをコピーしました" })
     } catch {
-      setMessage("記事URLをコピーできませんでした")
+      setFeedback({ severity: "error", message: "記事URLをコピーできませんでした" })
     }
   }
 
@@ -61,12 +63,34 @@ export default function ArticleActions({ article }) {
         </MenuItem>
       </Menu>
       <Snackbar
-        open={Boolean(message)}
-        autoHideDuration={2400}
-        message={message}
-        onClose={() => setMessage("")}
+        key={feedback?.severity}
+        open={Boolean(feedback)}
+        autoHideDuration={feedback?.severity === "success" ? 3000 : null}
+        onClose={(_event, reason) => {
+          if (reason !== "clickaway" && feedback?.severity === "success") setFeedback(null)
+        }}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      />
+      >
+        <StatusAlert
+          severity={feedback?.severity || "success"}
+          onClose={() => setFeedback(null)}
+          action={
+            feedback?.severity === "error" ? (
+              <>
+                <Button color="inherit" size="small" onClick={handleCopy}>
+                  再試行
+                </Button>
+                <Button color="inherit" size="small" onClick={() => setFeedback(null)}>
+                  閉じる
+                </Button>
+              </>
+            ) : undefined
+          }
+          sx={{ width: "100%", minWidth: 0, "& .MuiAlert-message": { overflowWrap: "anywhere" } }}
+        >
+          {feedback?.message}
+        </StatusAlert>
+      </Snackbar>
     </>
   )
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
+import StatusAlert from "@/shared/components/StatusAlert"
+import LoadingStatus from "@/shared/components/LoadingStatus"
 import CodeBlock, { CodeBlockRunButton } from "./CodeBlock"
 import { buildCodeBlockDataFromHtml } from "./codeBlockData"
 import { runRubyCode } from "./runRubyCode"
@@ -33,8 +34,6 @@ const outputSx = {
 
 function buildOutputText(result) {
   const output = [result?.stdout, result?.stderr].filter(Boolean).join("")
-
-  if (result?.error) return result.error
 
   return output || "(出力なし)"
 }
@@ -73,7 +72,7 @@ export default function RubyExecutableCodeBlock({ code, html }) {
   }
 
   const outputText = buildOutputText(result)
-  const hasDetails = Boolean(result || showsRunningWarning)
+  const hasDetails = Boolean(result || isRunning)
   const block = buildCodeBlockDataFromHtml(html)
 
   return (
@@ -84,21 +83,20 @@ export default function RubyExecutableCodeBlock({ code, html }) {
           action={<CodeBlockRunButton disabled={isRunning} isRunning={isRunning} onClick={handleRun} />}
         />
       ) : null}
+      {isRunning ? <LoadingStatus>実行中...</LoadingStatus> : null}
       {showsRunningWarning ? (
-        <Typography color="text.secondary" sx={{ fontSize: "12px" }}>
+        <StatusAlert severity="warning">
           実行が長引いています。停止できない場合はページを再読み込みしてください。
-        </Typography>
+        </StatusAlert>
       ) : null}
       {result ? (
         <Box sx={{ display: "grid", gap: 0.75 }}>
-          {result.error ? (
-            <Typography color="text.primary" sx={{ fontSize: "12px", fontWeight: 700 }}>
-              エラー
-            </Typography>
+          {result.error ? <StatusAlert>{result.error}</StatusAlert> : null}
+          {!result.error ? (
+            <Box component="pre" data-testid="ruby-code-runner-output" sx={outputSx}>
+              {outputText}
+            </Box>
           ) : null}
-          <Box component="pre" data-testid="ruby-code-runner-output" sx={outputSx}>
-            {outputText}
-          </Box>
         </Box>
       ) : null}
     </Box>
