@@ -1,7 +1,8 @@
+import GameScoreboard from "./GameScoreboard"
+import GamePrimaryAction from "./GamePrimaryAction"
 import { useCallback, useEffect, useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import Button from "@mui/material/Button"
 import charImgSrc from "../assets/masuda_run.webp"
 import obsShortSrc from "../assets/other1.webp"
 import obsTallSrc from "../assets/other2.webp"
@@ -21,16 +22,6 @@ const containerSx = {
   height: "100%",
   minHeight: 0,
 }
-
-const headerSx = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  px: 1,
-  pb: 0.25,
-}
-
-const scoreTextSx = { fontSize: 16 }
 
 const canvasWrapSx = {
   width: "100%",
@@ -52,13 +43,6 @@ const canvasFrameSx = {
 }
 
 const canvasStyle = { width: "100%", height: "auto", display: "block", outline: "none" }
-
-const SCORE_PAD = 5
-const BUTTON_LABELS = Object.freeze({
-  ready: "スタート",
-  playing: "ジャンプ",
-  gameover: "リスタート",
-})
 
 export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
   const registerLoadingTask = useAppLoading()
@@ -184,41 +168,18 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
 
   return (
     <Box sx={containerSx}>
-      <Box sx={headerSx}>
-        <Typography variant="body2" sx={scoreTextSx}>
-          スコア {score.toString().padStart(SCORE_PAD, "0")}
-        </Typography>
-        <Typography variant="body2" sx={scoreTextSx}>
-          ハイスコア {Math.max(high, score).toString().padStart(SCORE_PAD, "0")}
-        </Typography>
-      </Box>
+      <GameScoreboard score={score} high={high} />
       <Box ref={canvasWrapRef} sx={canvasWrapSx}>
         <Box sx={canvasFrameSx}>
           <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={canvasStyle} />
         </Box>
       </Box>
-      <Box sx={{ width: "100%", flexShrink: 0 }}>
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          size="large"
-          disableRipple
-          disabled={restartCooling}
-          onPointerDown={(e) => {
-            e.preventDefault()
-            inputHandlers.onPrimaryPointerDown()
-            handlePrimaryAction()
-          }}
-          onClick={(e) => {
-            e.preventDefault()
-            if (!inputHandlers.onPrimaryClick()) return
-            handlePrimaryAction()
-          }}
-        >
-          {BUTTON_LABELS[state]}
-        </Button>
-      </Box>
+      <GamePrimaryAction
+        state={state}
+        restartCooling={restartCooling}
+        inputHandlers={inputHandlers}
+        onAction={handlePrimaryAction}
+      />
       <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
