@@ -12,7 +12,7 @@ module Microcms
       end
 
       def execute(user_id:)
-        first = client.fetch_contents(filters: "user_id[equals]#{user_id}", limit: 1).first
+        first = client.fetch_content(content_id: Identity.content_id(user_id))
         user_hash(first)
       end
 
@@ -21,7 +21,7 @@ module Microcms
       attr_reader :client
 
       def user_hash(first)
-        return {} unless first.is_a?(Hash)
+        return {} unless first.is_a?(Hash) && first.any?
 
         {
           id: first["id"],
