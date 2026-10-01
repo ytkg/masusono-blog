@@ -32,4 +32,11 @@ describe("CodeBlock", () => {
 
     expect(screen.getByRole("button", { name: "実行中" })).toBeDisabled()
   })
+  it("インデントと空行を保ち、行番号を3桁で表示する", () => {
+    const code = "\tputs :hello\n\n  puts :world"
+    render(<CodeBlock block={{ code, languageLabel: "Ruby", prismLanguage: "ruby" }} />)
+    const lines = [...document.querySelectorAll("pre > code > [data-code-line]")]
+    expect(lines.map((line) => line.firstElementChild.textContent)).toEqual(["001", "002", "003"])
+    expect(lines.map((line) => line.lastElementChild.textContent).join("")).toContain(code)
+  })
 })
