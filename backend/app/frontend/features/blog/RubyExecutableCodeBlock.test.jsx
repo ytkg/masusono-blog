@@ -44,7 +44,9 @@ describe("RubyExecutableCodeBlock", () => {
     fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
 
     const output = await screen.findByTestId("ruby-code-runner-output")
-    expect(output).toHaveStyle({ maxHeight: "8.5em", overflow: "auto" })
+    const style = window.getComputedStyle(output)
+    expect(style.maxHeight).toBe(`${8.5 * Number.parseFloat(style.fontSize)}px`)
+    expect(output).toHaveStyle({ overflow: "auto" })
   })
 
   it("実行エラーを表示する", async () => {

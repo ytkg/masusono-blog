@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import AdminArticles from "./AdminArticles"
 
@@ -41,7 +41,8 @@ describe("AdminArticles", () => {
     fireEvent.click(screen.getByRole("button", { name: "検索" }))
 
     expect(await screen.findByText("下書きタイトル")).toBeInTheDocument()
-    expect(screen.getAllByText("公開中・下書きあり")).toHaveLength(2)
+    expect(screen.getByRole("combobox", { name: "公開状態" })).toHaveTextContent("公開中・下書きあり")
+    expect(within(screen.getByRole("listitem")).getByText("公開中・下書きあり")).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledWith(
       "/api/app/management/articles?page=1&status=published_and_draft&q=%E4%B8%8B%E6%9B%B8%E3%81%8D",
       expect.any(Object),
