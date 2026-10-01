@@ -56,4 +56,28 @@ describe("ArticleActions", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close" }))
     await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument())
   })
+  it("タイトルと省略されていない本文をコピーする", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    mockClipboard(writeText)
+    const body = "長い本文".repeat(40)
+    render(
+      <ArticleActions article={{ id: "article-1", title: "記事タイトル", content: `<p>${body}</p><p>続き</p>` }} />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    fireEvent.click(screen.getByRole("menuitem", { name: "記事全文をコピー" }))
+    expect(await screen.findByText("記事全文をコピーしました")).toBeInTheDocument()
+    expect(writeText).toHaveBeenCalledWith(`記事タイトル\n\n${body}\n\n続き`)
+  })
+
+  it("全文コピーに失敗したときは全文コピーを再試行する", async () => {
+    const writeText = vi.fn().mockRejectedValueOnce(new Error("denied")).mockResolvedValue(undefined)
+    mockClipboard(writeText)
+    render(<ArticleActions article={{ id: "article-1", title: "タイトル", content: "<p>本文</p>" }} />)
+    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    fireEvent.click(screen.getByRole("menuitem", { name: "記事全文をコピー" }))
+    expect(await screen.findByText("記事全文をコピーできませんでした")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+    expect(await screen.findByText("記事全文をコピーしました")).toBeInTheDocument()
+    expect(writeText).toHaveBeenNthCalledWith(2, "タイトル\n\n本文")
+  })
 })
