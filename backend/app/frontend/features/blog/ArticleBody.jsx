@@ -64,7 +64,7 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
             variant="text"
             size="small"
             onClick={() => setIsExpanded((current) => !current)}
-            sx={{ ...supportingActionSx, textAlign: "right" }}
+            sx={{ ...supportingActionSx, my: -1, textAlign: "right" }}
           >
             {isExpanded ? "閉じる" : "続きを読む"}
           </Button>
