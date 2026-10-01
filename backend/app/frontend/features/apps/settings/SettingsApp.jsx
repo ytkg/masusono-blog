@@ -1,3 +1,4 @@
+import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -18,26 +19,57 @@ const labelTextSx = { fontSize: "14px" }
 const valueSx = { fontWeight: 700, fontSize: "22px" }
 const fieldHeight = 40
 
-function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onSave, onDraftChange }) {
+function SettingsError({ id, children, spacing = 1 }) {
+  return (
+    <Alert id={id} severity="error" variant="outlined" sx={{ mt: spacing, fontSize: 14, lineHeight: 1.5 }}>
+      <Box component="span" sx={{ fontWeight: 700 }}>
+        失敗：
+      </Box>
+      {children}
+    </Alert>
+  )
+}
+
+function NameSection({
+  name,
+  draftName,
+  isEditing,
+  isSaving,
+  inputError,
+  errorMessage,
+  onStartEditing,
+  onSave,
+  onDraftChange,
+}) {
   return (
     <Card variant="outlined">
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.25, py: 1.5 }}>
         <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
           表示名
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
           <Box sx={{ flex: 1 }}>
             {isEditing ? (
-              <TextField
-                label=""
-                placeholder="表示名"
-                value={draftName}
-                size="small"
-                onChange={(event) => onDraftChange(event.target.value)}
-                inputProps={{ sx: valueSx }}
-                fullWidth
-                sx={{ "& .MuiInputBase-root": { height: fieldHeight } }}
-              />
+              <Box>
+                <TextField
+                  label=""
+                  error={Boolean(inputError)}
+                  placeholder="表示名"
+                  value={draftName}
+                  size="small"
+                  onChange={(event) => onDraftChange(event.target.value)}
+                  slotProps={{
+                    htmlInput: {
+                      "aria-label": "表示名",
+                      sx: { ...valueSx, py: 0, height: "100%", boxSizing: "border-box" },
+                      "aria-describedby": inputError ? "display-name-error" : undefined,
+                    },
+                  }}
+                  fullWidth
+                  sx={{ "& .MuiInputBase-root": { height: fieldHeight } }}
+                />
+                {inputError ? <SettingsError id="display-name-error">{inputError}</SettingsError> : null}
+              </Box>
             ) : (
               <Box sx={{ height: fieldHeight, display: "flex", alignItems: "center" }}>
                 <Typography variant="h4" sx={valueSx}>
@@ -64,6 +96,11 @@ function NameSection({ name, draftName, isEditing, isSaving, onStartEditing, onS
             )}
           </Box>
         </Box>
+        {errorMessage ? (
+          <Box sx={{ mt: -0.25 }}>
+            <SettingsError spacing={0}>{errorMessage}</SettingsError>
+          </Box>
+        ) : null}
       </CardContent>
     </Card>
   )
@@ -100,9 +137,9 @@ function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUn
           />
         </Box>
         {errorMessage ? (
-          <Typography variant="body2" color="error">
-            {errorMessage}
-          </Typography>
+          <Box sx={{ mt: -0.25 }}>
+            <SettingsError spacing={0}>{errorMessage}</SettingsError>
+          </Box>
         ) : null}
       </CardContent>
     </Card>
@@ -115,6 +152,7 @@ export function SettingsContent({ loadOnMount = false }) {
   const [draftName, setDraftName] = useState(name)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [inputError, setInputError] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [webPushState, setWebPushState] = useState({ supported: true, subscribed: false, permission: "default" })
   const [isUpdatingWebPush, setIsUpdatingWebPush] = useState(false)
@@ -158,13 +196,16 @@ export function SettingsContent({ loadOnMount = false }) {
   const startEditing = () => {
     setDraftName(name)
     setErrorMessage("")
+    setInputError("")
     setIsEditing(true)
   }
 
   const saveName = async () => {
+    setInputError("")
+    setErrorMessage("")
     const trimmed = draftName.trim()
     if (trimmed.length === 0) {
-      setErrorMessage("表示名を入力してください")
+      setInputError("表示名を入力してください")
       return
     }
 
@@ -207,6 +248,8 @@ export function SettingsContent({ loadOnMount = false }) {
         draftName={draftName}
         isEditing={isEditing}
         isSaving={isSaving}
+        inputError={inputError}
+        errorMessage={errorMessage}
         onStartEditing={startEditing}
         onSave={saveName}
         onDraftChange={setDraftName}
@@ -218,11 +261,6 @@ export function SettingsContent({ loadOnMount = false }) {
         onSubscribe={() => updateWebPush(subscribeToWebPush)}
         onUnsubscribe={() => updateWebPush(unsubscribeFromWebPush)}
       />
-      {errorMessage ? (
-        <Typography variant="body2" color="error">
-          {errorMessage}
-        </Typography>
-      ) : null}
     </Box>
   )
 }

@@ -140,3 +140,62 @@ test("admin media detail", async ({ page }) => {
   await expect(page.getByText("画像サイズ: 512 × 512 px")).toBeVisible()
   await screenshot(page, "admin-media-detail")
 })
+
+for (const state of ["input", "save", "notification"]) {
+  test(`settings ${state} error`, async ({ page }) => {
+    await page.context().addCookies([{ name: "user_id", value: "visual-user", url: "http://localhost:3000" }])
+    await page.route("**/api/app/users.json", (route) => route.fulfill({ status: 500, body: "{}" }))
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "Notification", {
+        value: {
+          permission: "default",
+          requestPermission: async () => {
+            throw new Error("Test failure")
+          },
+        },
+      })
+      Object.defineProperty(navigator, "serviceWorker", {
+        value: {
+          register: async () => ({}),
+          ready: Promise.resolve({ pushManager: { getSubscription: async () => null } }),
+        },
+      })
+      window.PushManager = function () {}
+    })
+    await openPage(page, "/others")
+    await page.getByRole("button", { name: "設定を開く" }).click()
+    await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
+    if (state === "notification") {
+      await page.getByRole("switch", { name: "新着記事の通知" }).click()
+      await expect(page.getByRole("alert")).toContainText("通知設定の更新に失敗しました")
+    } else {
+      await page.getByRole("button", { name: "変更", exact: true }).click()
+      await page.getByRole("textbox", { name: "表示名" }).fill(state === "input" ? " " : "新しい名前")
+      await page.getByRole("button", { name: "保存", exact: true }).click()
+      await expect(page.getByRole("alert")).toContainText(
+        state === "input" ? "表示名を入力してください" : "表示名の保存に失敗しました",
+      )
+    }
+    const alert = page.getByRole("alert")
+    const target =
+      state === "input"
+        ? page.getByRole("textbox", { name: "表示名" })
+        : state === "save"
+          ? page.getByRole("button", { name: "保存", exact: true })
+          : page.getByRole("switch", { name: "新着記事の通知" })
+    const targetBox = await target.evaluate((element, state) => {
+      const row =
+        state === "input"
+          ? element.closest(".MuiInputBase-root")
+          : state === "notification"
+            ? element.closest(".MuiSwitch-root").parentElement
+            : element.parentElement.parentElement
+      const { y, height } = row.getBoundingClientRect()
+      return { y, height }
+    }, state)
+    const alertBox = await alert.boundingBox()
+    expect(alertBox.y - (targetBox.y + targetBox.height)).toBeCloseTo(8, 0)
+    expect(alertBox.x + alertBox.width).toBeLessThanOrEqual(page.viewportSize().width)
+    await screenshot(page, `settings-${state}-error`)
+  })
+}
