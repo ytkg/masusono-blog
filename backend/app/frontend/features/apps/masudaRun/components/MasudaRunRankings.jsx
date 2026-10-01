@@ -1,3 +1,4 @@
+import EmptyStatus from "@/shared/components/EmptyStatus"
 import StatusAlert from "@/shared/components/StatusAlert"
 import LoadingStatus from "@/shared/components/LoadingStatus"
 import Box from "@mui/material/Box"
@@ -45,9 +46,7 @@ export default function MasudaRunRankings({ rankings, isLoading, hasError, error
       {isLoading && topRankings.length === 0 ? <LoadingStatus>読み込み中...</LoadingStatus> : null}
       {hasError ? <StatusAlert>{errorMessage}</StatusAlert> : null}
       {!isLoading && !hasError && topRankings.length === 0 ? (
-        <Typography sx={{ color: "text.secondary", fontSize: 14, lineHeight: 1.5 }}>
-          まだランキングがありません。
-        </Typography>
+        <EmptyStatus>まだランキングがありません。</EmptyStatus>
       ) : null}
       {topRankings.length > 0 ? (
         <TableContainer sx={tableContainerSx}>

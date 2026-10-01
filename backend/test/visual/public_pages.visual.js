@@ -589,3 +589,77 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
     await expect(page).toHaveURL(/\/$/)
   })
 }
+
+test.describe("admin feedback states", () => {
+  test.use({ serviceWorkers: "block" })
+
+for (const state of ["session", "login", "articles", "media", "upload"]) {
+  test(`admin feedback ${state}`, async ({ page }) => {
+    const error = { error: { message: "テスト用の通信失敗" } }
+    if (state === "session") {
+      await page.route("**/api/app/management/session", (route) => route.fulfill({ status: 500, json: error }))
+      await openAdmin(page)
+    } else if (state === "login") {
+      await page.route("**/api/app/management/session", (route) =>
+        route.request().method() === "POST" ? route.fulfill({ status: 500, json: error }) : route.continue(),
+      )
+      await openAdmin(page)
+      await page.getByRole("textbox", { name: "ユーザー名" }).fill("visual-owner")
+      await page.getByLabel("パスワード").fill("visual-password")
+      await page.getByRole("button", { name: "ログイン", exact: true }).click()
+    } else {
+      await loginAdmin(page)
+      if (state === "articles" || state === "media") {
+        await page.route(`**/api/app/management/${state}?*`, (route) => route.fulfill({ status: 500, json: error }))
+        await page.getByRole("button", { name: state === "articles" ? "記事一覧へ" : "メディア一覧へ" }).click()
+      } else {
+        await page.getByRole("button", { name: "メディア一覧へ" }).click()
+        await page.locator('input[type="file"]').setInputFiles({ name: "invalid.txt", mimeType: "text/plain", buffer: Buffer.from("test") })
+      }
+    }
+    const alert = page.getByRole("alert")
+    await expect(alert).toContainText("失敗")
+    await expect(alert).toHaveCSS("font-size", "14px")
+    await expect(alert).toHaveCSS("line-height", "21px")
+    await screenshot(page, `admin-feedback-${state}`)
+  })
+}
+
+test("admin feedback empty", async ({ page }) => {
+  await loginAdmin(page)
+  await page.route("**/api/app/management/articles?*", (route) => route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } }))
+  await page.getByRole("button", { name: "記事一覧へ" }).click()
+  const empty = page.getByText("記事が見つかりませんでした。")
+  await expect(empty).toHaveCSS("font-size", "14px")
+  await expect(empty).toHaveCSS("color", "rgb(102, 102, 102)")
+  await screenshot(page, "admin-feedback-empty")
+})
+
+test("admin feedback loading", async ({ page }) => {
+  await loginAdmin(page)
+  let release
+  const ready = new Promise((resolve) => { release = resolve })
+  await page.route("**/api/app/management/articles?*", async (route) => {
+    await ready
+    await route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } })
+  })
+  await page.getByRole("button", { name: "記事一覧へ" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "読み込み中" })).toBeVisible()
+  try {
+    await screenshot(page, "admin-feedback-loading")
+  } finally {
+    release()
+  }
+  await expect(page.getByText("記事が見つかりませんでした。")).toBeVisible()
+})
+
+})
+
+test("public empty status", async ({ page }) => {
+  await openPage(page, "/search?q=unmatched-visual-query")
+  const empty = page.getByText("該当する記事はありません。")
+  await expect(empty).toHaveCSS("font-size", "14px")
+  await expect(empty).toHaveCSS("line-height", "21px")
+  await expect(empty).toHaveCSS("color", "rgb(102, 102, 102)")
+  await screenshot(page, "public-empty-status")
+})

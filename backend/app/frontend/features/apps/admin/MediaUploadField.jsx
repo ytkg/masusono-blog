@@ -1,7 +1,8 @@
 import { useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Typography from "@mui/material/Typography"
+import StatusAlert from "../../../shared/components/StatusAlert"
+import LoadingStatus from "../../../shared/components/LoadingStatus"
 import { requestJson } from "../../../shared/lib/fetchJson"
 
 const uploadUrl = "/api/app/management/media"
@@ -62,11 +63,8 @@ export default function MediaUploadField({ csrfToken, onUnauthorized, onUploaded
           onChange={(event) => uploadFile(event.target.files?.[0])}
         />
       </Button>
-      {uploadError ? (
-        <Typography role="alert" color="error" sx={{ mt: 1 }}>
-          {uploadError}
-        </Typography>
-      ) : null}
+      {uploading ? <LoadingStatus>アップロード中…</LoadingStatus> : null}
+      {uploadError ? <StatusAlert sx={{ mt: 1 }}>{uploadError}</StatusAlert> : null}
     </Box>
   )
 }

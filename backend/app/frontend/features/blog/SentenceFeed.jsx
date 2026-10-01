@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
+import EmptyStatus from "../../shared/components/EmptyStatus"
 import SentenceFeedCard from "./SentenceFeedCard"
 import useSentenceFeedState from "./useSentenceFeedState"
 import useSentenceFeedLayout from "./useSentenceFeedLayout"
@@ -12,7 +12,7 @@ export default function SentenceFeed({ articles = [] }) {
   useSentenceFeedProgress(feed)
 
   if (items.length === 0) {
-    return <Typography color="text.secondary">書き出しを表示できる記事がありません。</Typography>
+    return <EmptyStatus>書き出しを表示できる記事がありません。</EmptyStatus>
   }
 
   return (
