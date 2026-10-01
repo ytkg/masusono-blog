@@ -44,6 +44,6 @@
     "prettier": "^3.8.1",
     "vite": "^8.0.8",
     "vite-plugin-ruby": "^5.2.1",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.2"
   }
 }
