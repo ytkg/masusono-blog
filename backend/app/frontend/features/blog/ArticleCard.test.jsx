@@ -544,7 +544,7 @@ describe("ArticleCard", () => {
     expect(screen.getByText("#旅行")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "#日記" })).toHaveAttribute("href", "/search?q=%23%E6%97%A5%E8%A8%98")
     expect(screen.getByText("#Ruby")).toBeInTheDocument()
-    expect(title).toHaveStyle({ marginBottom: "4px" })
+    expect(title).toHaveStyle({ marginBottom: "16px" })
     expect(tags).toHaveStyle({ marginBottom: "8px" })
     expect(tags.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy()
     expect(tags.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()

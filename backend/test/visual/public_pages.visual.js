@@ -24,6 +24,21 @@ async function screenshot(page, name) {
   await expect(page).toHaveScreenshot(`${name}.png`)
 }
 
+async function expectPageHeading(page, name) {
+  const heading = page.getByRole("heading", { name, level: 1, exact: true })
+  await expect(heading).toHaveCSS("font-size", "24px")
+  await expect(heading).toHaveCSS("font-weight", "700")
+  await expect(heading).toHaveCSS("line-height", "30px")
+  await expect(heading).toHaveCSS("letter-spacing", "normal")
+  const layout = await heading.evaluate((element) => {
+    const title = element.getBoundingClientRect()
+    const content = element.nextElementSibling.getBoundingClientRect()
+    return { gap: content.top - title.bottom, width: element.clientWidth, scrollWidth: element.scrollWidth }
+  })
+  expect(layout.gap).toBe(24)
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.width)
+}
+
 test("home feed", async ({ page }) => {
   await openPage(page, "/")
   await expect(page.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
@@ -49,6 +64,9 @@ for (const [name, path, heading] of [
   test(name, async ({ page }) => {
     await openPage(page, path)
     await expect(page.getByRole("heading", { name: heading, exact: true }).first()).toBeVisible()
+    if (["about", "authors", "numbers"].includes(name)) {
+      await expectPageHeading(page, heading)
+    }
     if (name === "others") {
       for (const button of ["増田RUNを開く", "設定を開く", "管理を開く"]) {
         await expect(page.getByRole("button", { name: button })).toBeVisible()
@@ -68,6 +86,46 @@ test("search results", async ({ page }) => {
   await openPage(page, "/search?q=散歩")
   await expect(page.getByRole("link", { name: "週末の散歩で見つけたもの" })).toBeVisible()
   await screenshot(page, "search-results")
+})
+
+test.describe("article titles", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("long article title wraps in list and detail", async ({ page }) => {
+    const title = "週末の散歩で見つけたもの".repeat(5) + "LongUnbrokenArticleTitle".repeat(4)
+    await page.route("**/*", async (route) => {
+      const path = new URL(route.request().url()).pathname
+      if (path !== "/" && path !== "/articles/visual-article-1") return route.continue()
+      const response = await route.fetch()
+      if (response.headers()["content-type"]?.includes("application/json")) {
+        const json = await response.json()
+        if (json.props?.article) json.props.article.title = title
+        await route.fulfill({ response, body: JSON.stringify(json) })
+        return
+      }
+      const body = (await response.text()).replaceAll("週末の散歩で見つけたもの", title)
+      await route.fulfill({ response, body })
+    })
+    await openPage(page, "/")
+    const listTitle = page.getByRole("heading", { name: title, level: 3 })
+    await expect(listTitle).toHaveCSS("font-size", "20px")
+    await expect(listTitle).toHaveCSS("line-height", "25px")
+    await screenshot(page, "article-title-long-list")
+    await page.getByRole("link", { name: title, exact: true }).click()
+    await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
+    const detailTitle = page.getByRole("heading", { name: title, level: 1 })
+    await expect(detailTitle).toHaveCSS("font-size", "24px")
+    await expect(detailTitle).toHaveCSS("line-height", "30px")
+    await expect(detailTitle).toHaveCSS("margin-bottom", "16px")
+    await expect(detailTitle).toHaveCSS("font-weight", "700")
+    await expect(detailTitle).toHaveCSS("letter-spacing", "normal")
+    await expect(detailTitle).toHaveCSS("overflow-wrap", "anywhere")
+    const box = await detailTitle.boundingBox()
+    expect(box.height).toBeGreaterThan(30)
+    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize().width)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(page.viewportSize().width)
+    await screenshot(page, "article-title-long-detail")
+  })
 })
 
 for (const [name, button] of [
@@ -90,7 +148,10 @@ for (const [name, button] of [
 test("not found", async ({ page }) => {
   await openPage(page, "/articles/visual-missing", 404)
   await expect(page.getByRole("heading", { name: "ページが見つかりません" })).toBeVisible()
+  await expectPageHeading(page, "ページが見つかりません")
   await screenshot(page, "not-found")
+  await page.getByRole("link", { name: "ホームに戻る" }).click()
+  await expect(page.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
 })
 
 async function openAdmin(page) {

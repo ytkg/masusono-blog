@@ -1,5 +1,4 @@
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
+import PageHeading from "../../shared/PageHeading"
 import PageContainer from "../../shared/PageContainer"
 import SeoHead from "../../shared/SeoHead"
 import NumbersPreview from "../../features/apps/numbers/NumbersPreview"
@@ -14,12 +13,8 @@ export default function NumbersIndex({ metrics }) {
       />
 
       <PageContainer id="numbers">
-        <Stack spacing={1.5}>
-          <Typography variant="h5" component="h1" sx={{ m: 0, fontWeight: 700, lineHeight: 1.25 }}>
-            数字でわかる、増田とその他！
-          </Typography>
-          <NumbersPreview metrics={metrics} />
-        </Stack>
+        <PageHeading>数字でわかる、増田とその他！</PageHeading>
+        <NumbersPreview metrics={metrics} />
       </PageContainer>
     </>
   )
