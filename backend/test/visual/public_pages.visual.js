@@ -431,6 +431,7 @@ test("numbers trend", async ({ page }) => {
 
 for (const state of ["success", "error"]) {
   test(`copy ${state}`, async ({ page }) => {
+    await page.clock.install()
     await page.addInitScript((state) => {
       Object.defineProperty(navigator, "clipboard", {
         value: {
@@ -445,8 +446,8 @@ for (const state of ["success", "error"]) {
     await page.getByRole("menuitem", { name: "記事URLをコピー" }).click()
     await expect(page.getByRole("alert")).toContainText(state === "success" ? "完了" : "失敗")
     await screenshot(page, `copy-${state}`)
+    await page.clock.fastForward(3200)
     if (state === "error") {
-      await page.waitForTimeout(3200)
       await expect(page.getByRole("alert")).toBeVisible()
       await page.getByRole("button", { name: "閉じる", exact: true }).click()
       await expect(page.getByRole("alert")).not.toBeVisible()
@@ -491,6 +492,7 @@ for (const state of ["empty", "error"]) {
 
 for (const state of ["loading", "warning", "error"]) {
   test(`ruby ${state}`, async ({ page }) => {
+    if (state === "warning") await page.clock.install()
     await page.addInitScript((state) => {
       window.Worker = class {
         addEventListener(type, listener) {
@@ -512,6 +514,7 @@ for (const state of ["loading", "warning", "error"]) {
     })
     await openPage(page, "/articles/visual-article-1")
     await page.getByRole("button", { name: "▶ 実行" }).click()
+    if (state === "warning") await page.clock.fastForward(3000)
     const runner = page.getByTestId("ruby-code-runner")
     await runner.scrollIntoViewIfNeeded()
     if (state === "loading") await expect(runner.getByRole("status")).toBeVisible()
