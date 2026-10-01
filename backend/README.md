@@ -139,7 +139,9 @@ docker compose run --rm backend bundle exec rails articles:apply_tag_updates_fro
 
 ### ユーザーコンテンツID移行
 
-`users` APIのコンテンツIDは、前後空白を除去した `user_id` のSHA-256先頭32文字に `u-` を付けた値を正規IDとして使用します。microCMSの `users` APIで、コンテンツIDに英小文字・数字・`-` を許可し、`GET`・`PUT`・`DELETE` 権限を付与してください。
+`users` APIのコンテンツIDは、前後空白を除去した `user_id` のSHA-256先頭32文字に `u-` を付けた値を正規IDとして使用します。microCMSの `users` APIで、コンテンツIDに英小文字・数字・`-` を許可し、`GET`・`PUT`・`PATCH`・`DELETE` 権限を付与してください。
+
+通常保存は正規IDへの `PUT` で作成し、既存IDの場合は `PATCH` で更新します。ユーザー取得も正規IDを使います。
 
 次のコマンドはデータを変更せず、移行候補・削除予定・要確認レコードをJSONで出力します。
 

@@ -11,7 +11,8 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
     end
     let(:endpoint) { service_class::ENDPOINT }
     let(:user_id) { "cookie-user" }
-    let(:query) { { "limit" => "1", "filters" => "user_id[equals]cookie-user" } }
+    let(:content_id) { Microcms::Users::Identity.content_id("cookie-user") }
+    let(:content_url) { "#{endpoint}/#{content_id}" }
 
     before do
       stub_microcms_api_key
@@ -19,21 +20,14 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
 
     context "取得成功時" do
       before do
-        stub_request(:get, endpoint)
-          .with(query: query, headers: microcms_request_headers)
+        stub_request(:get, content_url)
+          .with(headers: microcms_request_headers)
           .to_return(
             status: 200,
             body: {
-              contents: [
-                {
-                  id: "u_1",
-                  user_id: "cookie-user",
-                  name: "表示名太郎"
-                }
-              ],
-              totalCount: 1,
-              limit: 1,
-              offset: 0
+              id: content_id,
+              user_id: "cookie-user",
+              name: "表示名太郎"
             }.to_json,
             headers: json_response_headers
           )
@@ -42,7 +36,7 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
       it do
         expect(result).to eq(
           {
-            id: "u_1",
+            id: content_id,
             user_id: "cookie-user",
             name: "表示名太郎"
           }
@@ -50,13 +44,27 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
       end
     end
 
+    context "user_idの前後に空白がある場合" do
+      let(:user_id) { "  cookie-user  " }
+
+      before do
+        stub_request(:get, content_url)
+          .with(headers: microcms_request_headers)
+          .to_return(status: 200, body: { id: content_id, user_id: "cookie-user", name: "表示名太郎" }.to_json)
+      end
+
+      it do
+        expect(result).to eq(id: content_id, user_id: "cookie-user", name: "表示名太郎")
+      end
+    end
+
     context "対象がない場合" do
       before do
-        stub_request(:get, endpoint)
-          .with(query: query, headers: microcms_request_headers)
+        stub_request(:get, content_url)
+          .with(headers: microcms_request_headers)
           .to_return(
-            status: 200,
-            body: { contents: [], totalCount: 0, limit: 1, offset: 0 }.to_json,
+            status: 404,
+            body: { message: "Not found" }.to_json,
             headers: json_response_headers
           )
       end
@@ -68,8 +76,8 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
 
     context "取得失敗時" do
       before do
-        stub_request(:get, endpoint)
-          .with(query: query, headers: microcms_request_headers)
+        stub_request(:get, content_url)
+          .with(headers: microcms_request_headers)
           .to_return(status: 503, body: "upstream unavailable", headers: json_response_headers)
       end
 

@@ -29,6 +29,20 @@ module Microcms
         []
       end
 
+      def fetch_content(content_id:)
+        response = faraday.get("#{endpoint}/#{content_id}") do |request|
+          request.headers["X-API-KEY"] = api_key
+          request.headers["Accept"] = "application/json"
+        end
+
+        return {} if response.status == 404
+
+        raise_on_error!(response)
+        JSON.parse(response.body)
+      rescue JSON::ParserError
+        {}
+      end
+
       private
 
       attr_reader :api_key, :endpoint, :faraday
