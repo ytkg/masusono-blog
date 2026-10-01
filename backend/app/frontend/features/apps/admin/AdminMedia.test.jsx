@@ -141,4 +141,44 @@ describe("AdminMedia", () => {
     fireEvent.change(input, { target: { files: [file] } })
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(4))
   })
+  it("5MBを超える画像を送信せず、入力をリセットする", async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse({ media: [], total_count: 0, has_more: false, page: 1 }))
+    vi.stubGlobal("fetch", fetch)
+    const { container } = render(<AdminMedia onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    await screen.findByText("メディアが見つかりませんでした。")
+    const file = new File([new Uint8Array(5 * 1024 * 1024 + 1)], "large.png", { type: "image/png" })
+    const input = container.querySelector('input[type="file"]')
+    fireEvent.change(input, { target: { files: [file] } })
+    expect(screen.getByRole("alert")).toHaveTextContent("画像ファイルは5MB以下にしてください。")
+    expect(input.value).toBe("")
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("非画像メディアの詳細情報を表示する", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        jsonResponse({
+          media: [
+            {
+              id: "file",
+              url: "https://example.com/memo.pdf",
+              alt: "資料",
+              tags: ["メモ"],
+              createdAt: "2026-01-01T00:00:00Z",
+            },
+          ],
+          total_count: 1,
+          has_more: false,
+          page: 1,
+        }),
+      ),
+    )
+    render(<AdminMedia onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    fireEvent.click(await screen.findByRole("button", { name: "memo.pdfの詳細を表示" }))
+    expect(screen.getByRole("dialog", { name: "memo.pdf" })).toBeInTheDocument()
+    expect(screen.getByText("代替テキスト: 資料")).toBeInTheDocument()
+    expect(screen.getByText("タグ: メモ")).toBeInTheDocument()
+    expect(screen.queryByText(/画像サイズ:/)).not.toBeInTheDocument()
+  })
 })
