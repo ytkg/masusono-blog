@@ -52,7 +52,7 @@ describe("AdminArticles", () => {
     await waitFor(() => expect(screen.getByText("下書きの続き")).toBeInTheDocument())
     expect(fetch).toHaveBeenCalledWith(
       "/api/app/management/articles?page=2&status=published_and_draft&q=%E4%B8%8B%E6%9B%B8%E3%81%8D",
-      { cache: "no-store" },
+      { cache: "no-store", signal: expect.any(AbortSignal) },
     )
   })
 })
