@@ -1,7 +1,7 @@
 import PageHeading from "../../shared/PageHeading"
 import PageContainer from "../../shared/PageContainer"
 import SeoHead from "../../shared/SeoHead"
-import { ZukanContent } from "../../features/apps/zukan/ZukanApp"
+import AuthorsList from "../../features/authors/AuthorsList"
 
 export default function AuthorsIndex({ authors = [] }) {
   return (
@@ -10,7 +10,7 @@ export default function AuthorsIndex({ authors = [] }) {
 
       <PageContainer id="authors">
         <PageHeading>著者</PageHeading>
-        <ZukanContent authors={authors} />
+        <AuthorsList authors={authors} />
       </PageContainer>
     </>
   )

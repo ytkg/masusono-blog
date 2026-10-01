@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
-import { ZukanContent } from "./ZukanApp"
+import AuthorsList from "./AuthorsList"
 
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
@@ -32,9 +32,9 @@ const authors = [
   },
 ]
 
-describe("ZukanContent", () => {
+describe("AuthorsList", () => {
   it("図鑑項目を一覧表示する", () => {
-    render(<ZukanContent authors={authors} />)
+    render(<AuthorsList authors={authors} />)
 
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(authors.length)
     expect(screen.queryByText("AIが考えたプロフィール文")).not.toBeInTheDocument()
@@ -54,9 +54,9 @@ describe("ZukanContent", () => {
   })
 
   it("最後の項目には次要素用の下余白を付けない", () => {
-    render(<ZukanContent authors={authors} />)
+    render(<AuthorsList authors={authors} />)
 
-    const profiles = screen.getAllByTestId("zukan-member-profile")
+    const profiles = screen.getAllByTestId("author-list-profile")
 
     expect(profiles[0]).toHaveStyle({ paddingBottom: "20px" })
     expect(profiles[1]).toHaveStyle({ paddingBottom: "0px" })
