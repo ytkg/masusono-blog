@@ -9,12 +9,32 @@ on:
 jobs:
   screenshots:
     runs-on: ubuntu-24.04-arm
+    env:
+      COMPOSE_PROJECT_NAME: masusono-visual
     steps:
       - uses: actions/checkout@v7
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build visual test images
+        uses: docker/bake-action@v7
+        with:
+          source: ./backend
+          files: |
+            ./compose.yml
+            ./compose.visual.yml
+          targets: backend,visual
+          load: true
+          set: |
+            backend.tags=masusono-visual-backend
+            visual.tags=masusono-visual-visual
+            backend.cache-from=type=gha,scope=frontend-visual-backend
+            backend.cache-to=type=gha,scope=frontend-visual-backend,mode=max
+            visual.cache-from=type=gha,scope=frontend-visual-browser
+            visual.cache-to=type=gha,scope=frontend-visual-browser,mode=max
       - name: Start visual test server
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml up --build -d backend vite
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml up --no-build -d backend vite
       - name: Compare screenshots
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml run --build --rm visual
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml run --rm visual
       - name: Upload screenshot differences
         if: failure()
         uses: actions/upload-artifact@v4
@@ -26,4 +46,4 @@ jobs:
           if-no-files-found: ignore
       - name: Stop visual test server
         if: always()
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml down
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml down --timeout 1
