@@ -1,7 +1,15 @@
+export const articleBodyTextSx = {
+  fontSize: "16px",
+  letterSpacing: 0,
+  lineHeight: 1.8,
+}
+
 export const articleBodyHtmlSx = {
+  ...articleBodyTextSx,
   color: "text.primary",
   "& img": { maxWidth: "100%", height: "auto", borderRadius: "12px" },
   "& p": { margin: "0 0 1em" },
+  "& > p:last-child, & > span:last-child > p:last-child": { marginBottom: 0 },
   overflowWrap: "anywhere",
   wordBreak: "break-word",
   "& a": {
