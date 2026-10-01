@@ -38,6 +38,21 @@ async function checkAuxiliaryButton(page, button) {
   await expect(button).toHaveCSS("background-color", "rgb(245, 245, 245)")
 }
 
+async function expectPageHeading(page, name) {
+  const heading = page.getByRole("heading", { name, level: 1, exact: true })
+  await expect(heading).toHaveCSS("font-size", "24px")
+  await expect(heading).toHaveCSS("font-weight", "700")
+  await expect(heading).toHaveCSS("line-height", "30px")
+  await expect(heading).toHaveCSS("letter-spacing", "normal")
+  const layout = await heading.evaluate((element) => {
+    const title = element.getBoundingClientRect()
+    const content = element.nextElementSibling.getBoundingClientRect()
+    return { gap: content.top - title.bottom, width: element.clientWidth, scrollWidth: element.scrollWidth }
+  })
+  expect(layout.gap).toBe(24)
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.width)
+}
+
 test("home feed", async ({ page }) => {
   await openPage(page, "/")
   await expect(page.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
@@ -63,6 +78,9 @@ for (const [name, path, heading] of [
   test(name, async ({ page }) => {
     await openPage(page, path)
     await expect(page.getByRole("heading", { name: heading, exact: true }).first()).toBeVisible()
+    if (["about", "authors", "numbers"].includes(name)) {
+      await expectPageHeading(page, heading)
+    }
     if (name === "others") {
       for (const button of ["増田RUNを開く", "設定を開く", "管理を開く"]) {
         await expect(page.getByRole("button", { name: button })).toBeVisible()
@@ -119,7 +137,10 @@ for (const [name, button] of [
 test("not found", async ({ page }) => {
   await openPage(page, "/articles/visual-missing", 404)
   await expect(page.getByRole("heading", { name: "ページが見つかりません" })).toBeVisible()
+  await expectPageHeading(page, "ページが見つかりません")
   await screenshot(page, "not-found")
+  await page.getByRole("link", { name: "ホームに戻る" }).click()
+  await expect(page.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
 })
 
 async function openAdmin(page) {
@@ -255,3 +276,16 @@ for (const state of ["input", "save", "notification"]) {
     await screenshot(page, `settings-${state}-error`)
   })
 }
+
+test("numbers trend", async ({ page }) => {
+  await openPage(page, "/numbers")
+  const chart = page.getByTestId("numbers-trend")
+  await chart.scrollIntoViewIfNeeded()
+  await expect(chart.getByTestId("trend-line-totalArticles")).not.toHaveAttribute("stroke-dasharray")
+  await expect(chart.getByTestId("trend-line-totalChars")).toHaveAttribute("stroke-dasharray", "6 4")
+  await expect(chart.locator("svg[role=img] text").first()).toHaveAttribute("font-size", "12")
+  await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
+  await expect(chart).toHaveScreenshot("numbers-trend.png")
+})

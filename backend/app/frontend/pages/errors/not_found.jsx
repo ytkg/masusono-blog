@@ -3,7 +3,7 @@ import MuiLink from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
 import { requestHomeFeed } from "@/shared/lib/homeNavigation"
 import PageContainer from "../../shared/PageContainer"
-import SectionHeading from "../../shared/SectionHeading"
+import PageHeading from "../../shared/PageHeading"
 
 const SITE_TITLE = "増田とその他！"
 
@@ -16,7 +16,7 @@ export default function NotFound() {
       </Head>
 
       <PageContainer component="article">
-        <SectionHeading component="h1">ページが見つかりません</SectionHeading>
+        <PageHeading>ページが見つかりません</PageHeading>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
           指定されたURLは存在しないか、削除された可能性があります。
         </Typography>

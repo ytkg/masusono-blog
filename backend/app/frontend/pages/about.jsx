@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import PageContainer from "../shared/PageContainer"
+import PageHeading from "../shared/PageHeading"
 import SeoHead from "../shared/SeoHead"
 
 export default function About() {
@@ -13,9 +14,7 @@ export default function About() {
       />
 
       <PageContainer component="article" id="about">
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
-          「増田とその他！」について
-        </Typography>
+        <PageHeading>「増田とその他！」について</PageHeading>
 
         <Typography component="p" sx={{ mb: 2 }}>
           <strong>「増田とその他！」</strong> は、飲み仲間3人による、ゆるくて等身大な日常を綴るプロジェクトです。
