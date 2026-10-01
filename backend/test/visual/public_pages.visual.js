@@ -140,3 +140,30 @@ test("admin media detail", async ({ page }) => {
   await expect(page.getByText("画像サイズ: 512 × 512 px")).toBeVisible()
   await screenshot(page, "admin-media-detail")
 })
+
+test("article body spacing and expansion", async ({ page }) => {
+  await page.route("**/", async (route) => {
+    const response = await route.fetch()
+    const body = (await response.text()).replaceAll(
+      "駅を出て、いつもと違う道を歩きました。",
+      "駅を出て、いつもと違う道を歩きました。".repeat(6),
+    )
+    await route.fulfill({ response, body })
+  })
+  await openPage(page, "/")
+  const shortBody = page.getByTestId("article-body-html").last()
+  await expect(shortBody).toHaveCSS("font-size", "16px")
+  await expect(shortBody).toHaveCSS("line-height", "28.8px")
+  await expect(shortBody.locator("p").last()).toHaveCSS("margin-bottom", "0px")
+  const expand = page.getByRole("button", { name: "続きを読む", exact: true }).first()
+  await expect(expand).toBeVisible()
+  await expect(page.getByText(/駅を出て.*…$/)).toHaveCSS("line-height", "28.8px")
+  await expand.click()
+  const expandedBody = page.getByTestId("article-body-html").first()
+  await expect(expandedBody).toHaveCSS("line-height", "28.8px")
+  await expect(expandedBody).toHaveCSS("letter-spacing", "normal")
+  await expect(expandedBody.locator("p").first()).toHaveCSS("margin-bottom", "16px")
+  await expect(expandedBody.locator("p").last()).toHaveCSS("margin-bottom", "0px")
+  await page.getByRole("button", { name: "閉じる", exact: true }).click()
+  await expect(expand).toBeVisible()
+})
