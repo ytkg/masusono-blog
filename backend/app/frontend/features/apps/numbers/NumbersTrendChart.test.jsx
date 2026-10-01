@@ -53,4 +53,27 @@ describe("NumbersTrendChart", () => {
 
     expect(container).toBeEmptyDOMElement()
   })
+  it("1点だけの推移を日付ラベル1つで表示する", () => {
+    render(<NumbersTrendChart trend={{ ...trend, points: [trend.points[0]] }} />)
+    expect(screen.getByText("'25/10/05")).toBeInTheDocument()
+    expect(screen.getAllByTestId("trend-date-grid-line")).toHaveLength(1)
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", "M 18 18")
+  })
+
+  it("無効値とゼロだけの系列に壊れたSVGパスを生成しない", () => {
+    render(
+      <NumbersTrendChart
+        trend={{
+          ...trend,
+          points: [
+            { date: "2025-10-05", totalArticles: NaN, totalChars: Infinity },
+            { date: "2025-10-06", totalArticles: 0, totalChars: 0 },
+          ],
+        }}
+      />,
+    )
+    expect(screen.queryByTestId("trend-line-totalArticles")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("trend-line-totalChars")).not.toBeInTheDocument()
+    expect(screen.getByText("総記事数")).toBeInTheDocument()
+  })
 })
