@@ -2,13 +2,18 @@ import { Link, usePage } from "@inertiajs/react"
 import BottomNavigation from "@mui/material/BottomNavigation"
 import BottomNavigationAction from "@mui/material/BottomNavigationAction"
 import Paper from "@mui/material/Paper"
-import { PAGE_INNER_MAX_WIDTH } from "../shared/pageLayout"
+import {
+  NAVIGATION_CONTENT_HEIGHT,
+  NAVIGATION_VERTICAL_PADDING,
+  NAVIGATION_BORDER_WIDTH,
+  navigationBottomSx,
+  PAGE_INNER_MAX_WIDTH,
+} from "../shared/pageLayout"
 import { MAIN_NAVIGATION_LINKS } from "../shared/mainNavigationLinks"
 import { requestHomeFeed } from "../shared/lib/homeNavigation"
 
 const INDICATOR_HALF_WIDTH = 16
 const INDICATOR_TRANSITION_DURATION = 280
-const NAVIGATION_HEIGHT = 56
 const NAVIGATION_LABEL_FONT_SIZE = "0.72rem"
 const NAVIGATION_PREFETCH_MODES = Object.freeze(["hover", "mount"])
 
@@ -45,7 +50,7 @@ export default function FloatingBottomNavigation() {
       sx={{
         position: "fixed",
         left: "50%",
-        bottom: { xs: "calc(16px + env(safe-area-inset-bottom))", sm: "calc(20px + env(safe-area-inset-bottom))" },
+        bottom: navigationBottomSx,
         transform: "translateX(-50%)",
         width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
         maxWidth: PAGE_INNER_MAX_WIDTH,
@@ -53,12 +58,12 @@ export default function FloatingBottomNavigation() {
         overflow: "hidden",
         bgcolor: "common.white",
         color: "text.primary",
-        border: "1px solid",
+        border: `${NAVIGATION_BORDER_WIDTH}px solid`,
         borderColor: "divider",
         borderRadius: 999,
         boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)",
         px: { xs: 1, sm: 1.25 },
-        py: 0.5,
+        py: `${NAVIGATION_VERTICAL_PADDING}px`,
       }}
     >
       <BottomNavigation
@@ -69,7 +74,7 @@ export default function FloatingBottomNavigation() {
           "--navigation-active-index": activeIndex,
           width: "100%",
           maxWidth: "100%",
-          height: NAVIGATION_HEIGHT,
+          height: NAVIGATION_CONTENT_HEIGHT,
           position: "relative",
           bgcolor: "transparent",
           overflowX: "auto",

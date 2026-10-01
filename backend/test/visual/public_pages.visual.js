@@ -445,6 +445,12 @@ for (const state of ["success", "error"]) {
     await page.getByRole("button", { name: "記事メニューを開く" }).first().click()
     await page.getByRole("menuitem", { name: "記事URLをコピー" }).click()
     await expect(page.getByRole("alert")).toContainText(state === "success" ? "完了" : "失敗")
+    await page.clock.fastForward(300)
+    await expect.poll(async () => {
+      const navigation = await page.getByRole("navigation", { name: "メインナビゲーション" }).boundingBox()
+      const notice = await page.getByRole("alert").boundingBox()
+      return Math.round(navigation.y - (notice.y + notice.height))
+    }).toBe(8)
     await screenshot(page, `copy-${state}`)
     await page.clock.fastForward(3200)
     if (state === "error") {
