@@ -1,3 +1,5 @@
+import CloseIcon from "@mui/icons-material/Close"
+import AuxiliaryIconButton from "../../../shared/AuxiliaryIconButton"
 import Box from "@mui/material/Box"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
@@ -11,7 +13,14 @@ export default function MediaDetailDialog({ selected, onClose }) {
     <Dialog open={Boolean(selected)} onClose={onClose} fullWidth maxWidth="md" aria-labelledby="media-detail-title">
       {selected ? (
         <>
-          <DialogTitle id="media-detail-title">{fileName(selected.url)}</DialogTitle>
+          <DialogTitle id="media-detail-title" sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+            <Box component="span" sx={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>
+              {fileName(selected.url)}
+            </Box>
+            <AuxiliaryIconButton aria-label="メディア詳細を閉じる" onClick={onClose}>
+              <CloseIcon />
+            </AuxiliaryIconButton>
+          </DialogTitle>
           <DialogContent>
             <Box sx={{ height: "min(60vh, 560px)", mb: 2 }}>
               <MediaPreview item={selected} />
