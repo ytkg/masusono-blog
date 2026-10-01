@@ -1,13 +1,13 @@
+import useAdminArticles from "./useAdminArticles"
 import AdminSectionHeader from "./AdminSectionHeader"
 import AdminSearchForm from "./AdminSearchForm"
 import { AdminLoadingMessage, AdminEmptyMessage, AdminListError, LoadMoreButton } from "./AdminListFeedback"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import Box from "@mui/material/Box"
 import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
-import { requestJson } from "../../../shared/lib/fetchJson"
 
 const statuses = [
   ["all", "すべて"],
@@ -23,13 +23,6 @@ const articleStatusLabel = {
   PUBLISH_AND_DRAFT: "公開中・下書きあり",
   CLOSED: "公開終了",
 }
-const loadError = "記事を取得できませんでした。時間をおいて再度お試しください。"
-
-function articlesUrl(page, query, status) {
-  const params = new URLSearchParams({ page: String(page), status })
-  if (query) params.set("q", query)
-  return `/api/app/management/articles?${params}`
-}
 
 function formatDate(value) {
   const date = new Date(value)
@@ -37,68 +30,18 @@ function formatDate(value) {
 }
 
 export default function AdminArticles({ onBack, onUnauthorized }) {
-  const [items, setItems] = useState([])
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(false)
-  const [totalCount, setTotalCount] = useState(0)
   const [search, setSearch] = useState("")
   const [query, setQuery] = useState("")
   const [selectedStatus, setSelectedStatus] = useState("all")
   const [appliedStatus, setAppliedStatus] = useState("all")
   const [refreshKey, setRefreshKey] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError] = useState(null)
-  const requestIdRef = useRef(0)
 
-  useEffect(() => {
-    const requestId = ++requestIdRef.current
-    const controller = new AbortController()
-    setLoading(true)
-    setError(null)
-    setItems([])
-    setHasMore(false)
-    requestJson(articlesUrl(1, query, appliedStatus), { signal: controller.signal })
-      .then((result) => {
-        if (requestId !== requestIdRef.current) return
-        setItems(result.articles)
-        setPage(result.page)
-        setHasMore(result.has_more)
-        setTotalCount(result.total_count)
-      })
-      .catch((failure) => {
-        if (controller.signal.aborted) return
-        if (failure.status === 401) onUnauthorized()
-        else setError(loadError)
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-
-    return () => {
-      controller.abort()
-      requestIdRef.current += 1
-    }
-  }, [query, appliedStatus, refreshKey, onUnauthorized])
-
-  async function loadMore() {
-    const requestId = requestIdRef.current
-    setLoadingMore(true)
-    setError(null)
-    try {
-      const result = await requestJson(articlesUrl(page + 1, query, appliedStatus))
-      if (requestId !== requestIdRef.current) return
-      setItems((current) => [...current, ...result.articles])
-      setPage(result.page)
-      setHasMore(result.has_more)
-    } catch (failure) {
-      if (requestId !== requestIdRef.current) return
-      if (failure.status === 401) onUnauthorized()
-      else setError(loadError)
-    } finally {
-      setLoadingMore(false)
-    }
-  }
+  const { items, totalCount, hasMore, loading, loadingMore, error, loadMore } = useAdminArticles({
+    query,
+    status: appliedStatus,
+    refreshKey,
+    onUnauthorized,
+  })
 
   function submitSearch(event) {
     event.preventDefault()

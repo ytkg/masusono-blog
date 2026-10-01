@@ -64,7 +64,10 @@ describe("AdminMedia", () => {
     await screen.findByRole("button", { name: "first.pngの詳細を表示" })
     fireEvent.click(screen.getByRole("button", { name: "もっと見る" }))
     await waitFor(() => expect(screen.getByRole("button", { name: "second.pngの詳細を表示" })).toBeInTheDocument())
-    expect(fetch).toHaveBeenCalledWith("/api/app/management/media?page=2&token=next", { cache: "no-store" })
+    expect(fetch).toHaveBeenCalledWith("/api/app/management/media?page=2&token=next", {
+      cache: "no-store",
+      signal: expect.any(AbortSignal),
+    })
 
     fireEvent.click(screen.getByRole("button", { name: "first.pngの詳細を表示" }))
     expect(screen.getByText("画像サイズ: 320 × 240 px")).toBeInTheDocument()

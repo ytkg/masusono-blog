@@ -1,7 +1,8 @@
+import useAdminMedia from "./useAdminMedia"
 import AdminSectionHeader from "./AdminSectionHeader"
 import AdminSearchForm from "./AdminSearchForm"
 import { AdminLoadingMessage, AdminEmptyMessage, AdminListError, LoadMoreButton } from "./AdminListFeedback"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -23,14 +24,6 @@ function isImage(item) {
   return Number.isFinite(item.width) && Number.isFinite(item.height)
 }
 
-function mediaUrl(page, query, token) {
-  const params = new URLSearchParams({ page: String(page) })
-  if (query) params.set("q", query)
-  if (token) params.set("token", token)
-  return `/api/app/management/media?${params}`
-}
-
-const loadError = "メディアを取得できませんでした。時間をおいて再度お試しください。"
 const uploadUrl = "/api/app/management/media"
 const maxFileSize = 5 * 1024 * 1024
 
@@ -51,81 +44,19 @@ function MediaPreview({ item }) {
 }
 
 export default function AdminMedia({ csrfToken, onBack, onUnauthorized }) {
-  const [items, setItems] = useState([])
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(false)
-  const [nextToken, setNextToken] = useState(null)
-  const [totalCount, setTotalCount] = useState(0)
   const [search, setSearch] = useState("")
   const [query, setQuery] = useState("")
   const [refreshKey, setRefreshKey] = useState(0)
   const [selected, setSelected] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError] = useState(null)
   const [uploadError, setUploadError] = useState(null)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
-  const requestIdRef = useRef(0)
 
-  useEffect(() => {
-    const requestId = ++requestIdRef.current
-    const controller = new AbortController()
-    setLoading(true)
-    setError(null)
-    setItems([])
-    setHasMore(false)
-    setNextToken(null)
-    setTotalCount(0)
-    requestJson(mediaUrl(1, query), { signal: controller.signal })
-      .then((result) => {
-        if (requestId !== requestIdRef.current) return
-        setItems(result.media)
-        setPage(result.page)
-        setHasMore(result.has_more)
-        setNextToken(result.next_token)
-        setTotalCount(result.total_count)
-      })
-      .catch((failure) => {
-        if (controller.signal.aborted) return
-        if (failure.status === 401) {
-          onUnauthorized()
-        } else {
-          setError(loadError)
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-
-    return () => {
-      controller.abort()
-      requestIdRef.current += 1
-    }
-  }, [query, refreshKey, onUnauthorized])
-
-  async function loadMore() {
-    const requestId = requestIdRef.current
-    setLoadingMore(true)
-    setError(null)
-    try {
-      const result = await requestJson(mediaUrl(page + 1, query, nextToken))
-      if (requestId !== requestIdRef.current) return
-      setItems((current) => [...current, ...result.media])
-      setPage(result.page)
-      setHasMore(result.has_more)
-      setNextToken(result.next_token)
-    } catch (failure) {
-      if (requestId !== requestIdRef.current) return
-      if (failure.status === 401) {
-        onUnauthorized()
-      } else {
-        setError(loadError)
-      }
-    } finally {
-      setLoadingMore(false)
-    }
-  }
+  const { items, totalCount, hasMore, loading, loadingMore, error, loadMore } = useAdminMedia({
+    query,
+    refreshKey,
+    onUnauthorized,
+  })
 
   async function uploadFile(file) {
     if (!file) return
