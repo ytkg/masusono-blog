@@ -1,3 +1,4 @@
+import { HEADER_HEIGHT } from "../../shared/pageLayout"
 import CloseIcon from "@mui/icons-material/Close"
 import SearchIcon from "@mui/icons-material/Search"
 import Box from "@mui/material/Box"
@@ -10,7 +11,7 @@ export default function ArticleSearchBox({ autoFocus = false, onChange, onClear,
     <Box
       sx={{
         position: "sticky",
-        top: { xs: 45, sm: 53 },
+        top: HEADER_HEIGHT,
         zIndex: (theme) => theme.zIndex.appBar - 1,
         bgcolor: "background.default",
         borderBottom: "1px solid",

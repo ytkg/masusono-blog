@@ -706,3 +706,33 @@ for (const target of ["title", "author", "sentence"]) {
     await expect(link).not.toBeFocused()
   })
 }
+
+for (const width of [390, 600, 1280]) {
+  for (const path of ["/", "/search"]) {
+    test(`sticky alignment ${width}px ${path}`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== "desktop")
+      await page.setViewportSize({ width, height: 844 })
+      await openPage(page, path)
+      await page.addStyleTag({ content: "main { min-height: 200vh; }" })
+      const fixed = path === "/" ? page.getByRole("tablist") : page.getByRole("textbox", { name: "記事を検索" })
+      const bounds = async () => fixed.evaluate((element) => {
+        let parent = element
+        while (parent && getComputedStyle(parent).position !== "sticky") parent = parent.parentElement
+        return {
+          top: parent.getBoundingClientRect().top,
+          headerBottom: document.querySelector("header").getBoundingClientRect().bottom,
+          headerHeight: document.querySelector("header").getBoundingClientRect().height,
+        }
+      })
+      for (const scrollY of [0, 80]) {
+        await page.evaluate((y) => window.scrollTo(0, y), scrollY)
+        await expect.poll(async () => {
+          const value = await bounds()
+          return Math.round(value.top - value.headerBottom)
+        }).toBe(0)
+        expect(Math.round((await bounds()).headerHeight)).toBe(width < 600 ? 45 : 55)
+      }
+      await screenshot(page, `sticky-${path === "/" ? "home" : "search"}-${width}`)
+    })
+  }
+}

@@ -1,3 +1,4 @@
+import { HEADER_HEIGHT } from "../shared/pageLayout"
 import useHomeTabState from "../features/blog/useHomeTabState"
 import { useEffect } from "react"
 import Box from "@mui/material/Box"
@@ -37,7 +38,7 @@ export default function Home({ articles = [] }) {
           <Box
             sx={{
               position: "sticky",
-              top: { xs: 45, sm: 53 },
+              top: HEADER_HEIGHT,
               zIndex: (theme) => theme.zIndex.appBar - 1,
               bgcolor: "background.default",
               borderBottom: "1px solid",

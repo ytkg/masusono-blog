@@ -21,3 +21,8 @@ export const navigationNoticeBottomSx = Object.fromEntries(
     `calc(${margin + NAVIGATION_HEIGHT + NAVIGATION_NOTICE_GAP}px + env(safe-area-inset-bottom))`,
   ]),
 )
+
+export const HEADER_HEIGHT = { xs: 45, sm: 55 }
+export const HEADER_TOOLBAR_HEIGHT = Object.fromEntries(
+  Object.entries(HEADER_HEIGHT).map(([breakpoint, height]) => [breakpoint, height - 1]),
+)
