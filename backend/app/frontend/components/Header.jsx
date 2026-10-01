@@ -7,7 +7,7 @@ import { Link, usePage } from "@inertiajs/react"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { currentLocationPath, LOCATION_CHANGE_EVENT } from "@/shared/lib/locationEvents"
 import { requestHomeFeed } from "@/shared/lib/homeNavigation"
-import { PAGE_MAX_WIDTH, PAGE_HORIZONTAL_PADDING } from "../shared/pageLayout"
+import { HEADER_HEIGHT, HEADER_TOOLBAR_HEIGHT, PAGE_MAX_WIDTH, PAGE_HORIZONTAL_PADDING } from "../shared/pageLayout"
 import logo from "../assets/logo.webp"
 
 function goBack() {
@@ -51,7 +51,7 @@ export default function Header() {
       color="transparent"
       enableColorOnDark
       sx={{
-        minHeight: { xs: 44, sm: 52 },
+        minHeight: HEADER_HEIGHT,
         py: 0,
         bgcolor: "background.default",
         color: "text.primary",
@@ -66,7 +66,7 @@ export default function Header() {
           alignItems: "flex-end",
           display: "grid",
           gridTemplateColumns: "1fr auto 1fr",
-          minHeight: { xs: 44, sm: 52 },
+          minHeight: HEADER_TOOLBAR_HEIGHT,
           pt: 0,
           pb: { xs: 0.5, sm: 0.75 },
           px: PAGE_HORIZONTAL_PADDING,
