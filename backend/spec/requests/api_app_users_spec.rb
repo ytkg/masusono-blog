@@ -30,6 +30,64 @@ RSpec.describe "Api::App::Users", type: :request do
     end
   end
 
+  describe "GET /api/app/users/:user_id.json through microCMS" do
+    let(:content_id) { "u-e329d2ee785ead849d97f03f875fd338" }
+    let(:upstream_status) { 200 }
+    let(:upstream_body) { { id: content_id, user_id: "cookie-user", name: "表示名太郎" }.to_json }
+
+    before do
+      stub_microcms_api_key
+      stub_request(:get, "https://masusono.microcms.io/api/v1/users/#{content_id}")
+        .with(headers: microcms_request_headers)
+        .to_return(status: upstream_status, body: upstream_body, headers: json_response_headers)
+    end
+
+    it "正規IDで取得した表示名を従来のレスポンス契約で返す" do
+      get "/api/app/users/cookie-user.json"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("application/json")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+      expect(JSON.parse(response.body)).to eq("userId" => "cookie-user", "name" => "表示名太郎")
+    end
+
+    context "未登録の場合" do
+      let(:upstream_status) { 404 }
+      let(:upstream_body) { { message: "Not found" }.to_json }
+
+      it "200で表示名なしを返す" do
+        get "/api/app/users/cookie-user.json"
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)).to eq("userId" => "cookie-user", "name" => nil)
+      end
+    end
+
+    [ 401, 403 ].each do |status|
+      context "microCMSが#{status}を返す場合" do
+        let(:upstream_status) { status }
+        let(:upstream_body) { { message: "Access denied" }.to_json }
+
+        it "未登録扱いせず424の共通エラーを返す" do
+          get "/api/app/users/cookie-user.json"
+
+          expect(response).to have_http_status(424)
+          expect(response.media_type).to eq("application/json")
+          expect(response.headers["Cache-Control"]).to eq("no-store")
+          request_id = response.headers["X-Request-Id"]
+          expect(request_id).to be_present
+          expect(JSON.parse(response.body)).to eq(
+            "error" => {
+              "code" => "upstream_client_error",
+              "message" => ApplicationController::ERROR_MESSAGE_BY_CODE.fetch("upstream_client_error"),
+              "request_id" => request_id
+            }
+          )
+        end
+      end
+    end
+  end
+
   describe "POST /api/app/users.json" do
     let(:params) { { name: "表示名太郎" } }
 
