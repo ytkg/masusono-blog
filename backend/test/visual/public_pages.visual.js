@@ -226,3 +226,16 @@ for (const state of ["input", "save", "notification"]) {
     await screenshot(page, `settings-${state}-error`)
   })
 }
+
+test("numbers trend", async ({ page }) => {
+  await openPage(page, "/numbers")
+  const chart = page.getByTestId("numbers-trend")
+  await chart.scrollIntoViewIfNeeded()
+  await expect(chart.getByTestId("trend-line-totalArticles")).not.toHaveAttribute("stroke-dasharray")
+  await expect(chart.getByTestId("trend-line-totalChars")).toHaveAttribute("stroke-dasharray", "6 4")
+  await expect(chart.locator("svg[role=img] text").first()).toHaveAttribute("font-size", "12")
+  await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
+  await expect(chart).toHaveScreenshot("numbers-trend.png")
+})

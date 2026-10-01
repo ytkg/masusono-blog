@@ -1,11 +1,11 @@
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
+import { useTheme } from "@mui/material/styles"
 
 const CHART_WIDTH = 360
 const CHART_HEIGHT = 220
 const CHART_PADDING = Object.freeze({ top: 18, right: 18, bottom: 36, left: 18 })
-const SERIES_COLORS = Object.freeze(["#2563eb", "#16a34a"])
 const TOTAL_CHARS_SERIES_KEY = "totalChars"
 const TOTAL_CHARS_SCALE = 300
 
@@ -119,7 +119,11 @@ function hasTrendData(trend) {
 }
 
 export default function NumbersTrendChart({ trend }) {
+  const theme = useTheme()
   if (!hasTrendData(trend)) return null
+
+  const seriesColors = [theme.palette.dataVisualization.totalArticles, theme.palette.dataVisualization.totalChars]
+  const seriesDasharray = (key) => (key === TOTAL_CHARS_SERIES_KEY ? "6 4" : undefined)
 
   const bounds = chartBounds()
   const chartMaxValue = maxChartValue(trend.points, trend.series)
@@ -131,7 +135,7 @@ export default function NumbersTrendChart({ trend }) {
         <Typography variant="h6" component="h2" sx={{ m: 0, fontWeight: 700 }}>
           {trend.title ?? "推移"}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary", fontSize: 14 }}>
           {trend.description ?? "各指標の累積値を日ごとに表示しています。"}
         </Typography>
       </Box>
@@ -146,16 +150,22 @@ export default function NumbersTrendChart({ trend }) {
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
           role="img"
           aria-label="総記事数、総文字数の累積推移"
-          sx={{ display: "block", width: "100%", height: "auto" }}
+          sx={{ display: "block", width: "100%", height: "auto", fontFamily: theme.typography.fontFamily }}
         >
-          <line x1={bounds.left} y1={bounds.bottom} x2={bounds.right} y2={bounds.bottom} stroke="#e5e7eb" />
-          <line x1={bounds.left} y1={bounds.top} x2={bounds.right} y2={bounds.top} stroke="#f3f4f6" />
+          <line
+            x1={bounds.left}
+            y1={bounds.bottom}
+            x2={bounds.right}
+            y2={bounds.bottom}
+            stroke={theme.palette.divider}
+          />
+          <line x1={bounds.left} y1={bounds.top} x2={bounds.right} y2={bounds.top} stroke={theme.palette.divider} />
           <line
             x1={bounds.left}
             y1={(bounds.top + bounds.bottom) / 2}
             x2={bounds.right}
             y2={(bounds.top + bounds.bottom) / 2}
-            stroke="#f3f4f6"
+            stroke={theme.palette.divider}
           />
           {dateLabels.map((dateLabel) => (
             <line
@@ -165,7 +175,7 @@ export default function NumbersTrendChart({ trend }) {
               y1={bounds.top}
               x2={dateLabel.x}
               y2={bounds.bottom}
-              stroke="#f3f4f6"
+              stroke={theme.palette.divider}
             />
           ))}
 
@@ -180,7 +190,8 @@ export default function NumbersTrendChart({ trend }) {
                 data-testid={`trend-line-${series.key}`}
                 d={path}
                 fill="none"
-                stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
+                stroke={seriesColors[index % seriesColors.length]}
+                strokeDasharray={seriesDasharray(series.key)}
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -193,8 +204,8 @@ export default function NumbersTrendChart({ trend }) {
               key={dateLabel.key}
               x={dateLabel.x}
               y={CHART_HEIGHT - 12}
-              fill="#6b7280"
-              fontSize="11"
+              fill={theme.palette.text.secondary}
+              fontSize="12"
               textAnchor={dateLabel.textAnchor}
             >
               {dateLabel.label}
@@ -208,19 +219,22 @@ export default function NumbersTrendChart({ trend }) {
               key={series.key}
               sx={{ display: "grid", gridTemplateColumns: "auto minmax(0, 1fr) auto", alignItems: "center", gap: 1 }}
             >
-              <Box
-                aria-hidden="true"
-                sx={{
-                  width: 18,
-                  height: 3,
-                  borderRadius: 999,
-                  bgcolor: SERIES_COLORS[index % SERIES_COLORS.length],
-                }}
-              />
-              <Typography variant="body2" color="text.secondary">
+              <Box component="svg" aria-hidden="true" viewBox="0 0 24 6" sx={{ width: 24, height: 6 }}>
+                <line
+                  x1="2"
+                  y1="3"
+                  x2="22"
+                  y2="3"
+                  stroke={seriesColors[index % seriesColors.length]}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeDasharray={seriesDasharray(series.key)}
+                />
+              </Box>
+              <Typography variant="body2" sx={{ color: "text.secondary", fontSize: 14 }}>
                 {series.label}
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700 }}>
+              <Typography variant="body2" sx={{ color: "text.secondary", fontSize: 14, fontWeight: 700 }}>
                 {series.finalValue ?? "—"}
               </Typography>
             </Box>
@@ -228,7 +242,7 @@ export default function NumbersTrendChart({ trend }) {
         </Stack>
       </Box>
 
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: "text.secondary" }}>
         総文字数は1/300で表示しています。
       </Typography>
     </Stack>
