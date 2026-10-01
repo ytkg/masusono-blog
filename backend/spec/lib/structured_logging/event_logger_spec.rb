@@ -53,4 +53,16 @@ RSpec.describe StructuredLogging::EventLogger do
       )
     end
   end
+
+  describe ".navigation_failure" do
+    it "失敗したリクエストIDと記録送信のIDを区別する" do
+      CurrentRequest.set(request_id: "report-123") do
+        described_class.navigation_failure(payload: { kind: "http_exception", path: "/authors", status: 502, response_request_id: "failed-123" })
+      end
+
+      expect(logger).to have_received(:warn).with(
+        a_string_including("navigation_failed", "response_request_id=failed-123", "report_request_id=report-123")
+      )
+    end
+  end
 end

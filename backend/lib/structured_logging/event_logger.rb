@@ -38,6 +38,10 @@ module StructuredLogging
         )
       end
 
+      def navigation_failure(payload:)
+        log(:warn, **payload, event: "navigation_failed", report_request_id: CurrentRequest.request_id)
+      end
+
       private
 
       def log(level, **payload)
