@@ -76,6 +76,56 @@ for (const [name, path, heading] of [
   })
 }
 
+test.describe("author profiles", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("long profiles and missing images", async ({ page }) => {
+    const title = "日常の発見を記録する人".repeat(8)
+    const bio = "散歩と食事が好きです。気になった出来事を、肩の力を抜いて書いています。".repeat(6)
+    await page.route("**/*", async (route) => {
+      const path = new URL(route.request().url()).pathname
+      if (!["/authors", "/authors/visual-author-1", "/authors/visual-author-2"].includes(path)) {
+        return route.continue()
+      }
+      const response = await route.fetch()
+      const body = (await response.text())
+        .replaceAll("日常の発見を記録する人", title)
+        .replaceAll("散歩と食事が好きです。気になった出来事を、肩の力を抜いて書いています。", bio)
+        .replace(/("id":"visual-author-1"[^}]*"imageUrl":)null/, '$1"/icons/icon-512.png"')
+      await route.fulfill({ response, body })
+    })
+    for (const [name, path] of [
+      ["list", "/authors"],
+      ["detail", "/authors/visual-author-1"],
+    ]) {
+      await openPage(page, path)
+      const image = page.locator("main img").first()
+      await expect(image).toHaveCSS("width", page.viewportSize().width < 600 ? "112px" : "128px")
+      const label = page.getByText(title, { exact: true })
+      await expect(label).toHaveCSS("font-size", "13px")
+      await expect(label).toHaveCSS("font-weight", "700")
+      const imageBox = await image.boundingBox()
+      const labelBox = await label.boundingBox()
+      expect(labelBox.y - (imageBox.y + imageBox.height)).toBe(page.viewportSize().width < 600 ? 10 : 12)
+      const nameHeading = page.getByRole("heading", { name: "増田愛美", exact: true }).first()
+      await expect(nameHeading).toHaveCSS("font-size", "24px")
+      await expect(nameHeading).toHaveCSS("font-weight", "700")
+      await expect(page.getByText(bio, { exact: true })).toHaveCSS("font-size", "16px")
+      await expect(page.getByText(bio, { exact: true })).toHaveCSS("line-height", "30.4px")
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(page.viewportSize().width)
+      await expect.soft(page).toHaveScreenshot(`author-profile-long-${name}.png`)
+    }
+    await openPage(page, "/authors/visual-author-2")
+    await expect(page.locator("main img")).toHaveCount(0)
+    await expect(page.getByRole("heading", { name: "チャーリー", level: 1 })).toBeVisible()
+    await expect.soft(page).toHaveScreenshot("author-profile-no-image.png")
+    await openPage(page, "/authors")
+    await page.getByRole("link", { name: "チャーリーの記事を読む", exact: true }).click()
+    await expect(page).toHaveURL(/\/authors\/visual-author-2$/)
+    await expect(page.getByRole("heading", { name: "投稿", exact: true })).toBeVisible()
+  })
+})
+
 test("search suggestions", async ({ page }) => {
   await openPage(page, "/search")
   await expect(page.getByText("著者から探す")).toBeVisible()

@@ -3,21 +3,16 @@ import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 
-const labelTextSx = { m: 0, fontSize: "13px", fontWeight: 700, letterSpacing: 0, lineHeight: 1.4 }
-const nameTextSx = { m: 0, fontWeight: 700, lineHeight: 1.25 }
-const bioTextSx = { m: 0, lineHeight: 1.9, fontSize: { xs: "15px", sm: "16px" }, letterSpacing: 0 }
+import {
+  labelTextSx,
+  nameTextSx,
+  bioTextSx,
+  imageSx,
+  profileGap,
+  profileTextSpacing,
+} from "../../../shared/authorProfileStyles"
+
 const supportingLinkSx = { m: 0, fontSize: "12px", fontWeight: 700, letterSpacing: 0, lineHeight: 1.5 }
-const imageSx = {
-  width: { xs: 112, sm: 128 },
-  aspectRatio: "1 / 1",
-  border: "1px solid",
-  borderColor: "divider",
-  borderRadius: "50%",
-  bgcolor: "#fafafa",
-  objectFit: "cover",
-  display: "block",
-  alignSelf: "center",
-}
 
 function MemberProfile({ member, isLast }) {
   const image = member.imageUrl
@@ -29,7 +24,7 @@ function MemberProfile({ member, isLast }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: { xs: 1.25, sm: 1.5 },
+        gap: profileGap,
         pt: 2.5,
         pb: isLast ? 0 : 2.5,
         borderBottom: isLast ? "none" : "1px solid",
@@ -40,7 +35,7 @@ function MemberProfile({ member, isLast }) {
       {image ? (
         <Box component="img" src={image} alt={`${member.name}の人物像イラスト`} loading="lazy" sx={imageSx} />
       ) : null}
-      <Stack spacing={{ xs: 0.75, sm: 0.875 }} sx={{ minWidth: 0, maxWidth: 640 }}>
+      <Stack spacing={profileTextSpacing} sx={{ minWidth: 0, maxWidth: 640 }}>
         <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
           {member.title}
         </Typography>
