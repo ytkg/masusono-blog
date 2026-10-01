@@ -1,10 +1,10 @@
 import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography"
+import EmptyStatus from "../../shared/components/EmptyStatus"
 import ArticleCard from "./ArticleCard"
 
 export default function ArticlesList({ articles, emptyMessage = "記事がありません。" }) {
   if (!articles?.length) {
-    return <Typography color="text.secondary">{emptyMessage}</Typography>
+    return <EmptyStatus>{emptyMessage}</EmptyStatus>
   }
 
   return (

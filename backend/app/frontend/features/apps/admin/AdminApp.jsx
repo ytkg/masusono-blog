@@ -1,3 +1,5 @@
+import StatusAlert from "../../../shared/components/StatusAlert"
+import LoadingStatus from "../../../shared/components/LoadingStatus"
 import { useCallback, useRef, useState } from "react"
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import CollectionsIcon from "@mui/icons-material/Collections"
@@ -62,11 +64,8 @@ function Login({ csrfToken, onLogin }) {
         required
         fullWidth
       />
-      {error ? (
-        <Typography role="alert" color="error">
-          {error}
-        </Typography>
-      ) : null}
+      {error ? <StatusAlert>{error}</StatusAlert> : null}
+      {pending ? <LoadingStatus>ログイン中…</LoadingStatus> : null}
       <Button type="submit" variant="contained" size="large" disabled={pending}>
         {pending ? "ログイン中…" : "ログイン"}
       </Button>
@@ -135,6 +134,7 @@ export default function AdminApp() {
         setView("checking")
       }}
     >
+      {view === "checking" ? <LoadingStatus>認証状態を確認中…</LoadingStatus> : null}
       {view === "login" ? <Login csrfToken={csrfToken} onLogin={handleLogin} /> : null}
       {view === "dashboard" ? (
         <Dashboard onMedia={() => setView("media")} onArticles={() => setView("articles")} />
@@ -147,7 +147,7 @@ export default function AdminApp() {
       ) : null}
       {view === "error" ? (
         <Stack spacing={2} alignItems="flex-start">
-          <Typography role="alert">{error}</Typography>
+          <StatusAlert>{error}</StatusAlert>
           <Button
             onClick={() => {
               setView("checking")
