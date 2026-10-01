@@ -46,4 +46,4 @@ jobs:
           if-no-files-found: ignore
       - name: Stop visual test server
         if: always()
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml down
+        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml down --timeout 1
