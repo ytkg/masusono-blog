@@ -2,7 +2,7 @@
 
 この文書は現行 backend API のレスポンス契約の正本です。
 
-- 対象: Users API、管理ミニアプリ API、`GET /api/app/masuda_run/rankings.json`、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
+- 対象: Navigation failure API、Users API、管理ミニアプリ API、`GET /api/app/masuda_run/rankings.json`、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
 ## Users API
@@ -111,3 +111,19 @@ APIパスは次の2ファイルで一致させる。
 git grep -nE "(/api/app/users/:user_id\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/api-response-contract.md
 git grep -nE '(^|`)/app/(users|masuda_run/rankings)\.json' -- README.md docs/api-response-contract.md || true
 ```
+
+## POST /api/app/navigation_failures
+
+公開ページの画面遷移の異常を記録する診断用 API。認証・セッションを使わない。成功は `204 No Content`、不正な種別・必須オブジェクト欠落は `400` と共通エラー形式 (`invalid_request`)、2048 bytes 超は `413`、同一 IP の1分間20件超は `429` と共通エラー形式 (`rate_limited`)。すべて `Cache-Control: no-store`。レート制限はプロセス内で、Cloud Run インスタンス間では共有しない。
+
+Request: `{ "failure": { ... } }`
+
+- `kind`: 必須。`http_exception` または `network_error`。
+- `path`, `source_path`: 公開ページのパスだけ。クエリ・フラグメント・外部 URL・非公開 API パスは記録しない。
+- `status`: HTTP ステータス (100〜599)、通信失敗では省略。
+- `response_request_id`: 失敗した応答の `X-Request-Id`。100 bytes 以下の英数字・`_`・`-`。
+- `content_type`: MIME type のみ。100 bytes 以下。
+- `prefetch`, `prefetch_in_flight`, `online`, `service_worker`: Boolean。
+- `elapsed_ms`: ページ読み込みからの経過時間 (0〜86,400,000)。
+
+不正な任意項目と未知のキーは記録から除外する。本文・Cookie・トークン・検索語・例外メッセージは送信しない。標準のパラメータログでは `failure` 全体をフィルタし、検証済み項目だけを `navigation_failed` イベントに出す。

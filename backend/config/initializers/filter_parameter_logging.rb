@@ -6,3 +6,6 @@
 Rails.application.config.filter_parameters += [
   :passw, :email, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn, :cvv, :cvc
 ]
+
+# Raw client diagnostics are untrusted; only the sanitized structured event is logged.
+Rails.application.config.filter_parameters += [ :failure ]

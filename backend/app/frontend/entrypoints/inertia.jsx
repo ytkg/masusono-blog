@@ -1,8 +1,10 @@
 import { createRoot } from "react-dom/client"
-import { createInertiaApp } from "@inertiajs/react"
+import { createInertiaApp, router } from "@inertiajs/react"
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
 import theme from "../theme"
+import NavigationFailureDialog from "../components/NavigationFailureDialog"
+import { installNavigationRecovery } from "../shared/lib/navigationRecovery"
 
 void import("../styles/fonts.css")
 
@@ -51,6 +53,8 @@ function resolvePageLoader(name) {
   return pages[matchedPath]
 }
 
+installNavigationRecovery(router)
+
 createInertiaApp({
   resolve: async (name) => {
     const page = await resolvePageLoader(name)()
@@ -66,6 +70,7 @@ createInertiaApp({
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <App {...props} />
+        <NavigationFailureDialog />
       </ThemeProvider>,
     )
   },

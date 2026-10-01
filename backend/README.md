@@ -50,6 +50,8 @@ npm run dev
 JSON API を使います。認証トークンは画面へ返さず Rails セッションに保持し、
 ログインとメディアアップロードのリクエストは CSRF トークンで保護します。
 
+- `POST /api/app/navigation_failures`
+  - 画面遷移の異常を診断ログに記録する。確認方法は [画面遷移エラーの診断](docs/navigation-error-diagnostics.md) を参照
 - `GET /api/app/users/:user_id.json`
   - `user_id` に対応するユーザー情報を返す
 - `POST /api/app/users.json`
