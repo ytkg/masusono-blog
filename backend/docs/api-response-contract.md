@@ -51,6 +51,13 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 | --- | --- | --- | --- |
 | `publicKey` | `String` | No | VAPID公開鍵。Push subscriptionの作成にだけ使用する |
 
+### GET /api/app/web_push/subscription.json
+
+- Query: `endpoint`（ブラウザのPush subscriptionのendpoint、必須）
+- Response (`200 OK`): `{ "subscribed": Boolean }`
+- サーバーの配信対象に登録されているかを返す。設定画面ではブラウザ側の購読が存在する場合に確認し、未登録なら通知OFFとして再登録できる。
+- 取得失敗は共通のエラー形式で返し、未登録として扱わない。
+
 ### POST /api/app/web_push/subscription.json
 
 - Request: `{ "subscription": { "endpoint": "String", "keys": { "p256dh": "String", "auth": "String" } } }`

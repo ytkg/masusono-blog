@@ -103,6 +103,30 @@ describe("SettingsContent", () => {
     expect(screen.getByText("新しい記事が公開されたときに通知を受け取ります。")).toBeInTheDocument()
   })
 
+  it("購読状態の確認中は操作を無効化する", async () => {
+    let resolveState
+    getWebPushState.mockReturnValue(new Promise((resolve) => (resolveState = resolve)))
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({ name: "現在名" }) }))
+
+    render(<SettingsContent loadOnMount />)
+
+    expect(screen.getByRole("switch", { name: "新着記事の通知" })).toBeDisabled()
+    resolveState({ supported: true, subscribed: true, permission: "granted" })
+    await waitFor(() => expect(screen.getByRole("switch", { name: "新着記事の通知" })).toBeEnabled())
+    expect(screen.getByRole("switch", { name: "新着記事の通知" })).toBeChecked()
+  })
+
+  it("購読状態の取得失敗をブラウザ非対応として表示しない", async () => {
+    getWebPushState.mockRejectedValue(new Error("lookup failed"))
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({ name: "現在名" }) }))
+
+    render(<SettingsContent loadOnMount />)
+
+    expect(await screen.findByText("通知設定の取得に失敗しました")).toBeInTheDocument()
+    expect(screen.queryByText("このブラウザは通知に対応していません。")).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.getByRole("switch", { name: "新着記事の通知" })).toBeEnabled())
+  })
+
   it("通知拒否済みではスイッチを無効化して案内する", async () => {
     getWebPushState.mockResolvedValue({ supported: true, subscribed: false, permission: "denied" })
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({ name: "現在名" }) }))

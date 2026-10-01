@@ -4,6 +4,10 @@ module Api
       class SubscriptionsController < ApiController
         rescue_from ArgumentError, with: :render_invalid_request
 
+        def show
+          render_json_result(SubscriptionsShowUsecase.call(endpoint: params[:endpoint]))
+        end
+
         def create
           render_json_result(SubscriptionsCreateUsecase.call(subscription: params[:subscription]))
         end
