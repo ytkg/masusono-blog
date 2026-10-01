@@ -1,3 +1,4 @@
+import { supportingActionSx } from "../../shared/supportingActionStyles"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import HighlightedCode from "./HighlightedCode"
@@ -45,16 +46,6 @@ const scrollerSx = {
   WebkitOverflowScrolling: "touch",
 }
 
-const runButtonSx = {
-  color: "text.secondary",
-  fontSize: "11px",
-  fontWeight: 700,
-  minWidth: 0,
-  px: 0.5,
-  py: 0,
-  "&:hover": { bgcolor: "transparent", color: "text.primary" },
-}
-
 export default function CodeBlock({ block, action }) {
   return (
     <Box data-code-block-shell sx={shellSx}>
@@ -73,7 +64,7 @@ export default function CodeBlock({ block, action }) {
 
 export function CodeBlockRunButton({ disabled, isRunning, onClick }) {
   return (
-    <Button disabled={disabled} onClick={onClick} size="small" variant="text" sx={runButtonSx}>
+    <Button disabled={disabled} onClick={onClick} size="small" variant="text" sx={supportingActionSx}>
       {isRunning ? "実行中" : "▶ 実行"}
     </Button>
   )

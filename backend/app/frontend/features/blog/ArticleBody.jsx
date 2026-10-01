@@ -1,3 +1,4 @@
+import { supportingActionSx } from "../../shared/supportingActionStyles"
 import { lazy, Suspense, useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -10,7 +11,6 @@ const ArticleStructuredHtml = lazy(() => import("./ArticleStructuredHtml"))
 const EXCERPT_MAX_LENGTH = 80
 const RICH_HTML_PATTERN = /<(img|figure|iframe|video|audio|table|ul|ol|blockquote)\b/i
 const LANGUAGE_CODE_PATTERN = /<pre\b[^>]*>\s*<code\b[^>]*class=["'][^"']*\b(?:language|lang)-/i
-const supportingTextSx = { fontSize: "12px", fontWeight: 700, letterSpacing: 0, lineHeight: 1.5 }
 
 function truncateText(text, maxLength = EXCERPT_MAX_LENGTH) {
   if (text.length <= maxLength) {
@@ -64,15 +64,7 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
             variant="text"
             size="small"
             onClick={() => setIsExpanded((current) => !current)}
-            sx={{
-              ...supportingTextSx,
-              px: 0,
-              py: 0,
-              minWidth: 0,
-              color: "text.secondary",
-              textAlign: "right",
-              "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
-            }}
+            sx={{ ...supportingActionSx, textAlign: "right" }}
           >
             {isExpanded ? "閉じる" : "続きを読む"}
           </Button>
