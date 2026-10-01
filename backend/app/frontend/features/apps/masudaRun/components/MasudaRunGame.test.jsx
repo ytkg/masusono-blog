@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useEffect } from "react"
 import { describe, expect, it, vi } from "vitest"
 import MasudaRunGame from "./MasudaRunGame"
+import { useMasudaRunInput } from "../hooks/useMasudaRunInput"
 
 vi.mock("../assets/masuda_run.webp", () => ({ default: "/player.png" }))
 vi.mock("../assets/other1.webp", () => ({ default: "/short.png" }))
@@ -109,5 +110,21 @@ describe("MasudaRunGame", () => {
     })
 
     expect(await screen.findByRole("button", { name: "リスタート" })).toBeDisabled()
+  })
+  it("pointer操作後の抑止されたclickではジャンプを重ねない", () => {
+    useMasudaRunLoopMock.mockReset()
+    const inputHandlers = {
+      onPrimaryPointerDown: vi.fn(),
+      onPrimaryClick: vi.fn().mockReturnValueOnce(false).mockReturnValue(true),
+    }
+    vi.mocked(useMasudaRunInput).mockReturnValue(inputHandlers)
+    render(<MasudaRunGame rankings={[]} rankingsLoading={false} rankingsError={false} />)
+    fireEvent.pointerDown(screen.getByRole("button", { name: "スタート" }))
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    const player = useMasudaRunLoopMock.mock.calls.at(-1)[0].refs.worldRef.current.player
+    expect(player.jumps).toBe(0)
+    expect(inputHandlers.onPrimaryPointerDown).toHaveBeenCalledOnce()
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(player.jumps).toBe(1)
   })
 })
