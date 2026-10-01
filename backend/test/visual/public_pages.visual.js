@@ -327,6 +327,10 @@ test("admin media detail", async ({ page }) => {
   await expect(page.getByRole("dialog", { name: "icon-512.png" })).toBeVisible()
   await expect(page.getByText("画像サイズ: 512 × 512 px")).toBeVisible()
   await screenshot(page, "admin-media-detail")
+  await page.getByRole("button", { name: "メディア詳細を閉じる" }).click()
+  await expect(page.getByRole("dialog", { name: "icon-512.png" })).not.toBeVisible()
+  await expect(page.getByRole("button", { name: "icon-512.pngの詳細を表示" })).toBeFocused()
+  await expect(page.getByRole("dialog", { name: "管理", exact: true })).toBeVisible()
 })
 
 test("article body spacing and expansion", async ({ page }) => {
