@@ -1,3 +1,4 @@
+import { titleTextSx } from "@/shared/typographyStyles"
 import { cloneElement, forwardRef, useCallback, useEffect, useId, useRef, useState } from "react"
 import AppsIcon from "@mui/icons-material/Apps"
 import CloseIcon from "@mui/icons-material/Close"
@@ -356,7 +357,7 @@ export default function AppsDialogLauncher({
           }}
         >
           <Box sx={dialogHeaderSx}>
-            <Typography id={titleId} variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+            <Typography id={titleId} variant="h5" component="h2" sx={titleTextSx}>
               {title}
             </Typography>
             <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>

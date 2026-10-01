@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react"
 import Box from "@mui/material/Box"
 import PageContainer from "../../shared/PageContainer"
-import SectionHeading from "../../shared/SectionHeading"
+import PageHeading from "../../shared/PageHeading"
 import SeoHead from "../../shared/SeoHead"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
@@ -36,7 +36,7 @@ export default function OthersIndex() {
       />
 
       <PageContainer id="others">
-        <SectionHeading component="h1">増田とその他のその他！</SectionHeading>
+        <PageHeading>増田とその他のその他！</PageHeading>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
           <Suspense fallback={<OthersAppFallback />}>
             <MasudaRunApp />
