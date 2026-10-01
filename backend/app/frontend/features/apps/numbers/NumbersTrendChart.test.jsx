@@ -1,6 +1,10 @@
-import { render, screen } from "@testing-library/react"
+import { render as testingLibraryRender, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import NumbersTrendChart from "./NumbersTrendChart"
+import { ThemeProvider } from "@mui/material/styles"
+import theme from "../../../theme"
+
+const render = (ui) => testingLibraryRender(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
 
 const trend = {
   title: "推移",
