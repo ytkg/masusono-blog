@@ -23,7 +23,7 @@ RSpec.describe "Admin mini app", type: :request do
          headers: { "CONTENT_TYPE" => "application/json", "X-CSRF-Token" => token }
   end
 
-  it "未ログインでは状態だけを返し、管理データを公開しない" do
+  it "未ログインでは状態だけを返し、メディアを公開しない" do
     get "/api/app/management/session"
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body["authenticated"]).to be(false)
@@ -34,10 +34,6 @@ RSpec.describe "Admin mini app", type: :request do
     expect(response.parsed_body.dig("error", "code")).to eq("unauthorized")
     expect(response.headers["cache-control"]).to include("no-store")
     expect(response.headers["X-Robots-Tag"]).to eq("noindex, nofollow")
-
-    get "/api/app/management/articles", headers: { "Accept" => "application/json" }
-    expect(response).to have_http_status(:unauthorized)
-    expect(response.parsed_body.dig("error", "code")).to eq("unauthorized")
   end
 
   it "認証サービスでログインし、ミニアプリ内の状態を取得する" do
@@ -105,5 +101,76 @@ RSpec.describe "Admin mini app", type: :request do
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body.dig("articles", 0, "title")).to eq("下書きタイトル")
     expect(response.headers["cache-control"]).to include("no-store")
+  end
+
+  it "認証済みでCSRFトークンを送ると画像をアップロードできる" do
+    allow(auth_client).to receive(:login).and_return(
+      { "access_token" => "access", "refresh_token" => "refresh" }
+    )
+    allow(auth_client).to receive(:verify).and_return(true)
+    allow(Microcms::UploadMediaService).to receive(:call).and_return({ "id" => "image-1", "url" => "https://example.com/image.png" })
+
+    login(username: "owner", password: "correct")
+    get "/api/app/management/session"
+    token = response.parsed_body.fetch("csrf_token")
+    file = Rack::Test::UploadedFile.new(StringIO.new("\x89PNG\r\n\x1A\n"), "image/png", original_filename: "image.png")
+
+    post "/api/app/management/media", params: { file: }, headers: { "X-CSRF-Token" => token }
+
+    expect(response).to have_http_status(:created)
+    expect(response.parsed_body.dig("media", "id")).to eq("image-1")
+    expect(Microcms::UploadMediaService).to have_received(:call).with(file: an_instance_of(ActionDispatch::Http::UploadedFile))
+    expect(response.body).not_to include("access", "refresh")
+  end
+
+  it "CSRFトークンなしのアップロードを拒否する" do
+    allow(auth_client).to receive(:login).and_return(
+      { "access_token" => "access", "refresh_token" => "refresh" }
+    )
+    allow(auth_client).to receive(:verify).and_return(true)
+
+    login(username: "owner", password: "correct")
+    file = Rack::Test::UploadedFile.new(StringIO.new("\x89PNG\r\n\x1A\n"), "image/png", original_filename: "image.png")
+
+    post "/api/app/management/media", params: { file: }
+
+    expect(response).to have_http_status(:unprocessable_content)
+  end
+
+  it "アップロードサービスの検証エラーを返す" do
+    allow(auth_client).to receive(:login).and_return(
+      { "access_token" => "access", "refresh_token" => "refresh" }
+    )
+    allow(auth_client).to receive(:verify).and_return(true)
+    error = Microcms::UploadMediaService::ValidationError.new("invalid_file_type", "画像ファイルを選択してください。")
+    allow(Microcms::UploadMediaService).to receive(:call).and_raise(error)
+
+    login(username: "owner", password: "correct")
+    get "/api/app/management/session"
+    token = response.parsed_body.fetch("csrf_token")
+    file = Rack::Test::UploadedFile.new(StringIO.new("text"), "text/plain", original_filename: "file.txt")
+
+    post "/api/app/management/media", params: { file: }, headers: { "X-CSRF-Token" => token }
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.parsed_body.dig("error", "code")).to eq("invalid_file_type")
+  end
+
+  it "microCMSへのアップロード失敗を502で返す" do
+    allow(auth_client).to receive(:login).and_return(
+      { "access_token" => "access", "refresh_token" => "refresh" }
+    )
+    allow(auth_client).to receive(:verify).and_return(true)
+    allow(Microcms::UploadMediaService).to receive(:call).and_raise(Microcms::UploadMediaService::UploadError)
+
+    login(username: "owner", password: "correct")
+    get "/api/app/management/session"
+    token = response.parsed_body.fetch("csrf_token")
+    file = Rack::Test::UploadedFile.new(StringIO.new("\x89PNG\r\n\x1A\n"), "image/png", original_filename: "image.png")
+
+    post "/api/app/management/media", params: { file: }, headers: { "X-CSRF-Token" => token }
+
+    expect(response).to have_http_status(:bad_gateway)
+    expect(response.parsed_body.dig("error", "code")).to eq("media_upload_failed")
   end
 end

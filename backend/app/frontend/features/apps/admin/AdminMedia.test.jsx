@@ -6,6 +6,10 @@ function jsonResponse(body) {
   return { ok: true, status: 200, json: async () => body }
 }
 
+function errorResponse(status, body) {
+  return { ok: false, status, json: async () => body }
+}
+
 afterEach(() => vi.unstubAllGlobals())
 
 describe("AdminMedia", () => {
@@ -64,5 +68,74 @@ describe("AdminMedia", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "first.pngの詳細を表示" }))
     expect(screen.getByText("画像サイズ: 320 × 240 px")).toBeInTheDocument()
+  })
+
+  it("画像をアップロード後、検索を解除して一覧を更新する", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ media: [], total_count: 0, has_more: false, page: 1 }))
+      .mockResolvedValueOnce(jsonResponse({ media: { id: "new-image" } }))
+      .mockResolvedValueOnce(
+        jsonResponse({
+          media: [{ id: "new-image", url: "https://example.com/new.png", width: 100, height: 100 }],
+          total_count: 1,
+          has_more: false,
+          page: 1,
+        }),
+      )
+    vi.stubGlobal("fetch", fetch)
+
+    const { container } = render(<AdminMedia csrfToken="csrf-token" onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    await screen.findByText("メディアが見つかりませんでした。")
+    const input = container.querySelector('input[type="file"]')
+    fireEvent.change(input, { target: { files: [new File(["image"], "new.png", { type: "image/png" })] } })
+
+    expect(await screen.findByRole("button", { name: "new.pngの詳細を表示" })).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/app/management/media",
+      expect.objectContaining({
+        method: "POST",
+        headers: { Accept: "application/json", "X-CSRF-Token": "csrf-token" },
+      }),
+    )
+    expect(fetch).toHaveBeenCalledWith("/api/app/management/media?page=1", expect.any(Object))
+  })
+
+  it("画像以外を送信せず理由を表示する", async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse({ media: [], total_count: 0, has_more: false, page: 1 }))
+    vi.stubGlobal("fetch", fetch)
+
+    const { container } = render(<AdminMedia csrfToken="csrf-token" onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    await screen.findByText("メディアが見つかりませんでした。")
+    fireEvent.change(container.querySelector('input[type="file"]'), {
+      target: { files: [new File(["text"], "memo.txt", { type: "text/plain" })] },
+    })
+
+    expect(screen.getByRole("alert")).toHaveTextContent("画像ファイルを選択してください。")
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("アップロード失敗時に理由を表示し、再試行できる", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ media: [], total_count: 0, has_more: false, page: 1 }))
+      .mockResolvedValueOnce(
+        errorResponse(502, { error: { code: "media_upload_failed", message: "アップロードできませんでした。" } }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ media: { id: "new-image" } }))
+      .mockResolvedValueOnce(jsonResponse({ media: [], total_count: 0, has_more: false, page: 1 }))
+    vi.stubGlobal("fetch", fetch)
+
+    const { container } = render(<AdminMedia csrfToken="csrf-token" onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    await screen.findByText("メディアが見つかりませんでした。")
+    const input = container.querySelector('input[type="file"]')
+    const file = new File(["image"], "new.png", { type: "image/png" })
+    fireEvent.change(input, { target: { files: [file] } })
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("アップロードできませんでした。")
+    expect(screen.getByRole("button", { name: "アップロード" })).toBeEnabled()
+
+    fireEvent.change(input, { target: { files: [file] } })
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(4))
   })
 })

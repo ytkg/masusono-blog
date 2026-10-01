@@ -139,7 +139,9 @@ export default function AdminApp() {
       {view === "dashboard" ? (
         <Dashboard onMedia={() => setView("media")} onArticles={() => setView("articles")} />
       ) : null}
-      {view === "media" ? <AdminMedia onBack={() => setView("dashboard")} onUnauthorized={handleUnauthorized} /> : null}
+      {view === "media" ? (
+        <AdminMedia csrfToken={csrfToken} onBack={() => setView("dashboard")} onUnauthorized={handleUnauthorized} />
+      ) : null}
       {view === "articles" ? (
         <AdminArticles onBack={() => setView("dashboard")} onUnauthorized={handleUnauthorized} />
       ) : null}

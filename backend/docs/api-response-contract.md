@@ -41,6 +41,7 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 - `POST /api/app/management/session`: `{ "username": String, "password": String }` と `X-CSRF-Token` を送る。成功時は GET と同じ形式を返す。
 - `GET /api/app/management/media?page=1&q=...&token=...`: ログイン必須。`{ "media": Array, "total_count": Integer, "has_more": Boolean, "next_token": String | null, "page": Integer, "query": String }` を返す。`q` はファイル名検索、`page` は1始まりで1回に20件取得する。追加読み込みには前回の `next_token` を指定できる。各メディアには `id`、`url` と、存在する場合は `width`、`height`、`createdAt`、`updatedAt`、`alt`、`tags` を含む。
 - `GET /api/app/management/articles?page=1&q=...&status=...`: ログイン必須。`{ "articles": Array, "total_count": Integer, "has_more": Boolean, "page": Integer, "query": String, "status": String }` を返す。`status` は `all`、`published`、`draft`、`published_and_draft`、`closed` のいずれかで、`q` と組み合わせられる。各記事には `id`、下書きがあればそのタイトルを優先した `title`、`status`（`PUBLISH`、`DRAFT`、`PUBLISH_AND_DRAFT`、`CLOSED`）、`updated_at` を含む。サーバー側で全件を結合・並べ替えるため、追加読み込み後も検索・絞り込み・更新日時降順が維持される。
+- `POST /api/app/management/media`: ログイン必須。CSRF トークンを `X-CSRF-Token`、画像1件を multipart/form-data の `file` で送る。画像以外と5MB超は `422`、microCMS への送信失敗は `502` を `{ "error": { "code": String, "message": String, "request_id": String } }` で返す。成功時は `201` と `{ "media": Object }` を返す。API キー・認証トークンはレスポンスに含めない。
 
 ## Web Push API
 
