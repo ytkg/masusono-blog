@@ -5,6 +5,15 @@ import ArticlesList from "../../features/blog/ArticlesList"
 import PageContainer from "../../shared/PageContainer"
 import SeoHead from "../../shared/SeoHead"
 
+import {
+  labelTextSx,
+  nameTextSx,
+  bioTextSx,
+  imageSx,
+  profileGap,
+  profileTextSpacing,
+} from "../../shared/authorProfileStyles"
+
 function AuthorProfile({ author }) {
   const image = author.imageUrl
 
@@ -15,34 +24,19 @@ function AuthorProfile({ author }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: { xs: 1.25, sm: 1.5 },
+        gap: profileGap,
         textAlign: "center",
       }}
     >
-      {image ? (
-        <Box
-          component="img"
-          src={image}
-          alt={`${author.name}のアイコン`}
-          sx={{
-            width: { xs: 96, sm: 128 },
-            aspectRatio: "1 / 1",
-            borderRadius: "50%",
-            border: "1px solid",
-            borderColor: "divider",
-            bgcolor: "#fafafa",
-            objectFit: "cover",
-          }}
-        />
-      ) : null}
-      <Stack spacing={0.75} sx={{ minWidth: 0, maxWidth: 640 }}>
-        <Typography variant="overline" color="text.secondary" sx={{ m: 0, fontWeight: 700, lineHeight: 1.4 }}>
+      {image ? <Box component="img" src={image} alt={`${author.name}のアイコン`} sx={imageSx} /> : null}
+      <Stack spacing={profileTextSpacing} sx={{ minWidth: 0, maxWidth: 640 }}>
+        <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
           {author.title}
         </Typography>
-        <Typography variant="h5" component="h1" sx={{ m: 0, fontWeight: 700, lineHeight: 1.25 }}>
+        <Typography variant="h5" component="h1" sx={nameTextSx}>
           {author.name}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ m: 0, lineHeight: 1.9, textAlign: "left" }}>
+        <Typography variant="body1" color="text.secondary" sx={{ ...bioTextSx, textAlign: "left" }}>
           {author.bio}
         </Typography>
       </Stack>

@@ -90,6 +90,56 @@ for (const [name, path, heading] of [
   })
 }
 
+test.describe("author profiles", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("long profiles and missing images", async ({ page }) => {
+    const title = "日常の発見を記録する人".repeat(8)
+    const bio = "散歩と食事が好きです。気になった出来事を、肩の力を抜いて書いています。".repeat(6)
+    await page.route("**/*", async (route) => {
+      const path = new URL(route.request().url()).pathname
+      if (!["/authors", "/authors/visual-author-1", "/authors/visual-author-2"].includes(path)) {
+        return route.continue()
+      }
+      const response = await route.fetch()
+      const body = (await response.text())
+        .replaceAll("日常の発見を記録する人", title)
+        .replaceAll("散歩と食事が好きです。気になった出来事を、肩の力を抜いて書いています。", bio)
+        .replace(/("id":"visual-author-1"[^}]*"imageUrl":)null/, '$1"/icons/icon-512.png"')
+      await route.fulfill({ response, body })
+    })
+    for (const [name, path] of [
+      ["list", "/authors"],
+      ["detail", "/authors/visual-author-1"],
+    ]) {
+      await openPage(page, path)
+      const image = page.locator("main img").first()
+      await expect(image).toHaveCSS("width", page.viewportSize().width < 600 ? "112px" : "128px")
+      const label = page.getByText(title, { exact: true })
+      await expect(label).toHaveCSS("font-size", "13px")
+      await expect(label).toHaveCSS("font-weight", "700")
+      const imageBox = await image.boundingBox()
+      const labelBox = await label.boundingBox()
+      expect(labelBox.y - (imageBox.y + imageBox.height)).toBe(page.viewportSize().width < 600 ? 10 : 12)
+      const nameHeading = page.getByRole("heading", { name: "増田愛美", exact: true }).first()
+      await expect(nameHeading).toHaveCSS("font-size", "24px")
+      await expect(nameHeading).toHaveCSS("font-weight", "700")
+      await expect(page.getByText(bio, { exact: true })).toHaveCSS("font-size", "16px")
+      await expect(page.getByText(bio, { exact: true })).toHaveCSS("line-height", "30.4px")
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(page.viewportSize().width)
+      await expect.soft(page).toHaveScreenshot(`author-profile-long-${name}.png`)
+    }
+    await openPage(page, "/authors/visual-author-2")
+    await expect(page.locator("main img")).toHaveCount(0)
+    await expect(page.getByRole("heading", { name: "チャーリー", level: 1 })).toBeVisible()
+    await expect.soft(page).toHaveScreenshot("author-profile-no-image.png")
+    await openPage(page, "/authors")
+    await page.getByRole("link", { name: "チャーリーの記事を読む", exact: true }).click()
+    await expect(page).toHaveURL(/\/authors\/visual-author-2$/)
+    await expect(page.getByRole("heading", { name: "投稿", exact: true })).toBeVisible()
+  })
+})
+
 test("search suggestions", async ({ page }) => {
   await openPage(page, "/search")
   await expect(page.getByText("著者から探す")).toBeVisible()
@@ -110,6 +160,46 @@ test("search results", async ({ page }) => {
   await expect(page.locator(".MuiInputBase-root")).toHaveCSS("height", "40px")
   await clear.click()
   await expect(page.getByRole("textbox", { name: "記事を検索" })).toHaveValue("")
+})
+
+test.describe("article titles", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("long article title wraps in list and detail", async ({ page }) => {
+    const title = "週末の散歩で見つけたもの".repeat(5) + "LongUnbrokenArticleTitle".repeat(4)
+    await page.route("**/*", async (route) => {
+      const path = new URL(route.request().url()).pathname
+      if (path !== "/" && path !== "/articles/visual-article-1") return route.continue()
+      const response = await route.fetch()
+      if (response.headers()["content-type"]?.includes("application/json")) {
+        const json = await response.json()
+        if (json.props?.article) json.props.article.title = title
+        await route.fulfill({ response, body: JSON.stringify(json) })
+        return
+      }
+      const body = (await response.text()).replaceAll("週末の散歩で見つけたもの", title)
+      await route.fulfill({ response, body })
+    })
+    await openPage(page, "/")
+    const listTitle = page.getByRole("heading", { name: title, level: 3 })
+    await expect(listTitle).toHaveCSS("font-size", "20px")
+    await expect(listTitle).toHaveCSS("line-height", "25px")
+    await screenshot(page, "article-title-long-list")
+    await page.getByRole("link", { name: title, exact: true }).click()
+    await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
+    const detailTitle = page.getByRole("heading", { name: title, level: 1 })
+    await expect(detailTitle).toHaveCSS("font-size", "24px")
+    await expect(detailTitle).toHaveCSS("line-height", "30px")
+    await expect(detailTitle).toHaveCSS("margin-bottom", "16px")
+    await expect(detailTitle).toHaveCSS("font-weight", "700")
+    await expect(detailTitle).toHaveCSS("letter-spacing", "normal")
+    await expect(detailTitle).toHaveCSS("overflow-wrap", "anywhere")
+    const box = await detailTitle.boundingBox()
+    expect(box.height).toBeGreaterThan(30)
+    expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize().width)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(page.viewportSize().width)
+    await screenshot(page, "article-title-long-detail")
+  })
 })
 
 for (const [name, button] of [
@@ -289,3 +379,98 @@ test("numbers trend", async ({ page }) => {
   await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
   await expect(chart).toHaveScreenshot("numbers-trend.png")
 })
+
+for (const state of ["success", "error"]) {
+  test(`copy ${state}`, async ({ page }) => {
+    await page.addInitScript((state) => {
+      Object.defineProperty(navigator, "clipboard", {
+        value: {
+          writeText: async () => {
+            if (state === "error") throw new Error("denied")
+          },
+        },
+      })
+    }, state)
+    await openPage(page, "/articles/visual-article-1")
+    await page.getByRole("button", { name: "記事メニューを開く" }).first().click()
+    await page.getByRole("menuitem", { name: "記事URLをコピー" }).click()
+    await expect(page.getByRole("alert")).toContainText(state === "success" ? "完了" : "失敗")
+    await screenshot(page, `copy-${state}`)
+    if (state === "error") {
+      await page.waitForTimeout(3200)
+      await expect(page.getByRole("alert")).toBeVisible()
+      await page.getByRole("button", { name: "閉じる", exact: true }).click()
+      await expect(page.getByRole("alert")).not.toBeVisible()
+    } else {
+      await expect(page.getByRole("alert")).not.toBeVisible({ timeout: 5000 })
+    }
+  })
+}
+
+for (const state of ["empty", "error"]) {
+  test(`rankings ${state}`, async ({ page }) => {
+    await page.addInitScript((state) => {
+      const originalFetch = window.fetch
+      window.fetch = (url, options) => {
+        if (String(url).includes("/api/app/masuda_run/rankings.json")) {
+          return Promise.resolve(
+            new Response(
+              state === "error" ? JSON.stringify({ error: { message: "ランキングの取得に失敗しました。" } }) : "[]",
+              {
+                status: state === "error" ? 500 : 200,
+                headers: { "Content-Type": "application/json" },
+              },
+            ),
+          )
+        }
+        return originalFetch(url, options)
+      }
+    }, state)
+    await openPage(page, "/others")
+    await page.getByRole("button", { name: "増田RUNを開く" }).click()
+    await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
+    await expect(
+      page.getByText(state === "error" ? "ランキングの取得に失敗しました。" : "まだランキングがありません。"),
+    ).toBeVisible()
+    const message = state === "error" ? page.getByRole("alert") : page.getByText("まだランキングがありません。")
+    await expect(message).toHaveCSS("font-size", "14px")
+    await expect(message).toHaveCSS("line-height", "21px")
+    await expect(message).toHaveCSS("color", state === "error" ? "rgb(0, 0, 0)" : "rgb(102, 102, 102)")
+    await screenshot(page, `rankings-${state}`)
+  })
+}
+
+for (const state of ["loading", "warning", "error"]) {
+  test(`ruby ${state}`, async ({ page }) => {
+    await page.addInitScript((state) => {
+      window.Worker = class {
+        addEventListener(type, listener) {
+          if (type === "message") this.listener = listener
+        }
+        postMessage() {
+          if (state === "error") this.listener({ data: { error: "Ruby の実行に失敗しました。" } })
+        }
+        terminate() {}
+      }
+    }, state)
+    await page.route("**/articles/visual-article-1", async (route) => {
+      const response = await route.fetch()
+      const body = (await response.text()).replaceAll(
+        "ゆっくり過ごした週末の記録です。",
+        JSON.stringify('</p><pre><code class="language-ruby">puts :hello</code></pre><p>').slice(1, -1),
+      )
+      await route.fulfill({ response, body })
+    })
+    await openPage(page, "/articles/visual-article-1")
+    await page.getByRole("button", { name: "▶ 実行" }).click()
+    const runner = page.getByTestId("ruby-code-runner")
+    await runner.scrollIntoViewIfNeeded()
+    if (state === "loading") await expect(runner.getByRole("status")).toBeVisible()
+    else await expect(runner.getByRole("alert")).toContainText(state === "warning" ? "注意" : "失敗")
+    const message = state === "loading" ? runner.getByText("実行中...") : runner.getByRole("alert")
+    await expect(message).toHaveCSS("font-size", "14px")
+    await expect(message).toHaveCSS("line-height", "21px")
+    await expect(message).toHaveCSS("color", state === "loading" ? "rgb(102, 102, 102)" : "rgb(0, 0, 0)")
+    await expect(runner).toHaveScreenshot(`ruby-${state}.png`)
+  })
+}
