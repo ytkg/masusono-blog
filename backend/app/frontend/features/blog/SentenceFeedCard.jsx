@@ -1,3 +1,4 @@
+import { focusRingSx } from "../../shared/focusStyles"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import { SENTENCE_REVEAL_DURATION_MS } from "./sentenceFeedData"
@@ -23,9 +24,7 @@ const CARD_SX = {
   "&:focus-visible": {
     borderColor: "text.primary",
     bgcolor: "background.default",
-    outline: "2px solid",
-    outlineColor: "secondary.main",
-    outlineOffset: 3,
+    ...focusRingSx,
   },
   "&:active": { borderColor: "text.primary", bgcolor: "#f5f5f5" },
   "@keyframes sentence-reveal": { to: { opacity: 1, filter: "blur(0)" } },

@@ -668,3 +668,24 @@ test("public empty status", async ({ page }) => {
   await expect(empty).toHaveCSS("color", "rgb(102, 102, 102)")
   await screenshot(page, "public-empty-status")
 })
+
+for (const target of ["title", "author", "sentence"]) {
+  test(`article focus ${target}`, async ({ page }) => {
+    await openPage(page, "/")
+    if (target === "sentence") {
+      await page.getByRole("tab", { name: "書き出し" }).click()
+    }
+    const link = target === "title"
+      ? page.getByRole("heading", { name: "週末の散歩で見つけたもの" }).getByRole("link")
+      : target === "author"
+        ? page.getByTestId("article-meta-author").first()
+        : page.locator(".sentence-card").first()
+    await page.keyboard.press("Tab")
+    await link.focus()
+    await expect(link).toHaveCSS("outline", "rgb(0, 0, 0) solid 2px")
+    await expect(link).toHaveCSS("outline-offset", "2px")
+    await screenshot(page, `article-focus-${target}`)
+    await page.keyboard.press("Tab")
+    await expect(link).not.toBeFocused()
+  })
+}

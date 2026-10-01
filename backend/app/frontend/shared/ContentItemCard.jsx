@@ -1,9 +1,11 @@
+import { focusVisibleSx } from "./focusStyles"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
 
 const ContentItemTitleLink = styled(Link)(({ theme }) => ({
+  ...focusVisibleSx,
   color: "inherit",
   textDecoration: "none",
   display: "inline-block",
