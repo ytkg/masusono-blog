@@ -25,7 +25,7 @@ services:
     working_dir: /rails
     command: npm run test:visual
     environment:
-      CI: ${CI:-}
+      CI: "1"
     volumes:
       - .:/rails
       - node_modules_cache:/rails/node_modules
