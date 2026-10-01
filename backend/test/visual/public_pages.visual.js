@@ -474,3 +474,56 @@ for (const state of ["loading", "warning", "error"]) {
     await expect(runner).toHaveScreenshot(`ruby-${state}.png`)
   })
 }
+
+for (const width of [390, 600, 1280, 1920, 2560]) {
+  test(`navigation alignment at ${width}px`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop")
+    await page.setViewportSize({ width, height: 844 })
+    await openPage(page, "/")
+    await openPage(page, "/articles/visual-article-1")
+    const bounds = await page.evaluate(() => {
+      const main = document.querySelector("main")
+      const content = main.firstElementChild
+      const rect = (element) => {
+        const { x, width } = element.getBoundingClientRect()
+        return { x, width }
+      }
+      return {
+        main: rect(main),
+        contentLeft: content.getBoundingClientRect().x + parseFloat(getComputedStyle(content).paddingLeft),
+        toolbar: rect(document.querySelector("header .MuiToolbar-root")),
+        backButton: rect(document.querySelector('button[aria-label="前のページに戻る"]')),
+        nav: rect(document.querySelector('nav[aria-label="メインナビゲーション"]')),
+        scrollWidth: document.documentElement.scrollWidth,
+      }
+    })
+    const outerWidth = Math.min(width, 1200)
+    const padding = width < 600 ? 16 : 24
+    const left = (width - outerWidth) / 2 + padding
+    expect(bounds.main.width).toBe(outerWidth)
+    expect(bounds.toolbar).toEqual(bounds.main)
+    expect(bounds.contentLeft).toBe(left)
+    expect(bounds.backButton.x).toBeCloseTo(left, 0)
+    expect(bounds.nav.x).toBe(left)
+    expect(bounds.nav.width).toBe(outerWidth - padding * 2)
+    expect(bounds.scrollWidth).toBe(width)
+    const links = page.getByRole("navigation", { name: "メインナビゲーション" }).getByRole("link")
+    await expect(links).toHaveCount(5)
+    for (const link of await links.all()) {
+      await expect(link).toBeVisible()
+      const box = await link.boundingBox()
+      expect(box.width).toBeGreaterThanOrEqual(44)
+      expect(box.height).toBeGreaterThanOrEqual(44)
+    }
+    await screenshot(page, `navigation-alignment-${width}`)
+    await page
+      .getByRole("navigation", { name: "メインナビゲーション" })
+      .getByRole("link", { name: "著者", exact: true })
+      .click()
+    await expect(page).toHaveURL(/\/authors$/)
+    await page.goBack()
+    await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
+    await page.getByRole("button", { name: "前のページに戻る" }).click()
+    await expect(page).toHaveURL(/\/$/)
+  })
+}

@@ -7,6 +7,7 @@ import { Link, usePage } from "@inertiajs/react"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { currentLocationPath, LOCATION_CHANGE_EVENT } from "@/shared/lib/locationEvents"
 import { requestHomeFeed } from "@/shared/lib/homeNavigation"
+import { PAGE_MAX_WIDTH, PAGE_HORIZONTAL_PADDING } from "../shared/pageLayout"
 import logo from "../assets/logo.webp"
 
 function goBack() {
@@ -68,7 +69,10 @@ export default function Header() {
           minHeight: { xs: 44, sm: 52 },
           pt: 0,
           pb: { xs: 0.5, sm: 0.75 },
-          px: { xs: 2, sm: 3 },
+          px: PAGE_HORIZONTAL_PADDING,
+          width: "100%",
+          maxWidth: PAGE_MAX_WIDTH,
+          mx: "auto",
         }}
       >
         <Box
@@ -105,7 +109,7 @@ export default function Header() {
               gridColumn: 1,
               gridRow: 1,
               justifySelf: "start",
-              transform: "translate(-8px, 2px)",
+              transform: "translateY(2px)",
             }}
           >
             <ArrowBackIcon />

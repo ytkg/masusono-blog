@@ -2,6 +2,7 @@ import { Link, usePage } from "@inertiajs/react"
 import BottomNavigation from "@mui/material/BottomNavigation"
 import BottomNavigationAction from "@mui/material/BottomNavigationAction"
 import Paper from "@mui/material/Paper"
+import { PAGE_INNER_MAX_WIDTH } from "../shared/pageLayout"
 import { MAIN_NAVIGATION_LINKS } from "../shared/mainNavigationLinks"
 import { requestHomeFeed } from "../shared/lib/homeNavigation"
 
@@ -47,6 +48,7 @@ export default function FloatingBottomNavigation() {
         bottom: { xs: "calc(16px + env(safe-area-inset-bottom))", sm: "calc(20px + env(safe-area-inset-bottom))" },
         transform: "translateX(-50%)",
         width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
+        maxWidth: PAGE_INNER_MAX_WIDTH,
         zIndex: (t) => t.zIndex.appBar,
         overflow: "hidden",
         bgcolor: "common.white",
