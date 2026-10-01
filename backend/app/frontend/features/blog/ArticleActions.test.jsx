@@ -35,4 +35,25 @@ describe("ArticleActions", () => {
 
     expect(await screen.findByText("記事URLをコピーできませんでした")).toBeInTheDocument()
   })
+  it("失敗が時間経過と外側のクリックで消えず、再試行できる", async () => {
+    const writeText = vi.fn().mockRejectedValueOnce(new Error("denied")).mockResolvedValue(undefined)
+    mockClipboard(writeText)
+    render(<ArticleActions article={{ id: "article-1" }} />)
+    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    fireEvent.click(screen.getByRole("menuitem", { name: "記事URLをコピー" }))
+    await screen.findByText("記事URLをコピーできませんでした")
+    vi.useFakeTimers()
+    try {
+      await vi.advanceTimersByTimeAsync(4000)
+      fireEvent.click(document.body)
+      expect(screen.getByRole("alert")).toHaveTextContent("失敗")
+    } finally {
+      vi.useRealTimers()
+    }
+    fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+    expect(await screen.findByText("記事URLをコピーしました")).toBeInTheDocument()
+    expect(writeText).toHaveBeenCalledTimes(2)
+    fireEvent.click(screen.getByRole("button", { name: "Close" }))
+    await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument())
+  })
 })

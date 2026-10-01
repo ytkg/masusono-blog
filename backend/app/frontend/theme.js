@@ -33,6 +33,8 @@ const theme = createTheme({
       },
       styleOverrides: {
         root: {
+          fontSize: 14,
+          lineHeight: 1.5,
           color: "#000",
           backgroundColor: "#fff",
           borderColor: "#e0e0e0",

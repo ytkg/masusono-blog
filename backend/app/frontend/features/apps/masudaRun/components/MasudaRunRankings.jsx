@@ -1,3 +1,5 @@
+import StatusAlert from "@/shared/components/StatusAlert"
+import LoadingStatus from "@/shared/components/LoadingStatus"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Table from "@mui/material/Table"
@@ -40,18 +42,10 @@ export default function MasudaRunRankings({ rankings, isLoading, hasError, error
       <Typography variant="subtitle1" sx={titleSx}>
         ランキング
       </Typography>
-      {isLoading && topRankings.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
-          読み込み中...
-        </Typography>
-      ) : null}
-      {hasError ? (
-        <Typography variant="body2" color="text.secondary">
-          {errorMessage}
-        </Typography>
-      ) : null}
+      {isLoading && topRankings.length === 0 ? <LoadingStatus>読み込み中...</LoadingStatus> : null}
+      {hasError ? <StatusAlert>{errorMessage}</StatusAlert> : null}
       {!isLoading && !hasError && topRankings.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
+        <Typography sx={{ color: "text.secondary", fontSize: 14, lineHeight: 1.5 }}>
           まだランキングがありません。
         </Typography>
       ) : null}

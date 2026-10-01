@@ -61,7 +61,7 @@ describe("RubyExecutableCodeBlock", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
 
-    expect(await screen.findByText("エラー")).toBeInTheDocument()
+    expect(await screen.findByRole("alert")).toBeInTheDocument()
     expect(screen.getByText("boom")).toBeInTheDocument()
   })
 })
