@@ -65,7 +65,7 @@ jobs:
           IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
         run: ./deploy.sh
 
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         env:
           SERVICE_NAME: ${{ steps.deploy.outputs.service_name }}
           SERVICE_URL: ${{ steps.deploy.outputs.service_url }}
