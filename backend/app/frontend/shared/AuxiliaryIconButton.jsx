@@ -1,3 +1,4 @@
+import { focusRingSx } from "./focusStyles"
 import IconButton from "@mui/material/IconButton"
 
 const auxiliaryIconButtonSx = {
@@ -8,7 +9,7 @@ const auxiliaryIconButtonSx = {
   opacity: 1,
   "& .MuiSvgIcon-root": { fontSize: 20 },
   "&:hover": { bgcolor: "#f5f5f5" },
-  "&.Mui-focusVisible": { outline: "2px solid #000", outlineOffset: 2 },
+  "&.Mui-focusVisible": focusRingSx,
   "&.Mui-disabled": { color: "text.disabled" },
 }
 

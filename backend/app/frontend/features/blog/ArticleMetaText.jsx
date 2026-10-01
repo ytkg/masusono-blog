@@ -1,3 +1,4 @@
+import { focusVisibleSx } from "../../shared/focusStyles"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
@@ -9,6 +10,7 @@ export default function ArticleMetaText({ articleStats, author, authorHref, date
       href={authorHref}
       data-testid={mode === "detail" ? "article-detail-author" : "article-meta-author"}
       sx={{
+        ...(authorHref ? focusVisibleSx : {}),
         color: "text.primary",
         fontWeight: 700,
         lineHeight: 1.35,

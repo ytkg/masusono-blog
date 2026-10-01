@@ -1,3 +1,4 @@
+import { FOCUS_RING_OUTSET } from "../../shared/focusStyles"
 import Box from "@mui/material/Box"
 import EmptyStatus from "../../shared/components/EmptyStatus"
 import SentenceFeedCard from "./SentenceFeedCard"
@@ -19,7 +20,13 @@ export default function SentenceFeed({ articles = [] }) {
     <Box
       ref={containerRef}
       data-testid="sentence-feed"
-      sx={{ position: "relative", minHeight: height, overflowX: "clip", px: { xs: 0, sm: 1.5 } }}
+      sx={{
+        position: "relative",
+        minHeight: height,
+        overflow: "clip",
+        overflowClipMargin: `${FOCUS_RING_OUTSET}px`,
+        px: { xs: 0, sm: 1.5 },
+      }}
     >
       {items.map(({ article, hasRevealed, key, sentence, revealDelay }) => (
         <SentenceFeedCard
