@@ -1,7 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close"
 import SearchIcon from "@mui/icons-material/Search"
 import Box from "@mui/material/Box"
-import IconButton from "@mui/material/IconButton"
+import AuxiliaryIconButton from "../../shared/AuxiliaryIconButton"
 import InputAdornment from "@mui/material/InputAdornment"
 import TextField from "@mui/material/TextField"
 
@@ -26,6 +26,7 @@ export default function ArticleSearchBox({ autoFocus = false, onChange, onClear,
         onChange={(event) => onChange(event.target.value)}
         placeholder="記事を検索"
         size="small"
+        sx={{ "& .MuiInputBase-root": { height: 40 } }}
         slotProps={{
           htmlInput: {
             "aria-label": "記事を検索",
@@ -38,9 +39,9 @@ export default function ArticleSearchBox({ autoFocus = false, onChange, onClear,
             ),
             endAdornment: query ? (
               <InputAdornment position="end">
-                <IconButton aria-label="検索語をクリア" edge="end" size="small" onClick={onClear}>
+                <AuxiliaryIconButton aria-label="検索語をクリア" edge="end" onClick={onClear}>
                   <CloseIcon fontSize="small" />
-                </IconButton>
+                </AuxiliaryIconButton>
               </InputAdornment>
             ) : null,
           },

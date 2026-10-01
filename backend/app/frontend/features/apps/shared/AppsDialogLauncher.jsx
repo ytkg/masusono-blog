@@ -9,6 +9,7 @@ import LinearProgress from "@mui/material/LinearProgress"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { Transition } from "react-transition-group"
+import AuxiliaryIconButton from "../../../shared/AuxiliaryIconButton"
 import { AppsLoadingProvider } from "./AppsLoadingContext"
 
 const animationDuration = { enter: 500, exit: 300 }
@@ -70,12 +71,6 @@ const dialogHeaderSx = {
 const dialogBodyBaseSx = {
   flexGrow: 1,
   overflow: "auto",
-}
-
-const closeButtonSx = {
-  width: 44,
-  height: 44,
-  "&:hover": { bgcolor: "transparent" },
 }
 
 const loadingIconSx = {
@@ -366,9 +361,9 @@ export default function AppsDialogLauncher({
             </Typography>
             <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>
               {titleAccessory}
-              <IconButton aria-label="閉じる" onClick={handleClose} sx={closeButtonSx} autoFocus>
+              <AuxiliaryIconButton aria-label="閉じる" onClick={handleClose} autoFocus>
                 <CloseIcon />
-              </IconButton>
+              </AuxiliaryIconButton>
             </Box>
           </Box>
           <AppsLoadingProvider value={registerLoadingTask}>
