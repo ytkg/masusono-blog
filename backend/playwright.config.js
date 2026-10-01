@@ -3,8 +3,8 @@ import { defineConfig } from "@playwright/test"
 export default defineConfig({
   testDir: "./test/visual",
   testMatch: "*.visual.js",
-  fullyParallel: false,
-  workers: 2,
+  fullyParallel: true,
+  workers: process.env.CI ? 4 : 2,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: process.env.VISUAL_BASE_URL || "http://localhost:3000",
