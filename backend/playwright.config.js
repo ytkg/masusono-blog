@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./test/visual",
   testMatch: "*.visual.js",
   fullyParallel: false,
-  workers: 1,
+  workers: 2,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: process.env.VISUAL_BASE_URL || "http://localhost:3000",
