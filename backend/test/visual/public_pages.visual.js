@@ -24,6 +24,20 @@ async function screenshot(page, name) {
   await expect(page).toHaveScreenshot(`${name}.png`)
 }
 
+async function checkAuxiliaryButton(page, button) {
+  await expect(button).toHaveCSS("width", "44px")
+  await expect(button).toHaveCSS("height", "44px")
+  await expect(button).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(button).toHaveCSS("opacity", "1")
+  await expect(button.locator("svg")).toHaveCSS("font-size", "20px")
+  await page.keyboard.press("Tab")
+  await button.focus()
+  await expect(button).toHaveCSS("outline", "rgb(0, 0, 0) solid 2px")
+  await expect(button).toHaveCSS("outline-offset", "2px")
+  await button.hover()
+  await expect(button).toHaveCSS("background-color", "rgb(245, 245, 245)")
+}
+
 test("home feed", async ({ page }) => {
   await openPage(page, "/")
   await expect(page.getByRole("tab", { name: "フィード" })).toHaveAttribute("aria-selected", "true")
@@ -68,6 +82,16 @@ test("search results", async ({ page }) => {
   await openPage(page, "/search?q=散歩")
   await expect(page.getByRole("link", { name: "週末の散歩で見つけたもの" })).toBeVisible()
   await screenshot(page, "search-results")
+  const menu = page.getByRole("button", { name: "記事メニューを開く" }).first()
+  await checkAuxiliaryButton(page, menu)
+  await menu.click()
+  await expect(page.getByRole("menuitem", { name: "記事URLをコピー" })).toBeVisible()
+  await page.keyboard.press("Escape")
+  const clear = page.getByRole("button", { name: "検索語をクリア" })
+  await checkAuxiliaryButton(page, clear)
+  await expect(page.locator(".MuiInputBase-root")).toHaveCSS("height", "40px")
+  await clear.click()
+  await expect(page.getByRole("textbox", { name: "記事を検索" })).toHaveValue("")
 })
 
 for (const [name, button] of [
@@ -84,6 +108,11 @@ for (const [name, button] of [
       await expect(rankings.getByRole("row", { name: /増田愛美/ })).toBeVisible()
     }
     await screenshot(page, name)
+    const close = page.getByRole("button", { name: "閉じる", exact: true })
+    await checkAuxiliaryButton(page, close)
+    await close.click()
+    await expect(page.getByRole("dialog")).not.toBeVisible()
+    await expect(page.getByRole("button", { name: button })).toBeFocused()
   })
 }
 

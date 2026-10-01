@@ -1,5 +1,5 @@
 import { useState } from "react"
-import IconButton from "@mui/material/IconButton"
+import AuxiliaryIconButton from "../../shared/AuxiliaryIconButton"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import Snackbar from "@mui/material/Snackbar"
@@ -39,21 +39,14 @@ export default function ArticleActions({ article }) {
 
   return (
     <>
-      <IconButton
+      <AuxiliaryIconButton
         aria-label="記事メニューを開く"
         aria-haspopup="menu"
         aria-expanded={isOpen}
         onClick={handleOpen}
-        size="small"
-        sx={{
-          color: "text.secondary",
-          opacity: 0.72,
-          p: 0.5,
-          "&:hover": { opacity: 1 },
-        }}
       >
         <MoreHorizIcon fontSize="small" />
-      </IconButton>
+      </AuxiliaryIconButton>
       <Menu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
         <MenuItem onClick={handleCopy}>
           <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
