@@ -71,8 +71,6 @@ export default function ArticleCard({ article, mode = "list", sx }) {
         mb: isDetail ? 2 : 0.5,
       }}
       titleTo={isList ? `/articles/${article.id}` : undefined}
-      meta={undefined}
-      metaPlacement={isList ? "above" : "below"}
       sx={{ minWidth: 0 }}
     >
       <ArticleTags tags={article.tags} />
