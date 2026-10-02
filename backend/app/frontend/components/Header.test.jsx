@@ -7,9 +7,15 @@ import { LOCATION_CHANGE_EVENT } from "@/shared/lib/locationEvents"
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
   return {
-    Link: React.forwardRef(function MockLink({ href, prefetch: _prefetch, children, ...props }, ref) {
+    Link: React.forwardRef(function MockLink({ href, prefetch, cacheFor, children, ...props }, ref) {
       return (
-        <a ref={ref} href={href} {...props}>
+        <a
+          ref={ref}
+          href={href}
+          data-prefetch={JSON.stringify(prefetch)}
+          data-cache-for={JSON.stringify(cacheFor)}
+          {...props}
+        >
           {children}
         </a>
       )
@@ -29,6 +35,14 @@ describe("Header", () => {
     const image = screen.getByRole("img", { name: "増田とその他！" })
     expect(image).toHaveAttribute("src", "/mock-logo.png")
     expect(image.closest("a")).toHaveAttribute("href", "/")
+  })
+
+  it("別ページではロゴからホームを先読みし、期限後もキャッシュを表示して更新する", () => {
+    vi.mocked(usePage).mockReturnValueOnce({ url: "/authors" })
+    render(<Header />)
+    const link = screen.getByRole("img", { name: "増田とその他！" }).closest("a")
+    expect(link).toHaveAttribute("data-prefetch", '["hover","mount"]')
+    expect(link).toHaveAttribute("data-cache-for", '["30s","5m"]')
   })
 
   it("通常ページでは戻るボタンを表示しない", () => {
