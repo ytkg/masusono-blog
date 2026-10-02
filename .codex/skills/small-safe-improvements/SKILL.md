@@ -32,10 +32,16 @@ description: masusono-blog のコードから、既存テストで安全性を�
 1. 選んだ1件について Issue を作成する。現状の問題、改善内容、対象範囲、既存テストによる安全性の根拠、検証予定を記載する。候補ごとの承認待ちは挟まず、PR 作成まで進める。
 2. masusono-worktree スキルに従って専用 worktree を作成し、以降の編集・検証・コミット・push はそこで行う。メイン checkout や他の worktree の変更に触れない。
 3. 選んだ改善だけを実装する。関連箇所の整理や追加の改善を同じ PR に混ぜない。
-4. 変更範囲に必要な既存テストと静的解析、およびリポジトリで必須の検証を実行する。Docker Compose は worktree のラッパーを使う。変更前からある失敗が疑われる場合はベースでも確認する。
+4. 下記の検証準備と実行順序に従い、変更範囲に必要な既存テストと静的解析、およびリポジトリで必須の検証を実行する。Docker Compose は worktree のラッパーを使う。変更前からある失敗が疑われる場合はベースでも確認する。
 5. 検証失敗を今回の小さな変更の範囲で解消できなければ、変更範囲を広げず終了する。作成済み Issue に失敗内容・確認結果・残る作業を記録し、PR は作らない。検証を実行できず安全性の根拠が不足する場合も同様に扱う。
 6. 検証が成功したら差分を確認し、対象ファイルだけをコミットする。リポジトリ指定の push スクリプトを使い、PR を作成する。PR に改善理由、安全性の根拠、実行した検証と結果、`Closes #<Issue番号>` を記載する。作成した PR をタスクに添付する。
 7. 起動した開発サーバーはリポジトリの指示に従って停止する。worktree・ブランチ・ボリュームは自動削除しない。結果、Issue・PR のリンク、検証結果をユーザーに報告する。
+
+### 検証準備と実行順序
+
+- npm 依存は lockfile に従って `npm ci` で準備する。worktree のルートで、vite サービス起動前に `.codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm ci --no-audit --no-fund` を実行し、成功を確認する。すでに vite が起動している場合は、この worktree の vite サービスを止めてから実行し、依存のインストールを重ねない。
+- `compose.sh up --build -d` の終了だけで準備完了と判断しない。`compose.sh logs vite` で依存準備が正常に完了し、Vite が起動したことを確認してから RSpec を開始する。起動時にも npm install が実行されるため、`git diff -- backend/package.json backend/package-lock.json` で意図しない依存定義・lockfile の差分がないことを確認する。
+- RSpec と Visual Regression（`scripts/push.sh` が実行する全画面比較を含む）は、同じ `backend/public/vite` にビルド出力を書き込むため並列実行しない。RSpec の終了と成功を確認してから Visual Regression または `scripts/push.sh` を開始する。絞り込んだテストで必須の全画面比較を代替しない。
 
 ## スキル自身の改善提案
 
