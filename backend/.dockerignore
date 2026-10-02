@@ -40,6 +40,16 @@
 # Ignore development files
 /.devcontainer
 
+# Frontend dependencies are installed on the CI runner; keep built public assets.
+/node_modules
+
+# Tests and their generated artifacts are not needed at runtime.
+/spec
+/test
+/coverage
+/playwright-report
+/test-results
+
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
