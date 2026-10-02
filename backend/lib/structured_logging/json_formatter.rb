@@ -17,8 +17,12 @@ module StructuredLogging
       parsed = JSON.parse(message)
       return parsed if parsed.is_a?(Hash)
 
-      { message: message.to_s }
+      plain_message_payload(message)
     rescue JSON::ParserError, TypeError
+      plain_message_payload(message)
+    end
+
+    def plain_message_payload(message)
       { message: message.to_s }
     end
   end
