@@ -93,6 +93,16 @@ for (const [name, path, heading] of [
         await expect(page.getByRole("button", { name: button })).toBeVisible()
       }
     }
+    if (name === "authors") {
+      for (const link of await page.getByRole("link", { name: /の記事を読む$/ }).all()) {
+        const widths = await link.evaluate((element) => {
+          const text = document.createRange()
+          text.selectNodeContents(element)
+          return [element.getBoundingClientRect().width, text.getBoundingClientRect().width]
+        })
+        expect(Math.abs(widths[0] - widths[1])).toBeLessThan(1)
+      }
+    }
     await screenshot(page, name)
   })
 }
@@ -397,9 +407,9 @@ test("article body spacing and expansion", async ({ page }) => {
   const expand = page.getByRole("button", { name: "続きを読む", exact: true }).first()
   await expect(expand).toBeVisible()
   await expect(expand).toHaveCSS("font-size", "12px")
-  await expect(expand).toHaveCSS("height", "44px")
-  await expect(expand).toHaveCSS("margin-top", "-16px")
-  await expect(expand).toHaveCSS("margin-bottom", "-16px")
+  await expect(expand).toHaveCSS("height", "18px")
+  await expect(expand).toHaveCSS("padding", "0px")
+  await expect(expand).toHaveCSS("border-width", "0px")
   await expect(page.getByText(/駅を出て.*…$/)).toHaveCSS("line-height", "28.8px")
   await screenshot(page, "article-body-collapsed")
   await expand.click()

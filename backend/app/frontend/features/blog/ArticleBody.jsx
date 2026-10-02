@@ -1,7 +1,6 @@
 import { supportingActionSx } from "../../shared/supportingActionStyles"
 import { lazy, Suspense, useState } from "react"
 import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import { articleBodyHtmlSx, articleBodyTextSx } from "./articleBodyHtmlSx"
 import { extractTextFromHtml } from "./articleHtmlText"
@@ -60,14 +59,24 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
       )}
       {canExpand ? (
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            variant="text"
-            size="small"
+          <Box
+            component="button"
+            type="button"
             onClick={() => setIsExpanded((current) => !current)}
-            sx={{ ...supportingActionSx, my: -2, textAlign: "right" }}
+            sx={{
+              ...supportingActionSx,
+              minHeight: 0,
+              minWidth: 0,
+              p: 0,
+              border: 0,
+              bgcolor: "transparent",
+              fontFamily: "inherit",
+              cursor: "pointer",
+              textAlign: "right",
+            }}
           >
             {isExpanded ? "閉じる" : "続きを読む"}
-          </Button>
+          </Box>
         </Box>
       ) : null}
     </Box>
