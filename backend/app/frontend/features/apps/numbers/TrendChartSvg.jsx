@@ -13,7 +13,7 @@ import {
 
 export default function TrendChartSvg({ trend }) {
   const theme = useTheme()
-  const { seriesColors, seriesDasharray } = trendSeriesStyles(theme)
+  const { seriesColors } = trendSeriesStyles(theme)
   const bounds = chartBounds()
   const chartMaxValue = maxChartValue(trend.points, trend.series)
   const dateLabels = chartDateLabels(trend.points)
@@ -58,8 +58,7 @@ export default function TrendChartSvg({ trend }) {
             d={path}
             fill="none"
             stroke={seriesColors[index % seriesColors.length]}
-            strokeDasharray={seriesDasharray(series.key)}
-            strokeWidth="3"
+            strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />

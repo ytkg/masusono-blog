@@ -12,7 +12,7 @@ const theme = createTheme({
     background: { default: "#ffffff", paper: "#ffffff" },
     text: { primary: "#000000", secondary: "#666666", disabled: "#9e9e9e" },
     divider: "#e0e0e0",
-    dataVisualization: { totalArticles: "#2563eb", totalChars: "#16a34a" },
+    dataVisualization: { totalArticles: "#9966cc", totalChars: "#3399cc" },
     success: { main: "#000000" },
     error: { main: "#000000" },
     warning: { main: "#000000" },
