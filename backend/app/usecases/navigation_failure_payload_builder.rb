@@ -3,6 +3,7 @@ require "uri"
 class NavigationFailurePayloadBuilder
   KINDS = %w[http_exception network_error].freeze
   BOOLEAN_KEYS = %w[prefetch prefetch_in_flight online service_worker].freeze
+  BOOLEAN_VALUES = [ true, false ].freeze
 
   def self.call(params)
     kind = params["kind"]
@@ -18,7 +19,7 @@ class NavigationFailurePayloadBuilder
       elapsed_ms: integer_in_range(params["elapsed_ms"], 0..86_400_000)
     }
     BOOLEAN_KEYS.each do |key|
-      payload[key.to_sym] = params[key] if [ true, false ].include?(params[key])
+      payload[key.to_sym] = params[key] if BOOLEAN_VALUES.include?(params[key])
     end
     payload.compact
   end
