@@ -64,8 +64,9 @@ export default function ArticleCard({ article, mode = "list", sx }) {
       titleVariant="h6"
       titleComponent={isDetail ? "h1" : "h3"}
       titleSx={{
-        fontSize: isDetail ? { xs: "30px", sm: "44px" } : { xs: "23px", sm: "30px" },
-        fontWeight: 700,
+        fontSize: isDetail ? { xs: "38px", sm: "52px" } : { xs: "30px", sm: "36px" },
+        fontWeight: 500,
+        fontFamily: '"Yu Mincho", "Hiragino Mincho ProN", serif',
         lineHeight: 1.4,
         letterSpacing: 0,
         overflowWrap: "anywhere",
@@ -87,11 +88,10 @@ export default function ArticleCard({ article, mode = "list", sx }) {
           gridTemplateColumns: isDetail ? { xs: "1fr", md: "180px minmax(0, 1fr)" } : "1fr",
           gap: { xs: 3, md: 4 },
           bgcolor: "background.paper",
-          p: { xs: 2.5, sm: 4 },
-          border: "1px solid",
-          borderColor: "divider",
-          borderTop: "3px solid",
-          borderTopColor: isDetail ? "primary.main" : "text.primary",
+          p: { xs: 3, sm: 4 },
+          borderRadius: { xs: isDetail ? 0 : "28px 28px 4px 28px", sm: "28px" },
+          boxShadow: "0 10px 40px #223b9310",
+          minWidth: 0,
         },
         sx,
       ]}
@@ -112,12 +112,17 @@ export default function ArticleCard({ article, mode = "list", sx }) {
                   gap: 3,
                 },
               }
-            : undefined
+            : {
+                borderTop: "1px solid",
+                borderColor: "divider",
+                pt: 2,
+                "& .MuiAvatar-root": { width: 32, height: 32, fontSize: 16 },
+              }
         }
       >
         {plainHeader}
       </Box>
-      {content}
+      <Box sx={{ minWidth: 0, gridRow: isDetail ? { xs: 1, md: "auto" } : 1 }}>{content}</Box>
     </Box>
   )
 }

@@ -60,7 +60,7 @@ function MetricCard({ block }) {
         gap: 1.25,
         p: 3,
         bgcolor: "background.paper",
-        borderTop: "4px solid",
+        borderRadius: 24,
         borderColor: "primary.main",
       }}
     >

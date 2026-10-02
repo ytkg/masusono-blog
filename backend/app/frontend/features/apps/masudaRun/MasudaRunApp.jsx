@@ -1,3 +1,5 @@
+import { ThemeProvider } from "@mui/material/styles"
+import gameTheme from "../../../theme"
 import { useCallback, useState } from "react"
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun"
 import AppsDialogLauncher from "../shared/AppsDialogLauncher"
@@ -31,20 +33,22 @@ export default function MasudaRunApp() {
   )
 
   return (
-    <AppsDialogLauncher
-      title="増田RUN"
-      buttonAriaLabel="増田RUNを開く"
-      buttonIcon={<DirectionsRunIcon />}
-      onOpen={loadRankings}
-      contentSx={{ display: "flex", minHeight: 0, overflow: "hidden" }}
-    >
-      <MasudaRunGame
-        rankings={rankings}
-        rankingsLoading={rankingsLoading}
-        rankingsFetchError={error}
-        rankingsError={rankingsError}
-        onScoreSubmit={handleScoreSubmit}
-      />
-    </AppsDialogLauncher>
+    <ThemeProvider theme={gameTheme}>
+      <AppsDialogLauncher
+        title="増田RUN"
+        buttonAriaLabel="増田RUNを開く"
+        buttonIcon={<DirectionsRunIcon />}
+        onOpen={loadRankings}
+        contentSx={{ display: "flex", minHeight: 0, overflow: "hidden" }}
+      >
+        <MasudaRunGame
+          rankings={rankings}
+          rankingsLoading={rankingsLoading}
+          rankingsFetchError={error}
+          rankingsError={rankingsError}
+          onScoreSubmit={handleScoreSubmit}
+        />
+      </AppsDialogLauncher>
+    </ThemeProvider>
   )
 }

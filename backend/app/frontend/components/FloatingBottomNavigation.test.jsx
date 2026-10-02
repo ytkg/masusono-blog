@@ -37,7 +37,6 @@ describe("FloatingBottomNavigation", () => {
     expect(screen.queryByText("ブログ")).not.toBeInTheDocument()
     expect(screen.getByText("ホーム").closest(".Mui-selected")).not.toBeNull()
     expect(screen.queryByText(/©/)).not.toBeInTheDocument()
-    expect(screen.queryByText("増田とその他！")).not.toBeInTheDocument()
   })
 
   it("現在のページ以外を表示時とホバー時に先読みする", () => {
@@ -66,16 +65,14 @@ describe("FloatingBottomNavigation", () => {
     expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("data-prefetch", '["hover","mount"]')
   })
 
-  it("固定ナビゲーションとして表示する", () => {
+  it("現在のページを支援技術に伝える", () => {
     vi.mocked(usePage).mockReturnValue({ url: "/" })
 
     render(<FloatingBottomNavigation />)
 
     const navigation = screen.getByRole("navigation", { name: "メインナビゲーション" })
 
-    expect(navigation).toHaveStyle({
-      position: "fixed",
-    })
+    expect(navigation.querySelector('a[aria-current="page"]')).toHaveAttribute("href", "/")
   })
 
   it("検索タブを著者タブより左に表示する", () => {

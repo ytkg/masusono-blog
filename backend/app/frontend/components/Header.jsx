@@ -60,7 +60,7 @@ export default function Header() {
         color: "text.primary",
         boxShadow: "none",
         borderBottom: "1px solid",
-        borderColor: "text.primary",
+        borderColor: "divider",
       }}
     >
       <Toolbar
@@ -68,7 +68,7 @@ export default function Header() {
         sx={{
           alignItems: "center",
           display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
+          gridTemplateColumns: "auto 1fr auto",
           minHeight: HEADER_TOOLBAR_HEIGHT,
           pt: 0,
           pb: { xs: 0.5, sm: 0.75 },
@@ -88,18 +88,49 @@ export default function Header() {
             display: "inline-flex",
             alignItems: "center",
             gridColumn: 2,
+            gridRow: 1,
+            justifySelf: "start",
+            ml: 1,
             textDecoration: "none",
           }}
         >
           <Typography
             component="span"
-            sx={{ fontWeight: 900, fontSize: { xs: 20, sm: 26 }, letterSpacing: "-0.06em", lineHeight: 1.3 }}
+            sx={{
+              fontWeight: 900,
+              fontSize: { xs: 32, sm: 40 },
+              letterSpacing: "-0.09em",
+              lineHeight: 1,
+              fontStyle: "italic",
+            }}
           >
-            増田とその他
-            <Box component="span" sx={{ color: "primary.main" }}>
-              ！
+            <Box component="span" aria-hidden="true">
+              m/o.
+            </Box>
+            <Box
+              component="span"
+              sx={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clipPath: "inset(50%)" }}
+            >
+              増田とその他！
             </Box>
           </Typography>
+        </Box>
+        <Box
+          component={Link}
+          href="/about"
+          sx={{
+            gridColumn: 3,
+            gridRow: 1,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 999,
+            px: 2,
+            py: 1,
+            fontSize: 11,
+            fontWeight: 700,
+          }}
+        >
+          ABOUT ↗
         </Box>
         {showsBackButton ? (
           <IconButton

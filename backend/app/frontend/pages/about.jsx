@@ -21,7 +21,7 @@ export default function About() {
           mx: "auto",
           "& > p": { fontSize: { xs: 16, md: 20 }, lineHeight: 2.1 },
           "& blockquote": {
-            bgcolor: "text.primary",
+            bgcolor: "primary.main",
             color: "background.paper",
             p: 4,
             mx: 0,

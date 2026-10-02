@@ -24,10 +24,10 @@ async function screenshot(page, name) {
   await expect(page).toHaveScreenshot(`${name}.png`)
 }
 
-async function checkAuxiliaryButton(page, button) {
+async function checkAuxiliaryButton(page, button, legacy = false) {
   await expect(button).toHaveCSS("width", "44px")
   await expect(button).toHaveCSS("height", "44px")
-  await expect(button).toHaveCSS("color", "rgb(103, 105, 95)")
+  await expect(button).toHaveCSS("color", legacy ? "rgb(103, 105, 95)" : "rgb(89, 100, 137)")
   await expect(button).toHaveCSS("opacity", "1")
   await expect(button.locator("svg")).toHaveCSS("font-size", "20px")
   await page.keyboard.press("Tab")
@@ -48,10 +48,10 @@ async function expectSectionHeading(heading) {
 
 async function expectPageHeading(page, name) {
   const heading = page.getByRole("heading", { name, level: 1, exact: true })
-  await expect(heading).toHaveCSS("font-size", page.viewportSize().width < 600 ? "30px" : "44px")
-  await expect(heading).toHaveCSS("font-weight", "800")
-  await expect(heading).toHaveCSS("line-height", page.viewportSize().width < 600 ? "37.5px" : "55px")
-  await expect(heading).toHaveCSS("letter-spacing", "normal")
+  await expect(heading).toHaveCSS("font-size", page.viewportSize().width < 600 ? "38px" : "52px")
+  await expect(heading).toHaveCSS("font-weight", "500")
+  await expect(heading).toHaveCSS("line-height", page.viewportSize().width < 600 ? "49.4px" : "67.6px")
+  await expect(heading).toHaveCSS("letter-spacing", page.viewportSize().width < 600 ? "-1.9px" : "-2.6px")
   const layout = await heading.evaluate((element) => {
     const title = element.getBoundingClientRect()
     const content = element.nextElementSibling.getBoundingClientRect()
@@ -219,18 +219,18 @@ test.describe("article titles", () => {
     })
     await openPage(page, "/")
     const listTitle = page.getByRole("heading", { name: title, level: 3 })
-    await expect(listTitle).toHaveCSS("font-size", page.viewportSize().width < 600 ? "23px" : "30px")
-    await expect(listTitle).toHaveCSS("line-height", page.viewportSize().width < 600 ? "32.2px" : "42px")
+    await expect(listTitle).toHaveCSS("font-size", page.viewportSize().width < 600 ? "30px" : "36px")
+    await expect(listTitle).toHaveCSS("line-height", page.viewportSize().width < 600 ? "42px" : "50.4px")
     await screenshot(page, "article-title-long-list")
     await page.getByRole("link", { name: title, exact: true }).click()
     await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
     const detailTitle = page.getByRole("heading", { name: title, level: 1 })
-    await expect(detailTitle).toHaveCSS("font-size", page.viewportSize().width < 600 ? "30px" : "44px")
-    await expect(detailTitle).toHaveCSS("line-height", page.viewportSize().width < 600 ? "42px" : "61.6px")
+    await expect(detailTitle).toHaveCSS("font-size", page.viewportSize().width < 600 ? "38px" : "52px")
+    await expect(detailTitle).toHaveCSS("line-height", page.viewportSize().width < 600 ? "53.2px" : "72.8px")
     await expect(detailTitle).toHaveCSS("margin-bottom", "0px")
     await expect(page.getByTestId("article-tags")).toHaveCSS("margin-top", "12px")
     await expect(page.getByTestId("article-tags")).toHaveCSS("margin-bottom", "12px")
-    await expect(detailTitle).toHaveCSS("font-weight", "700")
+    await expect(detailTitle).toHaveCSS("font-weight", "500")
     await expect(detailTitle).toHaveCSS("letter-spacing", "normal")
     await expect(detailTitle).toHaveCSS("overflow-wrap", "anywhere")
     const box = await detailTitle.boundingBox()
@@ -267,9 +267,13 @@ for (const [name, button] of [
       await expect(rankings).toBeVisible()
       await expect(rankings.getByRole("row", { name: /増田愛美/ })).toBeVisible()
     }
+    // Match the established game screenshot hover state after the launcher moves.
+    if (name === "masuda-run" && page.viewportSize().width < 600) {
+      await page.getByRole("button", { name: "スタート", exact: true }).hover()
+    }
     await screenshot(page, name)
     const close = page.getByRole("button", { name: "閉じる", exact: true })
-    await checkAuxiliaryButton(page, close)
+    await checkAuxiliaryButton(page, close, name === "masuda-run")
     await close.click()
     await expect(page.getByRole("dialog")).not.toBeVisible()
     await expect(page.getByRole("button", { name: button })).toBeFocused()
@@ -492,7 +496,7 @@ test("numbers trend", async ({ page }) => {
   await expect(chart.getByTestId("trend-line-totalChars")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.locator("svg[role=img] text").first()).toHaveAttribute("font-size", "12")
   await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
-  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(103, 105, 95)")
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(89, 100, 137)")
   await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
   await expect(chart).toHaveScreenshot("numbers-trend.png")
 })
@@ -514,13 +518,12 @@ for (const state of ["success", "error"]) {
     await page.getByRole("menuitem", { name: "記事URLをコピー" }).click()
     await expect(page.getByRole("alert")).toContainText(state === "success" ? "完了" : "失敗")
     await page.clock.fastForward(300)
-    await expect.poll(async () => {
-      const navigation = await page.getByRole("navigation", { name: "メインナビゲーション" }).boundingBox()
-      const notice = await page.getByRole("alert").boundingBox()
-      return page.viewportSize().width >= 1200
-        ? Math.round(page.viewportSize().height - (notice.y + notice.height))
-        : Math.round(navigation.y - (notice.y + notice.height))
-    }).toBe(page.viewportSize().width >= 1200 ? 24 : 8)
+    await expect
+      .poll(async () => {
+        const notice = await page.getByRole("alert").boundingBox()
+        return Math.round(page.viewportSize().height - (notice.y + notice.height))
+      })
+      .toBe(24)
     await screenshot(page, `copy-${state}`)
     await page.clock.fastForward(3200)
     if (state === "error") {
@@ -562,6 +565,9 @@ for (const state of ["empty", "error"]) {
     await expect(message).toHaveCSS("font-size", "14px")
     await expect(message).toHaveCSS("line-height", "21px")
     await expect(message).toHaveCSS("color", state === "error" ? "rgb(82, 35, 30)" : "rgb(103, 105, 95)")
+    if (page.viewportSize().width < 600) {
+      await page.getByRole("button", { name: "スタート", exact: true }).hover()
+    }
     await screenshot(page, `rankings-${state}`)
   })
 }
@@ -601,7 +607,10 @@ for (const state of ["loading", "warning", "error"]) {
     const message = state === "loading" ? runner.getByText("実行中...") : runner.getByRole("alert")
     await expect(message).toHaveCSS("font-size", "14px")
     await expect(message).toHaveCSS("line-height", "21px")
-    await expect(message).toHaveCSS("color", state === "loading" ? "rgb(103, 105, 95)" : state === "warning" ? "rgb(66, 54, 27)" : "rgb(82, 35, 30)")
+    await expect(message).toHaveCSS(
+      "color",
+      state === "loading" ? "rgb(89, 100, 137)" : state === "warning" ? "rgb(66, 54, 27)" : "rgb(82, 35, 30)",
+    )
     await expect(runner).toHaveScreenshot(`ruby-${state}.png`)
   })
 }
@@ -636,8 +645,8 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
     expect(bounds.toolbar).toEqual(bounds.main)
     expect(bounds.contentLeft).toBe(left)
     expect(bounds.backButton.x).toBeCloseTo(left, 0)
-    expect(bounds.nav.x).toBe(sidebarWidth ? 0 : (width - Math.min(outerWidth - padding * 2, 640)) / 2)
-    expect(bounds.nav.width).toBe(sidebarWidth || Math.min(outerWidth - padding * 2, 640))
+    expect(bounds.nav.x).toBe(0)
+    expect(bounds.nav.width).toBe(sidebarWidth || width)
     expect(bounds.scrollWidth).toBe(width)
     const links = page.getByRole("navigation", { name: "メインナビゲーション" }).getByRole("link")
     await expect(links).toHaveCount(5)
@@ -663,69 +672,74 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
 test.describe("admin feedback states", () => {
   test.use({ serviceWorkers: "block" })
 
-for (const state of ["session", "login", "articles", "media", "upload"]) {
-  test(`admin feedback ${state}`, async ({ page }) => {
-    const error = { error: { message: "テスト用の通信失敗" } }
-    if (state === "session") {
-      await page.route("**/api/app/management/session", (route) => route.fulfill({ status: 500, json: error }))
-      await openAdmin(page)
-    } else if (state === "login") {
-      await page.route("**/api/app/management/session", (route) =>
-        route.request().method() === "POST" ? route.fulfill({ status: 500, json: error }) : route.continue(),
-      )
-      await openAdmin(page)
-      await page.getByRole("textbox", { name: "ユーザー名" }).fill("visual-owner")
-      await page.getByLabel("パスワード").fill("visual-password")
-      await page.getByRole("button", { name: "ログイン", exact: true }).click()
-    } else {
-      await loginAdmin(page)
-      if (state === "articles" || state === "media") {
-        await page.route(`**/api/app/management/${state}?*`, (route) => route.fulfill({ status: 500, json: error }))
-        await page.getByRole("button", { name: state === "articles" ? "記事一覧へ" : "メディア一覧へ" }).click()
+  for (const state of ["session", "login", "articles", "media", "upload"]) {
+    test(`admin feedback ${state}`, async ({ page }) => {
+      const error = { error: { message: "テスト用の通信失敗" } }
+      if (state === "session") {
+        await page.route("**/api/app/management/session", (route) => route.fulfill({ status: 500, json: error }))
+        await openAdmin(page)
+      } else if (state === "login") {
+        await page.route("**/api/app/management/session", (route) =>
+          route.request().method() === "POST" ? route.fulfill({ status: 500, json: error }) : route.continue(),
+        )
+        await openAdmin(page)
+        await page.getByRole("textbox", { name: "ユーザー名" }).fill("visual-owner")
+        await page.getByLabel("パスワード").fill("visual-password")
+        await page.getByRole("button", { name: "ログイン", exact: true }).click()
       } else {
-        await page.getByRole("button", { name: "メディア一覧へ" }).click()
-        await page.locator('input[type="file"]').setInputFiles({ name: "invalid.txt", mimeType: "text/plain", buffer: Buffer.from("test") })
+        await loginAdmin(page)
+        if (state === "articles" || state === "media") {
+          await page.route(`**/api/app/management/${state}?*`, (route) => route.fulfill({ status: 500, json: error }))
+          await page.getByRole("button", { name: state === "articles" ? "記事一覧へ" : "メディア一覧へ" }).click()
+        } else {
+          await page.getByRole("button", { name: "メディア一覧へ" }).click()
+          await page
+            .locator('input[type="file"]')
+            .setInputFiles({ name: "invalid.txt", mimeType: "text/plain", buffer: Buffer.from("test") })
+        }
       }
-    }
-    const alert = page.getByRole("alert")
-    await expect(alert).toContainText("失敗")
-    await expect(alert).toHaveCSS("font-size", "14px")
-    await expect(alert).toHaveCSS("line-height", "21px")
-    if (["session", "articles", "media"].includes(state)) {
-      await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible()
-    }
-    await screenshot(page, `admin-feedback-${state}`)
-  })
-}
-
-test("admin feedback empty", async ({ page }) => {
-  await loginAdmin(page)
-  await page.route("**/api/app/management/articles?*", (route) => route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } }))
-  await page.getByRole("button", { name: "記事一覧へ" }).click()
-  const empty = page.getByText("記事が見つかりませんでした。")
-  await expect(empty).toHaveCSS("font-size", "14px")
-  await expect(empty).toHaveCSS("color", "rgb(103, 105, 95)")
-  await screenshot(page, "admin-feedback-empty")
-})
-
-test("admin feedback loading", async ({ page }) => {
-  await loginAdmin(page)
-  let release
-  const ready = new Promise((resolve) => { release = resolve })
-  await page.route("**/api/app/management/articles?*", async (route) => {
-    await ready
-    await route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } })
-  })
-  await page.getByRole("button", { name: "記事一覧へ" }).click()
-  await expect(page.getByRole("status").filter({ hasText: "読み込み中" })).toBeVisible()
-  try {
-    await screenshot(page, "admin-feedback-loading")
-  } finally {
-    release()
+      const alert = page.getByRole("alert")
+      await expect(alert).toContainText("失敗")
+      await expect(alert).toHaveCSS("font-size", "14px")
+      await expect(alert).toHaveCSS("line-height", "21px")
+      if (["session", "articles", "media"].includes(state)) {
+        await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible()
+      }
+      await screenshot(page, `admin-feedback-${state}`)
+    })
   }
-  await expect(page.getByText("記事が見つかりませんでした。")).toBeVisible()
-})
 
+  test("admin feedback empty", async ({ page }) => {
+    await loginAdmin(page)
+    await page.route("**/api/app/management/articles?*", (route) =>
+      route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } }),
+    )
+    await page.getByRole("button", { name: "記事一覧へ" }).click()
+    const empty = page.getByText("記事が見つかりませんでした。")
+    await expect(empty).toHaveCSS("font-size", "14px")
+    await expect(empty).toHaveCSS("color", "rgb(89, 100, 137)")
+    await screenshot(page, "admin-feedback-empty")
+  })
+
+  test("admin feedback loading", async ({ page }) => {
+    await loginAdmin(page)
+    let release
+    const ready = new Promise((resolve) => {
+      release = resolve
+    })
+    await page.route("**/api/app/management/articles?*", async (route) => {
+      await ready
+      await route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } })
+    })
+    await page.getByRole("button", { name: "記事一覧へ" }).click()
+    await expect(page.getByRole("status").filter({ hasText: "読み込み中" })).toBeVisible()
+    try {
+      await screenshot(page, "admin-feedback-loading")
+    } finally {
+      release()
+    }
+    await expect(page.getByText("記事が見つかりませんでした。")).toBeVisible()
+  })
 })
 
 test("public empty status", async ({ page }) => {
@@ -733,7 +747,7 @@ test("public empty status", async ({ page }) => {
   const empty = page.getByText("該当する記事はありません。")
   await expect(empty).toHaveCSS("font-size", "14px")
   await expect(empty).toHaveCSS("line-height", "21px")
-  await expect(empty).toHaveCSS("color", "rgb(103, 105, 95)")
+  await expect(empty).toHaveCSS("color", "rgb(89, 100, 137)")
   await screenshot(page, "public-empty-status")
 })
 
@@ -743,11 +757,12 @@ for (const target of ["title", "author", "sentence"]) {
     if (target === "sentence") {
       await page.getByRole("tab", { name: "書き出し" }).click()
     }
-    const link = target === "title"
-      ? page.getByRole("heading", { name: "週末の散歩で見つけたもの" }).getByRole("link")
-      : target === "author"
-        ? page.getByTestId("article-meta-author").first()
-        : page.locator(".sentence-card").first()
+    const link =
+      target === "title"
+        ? page.getByRole("heading", { name: "週末の散歩で見つけたもの" }).getByRole("link")
+        : target === "author"
+          ? page.getByTestId("article-meta-author").first()
+          : page.locator(".sentence-card").first()
     await page.keyboard.press("Tab")
     await link.focus()
     await expect(link).toHaveCSS("outline", "rgb(0, 0, 0) solid 2px")
@@ -766,23 +781,27 @@ for (const width of [390, 600, 1280]) {
       await openPage(page, path)
       await page.addStyleTag({ content: "main { min-height: 200vh; }" })
       const fixed = path === "/" ? page.getByRole("tablist") : page.getByRole("textbox", { name: "記事を検索" })
-      const bounds = async () => fixed.evaluate((element) => {
-        let parent = element
-        while (parent && getComputedStyle(parent).position !== "sticky") parent = parent.parentElement
-        return {
-          top: parent.getBoundingClientRect().top,
-          headerBottom: document.querySelector("header").getBoundingClientRect().bottom,
-          headerHeight: document.querySelector("header").getBoundingClientRect().height,
-        }
-      })
+      const bounds = async () =>
+        fixed.evaluate((element) => {
+          let parent = element
+          while (parent && getComputedStyle(parent).position !== "sticky") parent = parent.parentElement
+          return {
+            top: parent.getBoundingClientRect().top,
+            headerBottom: document.querySelector(window.innerWidth < 1200 ? "nav" : "header").getBoundingClientRect()
+              .bottom,
+            headerHeight: document.querySelector("header").getBoundingClientRect().height,
+          }
+        })
       const initialBounds = await bounds()
       const stickyScroll = path === "/" ? Math.ceil(initialBounds.top - initialBounds.headerBottom) : 0
       for (const scrollY of [stickyScroll, stickyScroll + 80]) {
         await page.evaluate((y) => window.scrollTo(0, y), scrollY)
-        await expect.poll(async () => {
-          const value = await bounds()
-          return Math.round(value.top - value.headerBottom)
-        }).toBe(0)
+        await expect
+          .poll(async () => {
+            const value = await bounds()
+            return Math.round(value.top - value.headerBottom)
+          })
+          .toBe(0)
         expect(Math.round((await bounds()).headerHeight)).toBe(width < 600 ? 64 : 80)
       }
       await screenshot(page, `sticky-${path === "/" ? "home" : "search"}-${width}`)

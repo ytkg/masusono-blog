@@ -17,10 +17,9 @@ function AuthorListProfile({ member }) {
       sx={{
         p: 3,
         bgcolor: "background.paper",
-        border: "1px solid",
+        borderRadius: "28px",
         borderColor: "divider",
-        borderTop: "6px solid",
-        borderTopColor: "primary.main",
+
         height: "100%",
       }}
     >

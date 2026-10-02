@@ -13,7 +13,7 @@ export default function ArticlesList({ articles, emptyMessage = "記事があり
         display: "grid",
         gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
         alignItems: "start",
-        gap: 3,
+        gap: { xs: 4, sm: 4 },
       }}
     >
       {articles.map((article) => (

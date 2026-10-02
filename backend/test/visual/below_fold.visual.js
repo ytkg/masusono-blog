@@ -23,7 +23,8 @@ async function expectAboveNavigation(page, content) {
     expect(contentBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width)
     expect(contentBox.y + contentBox.height).toBeLessThanOrEqual(page.viewportSize().height)
   } else {
-    expect(contentBox.y + contentBox.height).toBeLessThanOrEqual(navBox.y)
+    expect(contentBox.y).toBeGreaterThanOrEqual(navBox.y + navBox.height)
+    expect(contentBox.y + contentBox.height).toBeLessThanOrEqual(page.viewportSize().height)
   }
 }
 

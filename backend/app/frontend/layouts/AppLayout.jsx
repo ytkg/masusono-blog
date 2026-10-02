@@ -6,8 +6,9 @@ import { PAGE_MAX_WIDTH } from "../shared/pageLayout"
 
 export default function AppLayout({ children }) {
   return (
-    <Box sx={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ minHeight: "100dvh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
       <Header />
+      <FloatingBottomNavigation />
       <Container
         component="main"
         maxWidth={false}
@@ -21,14 +22,13 @@ export default function AppLayout({ children }) {
           py: 0,
           px: 0,
           pb: {
-            xs: "calc(80px + env(safe-area-inset-bottom))",
-            sm: "calc(84px + env(safe-area-inset-bottom))",
+            xs: "calc(32px + env(safe-area-inset-bottom))",
+            sm: "calc(40px + env(safe-area-inset-bottom))",
           },
         }}
       >
         {children}
       </Container>
-      <FloatingBottomNavigation />
     </Box>
   )
 }

@@ -26,3 +26,5 @@ export const HEADER_HEIGHT = { xs: 64, sm: 80 }
 export const HEADER_TOOLBAR_HEIGHT = Object.fromEntries(
   Object.entries(HEADER_HEIGHT).map(([breakpoint, height]) => [breakpoint, height - 1]),
 )
+
+export const CONTENT_STICKY_TOP = { xs: HEADER_HEIGHT.xs + 48, sm: HEADER_HEIGHT.sm + 48, lg: HEADER_HEIGHT.sm }

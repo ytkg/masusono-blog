@@ -1,4 +1,4 @@
-import { HEADER_HEIGHT } from "../../shared/pageLayout"
+import { CONTENT_STICKY_TOP } from "../../shared/pageLayout"
 import CloseIcon from "@mui/icons-material/Close"
 import SearchIcon from "@mui/icons-material/Search"
 import Box from "@mui/material/Box"
@@ -11,7 +11,7 @@ export default function ArticleSearchBox({ autoFocus = false, onChange, onClear,
     <Box
       sx={{
         position: "sticky",
-        top: HEADER_HEIGHT,
+        top: CONTENT_STICKY_TOP,
         zIndex: (theme) => theme.zIndex.appBar - 1,
         bgcolor: "background.default",
         borderBottom: "1px solid",

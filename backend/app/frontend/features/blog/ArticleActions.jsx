@@ -1,4 +1,3 @@
-import { navigationNoticeBottomSx } from "../../shared/pageLayout"
 import { useState } from "react"
 import AuxiliaryIconButton from "../../shared/AuxiliaryIconButton"
 import Button from "@mui/material/Button"
@@ -70,7 +69,7 @@ export default function ArticleActions({ article }) {
           if (reason !== "clickaway" && feedback?.severity === "success") setFeedback(null)
         }}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        sx={{ bottom: { ...navigationNoticeBottomSx, lg: 24 }, left: { lg: "calc(50% + 110px)" } }}
+        sx={{ bottom: { xs: "calc(24px + env(safe-area-inset-bottom))", sm: 24 }, left: { lg: "calc(50% + 110px)" } }}
       >
         <StatusAlert
           severity={feedback?.severity || "success"}

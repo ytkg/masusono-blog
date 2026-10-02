@@ -36,9 +36,7 @@ function SearchSuggestionSection({ items, label, prefix, onSelect }) {
   if (!items.length) return null
 
   return (
-    <Box
-      sx={{ p: 3, minHeight: 230, bgcolor: "background.paper", borderTop: "4px solid", borderColor: "text.primary" }}
-    >
+    <Box sx={{ p: 3, minHeight: 160, bgcolor: "background.paper", borderRadius: 24, borderColor: "text.primary" }}>
       <SectionHeading>{label}</SectionHeading>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
         {items.map((item) => {
