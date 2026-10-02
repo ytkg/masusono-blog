@@ -21,6 +21,8 @@ function AuthorListProfile({ member, isLast }) {
         href={`/authors/${member.id}`}
         sx={{
           ...supportingLinkSx,
+          alignSelf: "flex-end",
+          width: "fit-content",
           color: "text.secondary",
           textAlign: "right",
           textDecoration: "none",
