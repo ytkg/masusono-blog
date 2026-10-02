@@ -361,6 +361,14 @@ Rails credentials の復号鍵はSecret Managerの `rails-master-key` からClou
 
 GitHub Actions は Artifact Registry へイメージをビルド・pushしてから、`deploy.sh` 経由でそのイメージをCloud Runへデプロイします。成果物はPR終了時に削除し、残ったイメージも3日後に自動削除します。本番イメージは最新3世代を保持します。Cloud Runソース用バケットにも保持ポリシーを設定しています。
 
+本番・ステージングともに Docker Buildx でビルドし、GitHub Actions に Docker レイヤーを
+キャッシュします。`mode=max` で gem のインストールを含む中間ステージも保存するため、
+Gemfile・Gemfile.lock・vendor が変わらないビルドでは依存関係のインストールを再利用できます。
+同じキャッシュ scope を使い、PR は GitHub のアクセス制限の範囲で main のキャッシュを
+参照します。PR が保存したキャッシュはその PR の merge ref 内に限定されます。
+初回やキャッシュ失効後は通常のビルドが必要です。キャッシュ保存に失敗してもデプロイは継続します。
+Actions のビルドサマリーで所要時間とキャッシュ利用状況を確認できます。
+
 手動で `deploy.sh` を実行する場合は、`IMAGE_URI` が未指定ならソースデプロイ、指定した場合はイメージデプロイになります。
 
 ```bash
