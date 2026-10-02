@@ -53,11 +53,17 @@ jobs:
 
       - run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
 
-      - env:
-          IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
-        run: |
-          docker build --tag "${IMAGE_URI}" .
-          docker push "${IMAGE_URI}"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: backend
+          push: true
+          tags: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
+          cache-from: type=gha,scope=cloud-run-backend
+          cache-to: type=gha,scope=cloud-run-backend,mode=max,ignore-error=true
 
       - id: deploy
         env:
