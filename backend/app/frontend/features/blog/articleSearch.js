@@ -1,3 +1,4 @@
+import { parseArticleTags } from "./parseArticleTags"
 import { extractTextFromHtml } from "./articleHtmlText"
 
 export function normalizeArticleSearchText(value) {
@@ -12,10 +13,7 @@ function parseSearchQuery(normalizedQuery) {
 }
 
 function articleTags(article) {
-  return String(article?.tags ?? "")
-    .split(",")
-    .map((tag) => normalizeArticleSearchText(tag))
-    .filter((tag) => tag.length > 0)
+  return parseArticleTags(article?.tags).map(normalizeArticleSearchText).filter(Boolean)
 }
 
 function articleMatchesToken(article, token, getSearchTarget) {

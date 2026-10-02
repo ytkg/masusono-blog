@@ -1,3 +1,4 @@
+import { parseArticleTags } from "./parseArticleTags"
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
 import SectionHeading from "@/shared/SectionHeading"
@@ -15,11 +16,7 @@ const READING_TIME_SUGGESTIONS = Object.freeze(
 function extractArticleTags(articles) {
   const tags = new Set()
   articles.forEach((article) => {
-    String(article.tags || "")
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean)
-      .forEach((tag) => tags.add(tag))
+    parseArticleTags(article.tags || "").forEach((tag) => tags.add(tag))
   })
 
   return Array.from(tags)

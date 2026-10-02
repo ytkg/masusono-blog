@@ -34,8 +34,8 @@ describe("ArticleTags", () => {
     expect(getComputedStyle(rubyTag).borderTopColor).toBe(getComputedStyle(searchRubyTag).borderTopColor)
   })
 
-  it("タグがない場合は何も表示しない", () => {
-    render(<ArticleTags tags=" , " />)
+  it.each([null, undefined, "", " , "])("タグが %s の場合は何も表示しない", (tags) => {
+    render(<ArticleTags tags={tags} />)
 
     expect(screen.queryByTestId("article-tags")).not.toBeInTheDocument()
   })

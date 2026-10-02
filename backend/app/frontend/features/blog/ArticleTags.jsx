@@ -1,16 +1,10 @@
+import { parseArticleTags } from "./parseArticleTags"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
 
-function normalizeTags(tags) {
-  return String(tags ?? "")
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter((tag) => tag.length > 0)
-}
-
 export default function ArticleTags({ tags }) {
-  const normalizedTags = normalizeTags(tags)
+  const normalizedTags = parseArticleTags(tags)
 
   if (!normalizedTags.length) return null
 
