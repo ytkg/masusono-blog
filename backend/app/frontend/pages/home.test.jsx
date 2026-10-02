@@ -87,6 +87,19 @@ describe("Home page", () => {
     expect(router.remember).toHaveBeenLastCalledWith({ mode: "feed", version: 2 }, "home-state")
   })
 
+  it("タブ変更を直ちにブラウザ履歴へ保存し、他の履歴情報を維持する", () => {
+    window.history.replaceState({ page: { url: "/", rememberedState: { other: "preserved" } } }, "")
+    render(<Home articles={[]} />)
+
+    fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
+
+    expect(window.history.state.page.rememberedState).toEqual({
+      other: "preserved",
+      "home-state": { mode: "beginnings", version: 2 },
+    })
+    window.history.replaceState(null, "")
+  })
+
   it("履歴から戻ったホームでも直前に選んだタブを復元する", () => {
     const screenOne = render(<Home articles={[{ id: "article-1", title: "記事1" }]} />)
 
