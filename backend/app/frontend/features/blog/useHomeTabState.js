@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { router, useRemember } from "@inertiajs/react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import useImmediateRemember from "@/shared/hooks/useImmediateRemember"
 import { consumeHomeFeedIntent } from "@/shared/lib/homeNavigation"
-import { rememberInCurrentHistoryEntry } from "@/shared/lib/rememberedState"
 import { DEFAULT_HOME_TAB_ID, isHomeTabId } from "./HomeTabs"
 
 const HOME_STATE_KEY = "home-state"
@@ -24,26 +23,10 @@ export default function useHomeTabState() {
     [],
   )
   const [shouldStartOnFeed, setShouldStartOnFeed] = useState(consumeHomeFeedIntent)
-  const [homeState, setHomeState] = useRemember(initialHomeState, HOME_STATE_KEY)
+  const { state: homeState, commit: commitHomeState } = useImmediateRemember(initialHomeState, HOME_STATE_KEY)
   const normalizedHomeState = normalizeHomeState(homeState, initialHomeState)
   const displayedHomeState = shouldStartOnFeed ? initialHomeState : normalizedHomeState
-  const homeStateRef = useRef(displayedHomeState)
   const hasAppliedHomeFeedIntentRef = useRef(false)
-  const commitHomeState = useCallback(
-    (nextState) => {
-      const versionedState = { ...nextState, version: HOME_STATE_VERSION }
-      homeStateRef.current = versionedState
-      rememberInCurrentHistoryEntry(HOME_STATE_KEY, versionedState)
-      router.remember(versionedState, HOME_STATE_KEY)
-      setHomeState(versionedState)
-    },
-    [setHomeState],
-  )
-
-  useEffect(() => {
-    homeStateRef.current = normalizedHomeState
-  }, [normalizedHomeState])
-
   useEffect(() => {
     if (!shouldStartOnFeed || hasAppliedHomeFeedIntentRef.current) return
 
@@ -55,7 +38,7 @@ export default function useHomeTabState() {
   function changeMode(nextMode) {
     if (nextMode === displayedHomeState.mode) return
 
-    commitHomeState({ ...homeStateRef.current, mode: nextMode })
+    commitHomeState({ ...displayedHomeState, mode: nextMode })
     window.scrollTo({ top: 0 })
   }
 
