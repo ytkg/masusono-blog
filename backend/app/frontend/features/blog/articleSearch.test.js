@@ -89,4 +89,9 @@ describe("articleSearch", () => {
     expect(matches("story")).toBe(false)
     expect(matches("その他4")).toBe(true)
   })
+  it("表示された文字参照とインライン要素の文字列で検索できる", () => {
+    const encoded = { ...article, content: "<p>Ru<strong>by</strong> &copy; &amp; Rails</p>" }
+    expect(articleMatchesQuery(encoded, normalizeArticleSearchText("Ruby ©"))).toBe(true)
+    expect(articleMatchesQuery(encoded, normalizeArticleSearchText("Rails &"))).toBe(true)
+  })
 })

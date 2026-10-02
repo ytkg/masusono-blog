@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { extractTextFromHtml } from "./articleHtmlText"
+import { extractHtmlText, extractTextFromHtml } from "./articleHtmlText"
 
 describe("extractTextFromHtml", () => {
   it("HTMLタグとエンティティをプレーンテキストへ変換する", () => {
@@ -14,5 +14,18 @@ describe("extractTextFromHtml", () => {
 
   it("空文字は空文字を返す", () => {
     expect(extractTextFromHtml("   ")).toBe("")
+  })
+  it("段落と br の境界を保持し、抜粋では空白に畳み込む", () => {
+    const html = "<p>一行目<br>二行目</p><p>三行目</p>"
+    expect(extractHtmlText(html)).toBe("一行目\n二行目\n三行目\n")
+    expect(extractTextFromHtml(html)).toBe("一行目 二行目 三行目")
+  })
+
+  it("DOM の文字参照デコードを利用し、不正なコードポイントでも失敗しない", () => {
+    expect(extractTextFromHtml("&copy; &#x110000; &lt;Ruby&gt;")).toBe("© � <Ruby>")
+  })
+
+  it("属性内の > とインライン要素を正しく扱う", () => {
+    expect(extractTextFromHtml('<p title="a > b">Ru<strong>by</strong></p>')).toBe("Ruby")
   })
 })

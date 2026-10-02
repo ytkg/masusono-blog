@@ -1,9 +1,7 @@
+import { extractTextFromHtml } from "./articleHtmlText"
+
 export function normalizeArticleSearchText(value) {
-  return String(value ?? "")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase()
+  return extractTextFromHtml(value).toLowerCase()
 }
 
 function parseSearchQuery(normalizedQuery) {
@@ -20,7 +18,7 @@ function articleTags(article) {
     .filter((tag) => tag.length > 0)
 }
 
-function articleMatchesToken(article, token) {
+function articleMatchesToken(article, token, getSearchTarget) {
   if (token.startsWith("read:")) {
     const readingTimeQuery = token.slice(5).trim()
     const readingTimeMinutes = Number(article?.readingTimeMinutes)
@@ -62,11 +60,7 @@ function articleMatchesToken(article, token) {
     return normalizeArticleSearchText(article?.author).includes(authorQuery)
   }
 
-  const searchTarget = [article?.title, article?.content, article?.author, article?.tags]
-    .map(normalizeArticleSearchText)
-    .join(" ")
-
-  return searchTarget.includes(token)
+  return getSearchTarget().includes(token)
 }
 
 export function articleMatchesQuery(article, normalizedQuery) {
@@ -76,5 +70,14 @@ export function articleMatchesQuery(article, normalizedQuery) {
 
   if (!queryGroups.length) return false
 
-  return queryGroups.some((group) => group.every((token) => articleMatchesToken(article, token)))
+  // Parse the body only for plain-text tokens, at most once per article/query.
+  let searchTarget
+  const getSearchTarget = () => {
+    searchTarget ??= [article?.title, article?.content, article?.author, article?.tags]
+      .map(normalizeArticleSearchText)
+      .join(" ")
+    return searchTarget
+  }
+
+  return queryGroups.some((group) => group.every((token) => articleMatchesToken(article, token, getSearchTarget)))
 }
