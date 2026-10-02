@@ -304,7 +304,7 @@ docker compose run --rm backend bundle exec rspec
 bin/ci
 ```
 
-## フロントエンドのLint/Format
+## フロントエンドのLint/Format/テスト
 
 `backend/` で実行します:
 
@@ -312,7 +312,18 @@ bin/ci
 docker compose run --rm backend npm run lint
 docker compose run --rm backend npm run format:check
 docker compose run --rm backend npm run format
+docker compose run --rm backend npm test
 ```
+
+Vitest の同時実行数はローカルで最大2、`CI` 環境で最大4です。Docker 上で
+Rails・ブラウザとリソースを共有するため、CPU数だけで並列数を増やさず、同時に生成する jsdom 環境を抑えます。
+フロントエンド全テストと Visual Regression は順番に実行してください。
+他の worktree でも重い検証を同時に実行している場合は、終了を待つか、
+`npm test -- --maxWorkers=1` でさらに並列数を減らせます。
+
+管理対象の worktree では、上記の `docker compose` の代わりに worktree ルートから
+`.codex/skills/masusono-worktree/scripts/compose.sh` を使います。Visual Regression の手順は
+[test/visual/README.md](test/visual/README.md) を参照してください。
 
 ## Cloud Run へのデプロイ
 
