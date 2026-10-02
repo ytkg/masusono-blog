@@ -8,9 +8,7 @@ async function scrollToBottom(page) {
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
   await expect
     .poll(() =>
-      page.evaluate(() =>
-        Math.round(document.documentElement.scrollHeight - window.innerHeight - window.scrollY),
-      ),
+      page.evaluate(() => Math.round(document.documentElement.scrollHeight - window.innerHeight - window.scrollY)),
     )
     .toBe(0)
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
