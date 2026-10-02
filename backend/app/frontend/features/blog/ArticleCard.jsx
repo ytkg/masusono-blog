@@ -44,7 +44,6 @@ export default function ArticleCard({ article, mode = "list", sx }) {
   const authorHref = getAuthorHref(article)
   const isDetail = mode === "detail"
   const isList = mode === "list"
-  const shouldCollapseBody = isList
   const action = article.id ? <ArticleActions article={article} /> : undefined
   const plainHeader = (
     <ArticlePlainHeader
@@ -74,26 +73,12 @@ export default function ArticleCard({ article, mode = "list", sx }) {
       sx={{ minWidth: 0 }}
     >
       <ArticleTags tags={article.tags} />
-      <ArticleBody
-        enableRubyRunner={isDetail || isList}
-        html={html}
-        hasBody={hasBody}
-        shouldCollapse={shouldCollapseBody}
-      />
+      <ArticleBody enableRubyRunner={isDetail || isList} html={html} hasBody={hasBody} shouldCollapse={isList} />
     </ContentItemCard>
   )
 
-  if (isDetail) {
-    return (
-      <Box sx={[{ display: "grid", gap: 2 }, sx]}>
-        {plainHeader}
-        {content}
-      </Box>
-    )
-  }
-
   return (
-    <Box sx={[{ display: "grid", gap: 1.5 }, sx]}>
+    <Box sx={[{ display: "grid", gap: isDetail ? 2 : 1.5 }, sx]}>
       {plainHeader}
       {content}
     </Box>
