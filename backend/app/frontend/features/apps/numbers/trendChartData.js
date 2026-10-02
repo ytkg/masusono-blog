@@ -118,6 +118,5 @@ export function hasTrendData(trend) {
 export function trendSeriesStyles(theme) {
   return {
     seriesColors: [theme.palette.dataVisualization.totalArticles, theme.palette.dataVisualization.totalChars],
-    seriesDasharray: (key) => (key === TOTAL_CHARS_SERIES_KEY ? "6 4" : undefined),
   }
 }

@@ -478,7 +478,7 @@ test("numbers trend", async ({ page }) => {
   await expectSectionHeading(chart.getByRole("heading", { name: "推移", level: 2 }))
   await chart.scrollIntoViewIfNeeded()
   await expect(chart.getByTestId("trend-line-totalArticles")).not.toHaveAttribute("stroke-dasharray")
-  await expect(chart.getByTestId("trend-line-totalChars")).toHaveAttribute("stroke-dasharray", "6 4")
+  await expect(chart.getByTestId("trend-line-totalChars")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.locator("svg[role=img] text").first()).toHaveAttribute("font-size", "12")
   await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
   await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(102, 102, 102)")

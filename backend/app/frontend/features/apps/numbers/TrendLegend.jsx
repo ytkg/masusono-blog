@@ -6,7 +6,7 @@ import { trendSeriesStyles } from "./trendChartData"
 
 export default function TrendLegend({ series }) {
   const theme = useTheme()
-  const { seriesColors, seriesDasharray } = trendSeriesStyles(theme)
+  const { seriesColors } = trendSeriesStyles(theme)
   return (
     <Stack spacing={0.75} sx={{ px: 1, pb: 0.5 }}>
       {series.map((series, index) => (
@@ -21,9 +21,8 @@ export default function TrendLegend({ series }) {
               x2="22"
               y2="3"
               stroke={seriesColors[index % seriesColors.length]}
-              strokeWidth="3"
+              strokeWidth="1.5"
               strokeLinecap="round"
-              strokeDasharray={seriesDasharray(series.key)}
             />
           </Box>
           <Typography variant="body2" sx={{ color: "text.secondary", fontSize: 14 }}>
