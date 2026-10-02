@@ -1,8 +1,9 @@
+import useAppLoadingTasks from "./useAppLoadingTasks"
 import LauncherZoomTransition from "./LauncherZoomTransition"
 import { animationDuration } from "./appDialogAnimation"
 import AppLoadingScreen from "./AppLoadingScreen"
 import AppDialogHeader from "./AppDialogHeader"
-import { useCallback, useEffect, useId, useRef, useState } from "react"
+import { useId, useRef, useState } from "react"
 import AppsIcon from "@mui/icons-material/Apps"
 import Box from "@mui/material/Box"
 import Dialog from "@mui/material/Dialog"
@@ -11,8 +12,6 @@ import IconButton from "@mui/material/IconButton"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { AppsLoadingProvider } from "./AppsLoadingContext"
-
-const completionDisplayDuration = 500
 
 const launcherContainerSx = {
   display: "flex",
@@ -77,9 +76,8 @@ export default function AppsDialogLauncher({
   const [open, setOpen] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isTransitionComplete, setIsTransitionComplete] = useState(false)
-  const [isContentVisible, setIsContentVisible] = useState(false)
-  const [loadingTasks, setLoadingTasks] = useState({})
-  const loadingTaskIdRef = useRef(0)
+  const { registerLoadingTask, resetLoadingTasks, isContentVisible, loadingTaskCount, completedTaskCount } =
+    useAppLoadingTasks(isTransitionComplete)
   const [transitionOrigin, setTransitionOrigin] = useState({
     left: 0,
     top: 0,
@@ -109,25 +107,10 @@ export default function AppsDialogLauncher({
     })
   }
 
-  const registerLoadingTask = useCallback((task) => {
-    const taskId = loadingTaskIdRef.current
-    loadingTaskIdRef.current += 1
-    setLoadingTasks((tasks) => ({ ...tasks, [taskId]: false }))
-
-    Promise.resolve(task)
-      .catch(() => {
-        // 失敗した読み込みも完了として扱い、起動画面に留まり続けないようにする
-      })
-      .finally(() => {
-        setLoadingTasks((tasks) => (Object.hasOwn(tasks, taskId) ? { ...tasks, [taskId]: true } : tasks))
-      })
-  }, [])
-
   const handleOpen = () => {
     updateTransitionOrigin()
     setIsTransitionComplete(false)
-    setIsContentVisible(false)
-    setLoadingTasks({})
+    resetLoadingTasks()
     setIsTransitioning(true)
     onOpen?.(registerLoadingTask)
     setOpen(true)
@@ -136,7 +119,6 @@ export default function AppsDialogLauncher({
   const handleClose = () => {
     updateTransitionOrigin()
     setIsTransitionComplete(false)
-    setIsContentVisible(false)
     setIsTransitioning(true)
     setOpen(false)
     onClose?.()
@@ -152,20 +134,6 @@ export default function AppsDialogLauncher({
     setIsTransitioning(false)
     launcherButtonRef.current?.focus()
   }
-
-  const loadingTaskCount = Object.keys(loadingTasks).length
-  const completedTaskCount = Object.values(loadingTasks).filter(Boolean).length
-  const isLoadingComplete = isTransitionComplete && completedTaskCount === loadingTaskCount
-
-  useEffect(() => {
-    if (!isLoadingComplete) {
-      setIsContentVisible(false)
-      return undefined
-    }
-
-    const timer = window.setTimeout(() => setIsContentVisible(true), completionDisplayDuration)
-    return () => window.clearTimeout(timer)
-  }, [isLoadingComplete])
 
   return (
     <Box sx={launcherContainerSx}>
