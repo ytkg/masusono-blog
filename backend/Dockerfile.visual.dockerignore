@@ -1,0 +1,6 @@
+# The visual test image only copies the Japanese font configuration.
+# Tests and application code are mounted by compose.visual.yml at runtime.
+**
+!test/
+!test/visual/
+!test/visual/fontconfig.xml
