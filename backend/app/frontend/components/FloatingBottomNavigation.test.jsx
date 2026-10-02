@@ -6,9 +6,15 @@ import FloatingBottomNavigation from "./FloatingBottomNavigation"
 vi.mock("@inertiajs/react", async () => {
   const React = await import("react")
   return {
-    Link: React.forwardRef(function MockLink({ href, prefetch, children, ...props }, ref) {
+    Link: React.forwardRef(function MockLink({ href, prefetch, cacheFor, children, ...props }, ref) {
       return (
-        <a ref={ref} href={href} data-prefetch={prefetch ? JSON.stringify(prefetch) : undefined} {...props}>
+        <a
+          ref={ref}
+          href={href}
+          data-cache-for={JSON.stringify(cacheFor)}
+          data-prefetch={prefetch ? JSON.stringify(prefetch) : undefined}
+          {...props}
+        >
           {children}
         </a>
       )
@@ -46,6 +52,18 @@ describe("FloatingBottomNavigation", () => {
     prefetchedLabels.forEach((label) => {
       expect(screen.getByText(label).closest("a")).toHaveAttribute("data-prefetch", '["hover","mount"]')
     })
+  })
+
+  it("別ページへの移動でホームのリンクを再マウントして先読みを再実行する", () => {
+    vi.mocked(usePage).mockReturnValue({ url: "/authors" })
+    const { rerender } = render(<FloatingBottomNavigation />)
+    const previousLink = screen.getByText("ホーム").closest("a")
+    expect(previousLink).toHaveAttribute("data-cache-for", '["30s","5m"]')
+
+    vi.mocked(usePage).mockReturnValue({ url: "/numbers" })
+    rerender(<FloatingBottomNavigation />)
+    expect(screen.getByText("ホーム").closest("a")).not.toBe(previousLink)
+    expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("data-prefetch", '["hover","mount"]')
   })
 
   it("画面下部に固定された pill 型ナビゲーションとして表示する", () => {
