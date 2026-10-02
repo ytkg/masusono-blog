@@ -677,6 +677,9 @@ for (const state of ["session", "login", "articles", "media", "upload"]) {
     await expect(alert).toContainText("失敗")
     await expect(alert).toHaveCSS("font-size", "14px")
     await expect(alert).toHaveCSS("line-height", "21px")
+    if (["session", "articles", "media"].includes(state)) {
+      await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible()
+    }
     await screenshot(page, `admin-feedback-${state}`)
   })
 }
