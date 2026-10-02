@@ -40,6 +40,7 @@ description: masusono-blog のコードから、既存テストで安全性を�
 ### 検証準備と実行順序
 
 - npm 依存は lockfile に従って `npm ci` で準備する。worktree のルートで、vite サービス起動前に `.codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm ci --no-audit --no-fund` を実行し、成功を確認する。すでに vite が起動している場合は、この worktree の vite サービスを止めてから実行し、依存のインストールを重ねない。
+- 新規の専用 `node_modules` ボリュームで `npm ci` が `EACCES` になった場合は、[masusono-worktree の権限エラー復旧手順](../masusono-worktree/SKILL.md#新規-node_modules-ボリュームの権限エラー)でマウントと所有者を確認し、対象 worktree に限定して復旧する。依存未準備のまま RSpec を開始しない。
 - `compose.sh up --build -d` の終了だけで準備完了と判断しない。`compose.sh logs vite` で依存準備が正常に完了し、Vite が起動したことを確認してから RSpec を開始する。起動時にも npm install が実行されるため、`git diff -- backend/package.json backend/package-lock.json` で意図しない依存定義・lockfile の差分がないことを確認する。
 - RSpec と Visual Regression（`scripts/push.sh` が実行する全画面比較を含む）は、同じ `backend/public/vite` にビルド出力を書き込むため並列実行しない。RSpec の終了と成功を確認してから Visual Regression または `scripts/push.sh` を開始する。絞り込んだテストで必須の全画面比較を代替しない。
 

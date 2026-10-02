@@ -37,6 +37,28 @@ worktree のルートで以下を使う。
 
 `compose.sh` は `.env.worktree` を読み込むため、別 worktree とホストポート・Compose プロジェクト名・名前付きボリュームが衝突しない。通常の `docker compose` を使う必要がある場合も、先に `.env.worktree` を読み込んで同じ環境変数を渡す。
 
+### 新規 node_modules ボリュームの権限エラー
+
+新規 worktree の `npm ci` が `/rails/node_modules` の `EACCES` で失敗した場合は、依存未準備による Vite manifest エラーとアプリのテスト失敗を区別する。以下は worktree ルートで実行する。
+
+1. この worktree の vite が起動中なら `compose.sh stop vite` で止め、インストールを重ねない。以下の `compose.sh` は `.codex/skills/masusono-worktree/scripts/compose.sh` を指す。
+2. `compose.sh config --format json` の出力から、vite の `/rails/node_modules` が `type: volume` の `node_modules_cache` であり、トップレベルの同ボリュームの `name` が `.env.worktree` の `COMPOSE_PROJECT_NAME` に対応する専用名であることを確認する。設定全体には環境変数が含まれるため表示せず、このマウントとボリューム名だけを抽出する。bind mount・external volume・別プロジェクトのボリュームなら、この手順で変更しない。
+3. 実行ユーザーとディレクトリ所有者を確認する。
+
+   ```bash
+   .codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite sh -c 'id; stat -c "%u:%g %a %n" /rails/node_modules'
+   ```
+
+4. 新規の専用ボリュームのルートが root 所有で、vite の実行ユーザーが現行設定の `1000:1000` と確認できた場合だけ、マウント先のディレクトリ自身の所有者を合わせる。
+
+   ```bash
+   .codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps --user root vite chown 1000:1000 /rails/node_modules
+   .codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm ci --no-audit --no-fund
+   ```
+
+   再帰的な chown、ホストの `backend/` や他のボリュームの権限変更、ボリューム削除は行わない。実行ユーザーが異なる、または再実行でも失敗する場合は原因を調査し、権限変更の範囲を広げない。
+5. 成功後に `compose.sh up --build -d` と `compose.sh logs vite` で Vite の起動を確認し、依存定義・lockfile の意図しない差分がないことを確認してから検証を再実行する。終了時は下記の `down` を使う。
+
 ## 完了後
 
 ユーザーが起動継続を指定した場合を除き、この作業の Compose 環境を終了する。
