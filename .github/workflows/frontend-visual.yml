@@ -7,6 +7,15 @@ on:
   pull_request:
 
 jobs:
+  push-gate:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate checked push scripts
+        run: |
+          bash -n scripts/check-visual.sh scripts/push.sh
+          python3 scripts/test_visual_gate.py
+
   screenshots:
     runs-on: ubuntu-24.04-arm
     env:
