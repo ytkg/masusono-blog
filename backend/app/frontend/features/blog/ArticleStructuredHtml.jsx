@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import { articleBodyHtmlSx } from "./articleBodyHtmlSx"
 import CodeBlock from "./CodeBlock"
-import { buildCodeBlockDataFromHtml } from "./codeBlockData"
+import { buildCodeBlockDataFromElement } from "./codeBlockData"
 import RubyExecutableCodeBlock from "./RubyExecutableCodeBlock"
 
 const PLACEHOLDER_ATTRIBUTE = "data-structured-code-block-placeholder"
@@ -16,7 +16,7 @@ function buildHtmlParts(html) {
     if (!preElement) return
 
     const blockHtml = preElement.outerHTML
-    const block = buildCodeBlockDataFromHtml(blockHtml)
+    const block = buildCodeBlockDataFromElement(codeElement)
     if (!block) return
 
     const placeholder = document.createElement("div")

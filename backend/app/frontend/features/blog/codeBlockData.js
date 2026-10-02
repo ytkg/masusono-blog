@@ -32,10 +32,7 @@ function codeLanguage(codeElement) {
   }
 }
 
-export function buildCodeBlockDataFromHtml(html) {
-  const document = new DOMParser().parseFromString(html, "text/html")
-  const codeElement = document.body.querySelector("pre > code")
-
+export function buildCodeBlockDataFromElement(codeElement) {
   if (!codeElement) return undefined
 
   const language = codeLanguage(codeElement)
@@ -47,4 +44,9 @@ export function buildCodeBlockDataFromHtml(html) {
     languageLabel: language.label,
     prismLanguage: language.prismLanguage,
   }
+}
+
+export function buildCodeBlockDataFromHtml(html) {
+  const document = new DOMParser().parseFromString(html, "text/html")
+  return buildCodeBlockDataFromElement(document.body.querySelector("pre > code"))
 }
