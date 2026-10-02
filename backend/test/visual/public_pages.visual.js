@@ -27,7 +27,7 @@ async function screenshot(page, name) {
 async function checkAuxiliaryButton(page, button) {
   await expect(button).toHaveCSS("width", "44px")
   await expect(button).toHaveCSS("height", "44px")
-  await expect(button).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(button).toHaveCSS("color", "rgb(103, 105, 95)")
   await expect(button).toHaveCSS("opacity", "1")
   await expect(button.locator("svg")).toHaveCSS("font-size", "20px")
   await page.keyboard.press("Tab")
@@ -39,17 +39,18 @@ async function checkAuxiliaryButton(page, button) {
 }
 
 async function expectSectionHeading(heading) {
-  await expect(heading).toHaveCSS("font-size", "20px")
-  await expect(heading).toHaveCSS("font-weight", "700")
-  await expect(heading).toHaveCSS("line-height", "25px")
+  const mobile = await heading.evaluate(() => window.innerWidth < 600)
+  await expect(heading).toHaveCSS("font-size", mobile ? "24px" : "32px")
+  await expect(heading).toHaveCSS("font-weight", "800")
+  await expect(heading).toHaveCSS("line-height", mobile ? "30px" : "40px")
   await expect(heading).toHaveCSS("margin-bottom", "16px")
 }
 
 async function expectPageHeading(page, name) {
   const heading = page.getByRole("heading", { name, level: 1, exact: true })
-  await expect(heading).toHaveCSS("font-size", "24px")
-  await expect(heading).toHaveCSS("font-weight", "700")
-  await expect(heading).toHaveCSS("line-height", "30px")
+  await expect(heading).toHaveCSS("font-size", page.viewportSize().width < 600 ? "30px" : "44px")
+  await expect(heading).toHaveCSS("font-weight", "800")
+  await expect(heading).toHaveCSS("line-height", page.viewportSize().width < 600 ? "37.5px" : "55px")
   await expect(heading).toHaveCSS("letter-spacing", "normal")
   const layout = await heading.evaluate((element) => {
     const title = element.getBoundingClientRect()
@@ -218,14 +219,14 @@ test.describe("article titles", () => {
     })
     await openPage(page, "/")
     const listTitle = page.getByRole("heading", { name: title, level: 3 })
-    await expect(listTitle).toHaveCSS("font-size", "20px")
-    await expect(listTitle).toHaveCSS("line-height", "25px")
+    await expect(listTitle).toHaveCSS("font-size", page.viewportSize().width < 600 ? "23px" : "30px")
+    await expect(listTitle).toHaveCSS("line-height", page.viewportSize().width < 600 ? "32.2px" : "42px")
     await screenshot(page, "article-title-long-list")
     await page.getByRole("link", { name: title, exact: true }).click()
     await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
     const detailTitle = page.getByRole("heading", { name: title, level: 1 })
-    await expect(detailTitle).toHaveCSS("font-size", "24px")
-    await expect(detailTitle).toHaveCSS("line-height", "30px")
+    await expect(detailTitle).toHaveCSS("font-size", page.viewportSize().width < 600 ? "30px" : "44px")
+    await expect(detailTitle).toHaveCSS("line-height", page.viewportSize().width < 600 ? "42px" : "61.6px")
     await expect(detailTitle).toHaveCSS("margin-bottom", "0px")
     await expect(page.getByTestId("article-tags")).toHaveCSS("margin-top", "12px")
     await expect(page.getByTestId("article-tags")).toHaveCSS("margin-bottom", "12px")
@@ -249,14 +250,14 @@ for (const [name, button] of [
     await page.getByRole("button", { name: button }).click()
     await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
     const title = page.getByRole("dialog").getByRole("heading", { level: 2 }).first()
-    await expect(title).toHaveCSS("font-size", "24px")
-    await expect(title).toHaveCSS("font-weight", "700")
-    await expect(title).toHaveCSS("line-height", "30px")
+    await expect(title).toHaveCSS("font-size", page.viewportSize().width < 600 ? "30px" : "44px")
+    await expect(title).toHaveCSS("font-weight", "800")
+    await expect(title).toHaveCSS("line-height", page.viewportSize().width < 600 ? "37.5px" : "55px")
     if (name === "settings") {
       for (const label of ["表示名", "新着記事の通知"]) {
         const item = page.getByRole("dialog").getByText(label, { exact: true })
         await expect(item).toHaveCSS("font-size", "14px")
-        await expect(item).toHaveCSS("font-weight", "700")
+        await expect(item).toHaveCSS("font-weight", "800")
         await expect(item).toHaveCSS("line-height", "21px")
         await expect(item).toHaveCSS("letter-spacing", "normal")
       }
@@ -491,7 +492,7 @@ test("numbers trend", async ({ page }) => {
   await expect(chart.getByTestId("trend-line-totalChars")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.locator("svg[role=img] text").first()).toHaveAttribute("font-size", "12")
   await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
-  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(103, 105, 95)")
   await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
   await expect(chart).toHaveScreenshot("numbers-trend.png")
 })
@@ -558,7 +559,7 @@ for (const state of ["empty", "error"]) {
     const message = state === "error" ? page.getByRole("alert") : page.getByText("まだランキングがありません。")
     await expect(message).toHaveCSS("font-size", "14px")
     await expect(message).toHaveCSS("line-height", "21px")
-    await expect(message).toHaveCSS("color", state === "error" ? "rgb(0, 0, 0)" : "rgb(102, 102, 102)")
+    await expect(message).toHaveCSS("color", state === "error" ? "rgb(82, 35, 30)" : "rgb(103, 105, 95)")
     await screenshot(page, `rankings-${state}`)
   })
 }
@@ -598,7 +599,7 @@ for (const state of ["loading", "warning", "error"]) {
     const message = state === "loading" ? runner.getByText("実行中...") : runner.getByRole("alert")
     await expect(message).toHaveCSS("font-size", "14px")
     await expect(message).toHaveCSS("line-height", "21px")
-    await expect(message).toHaveCSS("color", state === "loading" ? "rgb(102, 102, 102)" : "rgb(0, 0, 0)")
+    await expect(message).toHaveCSS("color", state === "loading" ? "rgb(103, 105, 95)" : state === "warning" ? "rgb(66, 54, 27)" : "rgb(82, 35, 30)")
     await expect(runner).toHaveScreenshot(`ruby-${state}.png`)
   })
 }
@@ -632,8 +633,8 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
     expect(bounds.toolbar).toEqual(bounds.main)
     expect(bounds.contentLeft).toBe(left)
     expect(bounds.backButton.x).toBeCloseTo(left, 0)
-    expect(bounds.nav.x).toBe(left)
-    expect(bounds.nav.width).toBe(outerWidth - padding * 2)
+    expect(bounds.nav.x).toBe((width - Math.min(outerWidth - padding * 2, 640)) / 2)
+    expect(bounds.nav.width).toBe(Math.min(outerWidth - padding * 2, 640))
     expect(bounds.scrollWidth).toBe(width)
     const links = page.getByRole("navigation", { name: "メインナビゲーション" }).getByRole("link")
     await expect(links).toHaveCount(5)
@@ -700,7 +701,7 @@ test("admin feedback empty", async ({ page }) => {
   await page.getByRole("button", { name: "記事一覧へ" }).click()
   const empty = page.getByText("記事が見つかりませんでした。")
   await expect(empty).toHaveCSS("font-size", "14px")
-  await expect(empty).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(empty).toHaveCSS("color", "rgb(103, 105, 95)")
   await screenshot(page, "admin-feedback-empty")
 })
 
@@ -729,7 +730,7 @@ test("public empty status", async ({ page }) => {
   const empty = page.getByText("該当する記事はありません。")
   await expect(empty).toHaveCSS("font-size", "14px")
   await expect(empty).toHaveCSS("line-height", "21px")
-  await expect(empty).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(empty).toHaveCSS("color", "rgb(103, 105, 95)")
   await screenshot(page, "public-empty-status")
 })
 
@@ -771,13 +772,15 @@ for (const width of [390, 600, 1280]) {
           headerHeight: document.querySelector("header").getBoundingClientRect().height,
         }
       })
-      for (const scrollY of [0, 80]) {
+      const initialBounds = await bounds()
+      const stickyScroll = path === "/" ? Math.ceil(initialBounds.top - initialBounds.headerBottom) : 0
+      for (const scrollY of [stickyScroll, stickyScroll + 80]) {
         await page.evaluate((y) => window.scrollTo(0, y), scrollY)
         await expect.poll(async () => {
           const value = await bounds()
           return Math.round(value.top - value.headerBottom)
         }).toBe(0)
-        expect(Math.round((await bounds()).headerHeight)).toBe(width < 600 ? 45 : 55)
+        expect(Math.round((await bounds()).headerHeight)).toBe(width < 600 ? 64 : 80)
       }
       await screenshot(page, `sticky-${path === "/" ? "home" : "search"}-${width}`)
     })

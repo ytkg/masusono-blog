@@ -24,24 +24,19 @@ vi.mock("@inertiajs/react", async () => {
   }
 })
 
-vi.mock("../assets/logo.webp", () => ({
-  default: "/mock-logo.png",
-}))
-
 describe("Header", () => {
   it("ホームへのリンク付きロゴを表示する", () => {
     render(<Header />)
 
-    const image = screen.getByRole("img", { name: "増田とその他！" })
-    expect(image).toHaveAttribute("src", "/mock-logo.png")
-    expect(image.closest("a")).toHaveAttribute("href", "/")
-    expect(image.closest("a")).toHaveAttribute("data-prefetch", "false")
+    const link = screen.getByRole("link", { name: "増田とその他！" })
+    expect(link).toHaveAttribute("href", "/")
+    expect(link).toHaveAttribute("data-prefetch", "false")
   })
 
   it("別ページではロゴからホームを先読みし、期限後もキャッシュを表示して更新する", () => {
     vi.mocked(usePage).mockReturnValueOnce({ url: "/authors" })
     render(<Header />)
-    const link = screen.getByRole("img", { name: "増田とその他！" }).closest("a")
+    const link = screen.getByRole("link", { name: "増田とその他！" })
     expect(link).toHaveAttribute("data-prefetch", '["hover","mount"]')
     expect(link).toHaveAttribute("data-cache-for", '["30s","5m"]')
   })
@@ -49,14 +44,14 @@ describe("Header", () => {
   it("移動先のパスが変わった場合だけホームリンクの表示時先読みを再実行する", () => {
     vi.mocked(usePage).mockReturnValue({ url: "/authors" })
     const { rerender } = render(<Header />)
-    const previousLink = screen.getByRole("img", { name: "増田とその他！" }).closest("a")
+    const previousLink = screen.getByRole("link", { name: "増田とその他！" })
 
     rerender(<Header />)
-    expect(screen.getByRole("img", { name: "増田とその他！" }).closest("a")).toBe(previousLink)
+    expect(screen.getByRole("link", { name: "増田とその他！" })).toBe(previousLink)
 
     vi.mocked(usePage).mockReturnValue({ url: "/numbers" })
     rerender(<Header />)
-    expect(screen.getByRole("img", { name: "増田とその他！" }).closest("a")).not.toBe(previousLink)
+    expect(screen.getByRole("link", { name: "増田とその他！" })).not.toBe(previousLink)
     vi.mocked(usePage).mockReturnValue({ url: "/" })
   })
 

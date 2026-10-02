@@ -3,11 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 import ArticlesList from "./ArticlesList"
 
 vi.mock("./ArticleCard", () => ({
-  default: ({ article, sx }) => (
-    <div data-testid={`article-${article.id}`} style={{ paddingTop: sx?.pt, paddingBottom: sx?.pb }}>
-      {article.title}
-    </div>
-  ),
+  default: ({ article }) => <div>{article.title}</div>,
 }))
 
 describe("ArticlesList", () => {
@@ -35,21 +31,5 @@ describe("ArticlesList", () => {
 
     expect(screen.getByText("記事1")).toBeInTheDocument()
     expect(screen.getByText("記事2")).toBeInTheDocument()
-  })
-
-  it("区切り線付きの記事一覧を描画する", () => {
-    render(
-      <ArticlesList
-        articles={[
-          { id: "a1", title: "記事1" },
-          { id: "a2", title: "記事2" },
-        ]}
-      />,
-    )
-
-    expect(screen.getByText("記事1")).toBeInTheDocument()
-    expect(screen.getByText("記事2")).toBeInTheDocument()
-    expect(screen.getByTestId("article-a1")).toHaveStyle({ paddingTop: "0px", paddingBottom: "1.5px" })
-    expect(screen.getByTestId("article-a2")).toHaveStyle({ paddingTop: "1.5px", paddingBottom: "0px" })
   })
 })

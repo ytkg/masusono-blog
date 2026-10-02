@@ -2,6 +2,7 @@ import { HEADER_HEIGHT } from "../shared/pageLayout"
 import useHomeTabState from "../features/blog/useHomeTabState"
 import { useEffect } from "react"
 import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
 import Tab from "@mui/material/Tab"
 import Tabs from "@mui/material/Tabs"
 import { ensureUserIdCookie } from "@/shared/lib/userId"
@@ -35,6 +36,34 @@ export default function Home({ articles = [] }) {
       />
       <PageContainer id="home" sx={{ pt: 0 }}>
         <Box sx={{ display: "grid", gap: 1.5 }}>
+          <Box
+            sx={{ py: { xs: 4, sm: 7 }, borderBottom: "3px solid", borderColor: "text.primary", position: "relative" }}
+          >
+            <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.22em", color: "primary.main", mb: 2 }}>
+              MASUDA & OTHERS / INDEPENDENT JOURNAL
+            </Typography>
+            <Typography
+              component="h1"
+              sx={{ fontSize: { xs: 44, sm: 86 }, fontWeight: 900, letterSpacing: "-0.07em", lineHeight: 1.08 }}
+            >
+              日々の余白に、
+              <br />
+              ちょっと寄り道。
+            </Typography>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "end", mt: 3, gap: 2 }}>
+              <Typography sx={{ fontSize: { xs: 13, sm: 15 }, color: "text.secondary" }}>
+                増田と、その他のみんなの記録。
+                <br />
+                出来事、考えごと、ときどき遊び。
+              </Typography>
+              <Typography
+                aria-hidden="true"
+                sx={{ fontSize: { xs: 40, sm: 64 }, color: "primary.main", lineHeight: 1 }}
+              >
+                ↘
+              </Typography>
+            </Box>
+          </Box>
           <Box
             sx={{
               position: "sticky",

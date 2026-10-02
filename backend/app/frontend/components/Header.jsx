@@ -9,7 +9,7 @@ import { currentLocationPath, LOCATION_CHANGE_EVENT } from "@/shared/lib/locatio
 import { requestHomeFeed } from "@/shared/lib/homeNavigation"
 import { navigationPrefetchKey, navigationPrefetchProps } from "@/shared/lib/navigationPrefetch"
 import { HEADER_HEIGHT, HEADER_TOOLBAR_HEIGHT, PAGE_MAX_WIDTH, PAGE_HORIZONTAL_PADDING } from "../shared/pageLayout"
-import logo from "../assets/logo.webp"
+import Typography from "@mui/material/Typography"
 
 function goBack() {
   if (window.history.length > 1) {
@@ -58,13 +58,13 @@ export default function Header() {
         color: "text.primary",
         boxShadow: "none",
         borderBottom: "1px solid",
-        borderColor: "divider",
+        borderColor: "text.primary",
       }}
     >
       <Toolbar
         disableGutters
         sx={{
-          alignItems: "flex-end",
+          alignItems: "center",
           display: "grid",
           gridTemplateColumns: "1fr auto 1fr",
           minHeight: HEADER_TOOLBAR_HEIGHT,
@@ -84,21 +84,20 @@ export default function Header() {
           onClick={requestHomeFeed}
           sx={{
             display: "inline-flex",
-            alignItems: "flex-end",
+            alignItems: "center",
             gridColumn: 2,
             textDecoration: "none",
           }}
         >
-          <Box
-            component="img"
-            src={logo}
-            alt="増田とその他！"
-            sx={{
-              height: { xs: 40, sm: 48 },
-              maxWidth: "100%",
-              objectFit: "contain",
-            }}
-          />
+          <Typography
+            component="span"
+            sx={{ fontWeight: 900, fontSize: { xs: 20, sm: 26 }, letterSpacing: "-0.06em", lineHeight: 1.3 }}
+          >
+            増田とその他
+            <Box component="span" sx={{ color: "primary.main" }}>
+              ！
+            </Box>
+          </Typography>
         </Box>
         {showsBackButton ? (
           <IconButton

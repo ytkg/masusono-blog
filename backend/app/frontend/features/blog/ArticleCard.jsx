@@ -64,9 +64,9 @@ export default function ArticleCard({ article, mode = "list", sx }) {
       titleVariant="h6"
       titleComponent={isDetail ? "h1" : "h3"}
       titleSx={{
-        fontSize: isDetail ? "24px" : "20px",
+        fontSize: isDetail ? { xs: "30px", sm: "44px" } : { xs: "23px", sm: "30px" },
         fontWeight: 700,
-        lineHeight: 1.25,
+        lineHeight: 1.4,
         letterSpacing: 0,
         overflowWrap: "anywhere",
         mb: hasTags ? 0 : isDetail ? 2 : 0.5,
@@ -80,7 +80,21 @@ export default function ArticleCard({ article, mode = "list", sx }) {
   )
 
   return (
-    <Box sx={[{ display: "grid", gap: isDetail ? 2 : 1.5 }, sx]}>
+    <Box
+      sx={[
+        {
+          display: "grid",
+          gap: 2,
+          bgcolor: "background.paper",
+          p: { xs: 2.5, sm: 4 },
+          border: "1px solid",
+          borderColor: "divider",
+          borderTop: "3px solid",
+          borderTopColor: isDetail ? "primary.main" : "text.primary",
+        },
+        sx,
+      ]}
+    >
       {plainHeader}
       {content}
     </Box>

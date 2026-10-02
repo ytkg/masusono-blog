@@ -22,7 +22,7 @@ export const navigationNoticeBottomSx = Object.fromEntries(
   ]),
 )
 
-export const HEADER_HEIGHT = { xs: 45, sm: 55 }
+export const HEADER_HEIGHT = { xs: 64, sm: 80 }
 export const HEADER_TOOLBAR_HEIGHT = Object.fromEntries(
   Object.entries(HEADER_HEIGHT).map(([breakpoint, height]) => [breakpoint, height - 1]),
 )
