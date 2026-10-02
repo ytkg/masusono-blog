@@ -6,7 +6,8 @@ import Toolbar from "@mui/material/Toolbar"
 import { Link, usePage } from "@inertiajs/react"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { currentLocationPath, LOCATION_CHANGE_EVENT } from "@/shared/lib/locationEvents"
-import { HOME_PREFETCH_MODES, HOME_PREFETCH_CACHE_FOR, requestHomeFeed } from "@/shared/lib/homeNavigation"
+import { requestHomeFeed } from "@/shared/lib/homeNavigation"
+import { navigationPrefetchKey, navigationPrefetchProps } from "@/shared/lib/navigationPrefetch"
 import { HEADER_HEIGHT, HEADER_TOOLBAR_HEIGHT, PAGE_MAX_WIDTH, PAGE_HORIZONTAL_PADDING } from "../shared/pageLayout"
 import logo from "../assets/logo.webp"
 
@@ -77,10 +78,9 @@ export default function Header() {
       >
         <Box
           component={Link}
-          key={path}
+          key={navigationPrefetchKey({ href: "/", currentPath: path })}
+          {...navigationPrefetchProps({ href: "/", currentPath: path })}
           href="/"
-          prefetch={path === "/" ? false : HOME_PREFETCH_MODES}
-          cacheFor={HOME_PREFETCH_CACHE_FOR}
           onClick={requestHomeFeed}
           sx={{
             display: "inline-flex",
