@@ -9,3 +9,6 @@ Rails.application.config.filter_parameters += [
 
 # Raw client diagnostics are untrusted; only the sanitized structured event is logged.
 Rails.application.config.filter_parameters += [ :failure ]
+
+# Push endpoints identify a browser subscription and may contain delivery tokens.
+Rails.application.config.filter_parameters += [ :endpoint ]

@@ -4,6 +4,7 @@ import { getWebPushState, subscribeToWebPush, unsubscribeFromWebPush } from "./w
 export default function useWebPushSettings({ loadOnMount, registerLoadingTask }) {
   const [webPushState, setWebPushState] = useState({ supported: true, subscribed: false, permission: "default" })
   const [isUpdatingWebPush, setIsUpdatingWebPush] = useState(false)
+  const [isLoadingWebPush, setIsLoadingWebPush] = useState(loadOnMount)
   const [webPushError, setWebPushError] = useState("")
 
   useEffect(() => {
@@ -12,8 +13,9 @@ export default function useWebPushSettings({ loadOnMount, registerLoadingTask })
     const task = getWebPushState()
       .then(setWebPushState)
       .catch(() => {
-        setWebPushState({ supported: false, subscribed: false, permission: "unsupported" })
+        setWebPushError("通知設定の取得に失敗しました")
       })
+      .finally(() => setIsLoadingWebPush(false))
     registerLoadingTask(task)
   }, [loadOnMount, registerLoadingTask])
 
@@ -31,7 +33,7 @@ export default function useWebPushSettings({ loadOnMount, registerLoadingTask })
 
   return {
     state: webPushState,
-    isSaving: isUpdatingWebPush,
+    isSaving: isUpdatingWebPush || isLoadingWebPush,
     errorMessage: webPushError,
     subscribe: () => updateWebPush(subscribeToWebPush),
     unsubscribe: () => updateWebPush(unsubscribeFromWebPush),

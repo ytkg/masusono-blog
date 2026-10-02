@@ -18,7 +18,12 @@ export async function getWebPushState() {
 
   const registration = await navigator.serviceWorker.ready
   const subscription = await registration.pushManager.getSubscription()
-  return { supported: true, subscribed: Boolean(subscription), permission: Notification.permission }
+  if (!subscription) return { supported: true, subscribed: false, permission: Notification.permission }
+
+  const { subscribed } = await requestJson(
+    `/api/app/web_push/subscription.json?${new URLSearchParams({ endpoint: subscription.endpoint })}`,
+  )
+  return { supported: true, subscribed, permission: Notification.permission }
 }
 
 export async function subscribeToWebPush() {
