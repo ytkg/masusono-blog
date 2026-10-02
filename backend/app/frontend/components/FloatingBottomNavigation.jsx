@@ -10,12 +10,12 @@ import {
   PAGE_INNER_MAX_WIDTH,
 } from "../shared/pageLayout"
 import { MAIN_NAVIGATION_LINKS } from "../shared/mainNavigationLinks"
-import { HOME_PREFETCH_CACHE_FOR, requestHomeFeed } from "../shared/lib/homeNavigation"
+import { requestHomeFeed } from "../shared/lib/homeNavigation"
+import { navigationPrefetchKey, navigationPrefetchProps } from "../shared/lib/navigationPrefetch"
 
 const INDICATOR_HALF_WIDTH = 16
 const INDICATOR_TRANSITION_DURATION = 280
 const NAVIGATION_LABEL_FONT_SIZE = "0.72rem"
-const NAVIGATION_PREFETCH_MODES = Object.freeze(["hover", "mount"])
 
 function matchesNavigationPath(path, href) {
   if (href === "/") return path === "/"
@@ -29,10 +29,6 @@ function currentNavigationIndex(path) {
 
 function navigationPathFromUrl(url) {
   return String(url || "/").split("?")[0]
-}
-
-function prefetchModesForNavigation(tab, active) {
-  return tab.value === active ? false : NAVIGATION_PREFETCH_MODES
 }
 
 export default function FloatingBottomNavigation() {
@@ -124,14 +120,13 @@ export default function FloatingBottomNavigation() {
       >
         {MAIN_NAVIGATION_LINKS.map((tab) => (
           <BottomNavigationAction
-            key={tab.href === "/" ? `${tab.value}:${path}` : tab.value}
+            key={navigationPrefetchKey({ href: tab.href, currentPath: path })}
+            {...navigationPrefetchProps({ href: tab.href, currentPath: path, isActive: tab.value === active })}
             label={tab.label}
             value={tab.value}
             icon={tab.icon}
             component={Link}
             href={tab.href}
-            prefetch={prefetchModesForNavigation(tab, active)}
-            cacheFor={tab.href === "/" ? HOME_PREFETCH_CACHE_FOR : undefined}
             onClick={tab.href === "/" ? requestHomeFeed : undefined}
           />
         ))}
