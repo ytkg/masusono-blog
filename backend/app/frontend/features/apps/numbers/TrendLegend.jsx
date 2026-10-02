@@ -21,7 +21,7 @@ export default function TrendLegend({ series }) {
               x2="22"
               y2="3"
               stroke={seriesColors[index % seriesColors.length]}
-              strokeWidth="1.5"
+              strokeWidth="2"
               strokeLinecap="round"
             />
           </Box>

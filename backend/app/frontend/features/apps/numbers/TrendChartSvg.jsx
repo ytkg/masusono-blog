@@ -58,7 +58,7 @@ export default function TrendChartSvg({ trend }) {
             d={path}
             fill="none"
             stroke={seriesColors[index % seriesColors.length]}
-            strokeWidth="1.5"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
