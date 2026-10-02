@@ -12,7 +12,17 @@ scripts/check-visual.sh
 
 このコマンドは撮影用サーバーを起動し、PC・スマートフォンの全テストを比較します。引数を受け付けないため、最終検証での `--grep`・`--project` による対象漏れや、基準画像の自動更新を防ぎます。調査中の絞り込みは Compose ラッパーから直接実行できますが、最終検証は全比較に戻してください。
 
+終了時は成功・失敗・Ctrl+CやSIGTERMによる中断のいずれでも、その worktree の
+`backend`・`vite` を停止します。起動途中で失敗した場合も停止を試みます。
+コンテナ・ボリューム・worktreeは保持されます。テストの失敗コードは維持し、
+テスト成功後に停止だけが失敗した場合もコマンドは失敗として終了します。
+このコマンドは同じ worktree の起動済みサーバーも停止するため、検証後に開発を再開する場合は
+Compose ラッパーで起動し直してください。
+
 通常のリポジトリで実行する場合は、`docker compose -f backend/compose.yml -f backend/compose.visual.yml up --build -d backend vite`、続いて `docker compose -f backend/compose.yml -f backend/compose.visual.yml run --build --rm visual` を使います。
+
+Compose ラッパーや通常の `docker compose` で直接実行した場合は自動停止しません。
+検証後に同じ Compose 設定で `stop backend vite` を実行してください。
 
 ## push 前の検証
 
@@ -22,7 +32,7 @@ scripts/check-visual.sh
 
 これは push 用のラッパーで、Git hook の自動インストールは行いません。通常の `git push` はこの確認を通らないため、エージェントの作業規約でも `scripts/push.sh` の使用を指定しています。GitHub の全画面比較も引き続き実行します。
 
-ラッパーの失敗時の push 停止、追加 push、対象判定、引数拒否は `python3 scripts/test_visual_gate.py` で検証できます。ローカルの一時 Git リポジトリを使用し、Docker・ネットワークは不要です。このテストも `frontend-visual` CI で実行します。
+ラッパーの失敗時の push 停止、追加 push、対象判定、引数拒否、成功・失敗・中断時のサーバー停止は `python3 scripts/test_visual_gate.py` で検証できます。ローカルの一時 Git リポジトリを使用し、Docker・ネットワークは不要です。このテストも `frontend-visual` CI で実行します。
 
 テストはファイル内も含めて並列実行し、公開リポジトリの4コアCIでは4ワーカー、ローカルでは2ワーカーを使います。各テストのブラウザコンテキストとモックは独立させ、共有する撮影用データは変更しません。並列数は `run --rm visual npm run test:visual -- --workers=1` のように指定できます。
 

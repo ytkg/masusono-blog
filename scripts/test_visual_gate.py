@@ -3,8 +3,10 @@
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import tempfile
+import time
 import unittest
 
 
@@ -31,7 +33,18 @@ class VisualGateTest(unittest.TestCase):
         compose.write_text(
             '#!/usr/bin/env bash\n'
             'printf "%s\\n" "$*" >> "$GATE_LOG"\n'
-            'if [[ "$*" == *" run "* ]]; then exit "${GATE_RESULT:-0}"; fi\n'
+            'if [[ "$*" == *" up "* ]]; then exit "${GATE_UP_RESULT:-0}"; fi\n'
+            'if [[ "$*" == *" stop "* ]]; then exit "${GATE_STOP_RESULT:-0}"; fi\n'
+            'if [[ "$*" == *" run "* ]]; then\n'
+            '  if [[ "${GATE_WAIT:-0}" == 1 ]]; then\n'
+            '    sleep 60 &\n'
+            '    sleep_pid=$!\n'
+            '    trap \'kill "$sleep_pid" 2>/dev/null; wait "$sleep_pid" 2>/dev/null; exit 143\' TERM\n'
+            '    touch "$GATE_READY"\n'
+            '    wait "$sleep_pid"\n'
+            '  fi\n'
+            '  exit "${GATE_RESULT:-0}"\n'
+            'fi\n'
         )
         compose.chmod(0o755)
         self.commit()
@@ -72,10 +85,75 @@ class VisualGateTest(unittest.TestCase):
         self.change("backend/app/frontend/Card.jsx")
         self.assertEqual(self.push().returncode, 0)
         calls = self.log.read_text().splitlines()
-        self.assertEqual(len(calls), 2)
+        self.assertEqual(len(calls), 3)
         self.assertIn("up --build -d backend vite", calls[0])
         self.assertTrue(calls[1].endswith("run --build --rm visual npm run test:visual"))
+        self.assertEqual(calls[2], "-f backend/compose.visual.yml stop --timeout 10 backend vite")
         self.assertTrue(self.remote_task())
+
+    def check_visual(self, **env):
+        return self.run_command(
+            "bash", "scripts/check-visual.sh", check=False,
+            env={**self.env, **env},
+        )
+
+    def assert_servers_stopped(self):
+        self.assertEqual(
+            self.log.read_text().splitlines()[-1],
+            "-f backend/compose.visual.yml stop --timeout 10 backend vite",
+        )
+
+    def test_comparison_failure_stops_servers_and_preserves_status(self):
+        self.assertEqual(self.check_visual(GATE_RESULT="7").returncode, 7)
+        self.assert_servers_stopped()
+
+    def test_partial_startup_failure_also_stops_servers(self):
+        self.assertEqual(self.check_visual(GATE_UP_RESULT="8").returncode, 8)
+        calls = self.log.read_text().splitlines()
+        self.assertEqual(len(calls), 2)
+        self.assert_servers_stopped()
+
+    def test_stop_failure_is_reported_without_hiding_test_failure(self):
+        for test_result, expected in (("0", 9), ("7", 7)):
+            with self.subTest(test_result=test_result):
+                command = self.check_visual(GATE_RESULT=test_result, GATE_STOP_RESULT="9")
+                self.assertEqual(command.returncode, expected)
+                self.assertIn("Failed to stop", command.stderr)
+                self.assert_servers_stopped()
+
+    def test_stop_failure_blocks_push(self):
+        self.change("backend/app/frontend/Card.jsx")
+        command = self.run_command(
+            "bash", "scripts/push.sh", check=False,
+            env={**self.env, "GATE_STOP_RESULT": "9"},
+        )
+        self.assertEqual(command.returncode, 9)
+        self.assertFalse(self.remote_task())
+
+    def test_interruption_stops_servers(self):
+        for interrupt, expected in ((signal.SIGINT, 130), (signal.SIGTERM, 143)):
+            with self.subTest(interrupt=interrupt):
+                ready = Path(self.temp.name) / "ready"
+                ready.unlink(missing_ok=True)
+                process = subprocess.Popen(
+                    ["bash", "scripts/check-visual.sh"], cwd=self.root,
+                    env={**self.env, "GATE_WAIT": "1", "GATE_READY": str(ready)},
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                    start_new_session=True,
+                )
+                try:
+                    deadline = time.monotonic() + 5
+                    while not ready.exists() and time.monotonic() < deadline and process.poll() is None:
+                        time.sleep(0.01)
+                    self.assertTrue(ready.exists(), "Mock comparison did not start")
+                    os.kill(process.pid, interrupt)
+                    process.communicate(timeout=5)
+                    self.assertEqual(process.returncode, expected)
+                    self.assert_servers_stopped()
+                finally:
+                    if process.poll() is None:
+                        os.killpg(process.pid, signal.SIGKILL)
+                        process.communicate()
 
     def test_failed_comparison_blocks_initial_and_subsequent_push(self):
         self.change("backend/test/visual/example.png")
