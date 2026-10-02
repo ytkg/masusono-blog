@@ -76,6 +76,10 @@ npm run format:check
 npm test
 ```
 
+フロントエンド全テストと Visual Regression は順番に実行する。同じホストで両者を
+同時に走らせると、CPU・メモリの競合でタイムアウトすることがある。Vitest の
+同時実行数は `vite.config.ts` でローカル最大2・CI最大4に制限している。
+
 RSpec がデータベース準備を必要とする環境では、先に
 `RAILS_ENV=test bin/rails db:prepare` を実行する。検証できない場合は、実行していない
 コマンドとその理由を完了報告に明記する。自動修正コマンドは、対象外の差分を生まないことを

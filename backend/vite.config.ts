@@ -38,6 +38,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
   },
   test: {
+    // Keep jsdom workers bounded when Docker shares resources with Rails and Playwright.
+    maxWorkers: process.env.CI ? 4 : 2,
     environment: "jsdom",
     setupFiles: ["./test/setup.js"],
     include: ["**/*.{test,spec}.{js,jsx}"],
