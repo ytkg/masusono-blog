@@ -10,8 +10,9 @@ describe("ArticleSearchSuggestions", () => {
       <ArticleSearchSuggestions
         articles={[
           { author: " 増田 ", tags: "Ruby, Rails" },
-          { author: "増田", tags: "Rails, JavaScript" },
+          { author: "増田", tags: " Rails, , JavaScript " },
           { author: "", tags: "" },
+          { author: "", tags: null },
         ]}
         onSelect={onSelect}
       />,

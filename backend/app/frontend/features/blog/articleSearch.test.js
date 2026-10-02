@@ -46,7 +46,7 @@ describe("articleSearch", () => {
   it("#付きトークンはタグの完全一致だけを対象にする", () => {
     const articleWithRubyKaigi = {
       ...article,
-      tags: "RubyKaigi,技術",
+      tags: " RubyKaigi, , 技術 ",
     }
 
     expect(articleMatchesQuery(articleWithRubyKaigi, normalizeArticleSearchText("#AI"))).toBe(false)
