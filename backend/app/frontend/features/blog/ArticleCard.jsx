@@ -5,6 +5,7 @@ import ArticleActions from "./ArticleActions"
 import ArticleBody from "./ArticleBody"
 import ArticlePlainHeader from "./ArticlePlainHeader"
 import ArticleTags from "./ArticleTags"
+import { parseArticleTags } from "./parseArticleTags"
 
 function getAuthorHref(article) {
   return article.authorId ? `/authors/${article.authorId}` : undefined
@@ -44,6 +45,7 @@ export default function ArticleCard({ article, mode = "list", sx }) {
   const authorHref = getAuthorHref(article)
   const isDetail = mode === "detail"
   const isList = mode === "list"
+  const hasTags = parseArticleTags(article.tags).length > 0
   const action = article.id ? <ArticleActions article={article} /> : undefined
   const plainHeader = (
     <ArticlePlainHeader
@@ -67,7 +69,7 @@ export default function ArticleCard({ article, mode = "list", sx }) {
         lineHeight: 1.25,
         letterSpacing: 0,
         overflowWrap: "anywhere",
-        mb: isDetail ? 2 : 0.5,
+        mb: hasTags ? 0 : isDetail ? 2 : 0.5,
       }}
       titleTo={isList ? `/articles/${article.id}` : undefined}
       sx={{ minWidth: 0 }}
