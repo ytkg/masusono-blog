@@ -13,8 +13,7 @@ module Numbers
     LABELS = {
       launch: "増田とその他！始動から",
       total_articles: "総記事数",
-      total_chars: "総文字数",
-      total_count: "総件数"
+      total_chars: "総文字数"
     }.freeze
 
     BLOG_METRIC_DEFINITIONS = [
