@@ -3,6 +3,7 @@ export function extractHtmlText(html = "") {
   const source = String(html ?? "")
   if (!/[<&]/.test(source)) return source
 
+  // A detached template keeps body images inert until the article is expanded.
   const template = document.createElement("template")
   template.innerHTML = source
   template.content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"))
