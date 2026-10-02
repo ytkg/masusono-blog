@@ -13,7 +13,23 @@ export default function About() {
         canonicalPath="/about"
       />
 
-      <PageContainer component="article" id="about">
+      <PageContainer
+        component="article"
+        id="about"
+        sx={{
+          maxWidth: 880,
+          mx: "auto",
+          "& > p": { fontSize: { xs: 16, md: 20 }, lineHeight: 2.1 },
+          "& blockquote": {
+            bgcolor: "text.primary",
+            color: "background.paper",
+            p: 4,
+            mx: 0,
+            fontSize: { xs: 22, md: 30 },
+            fontStyle: "normal",
+          },
+        }}
+      >
         <PageHeading>「増田とその他！」について</PageHeading>
 
         <Typography component="p" sx={{ mb: 2 }}>

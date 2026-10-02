@@ -70,7 +70,7 @@ export default function ArticleActions({ article }) {
           if (reason !== "clickaway" && feedback?.severity === "success") setFeedback(null)
         }}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        sx={{ bottom: navigationNoticeBottomSx }}
+        sx={{ bottom: { ...navigationNoticeBottomSx, lg: 24 }, left: { lg: "calc(50% + 110px)" } }}
       >
         <StatusAlert
           severity={feedback?.severity || "success"}

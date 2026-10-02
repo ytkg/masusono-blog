@@ -84,7 +84,8 @@ export default function ArticleCard({ article, mode = "list", sx }) {
       sx={[
         {
           display: "grid",
-          gap: 2,
+          gridTemplateColumns: isDetail ? { xs: "1fr", md: "180px minmax(0, 1fr)" } : "1fr",
+          gap: { xs: 3, md: 4 },
           bgcolor: "background.paper",
           p: { xs: 2.5, sm: 4 },
           border: "1px solid",
@@ -95,7 +96,27 @@ export default function ArticleCard({ article, mode = "list", sx }) {
         sx,
       ]}
     >
-      {plainHeader}
+      <Box
+        sx={
+          isDetail
+            ? {
+                alignSelf: "start",
+                position: { md: "sticky" },
+                top: { md: 112 },
+                borderTop: "1px solid",
+                pt: 2,
+                "& > div": { flexDirection: { md: "column" }, alignItems: { md: "flex-start" } },
+                "& [data-testid=article-detail-header]": {
+                  flexDirection: { md: "column" },
+                  alignItems: { md: "flex-start" },
+                  gap: 3,
+                },
+              }
+            : undefined
+        }
+      >
+        {plainHeader}
+      </Box>
       {content}
     </Box>
   )

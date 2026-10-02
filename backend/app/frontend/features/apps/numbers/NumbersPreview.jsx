@@ -16,7 +16,7 @@ export default function NumbersPreview({ metrics }) {
   }
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={5}>
       <NumbersMetricsGrid blocks={metricBlocks} />
       <NumbersTrendChart trend={trend} />
     </Stack>

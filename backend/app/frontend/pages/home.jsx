@@ -37,30 +37,91 @@ export default function Home({ articles = [] }) {
       <PageContainer id="home" sx={{ pt: 0 }}>
         <Box sx={{ display: "grid", gap: 1.5 }}>
           <Box
-            sx={{ py: { xs: 4, sm: 7 }, borderBottom: "3px solid", borderColor: "text.primary", position: "relative" }}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "1.3fr 1fr" },
+              mt: 3,
+              mb: 2,
+              border: "1px solid",
+              borderColor: "text.primary",
+            }}
           >
-            <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.22em", color: "primary.main", mb: 2 }}>
-              MASUDA & OTHERS / INDEPENDENT JOURNAL
-            </Typography>
-            <Typography
-              component="h1"
-              sx={{ fontSize: { xs: 44, sm: 86 }, fontWeight: 900, letterSpacing: "-0.07em", lineHeight: 1.08 }}
+            <Box
+              sx={{
+                p: { xs: 3, sm: 5 },
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                minHeight: { xs: 310, md: 440 },
+              }}
             >
-              日々の余白に、
-              <br />
-              ちょっと寄り道。
-            </Typography>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "end", mt: 3, gap: 2 }}>
-              <Typography sx={{ fontSize: { xs: 13, sm: 15 }, color: "text.secondary" }}>
+              <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", color: "primary.main" }}>
+                MASUDA & OTHERS / JOURNAL
+              </Typography>
+              <Typography
+                component="h1"
+                sx={{ fontSize: { xs: 46, sm: 64 }, fontWeight: 900, letterSpacing: "-0.08em", lineHeight: 1.1, my: 3 }}
+              >
+                日々の余白に、
+                <br />
+                ちょっと寄り道。
+              </Typography>
+              <Typography sx={{ fontSize: 13, color: "text.secondary", lineHeight: 1.9 }}>
                 増田と、その他のみんなの記録。
                 <br />
                 出来事、考えごと、ときどき遊び。
               </Typography>
+            </Box>
+            <Box
+              aria-hidden="true"
+              sx={{
+                bgcolor: "primary.main",
+                color: "#252820",
+                minHeight: { xs: 180, md: 440 },
+                p: 3,
+                position: "relative",
+                overflow: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: { xs: 260, md: 380 },
+                  height: { xs: 260, md: 380 },
+                  borderRadius: "50%",
+                  border: "1px solid #252820",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    inset: 24,
+                    borderRadius: "50%",
+                    border: "1px solid #252820",
+                  },
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    inset: 48,
+                    borderRadius: "50%",
+                    border: "1px solid #252820",
+                  },
+                }}
+              />
               <Typography
-                aria-hidden="true"
-                sx={{ fontSize: { xs: 40, sm: 64 }, color: "primary.main", lineHeight: 1 }}
+                sx={{
+                  position: "relative",
+                  fontSize: { xs: 100, md: 180 },
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  transform: "rotate(-12deg)",
+                }}
               >
-                ↘
+                余白
+              </Typography>
+              <Typography sx={{ position: "absolute", bottom: 20, left: 24, fontSize: 11, letterSpacing: "0.15em" }}>
+                EVERYDAY IS A STORY. ↗
               </Typography>
             </Box>
           </Box>

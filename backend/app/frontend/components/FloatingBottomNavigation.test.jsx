@@ -66,7 +66,7 @@ describe("FloatingBottomNavigation", () => {
     expect(screen.getByText("ホーム").closest("a")).toHaveAttribute("data-prefetch", '["hover","mount"]')
   })
 
-  it("画面下部に固定された pill 型ナビゲーションとして表示する", () => {
+  it("固定ナビゲーションとして表示する", () => {
     vi.mocked(usePage).mockReturnValue({ url: "/" })
 
     render(<FloatingBottomNavigation />)
@@ -75,7 +75,6 @@ describe("FloatingBottomNavigation", () => {
 
     expect(navigation).toHaveStyle({
       position: "fixed",
-      overflow: "hidden",
     })
   })
 

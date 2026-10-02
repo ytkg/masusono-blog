@@ -16,21 +16,27 @@ import { AppsLoadingProvider } from "./AppsLoadingContext"
 const launcherContainerSx = {
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
   gap: 1,
+  flex: "1 1 220px",
+  alignItems: "stretch",
+  bgcolor: "background.paper",
+  border: "1px solid",
+  borderColor: "divider",
+  p: 3,
 }
 
 const launcherSx = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: 0.5,
+  gap: 2,
 }
 
 const iconButtonBaseSx = {
   borderRadius: 2,
-  width: 56,
-  height: 56,
+  width: "100%",
+  height: 160,
+  "& .MuiSvgIcon-root": { fontSize: 64 },
   bgcolor: "common.black",
   color: "common.white",
   "&:hover": { bgcolor: "common.black" },

@@ -48,7 +48,7 @@ function MetricRowList({ rows }) {
   )
 }
 
-function MetricCard({ block, isLast }) {
+function MetricCard({ block }) {
   const rows = flattenMetricRows(block.children ?? [], block.value ? 1 : 0)
   const hasRows = rows.length > 0
   const showValue = !hasRows || Boolean(block.value)
@@ -58,9 +58,10 @@ function MetricCard({ block, isLast }) {
       sx={{
         display: "grid",
         gap: 1.25,
-        py: 2,
-        borderBottom: isLast ? "none" : "1px solid",
-        borderColor: "divider",
+        p: 3,
+        bgcolor: "background.paper",
+        borderTop: "4px solid",
+        borderColor: "primary.main",
       }}
     >
       <Box sx={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: 2, alignItems: "baseline" }}>
@@ -80,9 +81,9 @@ function MetricCard({ block, isLast }) {
 
 export default function NumbersMetricsGrid({ blocks }) {
   return (
-    <Box>
-      {blocks.map((block, index) => (
-        <MetricCard key={block.label} block={block} isLast={index === blocks.length - 1} />
+    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" }, gap: 3 }}>
+      {blocks.map((block) => (
+        <MetricCard key={block.label} block={block} />
       ))}
     </Box>
   )

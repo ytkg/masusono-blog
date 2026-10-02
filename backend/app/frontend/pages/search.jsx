@@ -29,7 +29,7 @@ export default function Search({ articles = [] }) {
         description="「増田とその他！」の記事を検索できます。"
         canonicalPath={isSearching ? `/search?q=${encodeURIComponent(query)}` : "/search"}
       />
-      <PageContainer id="search" sx={{ pt: 0 }}>
+      <PageContainer id="search" sx={{ pt: { xs: 0, sm: 0 } }}>
         <ArticleSearchBox onChange={setQuery} onClear={() => setQuery("")} query={query} />
         <Box sx={{ pt: 1 }}>
           {isSearching ? (

@@ -1,6 +1,8 @@
 import { Link, usePage } from "@inertiajs/react"
 import BottomNavigation from "@mui/material/BottomNavigation"
 import BottomNavigationAction from "@mui/material/BottomNavigationAction"
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
 import Paper from "@mui/material/Paper"
 import {
   NAVIGATION_CONTENT_HEIGHT,
@@ -45,23 +47,37 @@ export default function FloatingBottomNavigation() {
       aria-label="メインナビゲーション"
       sx={{
         position: "fixed",
-        left: "50%",
-        bottom: navigationBottomSx,
-        transform: "translateX(-50%)",
-        width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
+        left: { xs: "50%", lg: 0 },
+        top: { lg: 0 },
+        height: { lg: "100dvh" },
+        bottom: { ...navigationBottomSx, lg: 0 },
+        transform: { xs: "translateX(-50%)", lg: "none" },
+        width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)", lg: 220 },
         maxWidth: Math.min(PAGE_INNER_MAX_WIDTH, 640),
         zIndex: (t) => t.zIndex.appBar,
-        overflow: "hidden",
+        overflow: { xs: "hidden", lg: "auto" },
         bgcolor: "#252820",
         color: "#fffdf7",
         border: `${NAVIGATION_BORDER_WIDTH}px solid`,
         borderColor: "#252820",
-        borderRadius: 2,
+        borderRadius: { xs: 2, lg: 0 },
         boxShadow: "6px 6px 0 #e54520",
-        px: { xs: 1, sm: 1.25 },
+        px: { xs: 1, sm: 1.25, lg: 3 },
+        display: { lg: "flex" },
+        flexDirection: { lg: "column" },
         py: `${NAVIGATION_VERTICAL_PADDING}px`,
       }}
     >
+      <Box sx={{ display: { xs: "none", lg: "block" }, pt: 3, pb: 4 }}>
+        <Typography sx={{ color: "#ff8867", fontSize: 11, letterSpacing: "0.16em", mb: 2 }}>
+          INDEPENDENT JOURNAL
+        </Typography>
+        <Typography sx={{ fontSize: 38, fontWeight: 900, lineHeight: 1.12, letterSpacing: "-0.07em" }}>
+          増田と
+          <br />
+          その他<span style={{ color: "#ff8867" }}>！</span>
+        </Typography>
+      </Box>
       <BottomNavigation
         showLabels
         value={active}
@@ -70,12 +86,16 @@ export default function FloatingBottomNavigation() {
           "--navigation-active-index": activeIndex,
           width: "100%",
           maxWidth: "100%",
-          height: NAVIGATION_CONTENT_HEIGHT,
+          height: { xs: NAVIGATION_CONTENT_HEIGHT, lg: "auto" },
+          flexShrink: 0,
+          flexDirection: { lg: "column" },
+          gap: { lg: 1 },
           position: "relative",
           bgcolor: "transparent",
           overflowX: "auto",
           scrollbarWidth: "none",
           "&::after": {
+            display: { lg: "none" },
             content: hasActiveItem ? '""' : "none",
             position: "absolute",
             left: "calc((100% / var(--navigation-item-count)) * var(--navigation-active-index))",
@@ -95,6 +115,11 @@ export default function FloatingBottomNavigation() {
           },
           ".MuiBottomNavigationAction-root": {
             minWidth: 0,
+            flexDirection: { lg: "row" },
+            justifyContent: { lg: "flex-start" },
+            gap: { lg: 2 },
+            minHeight: { lg: 56 },
+            borderBottom: { lg: "1px solid #4a4d42" },
             flex: "1 1 0",
             position: "relative",
             px: { xs: 1, sm: 1.25 },
@@ -110,9 +135,9 @@ export default function FloatingBottomNavigation() {
           },
           ".MuiBottomNavigationAction-label": {
             whiteSpace: "nowrap",
-            fontSize: NAVIGATION_LABEL_FONT_SIZE,
+            fontSize: { xs: NAVIGATION_LABEL_FONT_SIZE, lg: "0.9rem" },
             "&.Mui-selected": {
-              fontSize: NAVIGATION_LABEL_FONT_SIZE,
+              fontSize: { xs: NAVIGATION_LABEL_FONT_SIZE, lg: "0.9rem" },
               fontWeight: 700,
             },
           },
@@ -131,6 +156,16 @@ export default function FloatingBottomNavigation() {
           />
         ))}
       </BottomNavigation>
+      <Box sx={{ display: { xs: "none", lg: "block" }, mt: "auto", pb: 2, pt: 3 }}>
+        <Typography sx={{ fontSize: 40, color: "#ff8867", mb: 1 }}>✳</Typography>
+        <Typography sx={{ fontSize: 12, lineHeight: 2, color: "#b8bcad" }}>
+          気楽にのぞいて、
+          <br />
+          ちょっと笑って。
+          <br />
+          日々を綴る、小さな場所。
+        </Typography>
+      </Box>
     </Paper>
   )
 }

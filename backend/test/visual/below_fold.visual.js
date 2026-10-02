@@ -19,7 +19,12 @@ async function expectAboveNavigation(page, content) {
   await expect(content).toBeVisible()
   const contentBox = await content.boundingBox()
   const navBox = await page.getByRole("navigation", { name: "メインナビゲーション" }).boundingBox()
-  expect(contentBox.y + contentBox.height).toBeLessThanOrEqual(navBox.y)
+  if (page.viewportSize().width >= 1200) {
+    expect(contentBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width)
+    expect(contentBox.y + contentBox.height).toBeLessThanOrEqual(page.viewportSize().height)
+  } else {
+    expect(contentBox.y + contentBox.height).toBeLessThanOrEqual(navBox.y)
+  }
 }
 
 test("article bottom with navigation", async ({ page }) => {

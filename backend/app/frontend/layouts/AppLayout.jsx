@@ -14,6 +14,9 @@ export default function AppLayout({ children }) {
         disableGutters
         sx={{
           flexGrow: 1,
+          width: { xs: "100%", lg: "calc(100% - 220px)" },
+          ml: { lg: "220px" },
+          mr: { lg: "auto" },
           maxWidth: PAGE_MAX_WIDTH,
           py: 0,
           px: 0,

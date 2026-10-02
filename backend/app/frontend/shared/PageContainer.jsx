@@ -3,7 +3,7 @@ import { PAGE_HORIZONTAL_PADDING } from "./pageLayout"
 
 export default function PageContainer({ children, component = "section", id, sx }) {
   return (
-    <Box component={component} id={id} sx={[{ px: PAGE_HORIZONTAL_PADDING, py: 2 }, sx]}>
+    <Box component={component} id={id} sx={[{ px: PAGE_HORIZONTAL_PADDING, py: { xs: 3, sm: 4 } }, sx]}>
       {children}
     </Box>
   )

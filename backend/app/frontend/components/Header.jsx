@@ -53,6 +53,8 @@ export default function Header() {
       enableColorOnDark
       sx={{
         minHeight: HEADER_HEIGHT,
+        width: { xs: "100%", lg: "calc(100% - 220px)" },
+        ml: { lg: "220px" },
         py: 0,
         bgcolor: "background.default",
         color: "text.primary",
@@ -73,7 +75,7 @@ export default function Header() {
           px: PAGE_HORIZONTAL_PADDING,
           width: "100%",
           maxWidth: PAGE_MAX_WIDTH,
-          mx: "auto",
+          mx: { xs: "auto", lg: 0 },
         }}
       >
         <Box

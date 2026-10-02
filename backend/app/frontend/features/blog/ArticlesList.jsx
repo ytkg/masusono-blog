@@ -8,7 +8,14 @@ export default function ArticlesList({ articles, emptyMessage = "記事があり
   }
 
   return (
-    <Box sx={{ display: "grid", gap: 3 }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+        alignItems: "start",
+        gap: 3,
+      }}
+    >
       {articles.map((article) => (
         <ArticleCard key={article.id} article={article} />
       ))}

@@ -517,8 +517,10 @@ for (const state of ["success", "error"]) {
     await expect.poll(async () => {
       const navigation = await page.getByRole("navigation", { name: "メインナビゲーション" }).boundingBox()
       const notice = await page.getByRole("alert").boundingBox()
-      return Math.round(navigation.y - (notice.y + notice.height))
-    }).toBe(8)
+      return page.viewportSize().width >= 1200
+        ? Math.round(page.viewportSize().height - (notice.y + notice.height))
+        : Math.round(navigation.y - (notice.y + notice.height))
+    }).toBe(page.viewportSize().width >= 1200 ? 24 : 8)
     await screenshot(page, `copy-${state}`)
     await page.clock.fastForward(3200)
     if (state === "error") {
@@ -626,15 +628,16 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
         scrollWidth: document.documentElement.scrollWidth,
       }
     })
-    const outerWidth = Math.min(width, 1200)
+    const sidebarWidth = width >= 1200 ? 220 : 0
+    const outerWidth = Math.min(width - sidebarWidth, 1200)
     const padding = width < 600 ? 16 : 24
-    const left = (width - outerWidth) / 2 + padding
+    const left = sidebarWidth ? sidebarWidth + padding : (width - outerWidth) / 2 + padding
     expect(bounds.main.width).toBe(outerWidth)
     expect(bounds.toolbar).toEqual(bounds.main)
     expect(bounds.contentLeft).toBe(left)
     expect(bounds.backButton.x).toBeCloseTo(left, 0)
-    expect(bounds.nav.x).toBe((width - Math.min(outerWidth - padding * 2, 640)) / 2)
-    expect(bounds.nav.width).toBe(Math.min(outerWidth - padding * 2, 640))
+    expect(bounds.nav.x).toBe(sidebarWidth ? 0 : (width - Math.min(outerWidth - padding * 2, 640)) / 2)
+    expect(bounds.nav.width).toBe(sidebarWidth || Math.min(outerWidth - padding * 2, 640))
     expect(bounds.scrollWidth).toBe(width)
     const links = page.getByRole("navigation", { name: "メインナビゲーション" }).getByRole("link")
     await expect(links).toHaveCount(5)

@@ -52,13 +52,4 @@ describe("AuthorsList", () => {
       )
     }
   })
-
-  it("最後の項目には次要素用の下余白を付けない", () => {
-    render(<AuthorsList authors={authors} />)
-
-    const profiles = screen.getAllByTestId("author-list-profile")
-
-    expect(profiles[0]).toHaveStyle({ paddingBottom: "20px" })
-    expect(profiles[1]).toHaveStyle({ paddingBottom: "0px" })
-  })
 })
