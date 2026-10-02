@@ -10,7 +10,7 @@ module DateDisplayFormatter
     return value if value.nil? || value == ""
 
     trimmed = value.to_s.strip
-    return "" if trimmed == ""
+    return "" if trimmed.empty?
 
     date_only_match = trimmed.match(DATE_ONLY_PATTERN)
     if date_only_match
