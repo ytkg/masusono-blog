@@ -350,6 +350,34 @@ test("admin media detail", async ({ page }) => {
   await expect(page.getByRole("dialog", { name: "管理", exact: true })).toBeVisible()
 })
 
+test("collapsed excerpts do not request body images", async ({ page }) => {
+  let imageRequests = 0
+  page.on("request", (request) => {
+    if (request.url().endsWith("/excerpt-image.webp")) imageRequests += 1
+  })
+  await page.route("**/excerpt-image.webp", (route) => route.fulfill({ path: "app/frontend/assets/logo.webp" }))
+  await page.route("**/", async (route) => {
+    const response = await route.fetch()
+    const body = (await response.text()).replaceAll(
+      "駅を出て、いつもと違う道を歩きました。",
+      JSON.stringify('駅を出て、いつもと違う道を歩きました。<img src="/excerpt-image.webp" alt="本文画像">').slice(
+        1,
+        -1,
+      ),
+    )
+    await route.fulfill({ response, body })
+  })
+
+  await openPage(page, "/")
+  await page.waitForLoadState("networkidle")
+  expect(imageRequests).toBe(0)
+  await expect(page.getByRole("img", { name: "本文画像" })).toHaveCount(0)
+
+  await page.getByRole("button", { name: "続きを読む", exact: true }).first().click()
+  await expect(page.getByRole("img", { name: "本文画像" })).toBeVisible()
+  await expect.poll(() => imageRequests).toBe(1)
+})
+
 test("article body spacing and expansion", async ({ page }) => {
   await page.route("**/", async (route) => {
     const response = await route.fetch()

@@ -13,6 +13,11 @@ describe("sentenceFeedData", () => {
     expect(firstSentenceFromHtml("<p>改行まで</p><p>次の段落</p>")).toBe("改行まで")
   })
 
+  it("文字参照・br・引用符を含む書き出しを抽出する", () => {
+    expect(firstSentenceFromHtml("<p>&copy; 最初の行<br>次の行</p>")).toBe("© 最初の行")
+    expect(firstSentenceFromHtml("<p>「こんにちは。」と言った。次の文。</p>")).toBe("「こんにちは。」と言った。")
+  })
+
   it("書き出しの初期状態と追加状態を記事IDで保持する", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.5)
     const articles = [

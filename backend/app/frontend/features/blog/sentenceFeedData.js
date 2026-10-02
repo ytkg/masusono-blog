@@ -1,3 +1,5 @@
+import { extractHtmlText } from "./articleHtmlText"
+
 export const INITIAL_SENTENCE_COUNT = 80
 export const APPEND_SENTENCE_COUNT = 24
 export const SENTENCE_REVEAL_DURATION_MS = 800
@@ -8,12 +10,7 @@ export const SENTENCE_STATE_VERSION = 1
 const SENTENCE_END_PATTERN = /[。！？!?]+[」』）)］\]｝}”’】〕〉》〙〗〟'"]*|\n/g
 
 export function firstSentenceFromHtml(html = "") {
-  const template = document.createElement("template")
-  template.innerHTML = html
-  template.content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"))
-  template.content.querySelectorAll("p, h1, h2, h3, h4, h5, h6, li").forEach((element) => element.append("\n"))
-
-  const text = template.content.textContent
+  const text = extractHtmlText(html)
     .replace(/[ \t\f\v]+/g, " ")
     .replace(/\n{2,}/g, "\n")
     .trim()

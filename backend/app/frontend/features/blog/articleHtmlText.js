@@ -1,36 +1,16 @@
-const HTML_TAG_PATTERN = /<[^>]*>/g
-const HTML_ENTITY_PATTERN = /&(#x[\da-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi
-const HTML_ENTITIES = Object.freeze({
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-  nbsp: " ",
-})
+// Keep line boundaries here; each consumer decides how to normalize whitespace.
+export function extractHtmlText(html = "") {
+  const source = String(html ?? "")
+  if (!/[<&]/.test(source)) return source
 
-function decodeHtmlEntity(entity) {
-  const normalizedEntity = entity.toLowerCase()
-
-  if (normalizedEntity.startsWith("#x")) {
-    return String.fromCodePoint(Number.parseInt(normalizedEntity.slice(2), 16))
-  }
-
-  if (normalizedEntity.startsWith("#")) {
-    return String.fromCodePoint(Number.parseInt(normalizedEntity.slice(1), 10))
-  }
-
-  return HTML_ENTITIES[normalizedEntity] ?? `&${entity};`
+  // A detached template keeps body images inert until the article is expanded.
+  const template = document.createElement("template")
+  template.innerHTML = source
+  template.content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"))
+  template.content.querySelectorAll("p, div, h1, h2, h3, h4, h5, h6, li").forEach((element) => element.append("\n"))
+  return template.content.textContent ?? ""
 }
 
 export function extractTextFromHtml(html) {
-  if (!html.trim()) {
-    return ""
-  }
-
-  return html
-    .replace(HTML_TAG_PATTERN, " ")
-    .replace(HTML_ENTITY_PATTERN, (_, entity) => decodeHtmlEntity(entity))
-    .replace(/\s+/g, " ")
-    .trim()
+  return extractHtmlText(html).replace(/\s+/g, " ").trim()
 }
