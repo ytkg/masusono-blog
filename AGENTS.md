@@ -28,6 +28,9 @@
 Pull Request には実行した検証を記載する。対応する GitHub Issue がある場合は、
 `Closes #<番号>` で紐づける。
 
+push は worktree 内の `scripts/push.sh` を使う。画面に関わる変更がある場合は全画面の
+Visual Regression が成功するまで push しない。絞り込んだテストの成功を最終検証の代わりにしない。
+
 ## 実装と検証
 
 - バックエンド固有の実装・テスト規約は [backend/AGENTS.md](backend/AGENTS.md) に従う。
