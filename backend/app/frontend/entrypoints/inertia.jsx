@@ -5,9 +5,7 @@ import { ThemeProvider } from "@mui/material/styles"
 import theme from "../theme"
 import NavigationFailureDialog from "../components/NavigationFailureDialog"
 import { installNavigationRecovery } from "../shared/lib/navigationRecovery"
-import { installAppleStartupImage } from "../shared/lib/appleStartupImage"
 
-installAppleStartupImage()
 void import("../styles/fonts.css")
 
 function registerServiceWorker() {
