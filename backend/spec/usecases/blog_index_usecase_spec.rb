@@ -4,8 +4,8 @@ RSpec.describe BlogIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
-    let(:articles) do
-      [
+    before do
+      articles = [
         {
           id: "first",
           publishedAt: "2025-10-05T18:30:00.000Z",
@@ -28,9 +28,6 @@ RSpec.describe BlogIndexUsecase do
           author: nil
         }
       ]
-    end
-
-    before do
       allow(Article).to receive(:all).and_return(articles)
     end
 
