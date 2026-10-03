@@ -6,16 +6,18 @@ RSpec.describe AuthorShowUsecase do
 
     let(:author_id) { "9wgrey2lh3" }
 
+    let(:author) do
+      {
+        id: author_id,
+        name: "増田",
+        title: "友達と行事に全力で参加する人",
+        bio: "プロフィール本文",
+        icon: { url: "https://images.microcms-assets.io/assets/masuda.webp" }
+      }
+    end
+
     before do
-      allow(Author).to receive(:find).with(author_id).and_return(
-        {
-          id: author_id,
-          name: "増田",
-          title: "友達と行事に全力で参加する人",
-          bio: "プロフィール本文",
-          icon: { url: "https://images.microcms-assets.io/assets/masuda.webp" }
-        }
-      )
+      allow(Author).to receive(:find).with(author_id).and_return(author)
       allow(Article).to receive(:for_author).with(author_id).and_return(
         [
           {
@@ -40,10 +42,7 @@ RSpec.describe AuthorShowUsecase do
 
     context "著者が見つからない場合" do
       let(:author_id) { "missing" }
-
-      before do
-        allow(Author).to receive(:find).with(author_id).and_return(nil)
-      end
+      let(:author) { nil }
 
       it do
         expect(result).to eq(
