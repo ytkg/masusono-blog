@@ -14,16 +14,15 @@ export function chartBounds() {
 }
 
 export function normalizePoints(points, seriesKey, maxChartValue) {
-  const visiblePoints = visibleSeriesPoints(points)
-  if (visiblePoints.length === 0 || maxChartValue <= 0) return []
+  if (points.length === 0 || maxChartValue <= 0) return []
 
   const bounds = chartBounds()
   const usableWidth = bounds.right - bounds.left
   const usableHeight = bounds.bottom - bounds.top
   const denominator = Math.max(points.length - 1, 1)
 
-  return visiblePoints
-    .map(({ point, index }) => {
+  return points
+    .map((point, index) => {
       const value = scaledSeriesValue(point, seriesKey)
       if (!Number.isFinite(value)) return null
 
@@ -39,9 +38,7 @@ export function normalizePoints(points, seriesKey, maxChartValue) {
 export function maxChartValue(points, series) {
   return Math.max(
     ...series.flatMap(({ key }) =>
-      visibleSeriesPoints(points)
-        .map(({ point }) => scaledSeriesValue(point, key))
-        .filter((value) => Number.isFinite(value)),
+      points.map((point) => scaledSeriesValue(point, key)).filter((value) => Number.isFinite(value)),
     ),
     0,
   )
@@ -54,10 +51,6 @@ function scaledSeriesValue(point, seriesKey) {
   if (seriesKey === TOTAL_CHARS_SERIES_KEY) return value / TOTAL_CHARS_SCALE
 
   return value
-}
-
-function visibleSeriesPoints(points) {
-  return points.map((point, index) => ({ point, index }))
 }
 
 export function smoothPath(points) {
