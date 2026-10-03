@@ -40,6 +40,10 @@ export function drawCloud(ctx, x, y, w, h, shape = {}) {
   ctx.fillStyle = bodyGradient
   ctx.fill()
 
+  drawCloudHighlight(ctx, x, y, w, h)
+}
+
+function drawCloudHighlight(ctx, x, y, w, h) {
   const highlightGradient = ctx.createRadialGradient(
     x + 0.44 * w,
     y + 0.31 * h,
