@@ -66,6 +66,7 @@ export default function AppsDialogLauncher({
   children,
   onOpen,
   onClose,
+  beforeClose,
   buttonSx,
   buttonIcon,
   paperSx,
@@ -117,6 +118,7 @@ export default function AppsDialogLauncher({
   }
 
   const handleClose = () => {
+    if (beforeClose && !beforeClose()) return
     updateTransitionOrigin()
     setIsTransitionComplete(false)
     setIsTransitioning(true)

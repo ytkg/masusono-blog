@@ -30,7 +30,7 @@ describe("AdminArticles", () => {
       )
     vi.stubGlobal("fetch", fetch)
 
-    render(<AdminArticles onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    render(<AdminArticles onBack={vi.fn()} onUnauthorized={vi.fn()} onDirtyChange={vi.fn()} canLeave={() => true} />)
     await screen.findByText("記事が見つかりませんでした。")
     fireEvent.change(screen.getByRole("textbox", { name: "タイトルで検索" }), { target: { value: "下書き" } })
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "公開状態" }))
@@ -51,5 +51,13 @@ describe("AdminArticles", () => {
       "/api/app/management/articles?page=2&status=published_and_draft&q=%E4%B8%8B%E6%9B%B8%E3%81%8D",
       { cache: "no-store", signal: expect.any(AbortSignal) },
     )
+    fetch.mockResolvedValueOnce(
+      jsonResponse({ article: { id: "draft", status: "PUBLISH_AND_DRAFT", editable: false }, authors: [] }),
+    )
+    fireEvent.click(screen.getByRole("button", { name: "下書きタイトル", exact: true }))
+    await screen.findByText("この記事は編集対象外です。microCMS で確認してください。")
+    fireEvent.click(screen.getByRole("button", { name: "記事一覧へ戻る" }))
+    expect(screen.getByRole("textbox", { name: "タイトルで検索" })).toHaveValue("下書き")
+    expect(screen.getByRole("combobox", { name: "公開状態" })).toHaveTextContent("公開中・下書きあり")
   })
 })

@@ -12,3 +12,6 @@ Rails.application.config.filter_parameters += [ :failure ]
 
 # Push endpoints identify a browser subscription and may contain delivery tokens.
 Rails.application.config.filter_parameters += [ :endpoint ]
+
+# Unpublished article bodies stay out of request logs.
+Rails.application.config.filter_parameters += [ :article ]
