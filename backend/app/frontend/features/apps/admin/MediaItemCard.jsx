@@ -4,12 +4,14 @@ import MediaPreview from "./MediaPreview"
 import { fileName } from "./mediaData"
 
 export default function MediaItemCard({ item, onSelect }) {
+  const name = fileName(item.url)
+
   return (
     <Box
       component="button"
       type="button"
       onClick={() => onSelect(item)}
-      aria-label={`${fileName(item.url)}の詳細を表示`}
+      aria-label={`${name}の詳細を表示`}
       sx={{
         minWidth: 0,
         width: "100%",
@@ -37,7 +39,7 @@ export default function MediaItemCard({ item, onSelect }) {
           whiteSpace: "nowrap",
         }}
       >
-        {fileName(item.url)}
+        {name}
       </Typography>
     </Box>
   )
