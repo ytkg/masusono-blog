@@ -68,7 +68,7 @@ module Numbers
 
     def normalize_author_name(raw_author)
       normalized = extract_normalized_author_name(raw_author)
-      normalized == "" ? UNKNOWN_AUTHOR_NAME : normalized
+      normalized.empty? ? UNKNOWN_AUTHOR_NAME : normalized
     end
   end
 end
