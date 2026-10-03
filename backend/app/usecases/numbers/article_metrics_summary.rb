@@ -46,7 +46,11 @@ module Numbers
     end
 
     def natural_sort_key(name)
-      name.scan(/\d+|\D+/).map { |part| part.match?(/\A\d+\z/) ? [ 1, part.to_i ] : [ 0, part ] }
+      name.scan(/\d+|\D+/).map { |part| natural_sort_part(part) }
+    end
+
+    def natural_sort_part(part)
+      part.match?(/\A\d+\z/) ? [ 1, part.to_i ] : [ 0, part ]
     end
 
     def initial_article_totals
