@@ -31,14 +31,13 @@ export default function ArticleActions({ article }) {
   }
 
   const handleCopy = async (kind = "url") => {
-    const label = kind === "full" ? "記事全文" : "記事URL"
     handleClose()
 
     try {
       await navigator.clipboard.writeText(kind === "full" ? buildArticleCopyText(article) : buildArticleUrl(article.id))
-      setFeedback({ severity: "success", kind, message: `${label}をコピーしました` })
+      setFeedback(copyFeedback(kind, "success"))
     } catch {
-      setFeedback({ severity: "error", kind, message: `${label}をコピーできませんでした` })
+      setFeedback(copyFeedback(kind, "error"))
     }
   }
 
@@ -94,4 +93,10 @@ export default function ArticleActions({ article }) {
       </Snackbar>
     </>
   )
+}
+
+function copyFeedback(kind, severity) {
+  const label = kind === "full" ? "記事全文" : "記事URL"
+  const message = severity === "success" ? `${label}をコピーしました` : `${label}をコピーできませんでした`
+  return { severity, kind, message }
 }
