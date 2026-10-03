@@ -31,8 +31,9 @@ module Numbers
 
       articles.each do |article|
         char_count = ArticleMetric.character_count(article)
-        add_article_totals(totals, char_count)
-        add_author_totals(totals, normalize_author_name(article[:author]), char_count)
+        add_counts(totals, char_count)
+        author_name = normalize_author_name(article[:author])
+        add_counts(totals[:authors][author_name], char_count)
       end
 
       totals
@@ -56,14 +57,9 @@ module Numbers
       }
     end
 
-    def add_article_totals(totals, char_count)
-      totals[:articles] += 1
-      totals[:chars] += char_count
-    end
-
-    def add_author_totals(totals, author_name, char_count)
-      totals[:authors][author_name][:articles] += 1
-      totals[:authors][author_name][:chars] += char_count
+    def add_counts(counts, char_count)
+      counts[:articles] += 1
+      counts[:chars] += char_count
     end
 
     def normalize_author_name(raw_author)
