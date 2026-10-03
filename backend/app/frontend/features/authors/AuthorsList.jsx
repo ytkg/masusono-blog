@@ -22,9 +22,7 @@ function AuthorListProfile({ member, isLast }) {
         sx={{
           ...supportingLinkSx,
           alignSelf: "flex-end",
-          width: "fit-content",
           color: "text.secondary",
-          textAlign: "right",
           textDecoration: "none",
           "&:hover": { textDecoration: "underline" },
         }}
