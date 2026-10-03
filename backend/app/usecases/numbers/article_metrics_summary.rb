@@ -30,7 +30,7 @@ module Numbers
       totals = initial_article_totals
 
       articles.each do |article|
-        char_count = article_char_count(article)
+        char_count = ArticleMetric.character_count(article)
         add_article_totals(totals, char_count)
         add_author_totals(totals, normalize_author_name(article[:author]), char_count)
       end
@@ -69,10 +69,6 @@ module Numbers
     def normalize_author_name(raw_author)
       normalized = extract_normalized_author_name(raw_author)
       normalized == "" ? UNKNOWN_AUTHOR_NAME : normalized
-    end
-
-    def article_char_count(article)
-      ArticleMetric.character_count(article)
     end
   end
 end
