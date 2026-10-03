@@ -4,15 +4,9 @@ import ArticleSearchSuggestions from "./ArticleSearchSuggestions"
 import ArticleTags from "./ArticleTags"
 
 vi.mock("@inertiajs/react", async () => {
-  const React = await import("react")
+  const { MockInertiaLink } = await import("@/test/inertiaLinkMocks")
   return {
-    Link: React.forwardRef(function MockLink({ href, children, ...props }, ref) {
-      return (
-        <a ref={ref} href={href} {...props}>
-          {children}
-        </a>
-      )
-    }),
+    Link: MockInertiaLink,
   }
 })
 

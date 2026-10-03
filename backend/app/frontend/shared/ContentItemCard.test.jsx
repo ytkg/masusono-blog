@@ -3,15 +3,9 @@ import { describe, expect, it, vi } from "vitest"
 import ContentItemCard from "./ContentItemCard"
 
 vi.mock("@inertiajs/react", async () => {
-  const React = await import("react")
+  const { MockInertiaLinkWithoutPrefetch } = await import("@/test/inertiaLinkMocks")
   return {
-    Link: React.forwardRef(function MockLink({ href, prefetch: _prefetch, children, ...props }, ref) {
-      return (
-        <a ref={ref} href={href} {...props}>
-          {children}
-        </a>
-      )
-    }),
+    Link: MockInertiaLinkWithoutPrefetch,
   }
 })
 
