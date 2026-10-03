@@ -33,19 +33,21 @@ class FeedsShowUsecase
   end
 
   def article_items(articles)
-    articles.filter_map do |article|
-      id = article[:id]
-      next if id.nil? || id == ""
+    articles.filter_map { |article| article_item(article) }
+  end
 
-      url = "#{SITE_URL}/articles/#{id}"
-      {
-        title: article[:title],
-        link: url,
-        guid: url,
-        published_at: article[:publishedAt],
-        description: article[:content],
-        author: extract_normalized_author_name(article[:author])
-      }
-    end
+  def article_item(article)
+    id = article[:id]
+    return if id.nil? || id == ""
+
+    url = "#{SITE_URL}/articles/#{id}"
+    {
+      title: article[:title],
+      link: url,
+      guid: url,
+      published_at: article[:publishedAt],
+      description: article[:content],
+      author: extract_normalized_author_name(article[:author])
+    }
   end
 end
