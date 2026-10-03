@@ -46,7 +46,7 @@ jobs:
         run: docker compose -f backend/compose.yml -f backend/compose.visual.yml run --rm visual
       - name: Upload screenshot differences
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: visual-test-results
           path: |
