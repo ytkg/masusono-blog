@@ -1,7 +1,3 @@
-function buildFallbackErrorMessage(status) {
-  return `Request failed with status ${status}`
-}
-
 export class ApiError extends Error {
   constructor({ status, code = null, message, requestId = null }) {
     super(message)
@@ -14,7 +10,7 @@ export class ApiError extends Error {
 
 async function buildApiError(response) {
   let code = null
-  let message = buildFallbackErrorMessage(response.status)
+  let message = `Request failed with status ${response.status}`
   let requestId = null
 
   try {
