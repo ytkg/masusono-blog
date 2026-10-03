@@ -18,13 +18,7 @@ class SitemapXmlBuilder
     ]
 
     entries.each do |entry|
-      lines << "  <url>"
-      lines << "    <loc>#{escape_xml(entry[:loc])}</loc>"
-      lastmod = normalize_date(entry[:lastmod])
-      lines << "    <lastmod>#{escape_xml(lastmod)}</lastmod>" if lastmod
-      lines << "    <changefreq>#{escape_xml(entry[:changefreq])}</changefreq>" if entry[:changefreq]
-      lines << "    <priority>#{format('%.1f', entry[:priority])}</priority>" if entry[:priority] != nil
-      lines << "  </url>"
+      lines.concat(entry_lines(entry))
     end
 
     lines << "</urlset>"
@@ -34,6 +28,17 @@ class SitemapXmlBuilder
   private
 
   attr_reader :entries
+
+  def entry_lines(entry)
+    lines = [ "  <url>" ]
+    lines << "    <loc>#{escape_xml(entry[:loc])}</loc>"
+    lastmod = normalize_date(entry[:lastmod])
+    lines << "    <lastmod>#{escape_xml(lastmod)}</lastmod>" if lastmod
+    lines << "    <changefreq>#{escape_xml(entry[:changefreq])}</changefreq>" if entry[:changefreq]
+    lines << "    <priority>#{format('%.1f', entry[:priority])}</priority>" if entry[:priority] != nil
+    lines << "  </url>"
+    lines
+  end
 
   def normalize_date(value)
     return nil if value.nil? || value == ""
