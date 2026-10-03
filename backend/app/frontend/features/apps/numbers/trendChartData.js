@@ -85,9 +85,8 @@ export function chartDateLabels(points) {
   if (points.length === 0) return []
   const lastIndex = points.length - 1
   const denominator = Math.max(lastIndex, 1)
-  const indexes = [0, Math.round(lastIndex / 3), Math.round((lastIndex * 2) / 3), lastIndex]
 
-  return [...new Set(indexes)].map((index) => {
+  return dateLabelIndexes(lastIndex).map((index) => {
     const point = points[index]
     return {
       key: point.date,
@@ -112,4 +111,9 @@ export function trendSeriesStyles(theme) {
   return {
     seriesColors: [theme.palette.dataVisualization.totalArticles, theme.palette.dataVisualization.totalChars],
   }
+}
+
+function dateLabelIndexes(lastIndex) {
+  const indexes = [0, Math.round(lastIndex / 3), Math.round((lastIndex * 2) / 3), lastIndex]
+  return [...new Set(indexes)]
 }
