@@ -1,10 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import AdminApp from "./AdminApp"
-
-function jsonResponse(body, status = 200) {
-  return { ok: status >= 200 && status < 300, status, json: async () => body }
-}
+import { jsonResponse } from "@/test/jsonResponse"
 
 afterEach(() => vi.unstubAllGlobals())
 
