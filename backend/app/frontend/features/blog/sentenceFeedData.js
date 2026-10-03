@@ -20,13 +20,15 @@ export function firstSentenceFromHtml(html = "") {
 }
 
 function firstSentenceBoundary(text) {
-  return [...text.matchAll(SENTENCE_END_PATTERN)].find((candidate) => {
+  for (const candidate of text.matchAll(SENTENCE_END_PATTERN)) {
     const end = candidate[0]
     const nextCharacter = text[candidate.index + end.length] || ""
     const hasClosingMark = /[」』）)］\]｝}”’】〕〉》〙〗〟'"]$/.test(end)
 
-    return end === "\n" || !hasClosingMark || !/^[ぁ-んァ-ヶー一-龠々〆ヵヶA-Za-z0-9]/.test(nextCharacter)
-  })
+    if (end === "\n" || !hasClosingMark || !/^[ぁ-んァ-ヶー一-龠々〆ヵヶA-Za-z0-9]/.test(nextCharacter)) {
+      return candidate
+    }
+  }
 }
 
 export function shuffleArticles(articles) {
