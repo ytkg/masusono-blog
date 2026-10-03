@@ -18,12 +18,17 @@ module DateDisplayFormatter
       return format_ymd(year.to_i, month.to_i, day.to_i)
     end
 
-    time = parse_time(trimmed)
-    jst_time = time.getlocal(JST_OFFSET)
-    format_ymd(jst_time.year, jst_time.month, jst_time.day)
+    format_timestamp(trimmed)
   rescue ArgumentError, TypeError
     value
   end
+
+  def format_timestamp(value)
+    time = parse_time(value)
+    jst_time = time.getlocal(JST_OFFSET)
+    format_ymd(jst_time.year, jst_time.month, jst_time.day)
+  end
+  private_class_method :format_timestamp
 
   def parse_time(value)
     Time.iso8601(value)
