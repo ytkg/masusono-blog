@@ -13,26 +13,18 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
     let(:user_id) { "cookie-user" }
     let(:content_id) { Microcms::Users::Identity.content_id("cookie-user") }
     let(:content_url) { "#{endpoint}/#{content_id}" }
+    let(:response_status) { 200 }
+    let(:response_body) { { id: content_id, user_id: "cookie-user", name: "表示名太郎" }.to_json }
+    let(:response_headers) { json_response_headers }
 
     before do
       stub_microcms_api_key
+      stub_request(:get, content_url)
+        .with(headers: microcms_request_headers)
+        .to_return(status: response_status, body: response_body, headers: response_headers)
     end
 
     context "取得成功時" do
-      before do
-        stub_request(:get, content_url)
-          .with(headers: microcms_request_headers)
-          .to_return(
-            status: 200,
-            body: {
-              id: content_id,
-              user_id: "cookie-user",
-              name: "表示名太郎"
-            }.to_json,
-            headers: json_response_headers
-          )
-      end
-
       it do
         expect(result).to eq(
           {
@@ -46,12 +38,7 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
 
     context "user_idの前後に空白がある場合" do
       let(:user_id) { "  cookie-user  " }
-
-      before do
-        stub_request(:get, content_url)
-          .with(headers: microcms_request_headers)
-          .to_return(status: 200, body: { id: content_id, user_id: "cookie-user", name: "表示名太郎" }.to_json)
-      end
+      let(:response_headers) { {} }
 
       it do
         expect(result).to eq(id: content_id, user_id: "cookie-user", name: "表示名太郎")
@@ -59,15 +46,8 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
     end
 
     context "対象がない場合" do
-      before do
-        stub_request(:get, content_url)
-          .with(headers: microcms_request_headers)
-          .to_return(
-            status: 404,
-            body: { message: "Not found" }.to_json,
-            headers: json_response_headers
-          )
-      end
+      let(:response_status) { 404 }
+      let(:response_body) { { message: "Not found" }.to_json }
 
       it do
         expect(result).to eq({})
@@ -75,11 +55,8 @@ RSpec.describe Microcms::Users::FetchByUserIdService do
     end
 
     context "取得失敗時" do
-      before do
-        stub_request(:get, content_url)
-          .with(headers: microcms_request_headers)
-          .to_return(status: 503, body: "upstream unavailable", headers: json_response_headers)
-      end
+      let(:response_status) { 503 }
+      let(:response_body) { "upstream unavailable" }
 
       it do
         expect { result }.to raise_error(
