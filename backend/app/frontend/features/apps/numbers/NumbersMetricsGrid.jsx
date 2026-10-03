@@ -1,3 +1,4 @@
+import { flattenMetricRows } from "./metricRows"
 import { Fragment } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
@@ -14,14 +15,6 @@ const valueSx = Object.freeze({ fontWeight: 700, fontSize: "22px", textAlign: "r
 const childValueSx = { fontWeight: 700, fontSize: "17px", textAlign: "right", justifySelf: "end" }
 const labelTextSx = { fontSize: "14px", lineHeight: 1.5, letterSpacing: 0, fontWeight: 400 }
 const primaryLabelTextSx = { ...labelTextSx, fontWeight: 700 }
-
-const flattenMetricRows = (blocks, depth = 0, prefix = "") =>
-  blocks.flatMap((block, index) => {
-    const id = `${prefix}-${index}`
-    const node = { id, label: block.label, value: block.value, depth }
-    const children = block.children ? flattenMetricRows(block.children, depth + 1, id) : []
-    return [node, ...children]
-  })
 
 function MetricRowList({ rows }) {
   return (
