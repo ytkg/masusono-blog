@@ -21,11 +21,7 @@ RSpec.describe Microcms::MasudaRun::CreateRankingService do
       before do
         stub_request(:post, endpoint)
           .with(
-            headers: {
-              "Accept" => "application/json",
-              "Content-Type" => "application/json",
-              "X-MICROCMS-API-KEY" => "test-api-key"
-            },
+            headers: microcms_write_request_headers,
             body: { user_id: user_id, score: score }.to_json
           )
           .to_return(

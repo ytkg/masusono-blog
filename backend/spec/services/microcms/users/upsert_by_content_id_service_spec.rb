@@ -21,11 +21,7 @@ RSpec.describe Microcms::Users::UpsertByContentIdService do
     it "指定したコンテンツIDへPUTする" do
       stub_request(:put, endpoint)
         .with(
-          headers: {
-            "Accept" => "application/json",
-            "Content-Type" => "application/json",
-            "X-MICROCMS-API-KEY" => "test-api-key"
-          },
+          headers: microcms_write_request_headers,
           body: { user_id:, name: }.to_json
         )
         .to_return(status: 200, body: { id: content_id }.to_json, headers: json_response_headers)
@@ -38,11 +34,7 @@ RSpec.describe Microcms::Users::UpsertByContentIdService do
         .to_return(status: 400, body: "Content is already exists. If you want update, please use PATCH request.")
       stub_request(:patch, endpoint)
         .with(
-          headers: {
-            "Accept" => "application/json",
-            "Content-Type" => "application/json",
-            "X-MICROCMS-API-KEY" => "test-api-key"
-          },
+          headers: microcms_write_request_headers,
           body: { user_id:, name: }.to_json
         )
         .to_return(status: 200, body: { id: content_id }.to_json, headers: json_response_headers)
