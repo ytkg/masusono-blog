@@ -67,7 +67,7 @@ module Numbers
 
     def grouped_article_events
       articles.each_with_object({}) do |article, grouped|
-        date = parse_date(article[:publishedAt] || article[:publishedDate])
+        date = article_date(article)
         next if date.nil?
 
         grouped[date] ||= { total_articles: 0, total_chars: 0 }
@@ -85,7 +85,7 @@ module Numbers
     end
 
     def latest_event_date
-      articles.filter_map { |article| parse_date(article[:publishedAt] || article[:publishedDate]) }.max
+      articles.filter_map { |article| article_date(article) }.max
     end
 
     def final_values
@@ -95,6 +95,10 @@ module Numbers
           total_chars: values.fetch(:totalChars)
         }
       end || { total_articles: 0, total_chars: 0 }
+    end
+
+    def article_date(article)
+      parse_date(article[:publishedAt] || article[:publishedDate])
     end
 
     def parse_date(value)
