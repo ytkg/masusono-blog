@@ -14,15 +14,19 @@ export function firstSentenceFromHtml(html = "") {
     .replace(/[ \t\f\v]+/g, " ")
     .replace(/\n{2,}/g, "\n")
     .trim()
-  const match = [...text.matchAll(SENTENCE_END_PATTERN)].find((candidate) => {
+  const match = firstSentenceBoundary(text)
+
+  return match ? text.slice(0, match.index + match[0].length).trim() : text.slice(0, 80)
+}
+
+function firstSentenceBoundary(text) {
+  return [...text.matchAll(SENTENCE_END_PATTERN)].find((candidate) => {
     const end = candidate[0]
     const nextCharacter = text[candidate.index + end.length] || ""
     const hasClosingMark = /[」』）)］\]｝}”’】〕〉》〙〗〟'"]$/.test(end)
 
     return end === "\n" || !hasClosingMark || !/^[ぁ-んァ-ヶー一-龠々〆ヵヶA-Za-z0-9]/.test(nextCharacter)
   })
-
-  return match ? text.slice(0, match.index + match[0].length).trim() : text.slice(0, 80)
 }
 
 export function shuffleArticles(articles) {
