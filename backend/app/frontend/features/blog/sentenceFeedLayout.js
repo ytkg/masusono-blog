@@ -11,11 +11,7 @@ function columnGapFor(viewportWidth, isNarrow) {
 }
 
 export function sentenceFeedLayout({ containerWidth, itemHeights, viewportWidth }) {
-  const isNarrow = viewportWidth <= NARROW_VIEWPORT_MAX_WIDTH
-  const preferredColumnWidth = isNarrow ? NARROW_COLUMN_WIDTH : DEFAULT_COLUMN_WIDTH
-  const gap = columnGapFor(viewportWidth, isNarrow)
-  const columnCount = Math.max(1, Math.floor((containerWidth + gap) / (preferredColumnWidth + gap)))
-  const columnWidth = (containerWidth - gap * (columnCount - 1)) / columnCount
+  const { columnCount, columnWidth, gap } = columnGeometry(containerWidth, viewportWidth)
   const columnHeights = Array.from({ length: columnCount }, () => 0)
 
   const items = itemHeights.map((height) => {
@@ -27,4 +23,13 @@ export function sentenceFeedLayout({ containerWidth, itemHeights, viewportWidth 
   })
 
   return { height: Math.max(...columnHeights) - gap, items }
+}
+
+function columnGeometry(containerWidth, viewportWidth) {
+  const isNarrow = viewportWidth <= NARROW_VIEWPORT_MAX_WIDTH
+  const preferredColumnWidth = isNarrow ? NARROW_COLUMN_WIDTH : DEFAULT_COLUMN_WIDTH
+  const gap = columnGapFor(viewportWidth, isNarrow)
+  const columnCount = Math.max(1, Math.floor((containerWidth + gap) / (preferredColumnWidth + gap)))
+  const columnWidth = (containerWidth - gap * (columnCount - 1)) / columnCount
+  return { columnCount, columnWidth, gap }
 }
