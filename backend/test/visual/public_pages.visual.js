@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { mockPageProps } from "./helpers"
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -109,6 +110,21 @@ for (const [name, path, heading] of [
 
 test.describe("author profiles", () => {
   test.use({ serviceWorkers: "block" })
+
+  test("name-only reading link alignment", async ({ page }) => {
+    await mockPageProps(page, "/authors", (props) => {
+      props.authors = [{ id: "name-only", name: "その他5" }]
+    })
+    await openPage(page, "/authors")
+    const profile = page.getByTestId("author-list-profile")
+    const link = profile.getByRole("link", { name: "その他5の記事を読む" })
+    const profileBox = await profile.boundingBox()
+    const linkBox = await link.boundingBox()
+    const contentWidth = Math.min(profileBox.width, 640)
+    const contentRight = profileBox.x + (profileBox.width + contentWidth) / 2
+    expect(Math.abs(linkBox.x + linkBox.width - contentRight)).toBeLessThan(1)
+    await screenshot(page, "authors-name-only")
+  })
 
   test("long profiles and missing images", async ({ page }) => {
     const title = "日常の発見を記録する人".repeat(8)

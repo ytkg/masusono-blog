@@ -30,7 +30,7 @@ export default function AuthorProfile({
       ]}
     >
       {image ? <Box component="img" src={image} alt={imageAlt} loading={imageLoading} sx={imageSx} /> : null}
-      <Stack spacing={profileTextSpacing} sx={{ minWidth: 0, maxWidth: 640 }}>
+      <Stack spacing={profileTextSpacing} sx={{ width: "100%", minWidth: 0, maxWidth: 640 }}>
         <Typography variant="overline" color="text.secondary" sx={labelTextSx}>
           {author.title}
         </Typography>
