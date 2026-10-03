@@ -1,0 +1,31 @@
+name: deploy-policy-test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/scripts/deploy-policy*.cjs
+      - .github/workflows/deploy-policy-test.yml
+      - .github/workflows/label-no-deploy.yml
+      - .github/workflows/deploy-cloud-run.yml
+      - .github/workflows/deploy-pr-cloud-run.yml
+  pull_request:
+    paths:
+      - .github/scripts/deploy-policy*.cjs
+      - .github/workflows/deploy-policy-test.yml
+      - .github/workflows/label-no-deploy.yml
+      - .github/workflows/deploy-cloud-run.yml
+      - .github/workflows/deploy-pr-cloud-run.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: node --test .github/scripts/deploy-policy.test.cjs
