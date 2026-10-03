@@ -70,13 +70,15 @@ module Numbers
     end
 
     def grouped_article_events
-      articles.each_with_object({}) do |article, grouped|
-        date = article_date(article)
-        next if date.nil?
+      @grouped_article_events ||= begin
+        articles.each_with_object({}) do |article, grouped|
+          date = article_date(article)
+          next if date.nil?
 
-        grouped[date] ||= { total_articles: 0, total_chars: 0 }
-        grouped[date][:total_articles] += 1
-        grouped[date][:total_chars] += ArticleMetric.character_count(article)
+          grouped[date] ||= { total_articles: 0, total_chars: 0 }
+          grouped[date][:total_articles] += 1
+          grouped[date][:total_chars] += ArticleMetric.character_count(article)
+        end
       end
     end
 
@@ -89,7 +91,7 @@ module Numbers
     end
 
     def latest_event_date
-      articles.filter_map { |article| article_date(article) }.max
+      grouped_article_events.keys.max
     end
 
     def final_values
