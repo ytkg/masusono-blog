@@ -4,8 +4,8 @@ RSpec.describe SitemapsIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
-    let(:articles) do
-      [
+    before do
+      articles = [
         {
           id: "hello-world",
           publishedAt: "2025-10-05T12:34:56+09:00",
@@ -30,9 +30,7 @@ RSpec.describe SitemapsIndexUsecase do
           author: "増田太郎"
         }
       ]
-    end
-    let(:authors) do
-      [
+      authors = [
         {
           id: "9wgrey2lh3",
           name: "増田",
@@ -43,9 +41,7 @@ RSpec.describe SitemapsIndexUsecase do
           name: "IDなし"
         }
       ]
-    end
 
-    before do
       allow(Article).to receive(:all).and_return(articles)
       allow(Author).to receive(:all).and_return(authors)
     end
