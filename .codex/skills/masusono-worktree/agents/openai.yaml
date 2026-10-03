@@ -1,4 +1,4 @@
 interface:
   display_name: "Masusono Worktree"
   short_description: "Create and clean up worktrees and Docker environments"
-  default_prompt: "Use $masusono-worktree to create an isolated Masusono task environment or clean up its merged worktree."
+  default_prompt: "Use $masusono-worktree to create an isolated Masusono task environment, clean it up after PR creation, or recreate it from the PR branch."
