@@ -28,7 +28,6 @@ RSpec.describe BlogIndexUsecase do
           author: nil
         }
       ]
-
       allow(Article).to receive(:all).and_return(articles)
     end
 
