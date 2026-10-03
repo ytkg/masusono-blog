@@ -42,29 +42,25 @@ class SitemapsIndexUsecase
 
   def article_entries(articles)
     articles.filter_map do |article|
-      id = article[:id]
-      next if id.nil? || id == ""
-
-      {
-        loc: "#{BASE_URL}/articles/#{id}",
-        lastmod: article[:revisedAt] || article[:updatedAt] || article[:publishedAt],
-        changefreq: BLOG_ENTRY[:changefreq],
-        priority: BLOG_ENTRY[:priority]
-      }
+      content_entry(article, section: "articles", changefreq: BLOG_ENTRY[:changefreq], priority: BLOG_ENTRY[:priority])
     end
   end
 
   def author_entries(authors)
     authors.filter_map do |author|
-      id = author[:id]
-      next if id.nil? || id == ""
-
-      {
-        loc: "#{BASE_URL}/authors/#{id}",
-        lastmod: author[:revisedAt] || author[:updatedAt] || author[:publishedAt],
-        changefreq: "monthly",
-        priority: 0.5
-      }
+      content_entry(author, section: "authors", changefreq: "monthly", priority: 0.5)
     end
+  end
+
+  def content_entry(content, section:, changefreq:, priority:)
+    id = content[:id]
+    return if id.nil? || id == ""
+
+    {
+      loc: "#{BASE_URL}/#{section}/#{id}",
+      lastmod: content[:revisedAt] || content[:updatedAt] || content[:publishedAt],
+      changefreq:,
+      priority:
+    }
   end
 end
