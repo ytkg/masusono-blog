@@ -48,20 +48,16 @@ module Numbers
 
     def build_blog_metric_blocks
       BLOG_METRIC_DEFINITIONS.map do |definition|
-        build_blog_metric_block(definition)
+        metric_key = definition.fetch(:metric_key)
+        label_key = definition.fetch(:label_key)
+
+        build_count_block(
+          label_key: label_key,
+          value: totals.fetch(metric_key),
+          unit_key: metric_key,
+          children: build_author_metric_children(metric_key:, label_key:)
+        )
       end
-    end
-
-    def build_blog_metric_block(definition)
-      metric_key = definition.fetch(:metric_key)
-      label_key = definition.fetch(:label_key)
-
-      build_count_block(
-        label_key: label_key,
-        value: totals.fetch(metric_key),
-        unit_key: metric_key,
-        children: build_author_metric_children(metric_key:, label_key:)
-      )
     end
 
     def build_author_metric_children(metric_key:, label_key:)
