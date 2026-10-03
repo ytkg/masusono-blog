@@ -13,11 +13,8 @@ export default function useSentenceFeedState(articles) {
     stateRef: rememberedStateRef,
     commit: commitRememberedState,
   } = useImmediateRemember(initialState, SENTENCE_STATE_KEY)
-  const articlesById = useMemo(() => new Map(articles.map((article) => [article.id, article])), [articles])
-  const sentenceArticlesById = useMemo(
-    () => new Map(sentenceArticles.map((article) => [article.id, article])),
-    [sentenceArticles],
-  )
+  const articlesById = useMemo(() => indexArticlesById(articles), [articles])
+  const sentenceArticlesById = useMemo(() => indexArticlesById(sentenceArticles), [sentenceArticles])
   const items = useMemo(
     () =>
       rememberedState.items
@@ -31,4 +28,8 @@ export default function useSentenceFeedState(articles) {
   }, [rememberedState.sourceIds, sentenceArticlesById])
 
   return { items, sourceRef, rememberedStateRef, commitRememberedState }
+}
+
+function indexArticlesById(articles) {
+  return new Map(articles.map((article) => [article.id, article]))
 }
