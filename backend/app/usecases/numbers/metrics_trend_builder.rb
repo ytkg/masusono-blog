@@ -72,7 +72,7 @@ module Numbers
 
         grouped[date] ||= { total_articles: 0, total_chars: 0 }
         grouped[date][:total_articles] += 1
-        grouped[date][:total_chars] += article_char_count(article)
+        grouped[date][:total_chars] += ArticleMetric.character_count(article)
       end
     end
 
@@ -95,10 +95,6 @@ module Numbers
           total_chars: values.fetch(:totalChars)
         }
       end || { total_articles: 0, total_chars: 0 }
-    end
-
-    def article_char_count(article)
-      ArticleMetric.character_count(article)
     end
 
     def parse_date(value)
