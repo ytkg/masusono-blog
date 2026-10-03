@@ -14,7 +14,7 @@ export function chartBounds() {
 }
 
 export function normalizePoints(points, seriesKey, maxChartValue) {
-  const visiblePoints = visibleSeriesPoints(points, seriesKey)
+  const visiblePoints = visibleSeriesPoints(points)
   if (visiblePoints.length === 0 || maxChartValue <= 0) return []
 
   const bounds = chartBounds()
@@ -39,7 +39,7 @@ export function normalizePoints(points, seriesKey, maxChartValue) {
 export function maxChartValue(points, series) {
   return Math.max(
     ...series.flatMap(({ key }) =>
-      visibleSeriesPoints(points, key)
+      visibleSeriesPoints(points)
         .map(({ point }) => scaledSeriesValue(point, key))
         .filter((value) => Number.isFinite(value)),
     ),
@@ -56,7 +56,7 @@ function scaledSeriesValue(point, seriesKey) {
   return value
 }
 
-function visibleSeriesPoints(points, _seriesKey) {
+function visibleSeriesPoints(points) {
   return points.map((point, index) => ({ point, index }))
 }
 
