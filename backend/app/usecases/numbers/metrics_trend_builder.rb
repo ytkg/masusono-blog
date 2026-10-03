@@ -55,14 +55,18 @@ module Numbers
           totals[:total_articles] += article_data.fetch(:total_articles)
           totals[:total_chars] += article_data.fetch(:total_chars)
 
-          {
-            date: date.strftime(POINT_DATE_FORMAT),
-            label: date.strftime(DATE_FORMAT),
-            totalArticles: totals.fetch(:total_articles),
-            totalChars: totals.fetch(:total_chars)
-          }
+          build_point(date, totals)
         end
       end
+    end
+
+    def build_point(date, totals)
+      {
+        date: date.strftime(POINT_DATE_FORMAT),
+        label: date.strftime(DATE_FORMAT),
+        totalArticles: totals.fetch(:total_articles),
+        totalChars: totals.fetch(:total_chars)
+      }
     end
 
     def grouped_article_events
