@@ -46,18 +46,8 @@ export const updateObstacles = (w) => {
 export const maybeSpawnCloud = (w, W, dt) => {
   w.nextCloud -= dt
   if (w.nextCloud > 0) return
-  const y = Math.random() * Math.max(20, w.groundY - 160)
-  const h = 18 + Math.random() * 22
-  const wCloud = h * (1.8 + Math.random() * 0.8)
-  const speed = CFG.CLOUD_SPEED_MIN + Math.random() * (CFG.CLOUD_SPEED_MAX - CFG.CLOUD_SPEED_MIN)
-  const alpha = 0.35 + Math.random() * 0.25
-  const shape = {
-    leftPuffX: 0.28 + Math.random() * 0.08,
-    leftPuffY: 0.38 + Math.random() * 0.16,
-    centerPuffY: 0.06 + Math.random() * 0.14,
-    rightPuffY: 0.06 + Math.random() * 0.16,
-  }
-  w.clouds.push({ x: W + 20, y, w: wCloud, h, speed, alpha, shape })
+  const cloud = createCloud(w, W)
+  w.clouds.push(cloud)
   w.nextCloud = CFG.CLOUD_SPAWN_BASE + Math.random() * CFG.CLOUD_SPAWN_RAND
 }
 
@@ -72,4 +62,19 @@ export const updateScoreDisplay = (scoreRef, scoreDisplayRef, setScore) => {
     scoreDisplayRef.current = sc
     setScore(sc)
   }
+}
+
+function createCloud(w, W) {
+  const y = Math.random() * Math.max(20, w.groundY - 160)
+  const h = 18 + Math.random() * 22
+  const wCloud = h * (1.8 + Math.random() * 0.8)
+  const speed = CFG.CLOUD_SPEED_MIN + Math.random() * (CFG.CLOUD_SPEED_MAX - CFG.CLOUD_SPEED_MIN)
+  const alpha = 0.35 + Math.random() * 0.25
+  const shape = {
+    leftPuffX: 0.28 + Math.random() * 0.08,
+    leftPuffY: 0.38 + Math.random() * 0.16,
+    centerPuffY: 0.06 + Math.random() * 0.14,
+    rightPuffY: 0.06 + Math.random() * 0.16,
+  }
+  return { x: W + 20, y, w: wCloud, h, speed, alpha, shape }
 }
