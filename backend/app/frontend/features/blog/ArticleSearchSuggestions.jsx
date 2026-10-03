@@ -40,8 +40,7 @@ function SearchSuggestionSection({ items, label, prefix, onSelect }) {
       <SectionHeading>{label}</SectionHeading>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
         {items.map((item) => {
-          const itemLabel = typeof item === "string" ? `${prefix}${item}` : item.label
-          const query = typeof item === "string" ? `${prefix}${item}` : item.query
+          const { label: itemLabel, query } = suggestionData(item, prefix)
 
           return (
             <Chip
@@ -75,4 +74,11 @@ export default function ArticleSearchSuggestions({ articles, onSelect }) {
       />
     </Box>
   )
+}
+
+function suggestionData(item, prefix) {
+  if (typeof item !== "string") return { label: item.label, query: item.query }
+
+  const query = `${prefix}${item}`
+  return { label: query, query }
 }
