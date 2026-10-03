@@ -4,7 +4,7 @@ function formatError(error) {
 
 export async function runRubyCode(code) {
   if (typeof Worker === "undefined") {
-    return { error: "この環境では Ruby 実行に対応していません。", stderr: "", stdout: "" }
+    return errorResult("この環境では Ruby 実行に対応していません。")
   }
 
   return new Promise((resolve) => {
@@ -26,7 +26,7 @@ export async function runRubyCode(code) {
     worker.addEventListener(
       "messageerror",
       () => {
-        finish({ error: "Ruby 実行結果の受信に失敗しました。", stderr: "", stdout: "" })
+        finish(errorResult("Ruby 実行結果の受信に失敗しました。"))
       },
       { once: true },
     )
@@ -34,11 +34,15 @@ export async function runRubyCode(code) {
     worker.addEventListener(
       "error",
       (event) => {
-        finish({ error: formatError(event.error ?? event.message), stderr: "", stdout: "" })
+        finish(errorResult(formatError(event.error ?? event.message)))
       },
       { once: true },
     )
 
     worker.postMessage({ code })
   })
+}
+
+function errorResult(error) {
+  return { error, stderr: "", stdout: "" }
 }
