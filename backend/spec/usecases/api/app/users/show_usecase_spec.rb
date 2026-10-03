@@ -4,9 +4,10 @@ RSpec.describe Api::App::Users::ShowUsecase do
   subject(:result) { described_class.call(user_id: user_id) }
 
   let(:user_id) { "cookie-user" }
+  let(:user_response) { { name: "表示名太郎" } }
 
   before do
-    allow(Microcms::Users::FetchByUserIdService).to receive(:execute).and_return({ name: "表示名太郎" })
+    allow(Microcms::Users::FetchByUserIdService).to receive(:execute).and_return(user_response)
   end
 
   it do
@@ -22,9 +23,7 @@ RSpec.describe Api::App::Users::ShowUsecase do
   end
 
   context "ユーザーが見つからない場合" do
-    before do
-      allow(Microcms::Users::FetchByUserIdService).to receive(:execute).and_return({})
-    end
+    let(:user_response) { {} }
 
     it do
       expect(result).to eq(
