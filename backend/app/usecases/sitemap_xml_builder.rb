@@ -38,8 +38,7 @@ class SitemapXmlBuilder
   def normalize_date(value)
     return nil if value.nil? || value == ""
 
-    time = Time.parse(value)
-    time.utc.iso8601
+    Time.parse(value).utc.iso8601
   rescue ArgumentError, TypeError
     nil
   end
