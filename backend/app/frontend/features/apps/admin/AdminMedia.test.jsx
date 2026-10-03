@@ -1,10 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import AdminMedia from "./AdminMedia"
-
-function jsonResponse(body) {
-  return { ok: true, status: 200, json: async () => body }
-}
+import { jsonResponse } from "@/test/jsonResponse"
 
 function errorResponse(status, body) {
   return { ok: false, status, json: async () => body }
