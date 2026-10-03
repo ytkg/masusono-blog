@@ -21,19 +21,19 @@ const BLOCK_TAGS = new Set([
 export function buildArticleCopyText(article) {
   const document = new DOMParser().parseFromString(article.content ?? "", "text/html")
 
-  function read(node, inPre = false) {
-    if (node.nodeType === 3) return inPre ? node.textContent : node.textContent.replace(/\s+/g, " ")
-    if (node.nodeType !== 1) return ""
-    const tag = node.tagName
-    if (["SCRIPT", "STYLE", "IFRAME"].includes(tag)) return ""
-    if (tag === "BR") return "\n"
-    const text = Array.from(node.childNodes, (child) => read(child, inPre || tag === "PRE")).join("")
-    if (["TD", "TH"].includes(tag)) return `${text}\t`
-    if (!BLOCK_TAGS.has(tag)) return text
-    const blockText = tag === "PRE" ? text : text.replace(/^\n+|\n+$/g, "")
-    return `\n${blockText}\n`
-  }
-
-  const body = read(document.body).trim()
+  const body = readCopyNode(document.body).trim()
   return [article.title?.trim(), body].filter(Boolean).join("\n\n")
+}
+
+function readCopyNode(node, inPre = false) {
+  if (node.nodeType === 3) return inPre ? node.textContent : node.textContent.replace(/\s+/g, " ")
+  if (node.nodeType !== 1) return ""
+  const tag = node.tagName
+  if (["SCRIPT", "STYLE", "IFRAME"].includes(tag)) return ""
+  if (tag === "BR") return "\n"
+  const text = Array.from(node.childNodes, (child) => readCopyNode(child, inPre || tag === "PRE")).join("")
+  if (["TD", "TH"].includes(tag)) return `${text}\t`
+  if (!BLOCK_TAGS.has(tag)) return text
+  const blockText = tag === "PRE" ? text : text.replace(/^\n+|\n+$/g, "")
+  return `\n${blockText}\n`
 }
