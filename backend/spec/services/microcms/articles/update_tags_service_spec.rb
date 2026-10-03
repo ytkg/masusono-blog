@@ -21,11 +21,7 @@ RSpec.describe Microcms::Articles::UpdateTagsService do
       before do
         stub_request(:patch, endpoint)
           .with(
-            headers: {
-              "Accept" => "application/json",
-              "Content-Type" => "application/json",
-              "X-MICROCMS-API-KEY" => "test-api-key"
-            },
+            headers: microcms_write_request_headers,
             body: { tags: tags }.to_json
           )
           .to_return(status: 200, body: { id: article_id }.to_json, headers: json_response_headers)

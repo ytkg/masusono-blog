@@ -21,6 +21,14 @@ module MicrocmsStubHelper
     }
   end
 
+  def microcms_write_request_headers
+    {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json",
+      "X-MICROCMS-API-KEY" => "test-api-key"
+    }
+  end
+
   def microcms_response_body(contents:, total_count:, limit:, offset:)
     {
       contents:,
