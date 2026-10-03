@@ -29,11 +29,9 @@ function writeQueryToUrl(query, mode = HISTORY_MODES.replace) {
   const nextUrl = `${url.pathname}${url.search}${url.hash}`
   if (mode === HISTORY_MODES.push) {
     window.history.pushState(window.history.state, "", nextUrl)
-    notifyLocationChange()
-    return
+  } else {
+    window.history.replaceState(window.history.state, "", nextUrl)
   }
-
-  window.history.replaceState(window.history.state, "", nextUrl)
   notifyLocationChange()
 }
 
