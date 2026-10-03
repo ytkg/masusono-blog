@@ -36,12 +36,14 @@ export function normalizePoints(points, seriesKey, maxChartValue) {
 }
 
 export function maxChartValue(points, series) {
-  return Math.max(
-    ...series.flatMap(({ key }) =>
-      points.map((point) => scaledSeriesValue(point, key)).filter((value) => Number.isFinite(value)),
-    ),
-    0,
-  )
+  let maximum = 0
+  for (const { key } of series) {
+    for (const point of points) {
+      const value = scaledSeriesValue(point, key)
+      if (Number.isFinite(value)) maximum = Math.max(maximum, value)
+    }
+  }
+  return maximum
 }
 
 function scaledSeriesValue(point, seriesKey) {
