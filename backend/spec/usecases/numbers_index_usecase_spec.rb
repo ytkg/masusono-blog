@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe NumbersIndexUsecase do
   describe ".call" do
+    subject(:result) { described_class.call }
+
     before do
       allow(Numbers::MetricsIndexUsecase).to receive(:call).and_return(
         {
@@ -16,7 +18,7 @@ RSpec.describe NumbersIndexUsecase do
     end
 
     it "Inertiaページ用の結果を返す" do
-      expect(described_class.call).to eq(
+      expect(result).to eq(
         {
           props: {
             metrics: {
