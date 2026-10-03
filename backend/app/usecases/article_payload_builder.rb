@@ -7,6 +7,10 @@ class ArticlePayloadBuilder
     new(article:).call
   end
 
+  def self.collection(articles)
+    articles.map { |article| call(article:) }
+  end
+
   def initialize(article:)
     @article = article
   end

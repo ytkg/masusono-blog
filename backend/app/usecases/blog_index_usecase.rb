@@ -6,7 +6,7 @@ class BlogIndexUsecase
   def call
     {
       props: {
-        articles: Article.all.map { |article| ArticlePayloadBuilder.call(article:) }
+        articles: ArticlePayloadBuilder.collection(Article.all)
       },
       status: :ok
     }

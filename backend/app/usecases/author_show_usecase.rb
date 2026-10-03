@@ -12,7 +12,7 @@ class AuthorShowUsecase
     author = AuthorPayloadBuilder.call(author:) if author
     return { props: { author: nil, articles: [] }, status: :not_found } if author.nil?
 
-    articles = Article.for_author(author.fetch(:id)).map { |article| ArticlePayloadBuilder.call(article:) }
+    articles = ArticlePayloadBuilder.collection(Article.for_author(author.fetch(:id)))
 
     {
       props: {
