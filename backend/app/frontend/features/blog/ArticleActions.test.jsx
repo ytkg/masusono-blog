@@ -3,6 +3,10 @@ import { describe, expect, it, vi } from "vitest"
 import ArticleActions from "./ArticleActions"
 
 describe("ArticleActions", () => {
+  function openArticleMenu() {
+    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+  }
+
   function mockClipboard(writeText) {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -16,7 +20,7 @@ describe("ArticleActions", () => {
 
     render(<ArticleActions article={{ id: "article-1" }} />)
 
-    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    openArticleMenu()
     fireEvent.click(screen.getByRole("menuitem", { name: "記事URLをコピー" }))
 
     await waitFor(() => {
@@ -30,7 +34,7 @@ describe("ArticleActions", () => {
 
     render(<ArticleActions article={{ id: "article-1" }} />)
 
-    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    openArticleMenu()
     fireEvent.click(screen.getByRole("menuitem", { name: "記事URLをコピー" }))
 
     expect(await screen.findByText("記事URLをコピーできませんでした")).toBeInTheDocument()
@@ -39,7 +43,7 @@ describe("ArticleActions", () => {
     const writeText = vi.fn().mockRejectedValueOnce(new Error("denied")).mockResolvedValue(undefined)
     mockClipboard(writeText)
     render(<ArticleActions article={{ id: "article-1" }} />)
-    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    openArticleMenu()
     fireEvent.click(screen.getByRole("menuitem", { name: "記事URLをコピー" }))
     await screen.findByText("記事URLをコピーできませんでした")
     vi.useFakeTimers()
@@ -63,7 +67,7 @@ describe("ArticleActions", () => {
     render(
       <ArticleActions article={{ id: "article-1", title: "記事タイトル", content: `<p>${body}</p><p>続き</p>` }} />,
     )
-    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    openArticleMenu()
     fireEvent.click(screen.getByRole("menuitem", { name: "記事全文をコピー" }))
     expect(await screen.findByText("記事全文をコピーしました")).toBeInTheDocument()
     expect(writeText).toHaveBeenCalledWith(`記事タイトル\n\n${body}\n\n続き`)
@@ -73,7 +77,7 @@ describe("ArticleActions", () => {
     const writeText = vi.fn().mockRejectedValueOnce(new Error("denied")).mockResolvedValue(undefined)
     mockClipboard(writeText)
     render(<ArticleActions article={{ id: "article-1", title: "タイトル", content: "<p>本文</p>" }} />)
-    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    openArticleMenu()
     fireEvent.click(screen.getByRole("menuitem", { name: "記事全文をコピー" }))
     expect(await screen.findByText("記事全文をコピーできませんでした")).toBeInTheDocument()
     fireEvent.click(screen.getByRole("button", { name: "再試行" }))
