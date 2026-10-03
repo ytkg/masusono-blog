@@ -7,7 +7,7 @@ export default function useCurrentPathSegmentId() {
 
   try {
     return decodeURIComponent(rawSegment)
-  } catch (_error) {
+  } catch {
     return rawSegment
   }
 }
