@@ -6,16 +6,18 @@ RSpec.describe BlogShowUsecase do
 
     let(:article_id) { "article-1" }
 
+    let(:article) do
+      {
+        id: "article-1",
+        title: "記事1",
+        publishedAt: "2026-02-10T00:00:00.000Z",
+        content: "<p>本文</p>",
+        author: "著者"
+      }
+    end
+
     before do
-      allow(Article).to receive(:find).with(article_id).and_return(
-        {
-          id: "article-1",
-          title: "記事1",
-          publishedAt: "2026-02-10T00:00:00.000Z",
-          content: "<p>本文</p>",
-          author: "著者"
-        }
-      )
+      allow(Article).to receive(:find).with(article_id).and_return(article)
     end
 
     it do
@@ -42,10 +44,7 @@ RSpec.describe BlogShowUsecase do
 
     context "記事が見つからない場合" do
       let(:article_id) { "missing" }
-
-      before do
-        allow(Article).to receive(:find).with(article_id).and_return(nil)
-      end
+      let(:article) { nil }
 
       it do
         expect(result).to eq(
