@@ -91,6 +91,11 @@ export default function AdminApp() {
   const [csrfToken, setCsrfToken] = useState("")
   const [error, setError] = useState("")
   const requestIdRef = useRef(0)
+  const dirtyRef = useRef(false)
+  const onDirtyChange = useCallback((dirty) => {
+    dirtyRef.current = dirty
+  }, [])
+  const canLeave = useCallback(() => !dirtyRef.current || window.confirm("未保存の変更を破棄して閉じますか？"), [])
   const handleUnauthorized = useCallback(() => setView("login"), [])
 
   async function loadSession(requestId) {
@@ -129,6 +134,7 @@ export default function AdminApp() {
       buttonAriaLabel="管理を開く"
       buttonIcon={<AdminPanelSettingsIcon />}
       onOpen={handleOpen}
+      beforeClose={canLeave}
       onClose={() => {
         requestIdRef.current += 1
         setView("checking")
@@ -143,7 +149,13 @@ export default function AdminApp() {
         <AdminMedia csrfToken={csrfToken} onBack={() => setView("dashboard")} onUnauthorized={handleUnauthorized} />
       ) : null}
       {view === "articles" ? (
-        <AdminArticles onBack={() => setView("dashboard")} onUnauthorized={handleUnauthorized} />
+        <AdminArticles
+          csrfToken={csrfToken}
+          onDirtyChange={onDirtyChange}
+          canLeave={canLeave}
+          onBack={() => setView("dashboard")}
+          onUnauthorized={handleUnauthorized}
+        />
       ) : null}
       {view === "error" ? (
         <Stack spacing={2} alignItems="flex-start">

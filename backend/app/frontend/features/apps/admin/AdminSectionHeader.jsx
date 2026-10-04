@@ -2,7 +2,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 
-export default function AdminSectionHeader({ title, onBack }) {
+export default function AdminSectionHeader({ title, onBack, backLabel = "管理画面" }) {
   return (
     <>
       <Box
@@ -22,7 +22,7 @@ export default function AdminSectionHeader({ title, onBack }) {
         }}
       >
         <ArrowBackIcon fontSize="small" />
-        管理画面
+        {backLabel}
       </Box>
       <Typography component="h3" variant="h6" fontWeight={700} sx={{ mb: { xs: 1, sm: 2 } }}>
         {title}
