@@ -83,6 +83,10 @@ module VisualTestFixtures
   module Articles
     def all = VisualTestFixtures::ARTICLES
 
+    def page(limit:, offset:)
+      { contents: VisualTestFixtures::ARTICLES.slice(offset, limit) || [], total_count: VisualTestFixtures::ARTICLES.size }
+    end
+
     def find(id) = VisualTestFixtures::ARTICLES.find { |article| article[:id] == id }
 
     def for_author(author_id) = VisualTestFixtures::ARTICLES.select { |article| article[:author][:id] == author_id }

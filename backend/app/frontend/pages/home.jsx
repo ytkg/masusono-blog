@@ -1,5 +1,7 @@
 import { HEADER_HEIGHT } from "../shared/pageLayout"
 import useHomeTabState from "../features/blog/useHomeTabState"
+import useHomeArticles from "../features/blog/useHomeArticles"
+import LoadMoreArticles from "../features/blog/LoadMoreArticles"
 import { useEffect } from "react"
 import Box from "@mui/material/Box"
 import Tab from "@mui/material/Tab"
@@ -15,8 +17,9 @@ const compactTabSx = {
   py: 0.75,
 }
 
-export default function Home({ articles = [] }) {
+export default function Home({ articles = [], pagination }) {
   const { mode, changeMode } = useHomeTabState()
+  const feed = useHomeArticles(articles, pagination)
 
   useEffect(() => {
     ensureUserIdCookie()
@@ -59,8 +62,9 @@ export default function Home({ articles = [] }) {
           </Box>
           <Box sx={{ pt: 1 }}>
             {HOME_TABS.find((tab) => tab.id === mode)?.renderContent({
-              articles,
+              articles: feed.articles,
             })}
+            <LoadMoreArticles {...feed} mode={mode} />
           </Box>
         </Box>
       </PageContainer>

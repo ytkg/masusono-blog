@@ -50,6 +50,8 @@ npm run dev
 JSON API を使います。認証トークンは画面へ返さず Rails セッションに保持し、
 ログインとメディアアップロードのリクエストは CSRF トークンで保護します。
 
+- `GET /api/app/articles?offset=0`
+  - トップページ用に公開記事を10件ずつ取得。次の取得位置は `pagination.nextOffset`（末尾は `null`）。初回のトップページも10件だけ取得し、スクロールで追加読み込みする。
 - `POST /api/app/navigation_failures`
   - 画面遷移の異常を診断ログに記録する。確認方法は [画面遷移エラーの診断](docs/navigation-error-diagnostics.md) を参照
 - `GET /api/app/users/:user_id.json`

@@ -3,6 +3,11 @@ class Article
     fetch_all
   end
 
+  def self.page(limit:, offset:)
+    page = Microcms::FetchArticlesService.page(limit:, offset:)
+    page.merge(contents: normalize(page.fetch(:contents)))
+  end
+
   def self.find(id)
     return nil if id.nil? || id.empty?
 

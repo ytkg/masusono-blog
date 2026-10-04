@@ -24,6 +24,23 @@ module Microcms
       new(api_key: api_key, faraday: faraday, filters: filters, ids: ids).execute(response: response)
     end
 
+    def self.page(limit:, offset:, api_key: nil, faraday: nil)
+      new(api_key:, faraday:).page(limit:, offset:)
+    end
+
+    # Fetch exactly one upstream page; full-collection callers still use execute.
+    def page(limit:, offset:)
+      response = fetch_response(limit:, offset:)
+      raise_on_error!(response)
+      page = parse_page(response.body)
+      meta = page.fetch(:meta)
+      unless pageable?(meta) && valid_pagination_meta?(meta) && meta[:limit] == limit && meta[:offset] == offset
+        raise FetchError.new(status: 502, body: "Invalid pagination metadata")
+      end
+
+      { contents: page.fetch(:contents).first(limit), total_count: meta[:total_count] }
+    end
+
     def initialize(api_key: nil, faraday: nil, filters: nil, ids: nil)
       @api_key = api_key || Rails.application.credentials.dig(:microcms, :api_key)
       raise "MICROCMS api key is missing (credentials: microcms.api_key)" if @api_key.nil? || @api_key.empty?

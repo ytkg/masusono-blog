@@ -24,6 +24,19 @@ export default function useSentenceFeedState(articles) {
   )
 
   useLayoutEffect(() => {
+    const state = rememberedStateRef.current
+    const knownIds = new Set(state.sourceIds)
+    const newIds = sentenceArticles.filter((article) => !knownIds.has(article.id)).map((article) => article.id)
+    if (newIds.length > 0) {
+      commitRememberedState(
+        state.items.length === 0
+          ? createInitialSentenceState(sentenceArticles)
+          : { ...state, sourceIds: [...state.sourceIds, ...newIds] },
+      )
+    }
+  }, [sentenceArticles, rememberedStateRef, commitRememberedState])
+
+  useLayoutEffect(() => {
     sourceRef.current = rememberedState.sourceIds.map((id) => sentenceArticlesById.get(id)).filter(Boolean)
   }, [rememberedState.sourceIds, sentenceArticlesById])
 
