@@ -396,4 +396,6 @@ Docker ComposeではViteのSSRエンドポイントをRailsから呼び出し、
 
 SSRに失敗したリクエストは初期propsを返してブラウザで描画します。Railsログの `[inertia-rails] SSR render failed` とPumaの `Inertia SSR` ログで障害を検知できます。
 
+本番のSSRプロセスは、URL・全props・アセットバージョンを含むInertiaペイロードが完全一致する描画結果を5分間再利用します。記事やflashなどのデータが変われば別の描画になり、失敗した結果は保存しません。キャッシュはプロセス内だけに保持し、LRUで最大8MiB・32件に制限します。同一データの同時リクエストも1回の描画を共有します。初回・更新直後・プロセス再起動後は通常どおり描画し、開発時にはキャッシュしません。
+
 検証には `npm run test:ssr`（実際の本番バンドルをNode.jsで描画）、 `bundle exec rspec spec/requests/ssr_spec.rb`（対象ページの選択・HTML・障害時の切り替え）、全画面の `scripts/check-visual.sh` を使用します。撮影環境では本番と同じSSRバンドルをPumaから起動し、クライアントとSSRの画像URLを一致させます。Visual RegressionにはJavaScript無効での本文・メタ情報検証と、hydration後の操作確認も含まれます。実際のCloud Runデプロイは別途実行します。

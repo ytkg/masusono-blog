@@ -76,3 +76,15 @@ for (const [component, url, props, text] of [
     }
   })
 }
+
+test("the production renderer picks up changed article data at the same URL", async () => {
+  const original = { ...article, title: "変更前の記事名" }
+  const updated = { ...article, title: "変更後の記事名" }
+  const first = await render("home", "/", { articles: [original] })
+  const second = await render("home", "/", { articles: [updated] })
+  const repeated = await render("home", "/", { articles: [original] })
+  assert.ok(first.body.includes(original.title))
+  assert.ok(second.body.includes(updated.title))
+  assert.ok(!second.body.includes(original.title))
+  assert.deepEqual(repeated, first)
+})
