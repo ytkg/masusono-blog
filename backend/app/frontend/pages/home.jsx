@@ -20,6 +20,7 @@ const compactTabSx = {
 export default function Home({ articles = [], pagination }) {
   const { mode, changeMode } = useHomeTabState()
   const feed = useHomeArticles(articles, pagination)
+  const activeTab = HOME_TABS.find((tab) => tab.id === mode)
 
   useEffect(() => {
     ensureUserIdCookie()
@@ -61,10 +62,10 @@ export default function Home({ articles = [], pagination }) {
             </Tabs>
           </Box>
           <Box sx={{ pt: 1 }}>
-            {HOME_TABS.find((tab) => tab.id === mode)?.renderContent({
+            {activeTab?.renderContent({
               articles: feed.articles,
             })}
-            <LoadMoreArticles {...feed} mode={mode} />
+            <LoadMoreArticles {...feed} buffer={activeTab?.articleLoadBuffer} />
           </Box>
         </Box>
       </PageContainer>

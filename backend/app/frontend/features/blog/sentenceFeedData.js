@@ -120,3 +120,11 @@ export function markSentenceItemsRevealed(state) {
     version: SENTENCE_STATE_VERSION,
   }
 }
+
+export function mergeSentenceArticleSources(state, articles) {
+  const knownIds = new Set(state.sourceIds)
+  const newIds = articles.filter((article) => !knownIds.has(article.id)).map((article) => article.id)
+  if (newIds.length === 0) return state
+  if (state.items.length === 0) return createInitialSentenceState(articles)
+  return { ...state, sourceIds: [...state.sourceIds, ...newIds] }
+}

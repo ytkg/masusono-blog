@@ -52,20 +52,19 @@ async function render(component, url, props) {
   return result
 }
 
-for (const [component, url, props, text] of [["blog/show", "/articles/ssr-article", { article }, "本文"]]) {
-  test(`${url}: initial HTML contains content, links, styles and SEO metadata`, async () => {
-    // Repeat a page to catch shared server state leaking between requests.
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const { head, body } = await render(component, url, props)
-      assert.ok(body.includes(text))
-      assert.match(body, /data-server-rendered/)
-      assert.match(body, /<a[^>]+href=/)
-      assert.match(body, /data-emotion=/)
-      const meta = head.join("")
-      assert.match(meta, /<title/)
-      assert.match(meta, /name="description"/)
-      assert.ok(meta.includes(`href="https://masusono.com${url}"`))
-      if (component === "blog/show") assert.ok(body.includes("puts 1"))
-    }
-  })
-}
+test("article initial HTML contains content, links, styles and SEO metadata", async () => {
+  const url = "/articles/ssr-article"
+  // Repeat a page to catch shared server state leaking between requests.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const { head, body } = await render("blog/show", url, { article })
+    assert.ok(body.includes("本文"))
+    assert.match(body, /data-server-rendered/)
+    assert.match(body, /<a[^>]+href=/)
+    assert.match(body, /data-emotion=/)
+    const meta = head.join("")
+    assert.match(meta, /<title/)
+    assert.match(meta, /name="description"/)
+    assert.ok(meta.includes(`href="https://masusono.com${url}"`))
+    assert.ok(body.includes("puts 1"))
+  }
+})

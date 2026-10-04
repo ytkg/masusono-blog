@@ -1,6 +1,6 @@
 import { createRoot, hydrateRoot } from "react-dom/client"
 import { createInertiaApp, router } from "@inertiajs/react"
-import AppProviders from "../shared/AppProviders"
+import InertiaApp from "../shared/InertiaApp"
 import { resolvePage } from "../shared/pageResolver"
 import { installNavigationRecovery } from "../shared/lib/navigationRecovery"
 
@@ -37,11 +37,7 @@ createInertiaApp({
   resolve: resolvePage,
   setup({ el, App, props }) {
     registerServiceWorker()
-    const app = (
-      <AppProviders>
-        <App {...props} />
-      </AppProviders>
-    )
+    const app = <InertiaApp App={App} props={props} />
     if (el.hasAttribute("data-server-rendered")) {
       hydrateRoot(el, app)
     } else {
