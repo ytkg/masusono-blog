@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    result = BlogIndexUsecase.call
+    result = HomeIndexUsecase.call
 
     render_inertia_result(result, component: "home")
   end

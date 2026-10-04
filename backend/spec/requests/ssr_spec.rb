@@ -30,6 +30,7 @@ RSpec.describe "Article page SSR", type: :request do
     allow(Rails.env).to receive(:test?).and_return(false)
     stub_request(:post, ssr_url).to_return(body: ssr_response.to_json, headers: { "Content-Type" => "application/json" })
     allow(BlogIndexUsecase).to receive(:call).and_return(props: { articles: [] }, status: :ok)
+    allow(HomeIndexUsecase).to receive(:call).and_return(props: { articles: [] }, status: :ok)
     allow(BlogShowUsecase).to receive(:call).and_return(props: { article: { id: "article-1" } }, status: :ok)
     allow(AuthorsIndexUsecase).to receive(:call).and_return(props: { authors: [] }, status: :ok)
     allow(NumbersIndexUsecase).to receive(:call).and_return(props: { metrics: {} }, status: :ok)

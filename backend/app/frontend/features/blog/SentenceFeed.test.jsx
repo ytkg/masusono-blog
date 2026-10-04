@@ -82,4 +82,15 @@ describe("SentenceFeed", () => {
     expect(screen.getByText("書き出しを表示できる記事がありません。")).toBeInTheDocument()
     expect(screen.queryByRole("link")).not.toBeInTheDocument()
   })
+
+  it("追加取得した記事を候補へ加え、表示済みの書き出しを維持する", () => {
+    const view = render(<SentenceFeed articles={articles} />)
+    const keys = screen.getAllByRole("link").map((link) => link.textContent)
+    view.rerender(<SentenceFeed articles={[...articles, { id: "second", content: "<p>追加された一文。</p>" }]} />)
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(keys)
+    expect(history.state.sourceIds).toEqual(["first", "second"])
+    fireEvent.scroll(window)
+    act(() => vi.advanceTimersByTime(20))
+    expect(screen.getAllByRole("link").some((link) => link.getAttribute("href") === "/articles/second")).toBe(true)
+  })
 })

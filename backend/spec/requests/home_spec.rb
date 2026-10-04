@@ -5,7 +5,7 @@ RSpec.describe "WebHome", type: :request do
 
   describe "GET /" do
     before do
-      allow(BlogIndexUsecase).to receive(:call).and_return(
+      allow(HomeIndexUsecase).to receive(:call).and_return(
         {
           props: {
             articles: [
