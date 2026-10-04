@@ -15,7 +15,6 @@ const article = {
   publishedDate: "2026/01/15",
   content: '<p>本文&nbsp;&amp;続き</p><pre><code class="language-ruby">puts 1</code></pre>',
 }
-const author = { id: "ssr-author", name: "SSR著者", bio: "著者の紹介", title: "著者" }
 
 before(async () => {
   server = spawn(process.execPath, ["ssr/ssr.mjs"], { stdio: ["ignore", "pipe", "pipe"] })
@@ -53,13 +52,7 @@ async function render(component, url, props) {
   return result
 }
 
-for (const [component, url, props, text] of [
-  ["home", "/", { articles: [article] }, "SSR記事"],
-  ["blog/show", "/articles/ssr-article", { article }, "本文"],
-  ["authors/index", "/authors", { authors: [author] }, "SSR著者"],
-  ["authors/show", "/authors/ssr-author", { author, articles: [article] }, "著者の紹介"],
-  ["about", "/about", {}, "飲み仲間3人"],
-]) {
+for (const [component, url, props, text] of [["blog/show", "/articles/ssr-article", { article }, "本文"]]) {
   test(`${url}: initial HTML contains content, links, styles and SEO metadata`, async () => {
     // Repeat a page to catch shared server state leaking between requests.
     for (let attempt = 0; attempt < 2; attempt++) {

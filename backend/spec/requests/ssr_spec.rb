@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Public page SSR", type: :request do
+RSpec.describe "Article page SSR", type: :request do
   let(:ssr_url) { "http://127.0.0.1:13714/render" }
   let(:html_headers) { { "ACCEPT" => "text/html" } }
   let(:ssr_response) do
@@ -8,7 +8,7 @@ RSpec.describe "Public page SSR", type: :request do
       head: [
         '<title data-inertia>SSRタイトル</title>',
         '<meta name="description" content="SSR説明" data-inertia>',
-        '<link rel="canonical" href="https://masusono.com/about" data-inertia>'
+        '<link rel="canonical" href="https://masusono.com/articles/article-1" data-inertia>'
       ],
       body: '<div id="app" data-server-rendered="true"><article>SSR本文</article></div>'
     }
@@ -40,7 +40,7 @@ RSpec.describe "Public page SSR", type: :request do
     expect(InertiaRails.configuration.ssr_enabled).to be(true)
   end
 
-  [ "/", "/about", "/articles/article-1", "/authors", "/authors/author-1" ].each do |path|
+  [ "/articles/article-1" ].each do |path|
     it "#{path}の初回レスポンスにSSRの本文とメタ情報を含める" do
       get path, headers: html_headers
 
@@ -49,11 +49,11 @@ RSpec.describe "Public page SSR", type: :request do
       expect(html.at_css("#app[data-server-rendered] article").text).to eq("SSR本文")
       expect(html.css("title").map(&:text)).to eq([ "SSRタイトル" ])
       expect(html.at_css('meta[name="description"]')["content"]).to eq("SSR説明")
-      expect(html.at_css('link[rel="canonical"]')["href"]).to eq("https://masusono.com/about")
+      expect(html.at_css('link[rel="canonical"]')["href"]).to eq("https://masusono.com/articles/article-1")
     end
   end
 
-  [ "/search", "/others", "/numbers" ].each do |path|
+  [ "/", "/about", "/authors", "/authors/author-1", "/search", "/others", "/numbers" ].each do |path|
     it "#{path}をSSRしない" do
       get path, headers: html_headers
 
@@ -64,10 +64,10 @@ RSpec.describe "Public page SSR", type: :request do
   end
 
   it "Inertia画面遷移ではSSRせずJSONを返す" do
-    get "/about", headers: html_headers.merge("X-Inertia" => "true", "X-Inertia-Version" => "development")
+    get "/articles/article-1", headers: html_headers.merge("X-Inertia" => "true", "X-Inertia-Version" => "development")
 
     expect(response.media_type).to eq("application/json")
-    expect(response.parsed_body["component"]).to eq("about")
+    expect(response.parsed_body["component"]).to eq("blog/show")
     expect(WebMock).not_to have_requested(:post, ssr_url)
   end
 
@@ -75,7 +75,7 @@ RSpec.describe "Public page SSR", type: :request do
     stub_request(:post, ssr_url).to_raise(Errno::ECONNREFUSED)
     allow(Rails.logger).to receive(:error)
 
-    get "/about", headers: html_headers
+    get "/articles/article-1", headers: html_headers
 
     expect(response).to have_http_status(:ok)
     html = Nokogiri::HTML(response.body)
@@ -89,7 +89,7 @@ RSpec.describe "Public page SSR", type: :request do
     stub_request(:post, ssr_url).to_return(status: 500, body: { error: "Rendering failed" }.to_json)
     allow(Rails.logger).to receive(:error)
 
-    get "/about", headers: html_headers
+    get "/articles/article-1", headers: html_headers
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include('data-page="app"')
