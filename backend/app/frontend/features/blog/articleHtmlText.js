@@ -2,12 +2,16 @@ import { parseFragment } from "parse5"
 
 const LINE_BOUNDARY_TAGS = new Set(["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li"])
 
-// Use the same inert HTML parser in Node and the browser so excerpts hydrate identically.
+// Both parsers use inert HTML fragments and preserve the same text boundaries.
 export function extractHtmlText(html = "") {
   const source = String(html ?? "")
   if (!/[<&]/.test(source)) return source
 
-  return readText(parseFragment(source))
+  if (import.meta.env.SSR) return readText(parseFragment(source))
+
+  const template = document.createElement("template")
+  template.innerHTML = source
+  return readText(template.content)
 }
 
 export function extractTextFromHtml(html) {
@@ -15,9 +19,10 @@ export function extractTextFromHtml(html) {
 }
 
 function readText(node) {
-  if (node.nodeName === "#text") return node.value
-  if (node.tagName === "br") return "\n"
+  if (node.nodeName === "#text") return node.value ?? node.nodeValue
+  const tagName = node.tagName?.toLowerCase()
+  if (tagName === "br") return "\n"
 
-  const text = (node.childNodes ?? []).map(readText).join("")
-  return LINE_BOUNDARY_TAGS.has(node.tagName) ? `${text}\n` : text
+  const text = Array.from(node.childNodes ?? [], readText).join("")
+  return LINE_BOUNDARY_TAGS.has(tagName) ? `${text}\n` : text
 }
