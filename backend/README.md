@@ -386,9 +386,9 @@ gcloud run deploy <ブランチに対応するサービス名> \
 
 - `gcloud` CLI がインストール済みで、認証済みであること
 
-## 公開ページのSSR
+## 記事詳細のSSR
 
-ホーム・記事詳細・著者一覧・著者詳細・紹介ページはInertia SSRで本文とSEO情報を初回HTMLに含めます。検索・ミニアプリ・数字ページはブラウザで描画します。
+記事詳細（`/articles/:id`）だけをInertia SSRで描画し、本文・リンク・SEO情報を初回HTMLに含めます。検索からの記事流入を優先し、全記事のSSRで初期応答が遅くなったホーム・著者ページはブラウザ描画に戻しています。紹介・検索・ミニアプリ・数字ページもブラウザで描画します。
 
 Docker ComposeではViteのSSRエンドポイントをRailsから呼び出し、開発アセットはRailsのViteプロキシ経由で配信します。管理対象worktreeでは通常どおり専用の `compose.sh up --build` を使います。ホストでの開発はRailsと `npm run dev` を起動すると、Inertia RailsがViteを検出します。
 
