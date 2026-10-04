@@ -1,5 +1,5 @@
 import { supportingActionSx } from "../../shared/supportingActionStyles"
-import { lazy, Suspense, useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { articleBodyHtmlSx, articleBodyTextSx } from "./articleBodyHtmlSx"
@@ -14,7 +14,13 @@ function ArticleRawHtml({ html }) {
 }
 
 function ArticleHtml({ enableRubyRunner, html }) {
-  if (LANGUAGE_CODE_PATTERN.test(html)) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    if (LANGUAGE_CODE_PATTERN.test(html)) setMounted(true)
+  }, [html])
+
+  // Code controls need browser APIs; keep their initial HTML identical during hydration.
+  if (mounted && LANGUAGE_CODE_PATTERN.test(html)) {
     return (
       <Suspense fallback={<ArticleRawHtml html={html} />}>
         <ArticleStructuredHtml enableRubyRunner={enableRubyRunner} html={html} />

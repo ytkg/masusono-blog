@@ -16,7 +16,9 @@ function formatBuildVersion(date: Date) {
     hour12: false,
   }).formatToParts(date)
 
-  const values = Object.fromEntries(parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]))
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
+  )
 
   return `${values.year}${values.month}${values.day}${values.hour}${values.minute}`
 }
@@ -24,24 +26,31 @@ function formatBuildVersion(date: Date) {
 const buildVersion = formatBuildVersion(new Date())
 const frontendRoot = fileURLToPath(new URL("./app/frontend", import.meta.url))
 
-export default defineConfig({
-  define: {
-    "import.meta.env.VITE_BUILD_VERSION": JSON.stringify(buildVersion),
-  },
-  plugins: [RubyPlugin(), react()],
-  resolve: {
-    alias: {
-      "@": frontendRoot,
+export default defineConfig(async ({ command }) => {
+  const { default: inertia } = await import("@inertiajs/vite")
+  return {
+    define: {
+      "import.meta.env.VITE_BUILD_VERSION": JSON.stringify(buildVersion),
     },
-  },
-  build: {
-    chunkSizeWarningLimit: 600,
-  },
-  test: {
-    // Keep jsdom workers bounded when Docker shares resources with Rails and Playwright.
-    maxWorkers: process.env.CI ? 4 : 2,
-    environment: "jsdom",
-    setupFiles: ["./test/setup.js"],
-    include: ["**/*.{test,spec}.{js,jsx}"],
-  },
-} as never)
+    plugins: [RubyPlugin(), react(), inertia({ ssr: { entry: "ssr/ssr.jsx", host: "127.0.0.1" } })],
+    server: { allowedHosts: ["vite"] },
+    ssr: {
+      noExternal: command === "build" ? true : [],
+    },
+    resolve: {
+      alias: {
+        "@": frontendRoot,
+      },
+    },
+    build: {
+      chunkSizeWarningLimit: 600,
+    },
+    test: {
+      // Keep jsdom workers bounded when Docker shares resources with Rails and Playwright.
+      maxWorkers: process.env.CI ? 4 : 2,
+      environment: "jsdom",
+      setupFiles: ["./test/setup.js"],
+      include: ["**/*.{test,spec}.{js,jsx}"],
+    },
+  } as never
+})

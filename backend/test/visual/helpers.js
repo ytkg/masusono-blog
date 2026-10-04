@@ -13,7 +13,7 @@ export async function mockPageProps(page, path, transform) {
         return
       }
       let replaced = false
-      const body = (await response.text()).replace(
+      let body = (await response.text()).replace(
         /(<script\b[^>]*data-page="app"[^>]*>)([\s\S]*?)(<\/script>)/,
         (_, start, json, end) => {
           const payload = JSON.parse(json)
@@ -23,6 +23,11 @@ export async function mockPageProps(page, path, transform) {
         },
       )
       expect(replaced, "Inertia initial page must be replaced").toBe(true)
+      // The replacement props differ from the server HTML: mount this mocked page afresh.
+      body = body.replace(
+        /<div data-server-rendered="true" id="app">[\s\S]*<\/div>(\s*<\/body>)/,
+        '<div id="app"></div>$1',
+      )
       await route.fulfill({ response, body })
     },
   )

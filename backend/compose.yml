@@ -24,11 +24,15 @@ services:
       BIGQUERY_DATASET_ID: ${BIGQUERY_DATASET_ID:-}
       BIGQUERY_PROJECT_ID: ${BIGQUERY_PROJECT_ID:-}
       RAILS_LOG_TO_STDOUT: "1"
+      VITE_RUBY_HOST: vite
+      VITE_RUBY_DEV_SERVER_CONNECTION_CHECK: "true"
     tty: true
     stdin_open: true
   vite:
     image: node:22-bookworm
     user: "1000:1000"
+    environment:
+      VITE_RUBY_HOST: 0.0.0.0
     working_dir: /rails
     command: sh -lc "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 3036"
     volumes:

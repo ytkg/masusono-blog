@@ -12,6 +12,7 @@ CI.run do
   step "Style: Frontend", "npm run lint"
   step "Format: Frontend", "npm run format:check"
   step "Tests: Frontend", "npm test"
+  step "Tests: SSR", "npm run test:ssr"
 
   # Optional: set a green GitHub commit status to unblock PR merge.
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.

@@ -1,9 +1,7 @@
-import { createRoot } from "react-dom/client"
+import { createRoot, hydrateRoot } from "react-dom/client"
 import { createInertiaApp, router } from "@inertiajs/react"
-import CssBaseline from "@mui/material/CssBaseline"
-import { ThemeProvider } from "@mui/material/styles"
-import theme from "../theme"
-import NavigationFailureDialog from "../components/NavigationFailureDialog"
+import AppProviders from "../shared/AppProviders"
+import { resolvePage } from "../shared/pageResolver"
 import { installNavigationRecovery } from "../shared/lib/navigationRecovery"
 
 void import("../styles/fonts.css")
@@ -33,45 +31,21 @@ function registerServiceWorker() {
   })
 }
 
-const pages = import.meta.glob(["../pages/**/*.jsx", "!../pages/**/*.test.jsx", "!../pages/**/*.spec.jsx"])
-
-function resolvePageLoader(name) {
-  const normalized = String(name)
-  const lower = normalized.toLowerCase()
-  const candidates = [
-    `../pages/${normalized}.jsx`,
-    `../pages/${normalized}/index.jsx`,
-    `../pages/${lower}.jsx`,
-    `../pages/${lower}/index.jsx`,
-  ]
-
-  const matchedPath = candidates.find((path) => pages[path])
-  if (!matchedPath) {
-    throw new Error(`Inertia page not found: ${name}`)
-  }
-
-  return pages[matchedPath]
-}
-
 installNavigationRecovery(router)
 
 createInertiaApp({
-  resolve: async (name) => {
-    const page = await resolvePageLoader(name)()
-    if (!page.default.layout) {
-      const { default: AppLayout } = await import("../layouts/AppLayout")
-      page.default.layout = (pageNode) => <AppLayout>{pageNode}</AppLayout>
-    }
-    return page
-  },
+  resolve: resolvePage,
   setup({ el, App, props }) {
     registerServiceWorker()
-    createRoot(el).render(
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+    const app = (
+      <AppProviders>
         <App {...props} />
-        <NavigationFailureDialog />
-      </ThemeProvider>,
+      </AppProviders>
     )
+    if (el.hasAttribute("data-server-rendered")) {
+      hydrateRoot(el, app)
+    } else {
+      createRoot(el).render(app)
+    }
   },
 })

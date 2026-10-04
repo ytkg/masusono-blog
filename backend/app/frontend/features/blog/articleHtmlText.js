@@ -1,20 +1,23 @@
-// Keep line boundaries here; each consumer decides how to normalize whitespace.
+import { parseFragment } from "parse5"
+
+const LINE_BOUNDARY_TAGS = new Set(["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li"])
+
+// Use the same inert HTML parser in Node and the browser so excerpts hydrate identically.
 export function extractHtmlText(html = "") {
   const source = String(html ?? "")
   if (!/[<&]/.test(source)) return source
 
-  // A detached template keeps body images inert until the article is expanded.
-  const template = document.createElement("template")
-  template.innerHTML = source
-  appendLineBoundaries(template.content)
-  return template.content.textContent ?? ""
+  return readText(parseFragment(source))
 }
 
 export function extractTextFromHtml(html) {
   return extractHtmlText(html).replace(/\s+/g, " ").trim()
 }
 
-function appendLineBoundaries(fragment) {
-  fragment.querySelectorAll("br").forEach((element) => element.replaceWith("\n"))
-  fragment.querySelectorAll("p, div, h1, h2, h3, h4, h5, h6, li").forEach((element) => element.append("\n"))
+function readText(node) {
+  if (node.nodeName === "#text") return node.value
+  if (node.tagName === "br") return "\n"
+
+  const text = (node.childNodes ?? []).map(readText).join("")
+  return LINE_BOUNDARY_TAGS.has(node.tagName) ? `${text}\n` : text
 }

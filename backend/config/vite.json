@@ -3,7 +3,8 @@
     "sourceCodeDir": "app/frontend",
     "entrypointsDir": "entrypoints",
     "publicOutputDir": "vite",
-    "watchAdditionalPaths": []
+    "watchAdditionalPaths": [],
+    "ssrOutputDir": "ssr"
   },
   "development": {
     "autoBuild": true

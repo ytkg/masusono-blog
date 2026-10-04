@@ -384,16 +384,11 @@ test("collapsed excerpts do not request body images", async ({ page }) => {
     if (request.url().endsWith("/excerpt-image.webp")) imageRequests += 1
   })
   await page.route("**/excerpt-image.webp", (route) => route.fulfill({ path: "app/frontend/assets/logo.webp" }))
-  await page.route("**/", async (route) => {
-    const response = await route.fetch()
-    const body = (await response.text()).replaceAll(
+  await mockPageProps(page, "/", (props) => {
+    props.articles[0].content = props.articles[0].content.replace(
       "駅を出て、いつもと違う道を歩きました。",
-      JSON.stringify('駅を出て、いつもと違う道を歩きました。<img src="/excerpt-image.webp" alt="本文画像">').slice(
-        1,
-        -1,
-      ),
+      '駅を出て、いつもと違う道を歩きました。<img src="/excerpt-image.webp" alt="本文画像">',
     )
-    await route.fulfill({ response, body })
   })
 
   await openPage(page, "/")
