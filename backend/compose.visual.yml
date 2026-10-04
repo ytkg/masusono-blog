@@ -1,8 +1,13 @@
 services:
   backend:
     user: "0:0"
+    depends_on:
+      vite:
+        condition: service_healthy
     environment:
       VISUAL_TEST: "1"
+      VITE_RUBY_HOST: localhost
+      INERTIA_SSR_URL: http://127.0.0.1:13714
       TZ: Asia/Tokyo
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:3000/up"]
@@ -11,7 +16,7 @@ services:
       retries: 60
   vite:
     user: "0:0"
-    command: sh -lc "npm ci --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 3036"
+    command: sh -lc "npm ci --no-audit --no-fund && npm run build && npm run dev -- --host 0.0.0.0 --port 3036"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:3036/"]
       interval: 2s

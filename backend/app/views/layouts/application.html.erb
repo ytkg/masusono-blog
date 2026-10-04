@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <title inertia>増田とその他！</title>
+    <% unless inertia_ssr_head.present? %>
+      <title data-inertia>増田とその他！</title>
+    <% end %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">

@@ -3,14 +3,15 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr",
     "lint": "eslint app/frontend --ext .js,.jsx",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:visual": "vite build && playwright test",
-    "test:visual:update": "vite build && playwright test --update-snapshots",
+    "test:visual": "npm run build && playwright test",
+    "test:visual:update": "npm run build && playwright test --update-snapshots",
     "format": "prettier --write \"app/frontend/**/*.{js,jsx,css,md,json}\"",
-    "format:check": "prettier --check \"app/frontend/**/*.{js,jsx,css,md,json}\""
+    "format:check": "prettier --check \"app/frontend/**/*.{js,jsx,css,md,json}\"",
+    "test:ssr": "vite build --ssr && node --test test/ssr/*.test.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "^0.4.2",
@@ -22,6 +23,7 @@
     "@mui/material": "^9.2.0",
     "@ruby/4.0-wasm-wasi": "^2.9.3-2.9.4",
     "@ruby/wasm-wasi": "^2.9.3-2.9.4",
+    "parse5": "^8.0.1",
     "prism-react-renderer": "^2.4.1",
     "prismjs": "^1.30.0",
     "react": "^19.1.0",
@@ -31,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@inertiajs/vite": "3.6.1",
     "@playwright/test": "1.63.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",

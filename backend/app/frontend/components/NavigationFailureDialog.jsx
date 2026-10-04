@@ -12,7 +12,7 @@ import {
 } from "../shared/lib/navigationRecovery"
 
 export default function NavigationFailureDialog() {
-  const failure = useSyncExternalStore(subscribeNavigationFailure, getNavigationFailure)
+  const failure = useSyncExternalStore(subscribeNavigationFailure, getNavigationFailure, () => null)
   return (
     <Dialog
       open={Boolean(failure)}

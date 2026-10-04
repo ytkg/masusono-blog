@@ -9,6 +9,15 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=4.0.1
+FROM node:22-bookworm-slim AS frontend
+WORKDIR /rails
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY vite.config.ts ./
+COPY config/vite.json config/vite.json
+COPY app/frontend app/frontend
+RUN npm run build
+
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -23,6 +32,9 @@ RUN apt-get update -qq && \
     fi && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# SSR runs alongside Puma; the runtime does not need npm or node_modules.
+COPY --from=frontend /usr/local/bin/node /usr/local/bin/node
 
 # Set environment variables (overridable via build args) and enable jemalloc for reduced memory usage and latency.
 ARG RAILS_ENV=production
@@ -54,6 +66,8 @@ RUN bundle install && \
 
 # Copy application code
 COPY . .
+COPY --from=frontend /rails/public/vite /rails/public/vite
+COPY --from=frontend /rails/ssr /rails/ssr
 
 # Precompile bootsnap code for faster boot times.
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495

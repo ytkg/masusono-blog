@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - backend/app/frontend/**
+      - backend/test/ssr/**
       - backend/package.json
       - backend/package-lock.json
       - backend/vite.config.ts
@@ -14,6 +15,7 @@ on:
   pull_request:
     paths:
       - backend/app/frontend/**
+      - backend/test/ssr/**
       - backend/package.json
       - backend/package-lock.json
       - backend/vite.config.ts
@@ -42,3 +44,6 @@ jobs:
 
       - name: Run Vitest
         run: npm test
+
+      - name: Verify production SSR bundle
+        run: npm run test:ssr

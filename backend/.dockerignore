@@ -40,7 +40,10 @@
 # Ignore development files
 /.devcontainer
 
-# Frontend dependencies are installed on the CI runner; keep built public assets.
+# Frontend dependencies and SSR are built in the frontend stage.
+/ssr
+/public/vite
+/public/vite-ssr
 /node_modules
 
 # Tests and their generated artifacts are not needed at runtime.
