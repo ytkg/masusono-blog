@@ -54,6 +54,47 @@ description: masusono-blog のコードから、既存テストで安全性を�
 - `compose.sh up --build -d` の終了だけで準備完了と判断しない。`compose.sh logs vite` で依存準備が正常に完了し、Vite が起動したことを確認してから RSpec を開始する。起動時にも npm install が実行されるため、`git diff -- backend/package.json backend/package-lock.json` で意図しない依存定義・lockfile の差分がないことを確認する。
 - RSpec と Visual Regression（`scripts/push.sh` が実行する全画面比較を含む）は、同じ `backend/public/vite` にビルド出力を書き込むため並列実行しない。RSpec の終了と成功を確認してから Visual Regression または `scripts/push.sh` を開始する。絞り込んだテストで必須の全画面比較を代替しない。
 
+### 並列作業の検証順番
+
+ユーザーまたは適用される指示が並列作業を明示した場合は、独立 worktree の候補調査・実装・依存準備を並列に進めてよい。改善テーマごとの Issue・PR と安全基準は維持する。同じホストのフロントエンド全テスト・RSpec・Visual Regression は、worktree が異なっても同時実行せず、共有ロックで検証の順番を調整する。
+
+- 同じホストの担当者全員で同じロックパスを使う。以下の例では `/tmp/masusono-validation.lock` を使う。
+- ロック取得に失敗したら、その呼び出しでは検証を開始しない。`mkdir` と検証コマンドを改行や `;` だけで並べず、成功時だけ後続処理を実行する。待ち時間にはロックを使わない調査・実装を進める。
+- 所有者の PID と worktree を記録し、全テストまたは全画面比較の実行中だけ保持する。`scripts/push.sh` も全画面比較を実行するためロックの対象にする。終了・失敗・中断時は、自分が取得したロックだけ解除する。
+- 残ったロックは所有者と対象の検証プロセスの状態を確認する。実行中の検証や用途不明のロックを削除せず、担当者と調整する。他の担当者のロックを無条件に削除して検証を開始しない。
+
+worktree ルートの Bash で次の関数を定義し、検証コマンドを引数として渡す。取得失敗は終了コード 75、検証失敗はそのコマンドの終了コードを返す。
+
+```bash
+with_validation_lock() (
+  set -euo pipefail
+  validation_lock=/tmp/masusono-validation.lock
+  validation_owner="${BASHPID:-$$}:$(pwd -P)"
+
+  if ! mkdir "${validation_lock}"; then
+    echo "別の検証がロックを保持しています: ${validation_lock}" >&2
+    exit 75
+  fi
+
+  cleanup_validation_lock() {
+    if [[ "$(cat "${validation_lock}/owner" 2>/dev/null)" == "${validation_owner}" ]]; then
+      rm "${validation_lock}/owner"
+      rmdir "${validation_lock}"
+    fi
+  }
+  trap cleanup_validation_lock EXIT
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  printf '%s\n' "${validation_owner}" > "${validation_lock}/owner"
+
+  "$@"
+)
+
+with_validation_lock .codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm test
+```
+
+必要な検証の成功を確認してコミットした後、全画面比較付き push は `with_validation_lock scripts/push.sh` で実行する。各呼び出しの終了コードを確認し、失敗した検証を飛ばして次へ進めない。
+
 ### PR 作成後の CI 確認
 
 - 作成した PR の先端コミットとチェック結果を確認し、対象の検証ジョブが完了して成功したことを確認する。古いコミットの成功や、待機中・実行中のチェックを成功として扱わない。スキップされたジョブは変更範囲や実行条件から理由を確認する。
