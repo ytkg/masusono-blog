@@ -69,7 +69,8 @@ worktree ルートの Bash で次の関数を定義し、検証コマンドを�
 with_validation_lock() (
   set -euo pipefail
   validation_lock=/tmp/masusono-validation.lock
-  validation_owner="${BASHPID:-$$}:$(pwd -P)"
+  # Bash 3.2 の $$ は親の PID を返すため、保持サブシェルの PID を取得する。
+  validation_owner="$(exec sh -c 'printf "%s" "$PPID"'):$(pwd -P)"
 
   if ! mkdir "${validation_lock}"; then
     echo "別の検証がロックを保持しています: ${validation_lock}" >&2
