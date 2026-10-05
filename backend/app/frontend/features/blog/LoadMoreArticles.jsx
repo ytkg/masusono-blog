@@ -3,7 +3,7 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 
-export default function LoadMoreArticles({ hasMore, loading, failed, loadMore, mode }) {
+export default function LoadMoreArticles({ hasMore, loading, failed, loadMore, buffer }) {
   const sentinelRef = useRef(null)
 
   useEffect(() => {
@@ -12,11 +12,11 @@ export default function LoadMoreArticles({ hasMore, loading, failed, loadMore, m
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) loadMore()
       },
-      { rootMargin: mode === "beginnings" ? "3000px" : "400px" },
+      { rootMargin: `${buffer}px` },
     )
     observer.observe(sentinelRef.current)
     return () => observer.disconnect()
-  }, [hasMore, loading, failed, loadMore, mode])
+  }, [hasMore, loading, failed, loadMore, buffer])
 
   if (!hasMore) return null
 

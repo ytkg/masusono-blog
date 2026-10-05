@@ -7,11 +7,13 @@ export const HOME_TABS = Object.freeze([
   {
     id: "feed",
     label: "フィード",
+    articleLoadBuffer: 400,
     renderContent: ({ articles }) => <ArticlesList articles={articles} emptyMessage="記事がありません。" />,
   },
   {
     id: "beginnings",
     label: "書き出し",
+    articleLoadBuffer: 3000,
     renderContent: ({ articles }) => <SentenceFeed articles={articles} />,
   },
 ])

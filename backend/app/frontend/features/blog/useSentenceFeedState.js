@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react"
 import useImmediateRemember from "@/shared/hooks/useImmediateRemember"
-import { prepareSentenceArticles, createInitialSentenceState } from "./sentenceFeedData"
+import { prepareSentenceArticles, createInitialSentenceState, mergeSentenceArticleSources } from "./sentenceFeedData"
 
 const SENTENCE_STATE_KEY = "home-beginnings"
 
@@ -25,15 +25,8 @@ export default function useSentenceFeedState(articles) {
 
   useLayoutEffect(() => {
     const state = rememberedStateRef.current
-    const knownIds = new Set(state.sourceIds)
-    const newIds = sentenceArticles.filter((article) => !knownIds.has(article.id)).map((article) => article.id)
-    if (newIds.length > 0) {
-      commitRememberedState(
-        state.items.length === 0
-          ? createInitialSentenceState(sentenceArticles)
-          : { ...state, sourceIds: [...state.sourceIds, ...newIds] },
-      )
-    }
+    const nextState = mergeSentenceArticleSources(state, sentenceArticles)
+    if (nextState !== state) commitRememberedState(nextState)
   }, [sentenceArticles, rememberedStateRef, commitRememberedState])
 
   useLayoutEffect(() => {
