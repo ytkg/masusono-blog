@@ -10,6 +10,37 @@ vi.mock("@inertiajs/react", async () => {
 })
 
 describe("ArticleCard", () => {
+  it("詳細の本文下に関連記事を通常のリンクとして表示する", () => {
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{ id: "current", title: "閲覧中", content: "<p>本文です</p>" }}
+        relatedArticles={[{ id: "related", title: "関連記事のタイトル" }]}
+      />,
+    )
+    const section = screen.getByRole("region", { name: "関連記事" })
+    expect(section).toContainElement(screen.getByRole("heading", { level: 2, name: "関連記事" }))
+    expect(screen.getByRole("link", { name: "関連記事のタイトル" })).toHaveAttribute("href", "/articles/related")
+    expect(
+      screen.getByText("本文です").compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it.each(["list", "detail"])("%sモードでは候補が0件なら関連記事の枠を表示しない", (mode) => {
+    render(<ArticleCard mode={mode} article={{ id: "current", title: "閲覧中", content: "<p>本文</p>" }} />)
+    expect(screen.queryByRole("region", { name: "関連記事" })).not.toBeInTheDocument()
+  })
+
+  it("一覧には関連記事を表示しない", () => {
+    render(
+      <ArticleCard
+        article={{ id: "current", title: "閲覧中", content: "<p>本文</p>" }}
+        relatedArticles={[{ id: "related", title: "関連記事のタイトル" }]}
+      />,
+    )
+    expect(screen.queryByRole("region", { name: "関連記事" })).not.toBeInTheDocument()
+  })
+
   function mockClipboard() {
     const writeText = vi.fn().mockResolvedValue(undefined)
 

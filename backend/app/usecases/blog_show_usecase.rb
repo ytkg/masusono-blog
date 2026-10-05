@@ -9,11 +9,13 @@ class BlogShowUsecase
 
   def call
     article = Article.find(@article_id)
+    related_articles = article ? RelatedArticlesBuilder.call(article:) : []
     article = ArticlePayloadBuilder.call(article:) if article
 
     {
       props: {
-        article: article
+        article: article,
+        relatedArticles: related_articles
       },
       status: article.nil? ? :not_found : :ok
     }

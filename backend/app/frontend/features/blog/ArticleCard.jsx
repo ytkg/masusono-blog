@@ -1,6 +1,7 @@
 import { formatArticleStats } from "./articleStats"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
+import Link from "@mui/material/Link"
 import ContentItemCard from "../../shared/ContentItemCard"
 import ArticleActions from "./ArticleActions"
 import ArticleBody from "./ArticleBody"
@@ -12,7 +13,7 @@ function getAuthorHref(article) {
   return article.authorId ? `/authors/${article.authorId}` : undefined
 }
 
-export default function ArticleCard({ article, mode = "list", sx }) {
+export default function ArticleCard({ article, mode = "list", sx, relatedArticles = [] }) {
   if (!article) {
     return (
       <ContentItemCard title="記事" titleComponent="h3" sx={sx}>
@@ -61,6 +62,22 @@ export default function ArticleCard({ article, mode = "list", sx }) {
     >
       <ArticleTags tags={article.tags} />
       <ArticleBody enableRubyRunner={isDetail || isList} html={html} hasBody={hasBody} shouldCollapse={isList} />
+      {isDetail && relatedArticles.length > 0 && (
+        <Box component="section" aria-label="関連記事" sx={{ mt: 3, pt: 3, borderTop: 1, borderColor: "divider" }}>
+          <Typography component="h2" variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
+            関連記事
+          </Typography>
+          <Box component="ul" sx={{ m: 0, pl: 3, display: "grid", gap: 1.5 }}>
+            {relatedArticles.map((related) => (
+              <Box component="li" key={related.id} sx={{ overflowWrap: "anywhere" }}>
+                <Link href={`/articles/${related.id}`} underline="always" color="inherit">
+                  {related.title}
+                </Link>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      )}
     </ContentItemCard>
   )
 
