@@ -9,6 +9,9 @@ export const SENTENCE_STATE_VERSION = 1
 
 const SENTENCE_END_PATTERN = /[。！？!?]+[」』）)］\]｝}”’】〕〉》〙〗〟'"]*|\n/g
 
+const SENTENCE_CLOSING_MARK_PATTERN = /[」』）)］\]｝}”’】〕〉》〙〗〟'"]$/
+const SENTENCE_CONTINUATION_PATTERN = /^[ぁ-んァ-ヶー一-龠々〆ヵヶA-Za-z0-9]/
+
 export function firstSentenceFromHtml(html = "") {
   const text = extractHtmlText(html)
     .replace(/[ \t\f\v]+/g, " ")
@@ -23,9 +26,9 @@ function firstSentenceBoundary(text) {
   for (const candidate of text.matchAll(SENTENCE_END_PATTERN)) {
     const end = candidate[0]
     const nextCharacter = text[candidate.index + end.length] || ""
-    const hasClosingMark = /[」』）)］\]｝}”’】〕〉》〙〗〟'"]$/.test(end)
+    const hasClosingMark = SENTENCE_CLOSING_MARK_PATTERN.test(end)
 
-    if (end === "\n" || !hasClosingMark || !/^[ぁ-んァ-ヶー一-龠々〆ヵヶA-Za-z0-9]/.test(nextCharacter)) {
+    if (end === "\n" || !hasClosingMark || !SENTENCE_CONTINUATION_PATTERN.test(nextCharacter)) {
       return candidate
     }
   }
