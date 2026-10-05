@@ -30,9 +30,8 @@ export function buildHtmlParts(html) {
   const parts = []
   const rewrittenHtml = document.body.innerHTML
   let lastIndex = 0
-  let match
 
-  while ((match = PLACEHOLDER_PATTERN.exec(rewrittenHtml))) {
+  for (const match of rewrittenHtml.matchAll(PLACEHOLDER_PATTERN)) {
     if (match.index > lastIndex) {
       parts.push({ type: "html", html: rewrittenHtml.slice(lastIndex, match.index) })
     }
