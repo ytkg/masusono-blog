@@ -1,3 +1,5 @@
+const EXCLUDED_TAGS = ["SCRIPT", "STYLE", "IFRAME"]
+
 const BLOCK_TAGS = new Set([
   "P",
   "DIV",
@@ -29,7 +31,7 @@ function readCopyNode(node, inPre = false) {
   if (node.nodeType === 3) return inPre ? node.textContent : node.textContent.replace(/\s+/g, " ")
   if (node.nodeType !== 1) return ""
   const tag = node.tagName
-  if (["SCRIPT", "STYLE", "IFRAME"].includes(tag)) return ""
+  if (EXCLUDED_TAGS.includes(tag)) return ""
   if (tag === "BR") return "\n"
   let text = ""
   for (const child of node.childNodes) {
