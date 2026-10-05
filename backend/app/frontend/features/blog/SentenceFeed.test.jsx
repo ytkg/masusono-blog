@@ -25,6 +25,12 @@ vi.mock("@inertiajs/react", async () => {
 })
 
 const articles = [{ id: "first", content: "<p>最初の一文。次の文。</p>" }]
+// These checks count rendered cards; avoid repeating visibility walks for every link.
+// The revealed card's visibility is asserted separately below.
+function sentenceLinks() {
+  return screen.getAllByRole("link", { hidden: true })
+}
+
 let observers
 beforeEach(() => {
   vi.useFakeTimers()
@@ -52,18 +58,20 @@ afterEach(() => {
 describe("SentenceFeed", () => {
   it("追加表示と表示済み状態を保存し、再表示時に復元する", () => {
     const view = render(<SentenceFeed articles={articles} />)
-    expect(screen.getAllByRole("link")).toHaveLength(INITIAL_SENTENCE_COUNT)
+    expect(sentenceLinks()).toHaveLength(INITIAL_SENTENCE_COUNT)
     act(() => vi.advanceTimersByTime(SENTENCE_REVEAL_SETTLE_MS))
     expect(history.state.items.every((item) => item.hasRevealed)).toBe(true)
+    expect(sentenceLinks()[0]).toBeVisible()
     fireEvent.scroll(window)
     fireEvent.scroll(window)
     act(() => vi.advanceTimersByTime(20))
-    expect(screen.getAllByRole("link")).toHaveLength(INITIAL_SENTENCE_COUNT + APPEND_SENTENCE_COUNT)
+    expect(sentenceLinks()).toHaveLength(INITIAL_SENTENCE_COUNT + APPEND_SENTENCE_COUNT)
     const keys = history.state.items.map((item) => item.key)
     view.unmount()
     render(<SentenceFeed articles={articles} />)
-    expect(screen.getAllByRole("link")).toHaveLength(keys.length)
+    expect(sentenceLinks()).toHaveLength(keys.length)
     expect(history.state.items.map((item) => item.key)).toEqual(keys)
+    expect(sentenceLinks()[0]).toBeVisible()
   })
 
   it("アンマウントで予約済み追加・表示タイマー・計測を解除する", () => {
@@ -85,12 +93,12 @@ describe("SentenceFeed", () => {
 
   it("追加取得した記事を候補へ加え、表示済みの書き出しを維持する", () => {
     const view = render(<SentenceFeed articles={articles} />)
-    const keys = screen.getAllByRole("link").map((link) => link.textContent)
+    const keys = sentenceLinks().map((link) => link.textContent)
     view.rerender(<SentenceFeed articles={[...articles, { id: "second", content: "<p>追加された一文。</p>" }]} />)
-    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(keys)
+    expect(sentenceLinks().map((link) => link.textContent)).toEqual(keys)
     expect(history.state.sourceIds).toEqual(["first", "second"])
     fireEvent.scroll(window)
     act(() => vi.advanceTimersByTime(20))
-    expect(screen.getAllByRole("link").some((link) => link.getAttribute("href") === "/articles/second")).toBe(true)
+    expect(sentenceLinks().some((link) => link.getAttribute("href") === "/articles/second")).toBe(true)
   })
 })
