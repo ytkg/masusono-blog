@@ -1,3 +1,5 @@
+const CHARACTER_COUNT_FORMATTER = new Intl.NumberFormat("ja-JP")
+
 export function formatArticleStats(article) {
   const characterCount = Number(article.characterCount)
   const readingTimeMinutes = Number(article.readingTimeMinutes)
@@ -6,7 +8,7 @@ export function formatArticleStats(article) {
     return undefined
   }
 
-  const formattedCharacterCount = new Intl.NumberFormat("ja-JP").format(characterCount)
+  const formattedCharacterCount = CHARACTER_COUNT_FORMATTER.format(characterCount)
   const formattedReadingTimeMinutes = String(readingTimeMinutes)
   const formattedReadingTime =
     Number.isFinite(readingTimeMinutes) && readingTimeMinutes > 0 ? `・約${formattedReadingTimeMinutes}分` : ""
