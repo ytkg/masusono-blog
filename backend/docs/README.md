@@ -11,18 +11,19 @@
 
 ## 開発・設計
 
-- [Inertia Rails 移行計画](./inertia-migration-plan.md)
-  - 画面移行の現在地、完了条件、切り戻し方針
-- [コンテンツページ Inertia Controller 移行設計メモ](./content-pages-inertia-controller-migration-plan.md)
-  - コンテンツページを server props 化した背景と設計判断
-- [増その図鑑プロフィール更新手順](./zukan-profile-update.md)
+- [バックエンド README](../README.md#記事詳細のssr)
+  - 現行の Inertia 描画構成、記事詳細の SSR とページング
+- [著者プロフィール更新手順](./zukan-profile-update.md)
   - 記事が増えたときに、人物像プロフィールを同じ判断軸で更新する手順
 
 ## 運用
 
 - [Cloud Run ウォーム維持戦略](./cloud-run-warmup-strategy.md)
-- [本番 HTTPS と Host Authorization](./production-https-host-authorization.md)
   - キャッシュではなくウォーム維持で運用する前提と監視方針
+- [本番 HTTPS と Host Authorization](./production-https-host-authorization.md)
+  - HTTPS の扱い、許可ホストとヘルスチェックの設定
+- [画面遷移エラーの診断](./navigation-error-diagnostics.md)
+  - 遷移失敗の復旧 UI と Cloud Logging での調査
 - [Service Worker 更新手順](./service-worker-versioning.md)
   - PWA キャッシュを切り替えるときの更新ルール
 

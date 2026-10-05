@@ -46,7 +46,7 @@ npm run dev
 「コンテンツの取得（一覧・詳細）」、Content API の「GET」「下書き全取得」「公開終了全取得」権限を追加してください。
 一覧は記事本文を取得せず、管理 API の状態・更新日時と Content API の `id,title` を結合して表示します。
 
-管理ミニアプリは、認証状態・ログイン・メディア取得に `/api/app/management/` 以下の
+管理ミニアプリは、認証状態・ログイン・メディア取得／アップロード・記事取得に `/api/app/management/` 以下の
 JSON API を使います。認証トークンは画面へ返さず Rails セッションに保持し、
 ログインとメディアアップロードのリクエストは CSRF トークンで保護します。
 
@@ -64,6 +64,8 @@ JSON API を使います。認証トークンは画面へ返さず Rails セッ�
   - 増田RUNのランキングを登録する
 - `GET /api/app/web_push/vapid_key.json`
   - Web Push公開鍵を返す
+- `GET /api/app/web_push/subscription.json?endpoint=...`
+  - 通知の購読がサーバーの配信対象に登録されているかを返す
 - `POST` / `DELETE /api/app/web_push/subscription.json`
   - Web Pushの購読を登録・解除する
 - `GET /sitemap.xml`
@@ -214,7 +216,7 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 }
 ```
 
-`ApplicationController` でのマッピング:
+`ApiController` でのマッピング（メッセージ定義は `ApplicationController`）:
 
 - `Microcms::FetchContentsService::FetchError`
   - upstream `408` -> `504 Gateway Timeout` (`upstream_timeout`)
@@ -303,8 +305,13 @@ docker compose run --rm backend bundle exec rspec
 ローカルで GitHub Actions 相当の主要チェックをまとめて回す場合:
 
 ```bash
-bin/ci
+rbenv exec bin/ci
 ```
+
+`config/ci.rb` はセットアップ、RuboCop、bundler-audit、Brakeman、テストDB準備、
+RSpec、ESLint、Prettier、Vitest、本番 SSR バンドルのテストを順に実行します。
+bundler-audit は既知の脆弱性を検出すると失敗し、現行設定に ignore はありません。
+Brakeman は警告または解析エラーで失敗します。`npm audit` はこのチェックに含みません。
 
 ## フロントエンドのLint/Format/テスト
 
@@ -336,14 +343,16 @@ Rails・ブラウザとリソースを共有するため、CPU数だけで並列
 ```
 
 デプロイ先はチェックアウト中の Git ブランチで決まります。GitHub Actions では
-`GITHUB_REF_NAME` を使うため、checkoutがデタッチされたHEADでも同じ規則で動作します。
+`DEPLOY_BRANCH` を明示します。判定の優先順は `DEPLOY_BRANCH`、`GITHUB_REF_NAME`、
+チェックアウト中のブランチです。デタッチされた HEAD では前者のいずれかが必要です。
 
 - `main`: 本番サービス `masusono` へデプロイ
 - その他のブランチ: ステージングサービス `masusono-<ブランチ名>` へデプロイ
 
 ステージングのサービス名では、ブランチ名を英小文字化し、英数字以外の連続を `-` に置換します。
 たとえば `feature/login` は `masusono-feature-login` になります。Cloud Run の63文字制限に
-収めるため、ブランチ名由来の部分は54文字までです。デプロイ完了時には対象サービス名と
+収めるため、正規化したブランチ名が54文字を超える場合は先頭45文字と
+元のブランチ名の SHA-256 先頭8文字を `-` で結合します。デプロイ完了時には対象サービス名と
 Cloud Run URL が表示されます。
 
 Rails credentials の復号鍵はSecret Managerの `rails-master-key` からCloud Runへ注入します。
@@ -351,10 +360,11 @@ Rails credentials の復号鍵はSecret Managerの `rails-master-key` からClou
 
 ### GitHub Actionsによる本番デプロイ
 
-`.github/workflows/deploy-cloud-run.yml` は、`backend/` またはworkflow自身に関係する変更が
+`.github/workflows/deploy-cloud-run.yml` は、`backend/**`、workflow 自身、または `.github/scripts/deploy-policy.cjs` の変更が
 `main` へpush（PRマージを含む）されたときに起動します。`backend/bin/ci` の全チェックが
 成功してから、OIDC / Workload Identity FederationでGCPへ認証し、本番サービスへデプロイします。
-認証対象はGitHubリポジトリ `ytkg/masusono-blog` の `main` ブランチに限定されています。
+認証設定は各 workflow の Workload Identity Provider とサービスアカウントを参照してください。
+`デプロイなし` によるスキップと自動ラベルの条件は [ルート README](../README.md#デプロイ) を参照してください。
 
 `.github/workflows/deploy-pr-cloud-run.yml` は、同一リポジトリのPRへ `ステージングデプロイ` ラベルを
 付けたとき、またはそのラベルが付いたPRを再オープン・更新したときに、全CI後のステージングデプロイを

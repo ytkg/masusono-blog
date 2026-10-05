@@ -1,60 +1,66 @@
-# 改善バックログ（2026-03-10 再棚卸し）
+# 改善バックログ（2026-10-05 実装照合）
 
-- 最終更新: 2026-03-10
+- 最終更新: 2026-10-05
 - 目的: `backend` の改善候補を実装事実ベースで管理し、着手順を明確にする
 - 調査範囲: `README.md`, `AGENTS.md`, `docs/*.md`, `.github/*`, `config/*`, `app/**/*`, `spec/**/*`
 
-## 0. 監査サマリー（今回の確定事項）
+本書は改善候補の一覧です。未完了項目の優先度・担当・期限は別途判断が必要です。
+削除済みの移行計画や旧 URL に関する項目は過去の対応履歴として記載しています。
 
-- [x] API パスを `README.md` / `docs/inertia-migration-plan.md` / `docs/api-response-contract.md` で `/api/app/...` に統一済み
-- [x] 上記3ファイルの相互整合性チェック手順を追加済み
+## 0. 監査サマリー（実装で確認した事項）
+
+- [x] 現行 API パスを `README.md` / `docs/api-response-contract.md` で `/api/app/...` に統一済み（移行計画は撤去済み）
+- [x] 上記2ファイルの相互整合性チェック手順を追加済み
 - [x] Dependabot に npm エコシステム更新を追加済み（`.github/dependabot.yml`）
 - [x] フロント単体テスト基盤（Vitest + React Testing Library）は導入済み
 - [x] `SeoHead` の canonical は絶対URL出力へ統一済み
 - [x] バックログに残っていた `ApplicationController#inertia_render` / `MICROCMS_*_ENDPOINT` は現行コード上で未検出
 - [x] CI の test ジョブが `bundle exec rspec` ベースへ移行済み
 - [x] CI に frontend lint / format check を追加済み
-- [x] PR テンプレートを追加済み（`.github/pull_request_template.md`）
-- [x] ドキュメント内に旧表記が残存（`/app/*`, `/app/*.json`）
-- [x] `sitemap.xml` の静的URLに `/shops` が残り、画面URL `/shop` と不整合
+- [x] PR テンプレートを追加済み（`backend/.github/pull_request_template.md`。リポジトリルートの `.github/` には配置されていない）
+- [x] 旧 API 表記（`/app/*`, `/app/*.json`）を修正済み
+- [x] 旧ショップ URL の不整合は解消済み。現行の routes / sitemap に `/shop`・`/shops` はない
 
-## 1. P0（今週）
+## 1. P0（過去の対応履歴）
 
-- [x] CI test を `bundle exec rspec` ベースに移行する（`.github/workflows/ci_backend.yml`）
-- [x] CI に `npm run lint` / `npm run format:check` を追加する（`.github/workflows/ci_frontend.yml`）
+- [x] CI test を `bundle exec rspec` ベースに移行する（現行: `.github/workflows/backend-rspec.yml`）
+- [x] CI に `npm run lint` / `npm run format:check` を追加する（現行: `.github/workflows/frontend-eslint.yml` / `frontend-prettier.yml`）
 - [x] `sitemap.xml` の `/shops` 方針を決定する（`/shop` へ変更 or `/shops` リダイレクト追加）
 - [x] `spec/routing/routes_spec.rb` に `/api/app/*`, `/sitemap.xml`, `/up` のルーティング検証を追加する
 - [x] API エラーレスポンスに `request_id` を含める（調査容易化）
 - [x] `docs/inertia-migration-plan.md` の `/app/*` / `/app/*.json` を `/api/app/*` 系に統一する
 - [x] Cloud Run ウォーム維持戦略を正本に統一し、旧キャッシュ戦略 docs を廃止する
 
-## 2. P1（次スプリント）
+## 2. P1（過去の対応履歴）
 
 - [x] `bin/ci` を CI 本体と同じ実行内容に揃える（Ruby lint/test + frontend lint）
 - [x] controller / usecase の返却契約を統一する（Inertia は `{ props:, status: }`、API は `{ json:, status: }`、XML は `{ body:, content_type:, status: }`）
 - [x] 未使用コードを整理する（`ApplicationController#inertia_render`, `MICROCMS_*_ENDPOINT`）
 - [x] `docs/` の目次ページを追加し、運用導線を一本化する
 - [x] `bundler-audit` 設定のプレースホルダ（`CVE-THAT-DOES-NOT-APPLY`）を削除し、ignore なし運用へ更新した
-- [x] PR テンプレートを追加し、影響範囲/検証観点/ロールバック手順を固定化する
+- [x] `backend/.github/pull_request_template.md` に影響範囲/検証観点/ロールバック手順を記載済み
+- [ ] PR テンプレートを当初の配置予定であるリポジトリルートの `.github/` に配置する
 
 ## 3. P2（品質・設計）
 
 - [x] フロント単体テスト基盤（Vitest）を導入し、hooks / shared lib から優先してテスト追加
 - [x] 主要導線のブラウザE2Eは撤去済み。主要確認は request spec / frontend test に集約
-- [ ] `fetchJson` のエラー表現を API 契約（`error.code`, `error.message`）へ接続する
-- [ ] SWR hook の重複パターンを共通化する（一覧系 hook のボイラープレート削減）
+- [x] `fetchJson` の `ApiError` に `status`, `code`, `message`, `requestId` を接続済み（`app/frontend/shared/lib/fetchJson.js`）
+- [x] 共通の `useApiSWR` を導入済み。現行の利用箇所は増田RUNランキング（公開ページは Inertia props、管理一覧は `useAdminList` を使用）
 - [x] `SeoHead` の canonical を絶対URL出力へ統一する
 - [x] `ApiController` の `no-store` 契約を request spec で網羅し、回帰を防止する
 - [x] `MetricsIndexUsecase` の責務を分割した（article 集計 / payload 構築 / orchestration）
 
 ## 4. セキュリティ・運用
 
-- [ ] `config/environments/production.rb` の `force_ssl` / `host_authorization` の運用方針を確定する
+- [x] `assume_ssl` / `force_ssl` と `ProductionSecurity::ALLOWED_HOSTS` を設定済み（`docs/production-https-host-authorization.md`）
 - [ ] CORS 許可 origin を環境変数で管理できる形へ変更する（`config/initializers/cors.rb`）
-- [ ] `deploy.sh` の `RAILS_MASTER_KEY` 直渡しを廃止し、Secret Manager 等へ移行する
-- [ ] `bundler-audit` / `npm audit` の fail 条件を文書化し、CIに組み込む
-- [ ] SAST / Secret scan（CodeQL, Gitleaks 等）導入可否を決定する
-- [ ] 構造化ログ（JSON）を標準化し、`request_id`, `path`, `status`, `duration_ms` を必須化する
+- [x] `deploy.sh` は環境変数の直渡しを削除し、Secret Manager の `rails-master-key:latest` を使用
+- [x] `bundler-audit` は ignore なしで CI / `bin/ci` に導入済み。失敗条件は README に記載
+- [ ] `npm audit` の失敗条件を決め、CI に組み込む（未導入）
+- [x] SAST は Brakeman を CI / `bin/ci` に導入済み（警告・解析エラーで失敗）
+- [ ] Secret scan（Gitleaks 等）や追加の CodeQL 導入可否を決定する
+- [x] 本番ログを JSON 化し、`request_completed` に `request_id`, `path`, `status`, `duration_ms` を記録済み（`lib/structured_logging/`）
 
 ## 5. データ・外部連携
 
@@ -71,7 +77,7 @@
 - [x] `README.md` に `bin/ci` の位置づけと実行例を追記する
 - [x] `bin/dev`（ホスト実行時）の Vite 同時起動方針を明記する
 - [ ] CI で RSpec 結果（JUnit等）をアーティファクト化する
-- [ ] GitHub Actions に path filter を導入し、不要ジョブを抑制する
+- [x] Ruby / frontend の個別 CI workflow に path filter を導入済み。全画面 Visual Regression は全 PR で実行する
 - [x] Service Worker のバージョン更新手順をドキュメント化する
 
 ## 7. バックログ運用ルール

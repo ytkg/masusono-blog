@@ -7,7 +7,7 @@ HTTPS を提供するため、コンテナに HTTP で届くことによる不�
 
 ## 許可する Host
 
-`config.hosts` は次だけを許可します。
+`config.hosts` は `config/production_security.rb` の `ProductionSecurity::ALLOWED_HOSTS` を使い、次だけを許可します。
 
 - `masusono.com`
 - `www.masusono.com`
@@ -37,7 +37,7 @@ Rails は `assume_ssl` によりそのリクエストを HTTPS と認識しま�
 ## 新しい公開ドメインを追加する手順
 
 1. Cloud Run のカスタムドメインまたはロードバランサーと TLS 証明書を先に準備する。
-2. `config/environments/production.rb` の `config.hosts` に完全一致のホスト名を追加する。
+2. `config/production_security.rb` の `ProductionSecurity::ALLOWED_HOSTS` に完全一致のホスト名を追加する。
 3. `backend/spec/requests/production_request_security_spec.rb` に許可ケースを追加する。
 4. `bundle exec rspec spec/requests/production_request_security_spec.rb` を実行し、PR をマージする。
 5. デプロイ後、`https://<新ドメイン>/up` が 200、未許可 Host が 403 となることを確認する。

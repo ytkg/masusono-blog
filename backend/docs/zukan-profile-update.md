@@ -1,16 +1,20 @@
-# 増その図鑑プロフィール更新手順
+# 著者プロフィール更新手順
 
-記事が増えたときに、`増その図鑑` のプロフィール文を再更新するための手順です。
+記事が増えたときに、著者ページのプロフィール文を再更新するための手順です。
 完全に同じ文章を再現することは目的にせず、同じ判断軸で「同じ人物像に見える」状態を目指します。
 
 ## 更新対象
 
-- プロフィールデータ: `app/frontend/features/apps/zukan/zukanData.js`
-- 表示コンポーネント: `app/frontend/features/apps/zukan/ZukanApp.jsx`
-- 人物画像: `app/frontend/features/apps/zukan/assets/`
+- プロフィールデータ: microCMS の `authors` API の `title`（キャッチコピー）と `bio`（本文）
+- データ整形: `app/usecases/author_payload_builder.rb`
+- 表示コンポーネント: `app/frontend/features/authors/AuthorProfile.jsx`
+- 確認画面: `/authors` と `/authors/:author_id`
 
-通常のプロフィール更新では `zukanData.js` だけを変更します。
-表示構造やIDを変えない限り、テストの期待値はプロフィール文ごとに修正しない方針です。
+旧 `増その図鑑` ミニアプリと `zukanData.js` は撤去済みで、`/zukan` は `/authors` へリダイレクトします。
+人物画像も microCMS の著者情報から取得します。
+通常のプロフィール更新はコード変更ではなく microCMS のデータ更新です。
+記事から更新案を作り、対象著者と `title` / `bio` の差分を提示して、明示的な更新依頼と承認後にだけ適用します。
+表示構造や ID を変えない限り、テストの期待値はプロフィール文ごとに修正しない方針です。
 
 ## 基本方針
 
@@ -49,8 +53,9 @@
 5. 変わっていない核は残し、増えた傾向だけを足す
 6. キャッチコピーを1行で更新する
 7. プロフィール文を4文前後で更新する
-8. 実画面で余白、改行、文章量を確認する
-9. テストとlintを実行する
+8. 対象著者と更新前後の文章を提示し、承認後に microCMS の `title` / `bio` を更新する
+9. `/authors` と著者詳細の実画面で余白、改行、文章量を確認する
+10. 表示コードも変更した場合はテスト・lint・全画面の Visual Regression を実行する
 
 ## feed.xml の見方
 
@@ -102,7 +107,7 @@
 プロフィール更新をAIに依頼するときは、次の形で渡します。
 
 ```text
-「増その図鑑」のプロフィールを更新したい。
+著者ページのプロフィールを更新したい。
 
 目的:
 - 記事が増えた分を反映して、各人物のプロフィールを更新する
@@ -125,7 +130,7 @@
 - その人を説明する文章にする
 
 既存プロフィール:
-ここに `app/frontend/features/apps/zukan/zukanData.js` の現在の内容を貼る
+ここに microCMS の対象著者の `name`、`title`、`bio` を貼る
 
 追加で読んだ記事メモ:
 ここに人物ごとの観察メモを貼る
@@ -143,10 +148,12 @@
 - 文章量がカード内で重すぎないか
 - キャッチコピー、名前、プロフィール文の余白が崩れていないか
 
-## 確認コマンド
+## 表示コードを変更した場合の確認コマンド
 
 ```bash
 cd backend
-npm test -- ZukanApp zukanData HomeAppLaunchers
+npm test -- AuthorsList pages/authors
 npm run lint
 ```
+
+絞り込みは調査用です。表示変更の最終検証では、worktree ルートから `scripts/check-visual.sh` で全画面の比較を成功させます。

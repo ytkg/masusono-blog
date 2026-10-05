@@ -2,7 +2,7 @@
 
 この文書は現行 backend API のレスポンス契約の正本です。
 
-- 対象: 公開記事一覧 API、Navigation failure API、Users API、管理ミニアプリ API、`GET /api/app/masuda_run/rankings.json`、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
+- 対象: 公開記事一覧 API、Navigation failure API、Users API、管理ミニアプリ API、増田RUN Rankings API、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
 ## GET /api/app/articles?offset=0
@@ -13,7 +13,7 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 
 `articles` はトップページと同じ記事形式（本文・著者・文字数・読了時間を含む）。`nextOffset` は次回取得位置で、末尾では `null`。初回の `GET /` も同じデータをInertia propsとして返す。すべて `Cache-Control: no-store` を返し、upstreamエラーには共通のエラー形式を使う。
 
-検索、著者別記事、RSS、サイトマップは従来どおり全記事を対象とする。
+検索、RSS、サイトマップは全記事、著者別ページはその著者の記事全件を対象とする（全件取得の上限は README の microCMS ページング保護を参照）。
 
 ## Users API
 
@@ -42,6 +42,13 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 | `score` | `Numeric` | No | スコア |
 | `rankedAt` | `String` | No | 形式: `YYYY/MM/DD` |
 | `rank` | `Integer` | No | 順位 |
+
+## POST /api/app/masuda_run/rankings.json
+
+- Request: `{ "userId": "String", "score": Integer }`
+- `userId` は空白だけの値を除く必須値。`score` は0以上の整数（整数として解釈できる文字列も受け付ける）。
+- Response (`201 Created`): `{ "id": "String", "userId": "String", "score": Integer }`
+- 不正な入力は `400 Bad Request` と共通エラー形式（`invalid_request`）。
 
 ## 管理ミニアプリ API
 
