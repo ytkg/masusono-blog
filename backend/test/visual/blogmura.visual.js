@@ -11,20 +11,27 @@ for (const hasRelated of [true, false]) {
     const imageLink = page.getByRole("link", { name: "にほんブログ村 その他日記ブログへ" })
     const textLink = page.getByRole("link", { name: "にほんブログ村", exact: true })
     await expect(imageLink).toHaveCount(1)
-    await expect(textLink).toHaveCount(1)
+    await expect(textLink).toHaveCount(0)
     const image = imageLink.locator("img")
     await image.evaluate((element) => element.decode())
     await expect(image).toHaveCSS("width", "88px")
     await expect(image).toHaveCSS("height", "31px")
     await expect(page.getByRole("region", { name: "関連記事" })).toHaveCount(hasRelated ? 1 : 0)
-    for (const link of [imageLink, textLink]) {
+    for (const link of [imageLink]) {
       await expect(link).toHaveAttribute("href", "https://diary.blogmura.com/ranking/in?p_cid=11218704")
       await expect(link).toHaveAttribute("target", "_blank")
       await expect(link).toHaveAttribute("rel", "noopener")
     }
-    await imageLink.focus()
-    await page.keyboard.press("Tab")
-    await expect(textLink).toBeFocused()
+    if (hasRelated) {
+      const relatedLink = page.getByRole("link", { name: "関連記事のタイトル" })
+      await relatedLink.focus()
+      await page.keyboard.press("Tab")
+    } else {
+      await imageLink.focus()
+      await page.keyboard.press("Shift+Tab")
+      await page.keyboard.press("Tab")
+    }
+    await expect(imageLink).toBeFocused()
     await expectNoPageOverflow(page)
     await expect(page).toHaveScreenshot(`article-support-related-${hasRelated}.png`)
   })

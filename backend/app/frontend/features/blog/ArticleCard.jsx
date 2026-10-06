@@ -63,28 +63,6 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
     >
       <ArticleTags tags={article.tags} />
       <ArticleBody enableRubyRunner={isDetail || isList} html={html} hasBody={hasBody} shouldCollapse={isList} />
-      {isDetail && (
-        <Box sx={{ mt: 3, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 0.5 }}>
-          <Link href="https://diary.blogmura.com/ranking/in?p_cid=11218704" target="_blank" rel="noopener">
-            <Box
-              component="img"
-              src="https://b.blogmura.com/diary/88_31.gif"
-              width="88"
-              height="31"
-              alt="にほんブログ村 その他日記ブログへ"
-              sx={{ display: "block", border: 0 }}
-            />
-          </Link>
-          <Link
-            href="https://diary.blogmura.com/ranking/in?p_cid=11218704"
-            target="_blank"
-            rel="noopener"
-            variant="body2"
-          >
-            にほんブログ村
-          </Link>
-        </Box>
-      )}
       {isDetail && relatedArticles.length > 0 && (
         <Box component="section" aria-label="関連記事" sx={{ mt: 3, pt: 3, borderTop: 1, borderColor: "divider" }}>
           <Typography component="h2" variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
@@ -107,6 +85,25 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
               </Box>
             ))}
           </Box>
+        </Box>
+      )}
+      {isDetail && (
+        <Box sx={{ mt: 3 }}>
+          <Link
+            href="https://diary.blogmura.com/ranking/in?p_cid=11218704"
+            target="_blank"
+            rel="noopener"
+            sx={{ display: "inline-block" }}
+          >
+            <Box
+              component="img"
+              src="https://b.blogmura.com/diary/88_31.gif"
+              width="88"
+              height="31"
+              alt="にほんブログ村 その他日記ブログへ"
+              sx={{ display: "block", border: 0 }}
+            />
+          </Link>
         </Box>
       )}
     </ContentItemCard>

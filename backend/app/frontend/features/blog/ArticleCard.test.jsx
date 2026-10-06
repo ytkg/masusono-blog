@@ -27,10 +27,8 @@ describe("ArticleCard", () => {
       expect(image).toHaveAttribute("src", "https://b.blogmura.com/diary/88_31.gif")
       expect(image).toHaveAttribute("width", "88")
       expect(image).toHaveAttribute("height", "31")
-      const links = [
-        screen.getByRole("link", { name: "にほんブログ村 その他日記ブログへ" }),
-        screen.getByRole("link", { name: "にほんブログ村", exact: true }),
-      ]
+      expect(screen.queryByRole("link", { name: "にほんブログ村", exact: true })).not.toBeInTheDocument()
+      const links = [screen.getByRole("link", { name: "にほんブログ村 その他日記ブログへ" })]
       for (const link of links) {
         expect(link).toHaveAttribute("href", "https://diary.blogmura.com/ranking/in?p_cid=11218704")
         expect(link).toHaveAttribute("target", "_blank")
@@ -41,7 +39,7 @@ describe("ArticleCard", () => {
       }
       if (relatedArticles.length) {
         expect(
-          links[1].compareDocumentPosition(screen.getByRole("region", { name: "関連記事" })) &
+          screen.getByRole("region", { name: "関連記事" }).compareDocumentPosition(links[0]) &
             Node.DOCUMENT_POSITION_FOLLOWING,
         ).toBeTruthy()
       }
