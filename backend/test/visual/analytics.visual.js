@@ -28,7 +28,8 @@ test("GA4 hydration, Inertia history and related links", async ({ page, baseURL 
   async function expectView(count, path) {
     await expect.poll(() => views().length).toBe(count)
     expect(views().at(-1)[2].page_location).toBe(`https://masusono.com${path}`)
-    expect(views().at(-1)[2].page_title).toBe(await page.title())
+    // Inertia Head batches DOM updates after the React commit used for analytics.
+    await expect.poll(() => page.title()).toBe(views().at(-1)[2].page_title)
   }
   const article = "/articles/visual-article-1?utm_source=x&utm_medium=social"
   await page.goto(`https://masusono.com${article}`)
