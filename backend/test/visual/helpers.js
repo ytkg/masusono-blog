@@ -33,7 +33,14 @@ export async function mockPageProps(page, path, transform) {
   )
 }
 
+export async function mockBlogmuraBanner(page) {
+  await page.route("https://b.blogmura.com/diary/88_31.gif", (route) =>
+    route.fulfill({ path: "test/visual/blogmura-banner.gif", contentType: "image/gif" }),
+  )
+}
+
 export async function openPage(page, path) {
+  await mockBlogmuraBanner(page)
   const response = await page.goto(path)
   expect(response?.status()).toBe(200)
   await page.locator("main").waitFor()

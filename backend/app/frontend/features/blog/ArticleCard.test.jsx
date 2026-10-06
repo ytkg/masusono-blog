@@ -13,6 +13,44 @@ vi.mock("../../shared/lib/analytics", () => ({ trackRelatedArticleClick: vi.fn()
 import { trackRelatedArticleClick } from "../../shared/lib/analytics"
 
 describe("ArticleCard", () => {
+  it.each([[[]], [[{ id: "related", title: "関連記事のタイトル" }]]])(
+    "関連記事の有無にかかわらず詳細の本文後に応援リンクを1組表示する: %j",
+    (relatedArticles) => {
+      render(
+        <ArticleCard
+          mode="detail"
+          article={{ id: "current", title: "閲覧中", content: "<p>本文です</p>" }}
+          relatedArticles={relatedArticles}
+        />,
+      )
+      const image = screen.getByRole("img", { name: "にほんブログ村 その他日記ブログへ" })
+      expect(image).toHaveAttribute("src", "https://b.blogmura.com/diary/88_31.gif")
+      expect(image).toHaveAttribute("width", "88")
+      expect(image).toHaveAttribute("height", "31")
+      expect(screen.queryByRole("link", { name: "にほんブログ村", exact: true })).not.toBeInTheDocument()
+      const links = [screen.getByRole("link", { name: "にほんブログ村 その他日記ブログへ" })]
+      for (const link of links) {
+        expect(link).toHaveAttribute("href", "https://diary.blogmura.com/ranking/in?p_cid=11218704")
+        expect(link).toHaveAttribute("target", "_blank")
+        expect(link).toHaveAttribute("rel", "noopener")
+        expect(
+          screen.getByText("本文です").compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy()
+      }
+      if (relatedArticles.length) {
+        expect(
+          screen.getByRole("region", { name: "関連記事" }).compareDocumentPosition(links[0]) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy()
+      }
+    },
+  )
+
+  it("一覧には応援リンクを表示しない", () => {
+    render(<ArticleCard article={{ id: "current", title: "閲覧中", content: "<p>本文</p>" }} />)
+    expect(screen.queryByRole("link", { name: /にほんブログ村/ })).not.toBeInTheDocument()
+  })
+
   it("関連記事のクリックと中ボタン選択をそれぞれ1回計測する", () => {
     trackRelatedArticleClick.mockClear()
     render(

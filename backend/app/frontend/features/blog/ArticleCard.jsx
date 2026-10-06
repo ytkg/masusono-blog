@@ -87,6 +87,25 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
           </Box>
         </Box>
       )}
+      {isDetail && (
+        <Box sx={{ mt: 3 }}>
+          <Link
+            href="https://diary.blogmura.com/ranking/in?p_cid=11218704"
+            target="_blank"
+            rel="noopener"
+            sx={{ display: "inline-block" }}
+          >
+            <Box
+              component="img"
+              src="https://b.blogmura.com/diary/88_31.gif"
+              width="88"
+              height="31"
+              alt="にほんブログ村 その他日記ブログへ"
+              sx={{ display: "block", border: 0 }}
+            />
+          </Link>
+        </Box>
+      )}
     </ContentItemCard>
   )
 
