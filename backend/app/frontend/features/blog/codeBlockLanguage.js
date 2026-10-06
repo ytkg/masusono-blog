@@ -23,10 +23,10 @@ function rawCodeLanguage(codeElement) {
 
 export function codeLanguage(codeElement) {
   const rawLanguage = rawCodeLanguage(codeElement)
-  const normalizedLanguage = rawLanguage?.toLowerCase()
-  const config = LANGUAGE_CONFIGS[normalizedLanguage]
-
   if (!rawLanguage) return undefined
+
+  const normalizedLanguage = rawLanguage.toLowerCase()
+  const config = LANGUAGE_CONFIGS[normalizedLanguage]
 
   return {
     key: normalizedLanguage,
