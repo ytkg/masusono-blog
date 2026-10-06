@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { mockPageProps } from "./helpers"
+import { mockBlogmuraBanner, mockPageProps } from "./helpers"
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -12,6 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 async function openPage(page, path, status = 200) {
+  await mockBlogmuraBanner(page)
   const response = await page.goto(path)
   expect(response?.status()).toBe(status)
   await page.locator("main").waitFor()
