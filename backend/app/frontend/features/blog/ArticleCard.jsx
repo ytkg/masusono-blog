@@ -1,3 +1,4 @@
+import { trackRelatedArticleClick } from "../../shared/lib/analytics"
 import { formatArticleStats } from "./articleStats"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
@@ -68,9 +69,17 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
             関連記事
           </Typography>
           <Box component="ul" sx={{ m: 0, pl: 3, display: "grid", gap: 1.5 }}>
-            {relatedArticles.map((related) => (
+            {relatedArticles.map((related, index) => (
               <Box component="li" key={related.id} sx={{ overflowWrap: "anywhere" }}>
-                <Link href={`/articles/${related.id}`} underline="always" color="inherit">
+                <Link
+                  href={`/articles/${related.id}`}
+                  underline="always"
+                  color="inherit"
+                  onClick={() => trackRelatedArticleClick(article.id, related.id, index + 1)}
+                  onAuxClick={(event) => {
+                    if (event.button === 1) trackRelatedArticleClick(article.id, related.id, index + 1)
+                  }}
+                >
                   {related.title}
                 </Link>
               </Box>

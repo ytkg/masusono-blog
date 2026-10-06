@@ -24,6 +24,10 @@
     </style>
     <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png">
     <%= render "layouts/apple_splash_screens" %>
+    <% measurement_id = ENV["GA4_MEASUREMENT_ID"].to_s %>
+    <% if Rails.env.production? && request.host == "masusono.com" && measurement_id.match?(/\AG-[A-Z0-9]+\z/) %>
+      <meta name="ga4-measurement-id" content="<%= measurement_id %>">
+    <% end %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= inertia_meta_tags %>

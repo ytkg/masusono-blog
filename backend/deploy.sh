@@ -89,6 +89,12 @@ if [[ "${COMMAND}" == "delete" ]]; then
   exit 0
 fi
 
+# Only the production service receives the blog measurement ID. Empty disables tracking.
+GA4_MEASUREMENT_ID=""
+if [[ "${CURRENT_BRANCH}" == "${PRODUCTION_BRANCH}" ]]; then
+  GA4_MEASUREMENT_ID="G-5930S30RWS"
+fi
+
 DEPLOY_TARGET=(--source .)
 if [[ -n "${IMAGE_URI:-}" ]]; then
   DEPLOY_TARGET=(--image "${IMAGE_URI}")
@@ -100,6 +106,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --region "${REGION}" \
   --allow-unauthenticated \
   --max-instances 1 \
+  --update-env-vars "GA4_MEASUREMENT_ID=${GA4_MEASUREMENT_ID}" \
   --remove-env-vars RAILS_MASTER_KEY \
   --update-secrets "RAILS_MASTER_KEY=${RAILS_MASTER_KEY_SECRET}"
 
