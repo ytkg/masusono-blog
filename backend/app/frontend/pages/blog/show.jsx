@@ -14,7 +14,7 @@ function extractMetaDescription(content) {
   return plainText ? `${plainText.slice(0, 120)}${plainText.length > 120 ? "…" : ""}` : undefined
 }
 
-export default function BlogDetail({ article = null }) {
+export default function BlogDetail({ article = null, relatedArticles = [] }) {
   const metaDescription = extractMetaDescription(article?.content)
   const canonical = article?.id ? `/articles/${article.id}` : "/"
 
@@ -23,7 +23,7 @@ export default function BlogDetail({ article = null }) {
       <SeoHead title={article?.title ?? "ブログ記事"} description={metaDescription} canonicalPath={canonical} />
 
       <PageContainer component="article">
-        <ArticleCard article={article ?? undefined} mode="detail" />
+        <ArticleCard article={article ?? undefined} mode="detail" relatedArticles={relatedArticles} />
       </PageContainer>
     </>
   )

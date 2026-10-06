@@ -18,12 +18,14 @@ RSpec.describe BlogShowUsecase do
 
     before do
       allow(Article).to receive(:find).with(article_id).and_return(article)
+      allow(RelatedArticlesBuilder).to receive(:call).with(article: article).and_return([])
     end
 
     it do
       expect(result).to eq(
         {
           props: {
+            relatedArticles: [],
             article: {
               id: "article-1",
               title: "記事1",
@@ -50,11 +52,38 @@ RSpec.describe BlogShowUsecase do
         expect(result).to eq(
           {
             props: {
-              article: nil
+              article: nil,
+              relatedArticles: []
             },
             status: :not_found
           }
         )
+      end
+    end
+
+    context "関連記事を取得する場合" do
+      let(:article) { super().merge(tags: "散歩") }
+
+      before do
+        allow(RelatedArticlesBuilder).to receive(:call).and_call_original
+        allow(Article).to receive(:all).and_return([ { id: "related", title: "散歩の記事", tags: "散歩" } ])
+      end
+
+      it "本文を変更せず関連記事を別のpropsで返す" do
+        expect(result[:props][:relatedArticles]).to eq([ { id: "related", title: "散歩の記事" } ])
+        expect(result[:props][:article][:content]).to eq(article[:content])
+      end
+
+      context "関連記事取得が失敗した場合" do
+        before do
+          allow(Article).to receive(:all).and_raise(Microcms::FetchContentsService::FetchError.new(status: 503, body: "unavailable"))
+        end
+
+        it "正常な本文表示を維持する" do
+          expect(result[:status]).to eq(:ok)
+          expect(result[:props][:article][:content]).to eq(article[:content])
+          expect(result[:props][:relatedArticles]).to eq([])
+        end
       end
     end
   end
