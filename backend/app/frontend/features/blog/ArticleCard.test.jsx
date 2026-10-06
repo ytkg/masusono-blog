@@ -9,7 +9,32 @@ vi.mock("@inertiajs/react", async () => {
   }
 })
 
+vi.mock("../../shared/lib/analytics", () => ({ trackRelatedArticleClick: vi.fn() }))
+import { trackRelatedArticleClick } from "../../shared/lib/analytics"
+
 describe("ArticleCard", () => {
+  it("関連記事のクリックと中ボタン選択をそれぞれ1回計測する", () => {
+    trackRelatedArticleClick.mockClear()
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{ id: "a", title: "A" }}
+        relatedArticles={[
+          { id: "b", title: "B" },
+          { id: "c", title: "C" },
+        ]}
+      />,
+    )
+    const link = screen.getByRole("link", { name: "C" })
+    fireEvent.click(link)
+    expect(trackRelatedArticleClick).toHaveBeenCalledTimes(1)
+    expect(trackRelatedArticleClick).toHaveBeenLastCalledWith("a", "c", 2)
+    fireEvent(link, new MouseEvent("auxclick", { bubbles: true, button: 1 }))
+    expect(trackRelatedArticleClick).toHaveBeenCalledTimes(2)
+    fireEvent(link, new MouseEvent("auxclick", { bubbles: true, button: 2 }))
+    expect(trackRelatedArticleClick).toHaveBeenCalledTimes(2)
+  })
+
   it("詳細の本文下に関連記事を通常のリンクとして表示する", () => {
     render(
       <ArticleCard

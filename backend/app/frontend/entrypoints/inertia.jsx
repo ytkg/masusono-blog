@@ -2,6 +2,7 @@ import { createRoot, hydrateRoot } from "react-dom/client"
 import { createInertiaApp, router } from "@inertiajs/react"
 import InertiaApp from "../shared/InertiaApp"
 import { resolvePage } from "../shared/pageResolver"
+import { installAnalyticsNavigation } from "../shared/lib/analytics"
 import { installNavigationRecovery } from "../shared/lib/navigationRecovery"
 
 void import("../styles/fonts.css")
@@ -32,6 +33,7 @@ function registerServiceWorker() {
 }
 
 installNavigationRecovery(router)
+installAnalyticsNavigation(router)
 
 createInertiaApp({
   resolve: resolvePage,

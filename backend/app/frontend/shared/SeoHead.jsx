@@ -1,3 +1,5 @@
+import { useEffect } from "react"
+import { trackPageView } from "./lib/analytics"
 import { Head } from "@inertiajs/react"
 
 const SITE_TITLE = "増田とその他！"
@@ -14,6 +16,10 @@ export default function SeoHead({ title, description, canonicalPath = "/" }) {
   const fullTitle = title ? `${title} | ${SITE_TITLE}` : SITE_TITLE
   const resolvedDescription = description ?? DEFAULT_DESCRIPTION
   const canonicalUrl = toAbsoluteUrl(canonicalPath)
+
+  useEffect(() => {
+    trackPageView(fullTitle)
+  })
 
   return (
     <Head>
