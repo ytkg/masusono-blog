@@ -32,7 +32,9 @@ export default function MediaDetailDialog({ selected, onClose }) {
             ) : null}
             {selected.alt ? <Typography>代替テキスト: {selected.alt}</Typography> : null}
             {selected.createdAt ? (
-              <Typography>登録日時: {new Date(selected.createdAt).toLocaleString("ja-JP")}</Typography>
+              <Typography>
+                登録日時: {new Date(selected.createdAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}
+              </Typography>
             ) : null}
             {selected.tags?.length ? <Typography>タグ: {selected.tags.join("、")}</Typography> : null}
           </DialogContent>

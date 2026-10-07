@@ -13,7 +13,7 @@ describe("AdminArticles", () => {
       .mockResolvedValueOnce(
         jsonResponse({
           articles: [
-            { id: "draft", title: "下書きタイトル", status: "PUBLISH_AND_DRAFT", updated_at: "2026-01-02T00:00:00Z" },
+            { id: "draft", title: "下書きタイトル", status: "PUBLISH_AND_DRAFT", updated_at: "2026-01-01T15:00:00Z" },
           ],
           total_count: 2,
           has_more: true,
@@ -38,6 +38,7 @@ describe("AdminArticles", () => {
     fireEvent.click(screen.getByRole("button", { name: "検索" }))
 
     expect(await screen.findByText("下書きタイトル")).toBeInTheDocument()
+    expect(screen.getByText("更新: 2026/1/2 0:00:00")).toBeInTheDocument()
     expect(screen.getByRole("combobox", { name: "公開状態" })).toHaveTextContent("公開中・下書きあり")
     expect(within(screen.getByRole("listitem")).getByText("公開中・下書きあり")).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledWith(

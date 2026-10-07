@@ -40,7 +40,15 @@ describe("AdminMedia", () => {
       .fn()
       .mockResolvedValueOnce(
         jsonResponse({
-          media: [{ id: "image-1", url: "https://example.com/first.png", width: 320, height: 240 }],
+          media: [
+            {
+              id: "image-1",
+              url: "https://example.com/first.png",
+              width: 320,
+              height: 240,
+              createdAt: "2026-01-01T15:00:00Z",
+            },
+          ],
           total_count: 2,
           has_more: true,
           next_token: "next",
@@ -68,6 +76,7 @@ describe("AdminMedia", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "first.pngの詳細を表示" }))
     expect(screen.getByText("画像サイズ: 320 × 240 px")).toBeInTheDocument()
+    expect(screen.getByText("登録日時: 2026/1/2 0:00:00")).toBeInTheDocument()
   })
 
   it("画像をアップロード後、検索を解除して一覧を更新する", async () => {
