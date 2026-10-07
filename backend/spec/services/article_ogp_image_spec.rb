@@ -53,4 +53,29 @@ RSpec.describe ArticleOgpImage do
       end
     end
   end
+
+  describe "句読点での改行" do
+    let(:automatic_renderer) { described_class.new }
+
+    before do
+      allow(automatic_renderer).to receive(:prefer_punctuation_breaks)
+    end
+
+    [ "仕事柄、肩は凝ったけれど仕事のおかげで救われた。",
+      "今日は晴れです。明日も晴れです。明後日も晴れです。" ].each do |title|
+      it "短い行や余分な行を作る場合は自動折り返しを使う: #{title}" do
+        expect(described_class.new.render(title:)).to eq(automatic_renderer.render(title:))
+      end
+    end
+
+    it "行数を増やさず長さが揃う場合は句読点で区切る" do
+      title = "無意味だと思っていたことも、実は無意味じゃなかったりする"
+      expect(described_class.new.render(title:)).not_to eq(automatic_renderer.render(title:))
+    end
+
+    it "読点で短い行ができる場合は句点だけで区切る" do
+      title = "仕事柄、肩は凝った。でも仕事のおかげで救われた。"
+      expect(described_class.new.render(title:)).not_to eq(automatic_renderer.render(title:))
+    end
+  end
 end
