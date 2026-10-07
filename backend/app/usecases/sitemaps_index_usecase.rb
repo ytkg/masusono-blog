@@ -1,15 +1,8 @@
 class SitemapsIndexUsecase
   CONTENT_TYPE = "application/xml; charset=utf-8".freeze
   BASE_URL = "https://masusono.com".freeze
-  BLOG_ENTRY = { changefreq: "monthly", priority: 0.6 }.freeze
-
-  STATIC_ENTRIES = [
-    { path: "/", changefreq: "weekly", priority: 1.0 },
-    { path: "/about", changefreq: "monthly", priority: 0.7 },
-    { path: "/authors", changefreq: "monthly", priority: 0.6 },
-    { path: "/numbers", changefreq: "monthly", priority: 0.5 },
-    { path: "/others", changefreq: "monthly", priority: 0.4 }
-  ].freeze
+  BLOG_ENTRY = SitemapEntriesBuilder::BLOG_ENTRY
+  STATIC_ENTRIES = SitemapEntriesBuilder::STATIC_ENTRIES
 
   def self.call
     new.call
@@ -26,41 +19,7 @@ class SitemapsIndexUsecase
   private
 
   def build_sitemap_xml(articles:, authors:)
-    entries = static_entries + author_entries(authors) + article_entries(articles)
+    entries = SitemapEntriesBuilder.call(articles:, authors:, base_url: BASE_URL)
     SitemapXmlBuilder.call(entries)
-  end
-
-  def static_entries
-    STATIC_ENTRIES.map do |entry|
-      {
-        loc: "#{BASE_URL}#{entry[:path]}",
-        changefreq: entry[:changefreq],
-        priority: entry[:priority]
-      }
-    end
-  end
-
-  def article_entries(articles)
-    articles.filter_map do |article|
-      content_entry(article, section: "articles", changefreq: BLOG_ENTRY[:changefreq], priority: BLOG_ENTRY[:priority])
-    end
-  end
-
-  def author_entries(authors)
-    authors.filter_map do |author|
-      content_entry(author, section: "authors", changefreq: "monthly", priority: 0.5)
-    end
-  end
-
-  def content_entry(content, section:, changefreq:, priority:)
-    id = content[:id]
-    return if id.nil? || id == ""
-
-    {
-      loc: "#{BASE_URL}/#{section}/#{id}",
-      lastmod: content[:revisedAt] || content[:updatedAt] || content[:publishedAt],
-      changefreq:,
-      priority:
-    }
   end
 end
