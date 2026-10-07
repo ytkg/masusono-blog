@@ -211,4 +211,24 @@ RSpec.describe Microcms::FetchContentsService do
       end
     end
   end
+
+  describe "#parse_contents" do
+    subject(:result) { described_class.new(api_key: "test-key").parse_contents(body) }
+
+    let(:body) do
+      { contents: [ { id: "article", author: { name: "増田" }, tags: [ { name: "Ruby" } ], enabled: true, missing: nil } ] }.to_json
+    end
+
+    it "配列と入れ子のキーをシンボルにし、値を維持する" do
+      expect(result).to eq([ { id: "article", author: { name: "増田" }, tags: [ { name: "Ruby" } ], enabled: true, missing: nil } ])
+    end
+
+    context "不正なJSONの場合" do
+      let(:body) { "invalid" }
+
+      it "既存の解析エラーを維持する" do
+        expect { result }.to raise_error(JSON::ParserError)
+      end
+    end
+  end
 end
