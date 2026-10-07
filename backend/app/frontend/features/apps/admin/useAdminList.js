@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useReducer, useRef } from "react"
+import { adminListReducer, initialAdminListState } from "./adminListReducer"
 import { requestJson } from "../../../shared/lib/fetchJson"
 
 export default function useAdminList({
@@ -9,14 +10,8 @@ export default function useAdminList({
   onUnauthorized,
   resetTotalCount = false,
 }) {
-  const [items, setItems] = useState([])
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(false)
-  const [nextToken, setNextToken] = useState(null)
-  const [totalCount, setTotalCount] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError] = useState(null)
+  const [state, dispatch] = useReducer(adminListReducer, initialAdminListState)
+  const { items, page, hasMore, nextToken, totalCount, loading, loadingMore, error } = state
   const requestIdRef = useRef(0)
   const controllerRef = useRef(null)
   const loadingMoreRef = useRef(false)
@@ -26,29 +21,19 @@ export default function useAdminList({
     const controller = new AbortController()
     controllerRef.current = controller
     loadingMoreRef.current = false
-    setLoadingMore(false)
-    setLoading(true)
-    setError(null)
-    setItems([])
-    setHasMore(false)
-    setNextToken(null)
-    if (resetTotalCount) setTotalCount(0)
+    dispatch({ type: "reset", resetTotalCount })
     requestJson(urlForPage(1), { signal: controller.signal })
       .then((result) => {
         if (controller.signal.aborted || requestId !== requestIdRef.current) return
-        setItems(result[itemsKey])
-        setPage(result.page)
-        setHasMore(result.has_more)
-        setNextToken(result.next_token ?? null)
-        setTotalCount(result.total_count)
+        dispatch({ type: "loaded", items: result[itemsKey], result })
       })
       .catch((failure) => {
         if (controller.signal.aborted || requestId !== requestIdRef.current) return
         if (failure.status === 401) onUnauthorized()
-        else setError(loadError)
+        else dispatch({ type: "failed", message: loadError })
       })
       .finally(() => {
-        if (!controller.signal.aborted && requestId === requestIdRef.current) setLoading(false)
+        if (!controller.signal.aborted && requestId === requestIdRef.current) dispatch({ type: "initialFinished" })
       })
     return () => {
       controller.abort()
@@ -61,23 +46,19 @@ export default function useAdminList({
     if (loading || loadingMoreRef.current || !hasMore || !controller || controller.signal.aborted) return
     const requestId = requestIdRef.current
     loadingMoreRef.current = true
-    setLoadingMore(true)
-    setError(null)
+    dispatch({ type: "moreStarted" })
     try {
       const result = await requestJson(urlForPage(page + 1, nextToken), { signal: controller.signal })
       if (controller.signal.aborted || requestId !== requestIdRef.current) return
-      setItems((current) => [...current, ...result[itemsKey]])
-      setPage(result.page)
-      setHasMore(result.has_more)
-      setNextToken(result.next_token ?? null)
+      dispatch({ type: "loaded", items: result[itemsKey], result, append: true })
     } catch (failure) {
       if (controller.signal.aborted || requestId !== requestIdRef.current) return
       if (failure.status === 401) onUnauthorized()
-      else setError(loadError)
+      else dispatch({ type: "failed", message: loadError })
     } finally {
       if (!controller.signal.aborted && requestId === requestIdRef.current) {
         loadingMoreRef.current = false
-        setLoadingMore(false)
+        dispatch({ type: "moreFinished" })
       }
     }
   }
