@@ -26,10 +26,7 @@ module Microcms
       @api_key = api_key || Rails.application.credentials.dig(:microcms, :api_key)
       raise UploadError, "microCMS API key is missing" if @api_key.blank?
 
-      @connection = connection || Faraday.new(url: BASE_URL) do |client|
-        client.options.open_timeout = 5
-        client.options.timeout = 10
-      end
+      @connection = connection || Microcms::ConnectionFactory.build(url: BASE_URL)
     end
 
     def call(file:)

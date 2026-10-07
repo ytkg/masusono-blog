@@ -14,10 +14,7 @@ module Microcms
         @api_key = api_key || Rails.application.credentials.dig(:microcms, :api_key)
         raise "MICROCMS api key is missing (credentials: microcms.api_key)" if @api_key.nil? || @api_key.empty?
 
-        @faraday = faraday || Faraday.new do |f|
-          f.options.timeout = 10
-          f.options.open_timeout = 5
-        end
+        @faraday = faraday || Microcms::ConnectionFactory.build
       end
 
       def execute(article_id:, tags:)
