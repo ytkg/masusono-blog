@@ -1,6 +1,4 @@
 class FeedsShowUsecase
-  include AuthorNameExtractor
-
   CONTENT_TYPE = "application/rss+xml; charset=utf-8".freeze
   SITE_TITLE = "増田とその他！".freeze
   SITE_URL = "https://masusono.com".freeze
@@ -28,26 +26,7 @@ class FeedsShowUsecase
       link: SITE_URL,
       description: SITE_DESCRIPTION,
       feed_url: FEED_URL,
-      items: article_items(articles)
+      items: RssArticleItemsBuilder.call(articles:, site_url: SITE_URL)
     )
-  end
-
-  def article_items(articles)
-    articles.filter_map { |article| article_item(article) }
-  end
-
-  def article_item(article)
-    id = article[:id]
-    return if id.nil? || id == ""
-
-    url = "#{SITE_URL}/articles/#{id}"
-    {
-      title: article[:title],
-      link: url,
-      guid: url,
-      published_at: article[:publishedAt],
-      description: article[:content],
-      author: extract_normalized_author_name(article[:author])
-    }
   end
 end
