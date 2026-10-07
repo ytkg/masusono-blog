@@ -6,7 +6,7 @@ require "tmpdir"
 
 class ArticleOgpImage
   # Bump when layout, logo or rendering dependencies change.
-  TEMPLATE_VERSION = "3"
+  TEMPLATE_VERSION = "4"
   WIDTH = 1200
   HEIGHT = 630
   TITLE_WIDTH = 1072
@@ -37,10 +37,12 @@ class ArticleOgpImage
     Dir.mktmpdir("article-ogp") do |directory|
       text_path = File.join(directory, "title.png")
       render_title(title, text_path)
+      text_height = image_height(text_path)
+      title_top = text_height <= 96 ? 256 + (TITLE_HEIGHT - text_height) / 2 : 256
       output = File.join(directory, "image.png")
       command("convert", "-size", "#{WIDTH}x#{HEIGHT}", "xc:#F6F2FA",
         "(", LOGO.to_s, "-resize", "360x180>", ")", "-geometry", "+420+64", "-composite",
-        text_path, "-geometry", "+64+256", "-composite",
+        text_path, "-geometry", "+64+#{title_top}", "-composite",
         "-fill", "none", "-stroke", "#3E1D6E", "-strokewidth", "8",
         "-draw", "rectangle 4,4 1195,625", "-strip", "PNG32:#{output}")
       File.binread(output)
@@ -74,7 +76,8 @@ class ArticleOgpImage
   end
 
   def prefer_punctuation_breaks(text, size, path)
-    return if image_height(path) <= (size * 1.5).ceil
+    original_height = image_height(path)
+    return if original_height <= (size * 1.5).ceil
 
     # Keep punctuation clusters and closing quotes with the preceding phrase.
     candidate = text.gsub(/([、。！？!?]+[」』）)]*)(?=[^、。！？!?」』）)])/) do |punctuation|
@@ -85,11 +88,20 @@ class ArticleOgpImage
         "#{punctuation}\n"
       end
     end
-    return unless candidate.count("\n").between?(1, 3)
-
     preferred_path = File.join(File.dirname(path), "preferred-title.png")
-    draw_text(candidate, size, preferred_path)
-    FileUtils.cp(preferred_path, path) if fits?(preferred_path, size)
+    # If commas isolate short phrases, also try keeping them within the sentence.
+    [ candidate, candidate.gsub(/(、[」』）)]*)\n/, '\1') ].uniq.each do |layout|
+      next unless layout.count("\n").between?(1, 3)
+      lengths = layout.split("\n").map { |line| line.scan(/\X/).length }
+      next if lengths.min * 2 < lengths.max
+
+      draw_text(layout, size, preferred_path)
+      # Punctuation breaks should not add lines compared with automatic wrapping.
+      next unless image_height(preferred_path) <= original_height && fits?(preferred_path, size)
+
+      FileUtils.cp(preferred_path, path)
+      return
+    end
   end
 
   def fits?(path, size)
