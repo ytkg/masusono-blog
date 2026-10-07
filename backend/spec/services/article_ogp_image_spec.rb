@@ -8,7 +8,7 @@ RSpec.describe ArticleOgpImage do
       original = described_class.version(article:)
       expect(described_class.version(article: article.dup)).to eq(original)
       expect(described_class.version(article: article.merge(title: "更新"))).not_to eq(original)
-      stub_const("ArticleOgpImage::TEMPLATE_VERSION", "2")
+      stub_const("ArticleOgpImage::TEMPLATE_VERSION", "next")
       expect(described_class.version(article:)).not_to eq(original)
     end
   end

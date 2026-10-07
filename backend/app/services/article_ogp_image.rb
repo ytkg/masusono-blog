@@ -5,7 +5,7 @@ require "tmpdir"
 
 class ArticleOgpImage
   # Bump when layout, logo or rendering dependencies change.
-  TEMPLATE_VERSION = "1"
+  TEMPLATE_VERSION = "2"
   WIDTH = 1200
   HEIGHT = 630
   TITLE_WIDTH = 1072
@@ -39,7 +39,9 @@ class ArticleOgpImage
       output = File.join(directory, "image.png")
       command("convert", "-size", "#{WIDTH}x#{HEIGHT}", "xc:#F6F2FA",
         "(", LOGO.to_s, "-resize", "360x180>", ")", "-geometry", "+64+64", "-composite",
-        text_path, "-geometry", "+64+256", "-composite", "-strip", "PNG32:#{output}")
+        text_path, "-geometry", "+64+256", "-composite",
+        "-fill", "none", "-stroke", "#3E1D6E", "-strokewidth", "8",
+        "-draw", "rectangle 4,4 1195,625", "-strip", "PNG32:#{output}")
       File.binread(output)
     end
   rescue IOError, SystemCallError => error
@@ -77,7 +79,7 @@ class ArticleOgpImage
     escaped = CGI.escapeHTML(text).gsub("&", "&amp;").gsub("%", "%%").gsub("\\") { "\\\\" }
     # Pango sizes are 1/1024 point; 96 dpi converts 3/4 point to one pixel.
     markup = "<span font_family='Noto Sans CJK JP' weight='bold' size='#{size * 768}' foreground='#3E1D6E'>#{escaped}</span>"
-    command("convert", "-background", "none", "-density", "96", "-size", "#{TITLE_WIDTH}x", "-define", "pango:wrap=word-char", "pango:#{markup}", "PNG32:#{path}")
+    command("convert", "-background", "none", "-density", "96", "-size", "#{TITLE_WIDTH}x", "-define", "pango:wrap=word-char", "-define", "pango:align=center", "pango:#{markup}", "PNG32:#{path}")
   end
 
   def command(*arguments)
