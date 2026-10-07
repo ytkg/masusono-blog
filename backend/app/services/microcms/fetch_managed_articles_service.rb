@@ -5,16 +5,10 @@ module Microcms
   class FetchManagedArticlesService
     MANAGEMENT_ENDPOINT = "https://masusono.microcms-management.io/api/v1/contents/articles".freeze
     CONTENT_ENDPOINT = "https://masusono.microcms.io/api/v1/articles".freeze
-    PAGE_SIZE = 20
+    PAGE_SIZE = Admin::ArticlesPageBuilder::PAGE_SIZE
     UPSTREAM_PAGE_SIZE = 100
     MAX_PAGE = 10_000
-    STATUSES = {
-      "all" => nil,
-      "published" => "PUBLISH",
-      "draft" => "DRAFT",
-      "closed" => "CLOSED",
-      "published_and_draft" => "PUBLISH_AND_DRAFT"
-    }.freeze
+    STATUSES = Admin::ArticlesPageBuilder::STATUSES
 
     class FetchError < StandardError; end
 
@@ -44,21 +38,7 @@ module Microcms
 
         build_article(metadata, article)
       end
-      matched.select! { |article| article[:status] == STATUSES.fetch(status) } if STATUSES.fetch(status)
-      normalized_query = query.downcase
-      matched.select! { |article| article[:title].downcase.include?(normalized_query) } if normalized_query.present?
-      matched.sort_by! { |article| [ article[:updated_at], article[:id] ] }
-      matched.reverse!
-
-      offset = (page_number - 1) * PAGE_SIZE
-      {
-        articles: matched.slice(offset, PAGE_SIZE) || [],
-        total_count: matched.size,
-        has_more: offset + PAGE_SIZE < matched.size,
-        page: page_number,
-        query: query,
-        status: status
-      }
+      Admin::ArticlesPageBuilder.call(articles: matched, query:, status:, page: page_number)
     rescue JSON::ParserError, Faraday::Error, KeyError => error
       raise FetchError, "microCMS articles request failed", cause: error
     end
