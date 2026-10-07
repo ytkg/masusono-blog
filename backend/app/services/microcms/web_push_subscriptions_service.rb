@@ -48,10 +48,7 @@ module Microcms
     def self.client(api_key:, faraday:)
       return faraday if faraday
 
-      Faraday.new do |connection|
-        connection.options.timeout = 10
-        connection.options.open_timeout = 5
-      end
+      Microcms::ConnectionFactory.build
     end
     private_class_method :client
 
