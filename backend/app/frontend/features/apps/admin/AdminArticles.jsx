@@ -26,7 +26,7 @@ const articleStatusLabel = {
 
 function formatDate(value) {
   const date = new Date(value)
-  return Number.isNaN(date.valueOf()) ? "-" : date.toLocaleString("ja-JP")
+  return Number.isNaN(date.valueOf()) ? "-" : date.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
 }
 
 export default function AdminArticles({ onBack, onUnauthorized }) {

@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Numbers::MetricsPayloadBuilder do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe ".call" do
     subject(:result) { described_class.call(article_summary:) }
 
@@ -12,8 +14,10 @@ RSpec.describe Numbers::MetricsPayloadBuilder do
     end
 
     before do
-      allow(Date).to receive(:current).and_return(Date.new(2025, 10, 6))
+      travel_to(Time.iso8601("2025-10-05T15:00:00Z"))
     end
+
+    after { travel_back }
 
     it do
       expect(result).to eq(
