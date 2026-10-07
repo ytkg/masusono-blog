@@ -1,11 +1,12 @@
 require "cgi"
 require "digest"
+require "fileutils"
 require "open3"
 require "tmpdir"
 
 class ArticleOgpImage
   # Bump when layout, logo or rendering dependencies change.
-  TEMPLATE_VERSION = "2"
+  TEMPLATE_VERSION = "3"
   WIDTH = 1200
   HEIGHT = 630
   TITLE_WIDTH = 1072
@@ -38,7 +39,7 @@ class ArticleOgpImage
       render_title(title, text_path)
       output = File.join(directory, "image.png")
       command("convert", "-size", "#{WIDTH}x#{HEIGHT}", "xc:#F6F2FA",
-        "(", LOGO.to_s, "-resize", "360x180>", ")", "-geometry", "+64+64", "-composite",
+        "(", LOGO.to_s, "-resize", "360x180>", ")", "-geometry", "+420+64", "-composite",
         text_path, "-geometry", "+64+256", "-composite",
         "-fill", "none", "-stroke", "#3E1D6E", "-strokewidth", "8",
         "-draw", "rectangle 4,4 1195,625", "-strip", "PNG32:#{output}")
@@ -54,7 +55,10 @@ class ArticleOgpImage
     text = title.to_s.gsub(/[[:cntrl:]]/, " ")
     [ 64, 60, 56, 52, 48 ].each do |size|
       draw_text(text, size, path)
-      return if fits?(path, size)
+      if fits?(path, size)
+        prefer_punctuation_breaks(text, size, path)
+        return
+      end
     end
 
     # Grapheme boundaries preserve combining characters and emoji sequences.
@@ -69,9 +73,31 @@ class ArticleOgpImage
     draw_text(graphemes.first(low).join + "…", 48, path)
   end
 
+  def prefer_punctuation_breaks(text, size, path)
+    return if image_height(path) <= (size * 1.5).ceil
+
+    # Keep punctuation clusters and closing quotes with the preceding phrase.
+    candidate = text.gsub(/([、。！？!?]+[」』）)]*)(?=[^、。！？!?」』）)])/) do |punctuation|
+      following_text = Regexp.last_match.post_match
+      if punctuation.match?(/[！？!?]/) && following_text.match?(/\A[のにはがをともへでや]/)
+        punctuation
+      else
+        "#{punctuation}\n"
+      end
+    end
+    return unless candidate.count("\n").between?(1, 3)
+
+    preferred_path = File.join(File.dirname(path), "preferred-title.png")
+    draw_text(candidate, size, preferred_path)
+    FileUtils.cp(preferred_path, path) if fits?(preferred_path, size)
+  end
+
   def fits?(path, size)
-    height = command("identify", "-format", "%h", path).to_i
-    height <= [ TITLE_HEIGHT, (size * 1.5 * 4).ceil ].min
+    image_height(path) <= [ TITLE_HEIGHT, (size * 1.5 * 4).ceil ].min
+  end
+
+  def image_height(path)
+    command("identify", "-format", "%h", path).to_i
   end
 
   def draw_text(text, size, path)

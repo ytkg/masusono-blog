@@ -8,8 +8,12 @@
 
 1200×630 PNG。背景は #F6F2FA、外周に #3E1D6E の8px枠線を描く。ロゴは既存の
 `app/frontend/assets/logo.webp`（「増田とその他！」の白枠付きロゴ）を
-左上64pxの位置に幅360px以内・縦横比保持で配置する。
+上端64pxの位置に幅360px以内・縦横比保持で、画像の横中央に配置する。
 記事タイトルは #3E1D6E、Noto Sans CJK JP Bold、幅1072pxの領域（左端64px・上端256px）内で中央揃えに描画。
+1行に収まらない場合は句読点（、。！？!?）の後で改行した配置を優先する。
+連続する句読点や閉じ括弧は前のまとまりに残す。「！の」のように感嘆符・
+疑問符の後が助詞につながる場合は区切らない。句読点区切りが最大4行・
+高さ310pxに収まらない場合は、全文表示を優先して通常の折り返しを使う。
 64pxから48pxまで縮小して最大4行・高さ310pxに収め、超過時だけ
 書記素単位で末尾を「…」にする。Pangoで日本語禁則・折返し・絵文字の
 フォントフォールバックを処理し、CMS本文やタイトルは変更しない。
@@ -41,7 +45,7 @@ worktreeルートでの共通PNG再生成：
 .codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps backend \
   convert -size 1200x630 'xc:#F6F2FA' \
   '(' app/frontend/assets/logo.webp -resize '360x180>' ')' \
-  -geometry +64+64 -composite \
+  -geometry +420+64 -composite \
   -fill none -stroke '#3E1D6E' -strokewidth 8 -draw 'rectangle 4,4 1195,625' \
   -strip PNG32:public/ogp-fallback.png
 ```
@@ -53,14 +57,14 @@ service specで日本語・長文・絵文字、版変更、キャッシュ、�
 SSRテストと全画面Visual RegressionでJavaScriptなしの初期HTMLと画像取得を確認する。
 共有サービスでの実カード確認には本番への明示的なデプロイ依頼が必要。
 
-## プレビュー（テンプレート2）
+## プレビュー（テンプレート3）
 
 2026-10-07の公開RSSから取得した実在タイトル2件と、検証用タイトルを同じ描画環境で生成。
 
-- [犬](https://masusono.com/articles/z72aggss5bmy)：64,465 bytes
-- [無意味だと思っていたことも、実は無意味じゃなかったりする](https://masusono.com/articles/g2skm_wrbxs)：109,498 bytes
-- 絵文字・ZWJ家族絵文字の検証：114,089 bytes
-- 超長文の48px・4行・末尾「…」の検証：176,498 bytes
+- [犬](https://masusono.com/articles/z72aggss5bmy)：64,442 bytes
+- [無意味だと思っていたことも、実は無意味じゃなかったりする](https://masusono.com/articles/g2skm_wrbxs)：109,485 bytes
+- 絵文字・ZWJ家族絵文字の検証：114,072 bytes
+- 超長文の48px・4行・末尾「…」の検証：176,474 bytes
 
 ![短い実在タイトル](images/article-ogp/short.png)
 ![長い実在タイトル](images/article-ogp/long.png)
