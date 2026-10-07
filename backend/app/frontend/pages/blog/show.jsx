@@ -14,13 +14,19 @@ function extractMetaDescription(content) {
   return plainText ? `${plainText.slice(0, 120)}${plainText.length > 120 ? "…" : ""}` : undefined
 }
 
-export default function BlogDetail({ article = null, relatedArticles = [] }) {
+export default function BlogDetail({ article = null, relatedArticles = [], ogpImagePath }) {
   const metaDescription = extractMetaDescription(article?.content)
   const canonical = article?.id ? `/articles/${article.id}` : "/"
 
   return (
     <>
-      <SeoHead title={article?.title ?? "ブログ記事"} description={metaDescription} canonicalPath={canonical} />
+      <SeoHead
+        title={article?.title ?? "ブログ記事"}
+        description={metaDescription}
+        canonicalPath={canonical}
+        imagePath={ogpImagePath}
+        imageAlt={`増田とその他！：${article?.title ?? "ブログ記事"}`}
+      />
 
       <PageContainer component="article">
         <ArticleCard article={article ?? undefined} mode="detail" relatedArticles={relatedArticles} />

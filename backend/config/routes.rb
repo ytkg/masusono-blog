@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get "zukan", to: redirect("/authors")
   get "numbers", to: "numbers#index"
   get "authors/:author_id", to: "authors#show"
+  get "articles/:article_id/ogp/:version.png", to: "article_images#show", as: :article_image
   get "articles/:article_id", to: "blog#show"
   get "blog", to: "blog#index"
   scope "/api/app/management", module: :admin do

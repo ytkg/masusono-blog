@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test"
 
-const pages = [["/articles/visual-article-1", "駅を出て、いつもと違う道を歩きました。"]]
+const pages = [
+  ["/articles/visual-article-1", "駅を出て、いつもと違う道を歩きました。"],
+  ["/articles/visual-article-2", "久しぶりに友人と集まりました。"],
+]
 
 for (const [path, text] of pages) {
   test(`SSR初回HTML: ${path}`, async ({ browser, baseURL }) => {
@@ -15,6 +18,16 @@ for (const [path, text] of pages) {
       await expect(page.locator('meta[name="description"]')).toHaveCount(1)
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://masusono.com${path}`)
       await expect(page.locator("main a[href]").first()).toBeVisible()
+      const imageUrl = await page.locator('meta[property="og:image"]').getAttribute("content")
+      expect(imageUrl).toMatch(/^https:\/\/masusono.com\/articles\/[^/]+\/ogp\/[a-f0-9]{24}\.png$/)
+      expect(imageUrl.startsWith(`https://masusono.com${path}/ogp/`)).toBe(true)
+      await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", imageUrl)
+      await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image")
+      const image = await context.request.get(new URL(imageUrl).pathname)
+      expect(image.status()).toBe(200)
+      expect(image.headers()["content-type"]).toMatch(/^image\/png/)
+      const bytes = await image.body()
+      expect([bytes.readUInt32BE(16), bytes.readUInt32BE(20)]).toEqual([1200, 630])
     } finally {
       await context.close()
     }

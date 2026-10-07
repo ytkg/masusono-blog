@@ -11,6 +11,9 @@
 
 ## 開発・設計
 
+- [記事のOGP画像](./article-ogp.md)
+  - 自動生成、公開状態・キャッシュの扱いと画像プレビュー
+
 - [バックエンド README](../README.md#記事詳細のssr)
   - 現行の Inertia 描画構成、記事詳細の SSR とページング
 - [著者プロフィール更新手順](./zukan-profile-update.md)
