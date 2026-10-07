@@ -23,31 +23,8 @@ module Microcms
       page_number = Integer(page, exception: false)
       raise ArgumentError, "Invalid page" unless page_number && page_number.between?(1, MAX_PAGE)
 
-      token = nil
-      result = nil
-      (cursor.present? ? 1 : page_number).times do |index|
-        params = if cursor.present?
-          { token: cursor }
-        elsif index.zero?
-          { limit: PAGE_SIZE, fileName: query.presence }
-        else
-          { token: token }
-        end
-        response = @connection.get("api/v2/media", params.compact) do |request|
-          request.headers["X-MICROCMS-API-KEY"] = @api_key
-        end
-        unless response.success?
-          return call(query:, page:) if cursor.present? && response.status == 400
-
-          raise FetchError, "microCMS media request failed"
-        end
-
-        result = JSON.parse(response.body)
-        token = result["token"]
-        if cursor.blank? && index < page_number - 1 && token.blank?
-          return { media: [], total_count: result["totalCount"].to_i, has_more: false, next_token: nil, page: page_number, query: query }
-        end
-      end
+      result = fetch_page(query:, page_number:, cursor:)
+      token = result["token"]
 
       media = Array(result["media"]).map do |item|
         item.slice("id", "url", "width", "height", "createdAt", "updatedAt", "alt", "tags")
@@ -62,6 +39,38 @@ module Microcms
       }
     rescue JSON::ParserError, Faraday::Error => error
       raise FetchError, "microCMS media request failed", cause: error
+    end
+
+    private
+
+    def fetch_page(query:, page_number:, cursor:)
+      token = nil
+      result = nil
+      (cursor.present? ? 1 : page_number).times do |index|
+        params = if cursor.present?
+          { token: cursor }
+        elsif index.zero?
+          { limit: PAGE_SIZE, fileName: query.presence }
+        else
+          { token: token }
+        end
+        response = @connection.get("api/v2/media", params.compact) do |request|
+          request.headers["X-MICROCMS-API-KEY"] = @api_key
+        end
+        unless response.success?
+          return fetch_page(query:, page_number:, cursor: nil) if cursor.present? && response.status == 400
+
+          raise FetchError, "microCMS media request failed"
+        end
+
+        result = JSON.parse(response.body)
+        token = result["token"]
+        if cursor.blank? && index < page_number - 1 && token.blank?
+          return result.merge("media" => [], "token" => nil)
+        end
+      end
+
+      result
     end
   end
 end
