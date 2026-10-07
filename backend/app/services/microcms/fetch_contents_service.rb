@@ -134,7 +134,7 @@ module Microcms
     end
 
     def parse_payload(body)
-      deep_symbolize(JSON.parse(body))
+      JSON.parse(body, symbolize_names: true)
     end
 
     def contents_from(json)
@@ -213,19 +213,6 @@ module Microcms
 
     def ids
       @ids
-    end
-
-    def deep_symbolize(value)
-      case value
-      when Array
-        value.map { |element| deep_symbolize(element) }
-      when Hash
-        value.each_with_object({}) do |(key, child), result|
-          result[key.to_sym] = deep_symbolize(child)
-        end
-      else
-        value
-      end
     end
   end
 end
