@@ -42,4 +42,19 @@ RSpec.describe Microcms::FetchMediaService do
   it "異常なページ番号を拒否する" do
     expect { described_class.call(query: "", page: "9999", api_key: "test-key", connection:) }.to raise_error(ArgumentError)
   end
+
+  it "目的ページに到達する前にtokenが尽きたら空ページを返す" do
+    response = double(success?: true, body: { media: [ { id: "first" } ], totalCount: 1 }.to_json)
+    allow(connection).to receive(:get).and_return(response)
+
+    expect(result).to eq(media: [], total_count: 1, has_more: false, next_token: nil, page: 2, query: "cat")
+  end
+
+  it "カーソルの400以外の失敗は再取得せずエラーにする" do
+    allow(connection).to receive(:get).and_return(double(success?: false, status: 503))
+
+    expect do
+      described_class.call(query: "cat", page: 2, cursor: "cursor", api_key: "test-key", connection:)
+    end.to raise_error(described_class::FetchError, "microCMS media request failed")
+  end
 end
