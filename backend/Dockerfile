@@ -91,6 +91,7 @@ COPY --chown=rails:rails --from=build /rails /rails
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
+# The shell command bypasses the entrypoint's Rails-server detection, so prepare
+# every production database (including Solid Cache) before starting Thruster.
 EXPOSE 8080
-CMD ["/bin/sh", "-c", "./bin/thrust ./bin/rails server -b 0.0.0.0 -p ${PORT:-8080}"]
+CMD ["/bin/sh", "-c", "./bin/rails db:prepare && exec ./bin/thrust ./bin/rails server -b 0.0.0.0 -p ${PORT:-8080}"]
