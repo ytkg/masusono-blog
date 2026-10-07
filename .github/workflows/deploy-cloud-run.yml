@@ -43,7 +43,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y libsqlite3-dev sqlite3 libvips
+          sudo apt-get install --no-install-recommends -y libsqlite3-dev sqlite3 libvips imagemagick libmagickcore-6.q16-7-extra fonts-noto-cjk fonts-noto-color-emoji
 
       - name: Install frontend dependencies
         run: npm ci

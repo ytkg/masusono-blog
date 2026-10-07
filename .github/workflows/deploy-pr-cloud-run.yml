@@ -35,7 +35,7 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      - run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libsqlite3-dev sqlite3 libvips
+      - run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libsqlite3-dev sqlite3 libvips imagemagick libmagickcore-6.q16-7-extra fonts-noto-cjk fonts-noto-color-emoji
       - run: npm ci
       - run: bin/ci
 

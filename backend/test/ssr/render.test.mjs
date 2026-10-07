@@ -56,15 +56,33 @@ test("article initial HTML contains content, links, styles and SEO metadata", as
   const url = "/articles/ssr-article"
   // Repeat a page to catch shared server state leaking between requests.
   for (let attempt = 0; attempt < 2; attempt++) {
-    const { head, body } = await render("blog/show", url, { article, relatedArticles: [{ id: "related-1", title: "関連する記事" }] })
+    const { head, body } = await render("blog/show", url, {
+      article,
+      ogpImagePath: "/articles/ssr-article/ogp/test-version.png",
+      relatedArticles: [{ id: "related-1", title: "関連する記事" }],
+    })
     assert.ok(body.includes("本文"))
     assert.match(body, /<a[^>]+href="\/articles\/related-1"[^>]*>関連する記事<\/a>/)
     assert.match(body, /data-server-rendered/)
     assert.match(body, /<a[^>]+href=/)
     assert.match(body, /data-emotion=/)
     const meta = head.join("")
+    assert.doesNotMatch(meta, /Symbol\(react.fragment\)/)
     assert.match(meta, /<title/)
     assert.match(meta, /name="description"/)
+    assert.match(
+      meta,
+      /property="og:image" content="https:\/\/masusono.com\/articles\/ssr-article\/ogp\/test-version.png"/,
+    )
+    assert.match(
+      meta,
+      /name="twitter:image" content="https:\/\/masusono.com\/articles\/ssr-article\/ogp\/test-version.png"/,
+    )
+    assert.match(meta, /name="twitter:card" content="summary_large_image"/)
+    assert.match(meta, /property="og:image:width" content="1200"/)
+    assert.match(meta, /property="og:image:height" content="630"/)
+    assert.match(meta, /property="og:image:type" content="image\/png"/)
+    assert.match(meta, /property="og:image:alt" content="増田とその他！：SSR記事"/)
     assert.ok(meta.includes(`href="https://masusono.com${url}"`))
     assert.ok(body.includes("puts 1"))
   }

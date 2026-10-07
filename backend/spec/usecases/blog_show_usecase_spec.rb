@@ -26,6 +26,7 @@ RSpec.describe BlogShowUsecase do
         {
           props: {
             relatedArticles: [],
+            ogpImagePath: ArticleOgpImage.path(article: article),
             article: {
               id: "article-1",
               title: "記事1",
@@ -53,7 +54,8 @@ RSpec.describe BlogShowUsecase do
           {
             props: {
               article: nil,
-              relatedArticles: []
+              relatedArticles: [],
+              ogpImagePath: nil
             },
             status: :not_found
           }
