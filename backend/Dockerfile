@@ -26,7 +26,7 @@ WORKDIR /rails
 # Install base packages (optionally include build tools for development)
 ARG INSTALL_DEV_TOOLS=0
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 imagemagick libmagickcore-7.q16-10-extra fonts-noto-cjk fonts-noto-color-emoji && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 sqlite3 imagemagick libmagickcore-7.q16-10-extra fonts-noto-cjk fonts-noto-color-emoji && \
     if [ "$INSTALL_DEV_TOOLS" = "1" ]; then \
       apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config nodejs npm; \
     fi && \
