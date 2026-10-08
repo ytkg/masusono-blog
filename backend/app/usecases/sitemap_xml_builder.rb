@@ -1,7 +1,6 @@
-require "time"
-
 class SitemapXmlBuilder
   include XmlEscaper
+  include XmlDateFormatter
 
   def self.call(entries)
     new(entries).call
@@ -32,19 +31,11 @@ class SitemapXmlBuilder
   def entry_lines(entry)
     lines = [ "  <url>" ]
     lines << "    <loc>#{escape_xml(entry[:loc])}</loc>"
-    lastmod = normalize_date(entry[:lastmod])
+    lastmod = format_xml_date(entry[:lastmod], &:iso8601)
     lines << "    <lastmod>#{escape_xml(lastmod)}</lastmod>" if lastmod
     lines << "    <changefreq>#{escape_xml(entry[:changefreq])}</changefreq>" if entry[:changefreq]
     lines << "    <priority>#{format('%.1f', entry[:priority])}</priority>" if entry[:priority] != nil
     lines << "  </url>"
     lines
-  end
-
-  def normalize_date(value)
-    return nil if value.nil? || value == ""
-
-    Time.parse(value).utc.iso8601
-  rescue ArgumentError, TypeError
-    nil
   end
 end

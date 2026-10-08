@@ -1,7 +1,6 @@
-require "time"
-
 class RssXmlBuilder
   include XmlEscaper
+  include XmlDateFormatter
 
   def self.call(title:, link:, description:, feed_url:, items:)
     new(title:, link:, description:, feed_url:, items:).call
@@ -46,19 +45,11 @@ class RssXmlBuilder
       "      <link>#{escape_xml(item[:link])}</link>",
       "      <guid isPermaLink=\"true\">#{escape_xml(item[:guid])}</guid>"
     ]
-    pub_date = normalize_pub_date(item[:published_at])
+    pub_date = format_xml_date(item[:published_at], &:rfc2822)
     lines << "      <pubDate>#{escape_xml(pub_date)}</pubDate>" if pub_date
     lines << "      <description>#{escape_xml(item[:description])}</description>" if item[:description]
     lines << "      <dc:creator>#{escape_xml(item[:author])}</dc:creator>" unless item[:author].to_s.empty?
     lines << "    </item>"
     lines
-  end
-
-  def normalize_pub_date(value)
-    return nil if value.nil? || value == ""
-
-    Time.parse(value).utc.rfc2822
-  rescue ArgumentError, TypeError
-    nil
   end
 end
