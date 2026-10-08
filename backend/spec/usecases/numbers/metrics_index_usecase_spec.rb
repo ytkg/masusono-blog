@@ -90,6 +90,34 @@ RSpec.describe Numbers::MetricsIndexUsecase do
         expect(blocks.map { |block| block[:label] }).to include("総記事数", "総文字数")
         expect(blocks.map { |block| block[:label] }).not_to include("ブログ")
       end
+
+      context "空の本文の記事もある場合" do
+        let(:articles) do
+          [
+            { content: "<p>a b c</p>", author: "増田" },
+            { content: nil, author: "増田" },
+            { content: "<p>de</p>", author: "その他" }
+          ]
+        end
+
+        it "空の本文も分母に含めて全体と著者別の平均を計算する" do
+          expect(blocks.last).to eq(
+            label: "平均文字数", value: "2 字",
+            children: [
+              { label: "増田の平均文字数", value: "2 字" },
+              { label: "その他の平均文字数", value: "2 字" }
+            ]
+          )
+        end
+      end
+
+      context "記事がない場合" do
+        let(:articles) { [] }
+
+        it "平均はダッシュで表示し著者別の行を作らない" do
+          expect(blocks.last).to eq(label: "平均文字数", value: "—", children: [])
+        end
+      end
     end
 
     describe "推移" do
