@@ -68,6 +68,14 @@ test("home feed", async ({ page }) => {
   await screenshot(page, "home-feed")
 })
 
+test("home calendar", async ({ page }) => {
+  await openPage(page, "/")
+  await page.getByRole("tab", { name: "カレンダー" }).click()
+  await expect(page.getByRole("heading", { name: "1月12日", exact: true })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "1月15日", exact: true })).toBeVisible()
+  await screenshot(page, "home-calendar")
+})
+
 test("home beginnings", async ({ page }) => {
   await openPage(page, "/")
   await page.getByRole("tab", { name: "書き出し" }).click()

@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :app do
       resources :articles, only: :index, defaults: { format: :json }
+      resources :calendar_articles, only: :index, defaults: { format: :json }
       resources :navigation_failures, only: :create, defaults: { format: :json }
       resources :users, only: %i[show create], param: :user_id, defaults: { format: :json }
 

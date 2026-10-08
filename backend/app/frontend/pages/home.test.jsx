@@ -57,6 +57,33 @@ vi.mock("@/shared/lib/userId", () => ({
 }))
 
 describe("Home page", () => {
+  it("カレンダーを開いたときだけ全期間を取得し、切り替え後も取得済み一覧を維持する", async () => {
+    requestJson.mockResolvedValue({
+      groups: [
+        { monthDay: "01/01", articles: [{ id: "new" }, { id: "old" }] },
+        { monthDay: "02/29", articles: [{ id: "leap" }] },
+      ],
+    })
+    render(<Home articles={[]} pagination={{ nextOffset: 10 }} />)
+    expect(requestJson).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole("tab", { name: "カレンダー" }))
+    expect(await screen.findByRole("heading", { name: "1月1日" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
+    fireEvent.click(screen.getByRole("tab", { name: "カレンダー" }))
+    expect(requestJson).toHaveBeenCalledTimes(1)
+  })
+
+  it("カレンダーの取得失敗から再試行し、空の一覧を表示する", async () => {
+    requestJson.mockRejectedValueOnce(new Error("failed")).mockResolvedValueOnce({ groups: [] })
+    render(<Home articles={[]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "カレンダー" }))
+    fireEvent.click(await screen.findByRole("button", { name: "再試行" }))
+    expect(await screen.findByText("記事がありません。")).toBeInTheDocument()
+    expect(requestJson).toHaveBeenCalledTimes(2)
+  })
+
   afterEach(() => {
     rememberedStates.clear()
     window.sessionStorage.clear()
