@@ -43,12 +43,21 @@ export default function CalendarFeed() {
   if (!groups.length) return <EmptyStatus>記事がありません。</EmptyStatus>
 
   return (
-    <Box sx={{ display: "grid", gap: 3 }}>
-      {groups.map(({ monthDay, articles }) => {
+    <Box sx={{ display: "grid", gap: 1.5 }}>
+      {groups.map(({ monthDay, articles }, index) => {
         const [month, day] = monthDay.split("/").map(Number)
         const label = `${month}月${day}日`
         return (
-          <Box component="section" key={monthDay} aria-label={label}>
+          <Box
+            component="section"
+            key={monthDay}
+            aria-label={label}
+            sx={{
+              borderBottom: index < groups.length - 1 ? "1px solid" : 0,
+              borderColor: "divider",
+              pb: index < groups.length - 1 ? 1.5 : 0,
+            }}
+          >
             <Typography component="h2" variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
               {label}
             </Typography>
