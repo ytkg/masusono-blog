@@ -71,7 +71,10 @@ test("home feed", async ({ page }) => {
 test("home calendar", async ({ page }) => {
   await openPage(page, "/")
   await page.getByRole("tab", { name: "カレンダー" }).click()
-  await expect(page.getByRole("heading", { name: "1月12日", exact: true })).toBeVisible()
+  const dateHeading = page.getByRole("heading", { name: "1月12日", exact: true })
+  await expect(dateHeading).toBeVisible()
+  await expect(dateHeading).toHaveCSS("font-size", "14px")
+  await expect(dateHeading).toHaveCSS("color", "rgb(102, 102, 102)")
   await expect(page.getByRole("heading", { name: "1月15日", exact: true })).toBeVisible()
   await screenshot(page, "home-calendar")
 })

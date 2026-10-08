@@ -58,7 +58,7 @@ export default function CalendarFeed() {
               pb: index < groups.length - 1 ? 1.5 : 0,
             }}
           >
-            <Typography component="h2" variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+            <Typography component="h2" variant="body2" sx={{ mb: 2, color: "text.secondary", fontWeight: 700 }}>
               {label}
             </Typography>
             <ArticlesList articles={articles} />
