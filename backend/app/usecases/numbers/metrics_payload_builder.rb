@@ -13,7 +13,8 @@ module Numbers
     LABELS = {
       launch: "増田とその他！始動から",
       total_articles: "総記事数",
-      total_chars: "総文字数"
+      total_chars: "総文字数",
+      average_chars: "平均文字数"
     }.freeze
 
     BLOG_METRIC_DEFINITIONS = [
@@ -33,7 +34,8 @@ module Numbers
       {
         blocks: [
           build_launch_block,
-          *build_blog_metric_blocks
+          *build_blog_metric_blocks,
+          build_average_chars_block
         ]
       }
     end
@@ -64,6 +66,24 @@ module Numbers
       author_rows.map do |name, data|
         { label: "#{name}の#{label(label_key)}", value: format_count(data.fetch(metric_key), unit(metric_key)) }
       end
+    end
+
+    def build_average_chars_block
+      build_block(
+        label: label(:average_chars),
+        value: format_average_chars(totals),
+        children: author_rows.map do |name, data|
+          { label: "#{name}の#{label(:average_chars)}", value: format_average_chars(data) }
+        end
+      )
+    end
+
+    def format_average_chars(counts)
+      article_count = counts.fetch(:articles)
+      return "—" if article_count.zero?
+
+      average = counts.fetch(:chars).quo(article_count).round
+      format_count(average, unit(:chars))
     end
 
     def build_block(label:, value:, children: nil)
