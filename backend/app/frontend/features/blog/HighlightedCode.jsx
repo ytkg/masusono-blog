@@ -36,6 +36,9 @@ const lineNumberSx = {
   zIndex: 1,
 }
 
+const codeRowStyle = { display: "flex", lineHeight: 1.7, minWidth: "max-content", whiteSpace: "pre" }
+const codeTextStyle = { display: "block", paddingLeft: "0.5rem" }
+
 function paddedLineNumber(index) {
   return String(index + 1).padStart(3, "0")
 }
@@ -60,15 +63,11 @@ export default function HighlightedCode({ block }) {
       })}
       renderer={({ rows, stylesheet, useInlineStyles }) =>
         rows.map((row, index) => (
-          <span
-            key={index}
-            data-code-line
-            style={{ display: "flex", lineHeight: 1.7, minWidth: "max-content", whiteSpace: "pre" }}
-          >
+          <span key={index} data-code-line style={codeRowStyle}>
             <span className="react-syntax-highlighter-line-number" style={lineNumberSx}>
               {paddedLineNumber(index)}
             </span>
-            <span style={{ display: "block", paddingLeft: "0.5rem" }}>
+            <span style={codeTextStyle}>
               {createElement({
                 key: `code-row-${index}`,
                 node: row,
