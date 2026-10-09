@@ -2,7 +2,6 @@ module Numbers
   class ArticleMetricsSummary
     include AuthorNameExtractor
 
-    PRIORITY_AUTHOR_KEYWORD = AuthorRowsSorter::PRIORITY_AUTHOR_KEYWORD
     UNKNOWN_AUTHOR_NAME = "不明"
 
     def self.call(articles:)
