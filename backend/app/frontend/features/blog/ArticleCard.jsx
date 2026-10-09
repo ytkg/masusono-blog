@@ -14,11 +14,11 @@ function getAuthorHref(article) {
   return article.authorId ? `/authors/${article.authorId}` : undefined
 }
 
-function ArticleLinkSection({ title, articles, sourceId, trackClick }) {
+function ArticleLinkSection({ title, articles, sourceId, trackClick, sx }) {
   if (articles.length === 0) return null
 
   return (
-    <Box component="section" aria-label={title} sx={{ mt: 3, pt: 3 }}>
+    <Box component="section" aria-label={title} sx={[{ mt: 3, pt: 3 }, sx]}>
       <Typography component="h2" variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
         {title}
       </Typography>
@@ -105,6 +105,7 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
             articles={yearAgoArticles}
             sourceId={article.id}
             trackClick={trackYearAgoArticleClick}
+            sx={relatedArticles.length > 0 ? { pt: 0 } : undefined}
           />
         </>
       )}
