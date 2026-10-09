@@ -18,7 +18,7 @@ function ArticleLinkSection({ title, articles, sourceId, trackClick }) {
   if (articles.length === 0) return null
 
   return (
-    <Box component="section" aria-label={title} sx={{ mt: 3, pt: 3, borderTop: 1, borderColor: "divider" }}>
+    <Box component="section" aria-label={title} sx={{ mt: 3, pt: 3 }}>
       <Typography component="h2" variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
         {title}
       </Typography>
