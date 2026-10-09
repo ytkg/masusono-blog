@@ -23,6 +23,16 @@ function SettingsError({ id, children, spacing = 1 }) {
   )
 }
 
+function SettingsSectionError({ message }) {
+  if (!message) return null
+
+  return (
+    <Box sx={{ mt: -0.25 }}>
+      <SettingsError spacing={0}>{message}</SettingsError>
+    </Box>
+  )
+}
+
 function NameSection({
   name,
   draftName,
@@ -79,11 +89,7 @@ function NameSection({
           )}
         </Box>
       </Box>
-      {errorMessage ? (
-        <Box sx={{ mt: -0.25 }}>
-          <SettingsError spacing={0}>{errorMessage}</SettingsError>
-        </Box>
-      ) : null}
+      <SettingsSectionError message={errorMessage} />
     </SettingsSection>
   )
 }
@@ -114,11 +120,7 @@ function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUn
           onChange={state.subscribed ? onUnsubscribe : onSubscribe}
         />
       </Box>
-      {errorMessage ? (
-        <Box sx={{ mt: -0.25 }}>
-          <SettingsError spacing={0}>{errorMessage}</SettingsError>
-        </Box>
-      ) : null}
+      <SettingsSectionError message={errorMessage} />
     </SettingsSection>
   )
 }
