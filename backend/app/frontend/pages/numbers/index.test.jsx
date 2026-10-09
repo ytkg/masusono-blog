@@ -8,11 +8,11 @@ vi.mock("../../shared/SeoHead", () => ({
 
 describe("Numbers page", () => {
   it("数字でわかる増田とその他をページとして表示する", () => {
-    render(<NumbersIndex metrics={{ blocks: [{ label: "記事数", value: 12 }] }} />)
+    render(<NumbersIndex metrics={{ rows: [{ label: "全体", articles: "12 本", chars: "120 字", averageChars: "10 字" }] }} />)
 
     expect(screen.getByText("seo:数字でわかる、増田とその他！:/numbers")).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "数字でわかる、増田とその他！" })).toBeInTheDocument()
-    expect(screen.getByText("記事数")).toBeInTheDocument()
-    expect(screen.getByText("12")).toBeInTheDocument()
+    expect(screen.getByText("全体")).toBeInTheDocument()
+    expect(screen.getByText("12 本")).toBeInTheDocument()
   })
 })

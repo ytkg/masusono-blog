@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { mockBlogmuraBanner, mockPageProps } from "./helpers"
+import { expectNoPageOverflow, mockBlogmuraBanner, mockPageProps } from "./helpers"
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -108,6 +108,12 @@ for (const [name, path, heading] of [
     await expect(page.getByRole("heading", { name: heading, exact: true }).first()).toBeVisible()
     if (["about", "others", "authors", "numbers"].includes(name)) {
       await expectPageHeading(page, heading)
+    }
+    if (name === "numbers") {
+      const table = page.getByRole("table", { name: "対象別の記事の指標" })
+      await expect(table.getByRole("columnheader")).toHaveText(["対象", "総記事数", "総文字数", "平均文字数"])
+      await expect(table.getByRole("rowheader")).toHaveText(["全体", "増田愛美", "チャーリー"])
+      await expectNoPageOverflow(page)
     }
     if (name === "others") {
       for (const button of ["増田RUNを開く", "設定を開く", "管理を開く"]) {

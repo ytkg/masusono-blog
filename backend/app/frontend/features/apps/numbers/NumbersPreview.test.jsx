@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import NumbersPreview from "./NumbersPreview"
 
-vi.mock("./NumbersMetricsGrid", () => ({
-  default: ({ blocks }) => <div data-testid="numbers-grid">{blocks.length} blocks</div>,
+vi.mock("./NumbersMetricsTable", () => ({
+  default: ({ rows }) => <div data-testid="numbers-grid">{rows.length} rows</div>,
 }))
 
 vi.mock("./NumbersTrendChart", () => ({
@@ -17,14 +17,14 @@ describe("NumbersPreview", () => {
     expect(screen.getByText("データがありません。")).toBeInTheDocument()
   })
 
-  it("データがあればグリッドを表示する", () => {
-    render(<NumbersPreview metrics={{ blocks: [{ label: "記事数" }] }} />)
+  it("データがあればテーブルを表示する", () => {
+    render(<NumbersPreview metrics={{ rows: [{ label: "記事数" }] }} />)
 
-    expect(screen.getByTestId("numbers-grid")).toHaveTextContent("1 blocks")
+    expect(screen.getByTestId("numbers-grid")).toHaveTextContent("1 rows")
   })
 
   it("推移データがあればグラフを表示する", () => {
-    render(<NumbersPreview metrics={{ blocks: [{ label: "記事数" }], trend: { title: "推移" } }} />)
+    render(<NumbersPreview metrics={{ rows: [{ label: "記事数" }], trend: { title: "推移" } }} />)
 
     expect(screen.getByTestId("numbers-grid").compareDocumentPosition(screen.getByTestId("numbers-trend"))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,

@@ -35,11 +35,10 @@ module VisualTestFixtures
   ].freeze
 
   METRICS = {
-    blocks: [
-      { label: "増田とその他！始動から（2025/10/05〜）", value: "102 日" },
-      { label: "総記事数", value: "2 本", children: [ { label: "増田愛美の総記事数", value: "1 本" }, { label: "チャーリーの総記事数", value: "1 本" } ] },
-      { label: "総文字数", value: "96 字", children: [ { label: "増田愛美の総文字数", value: "60 字" }, { label: "チャーリーの総文字数", value: "36 字" } ] },
-      { label: "平均文字数", value: "48 字", children: [ { label: "増田愛美の平均文字数", value: "60 字" }, { label: "チャーリーの平均文字数", value: "36 字" } ] }
+    rows: [
+      { label: "全体", articles: "2 本", chars: "96 字", averageChars: "48 字" },
+      { label: "増田愛美", articles: "1 本", chars: "60 字", averageChars: "60 字" },
+      { label: "チャーリー", articles: "1 本", chars: "36 字", averageChars: "36 字" }
     ],
     trend: {
       title: "推移",

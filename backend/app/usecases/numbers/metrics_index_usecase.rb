@@ -1,5 +1,6 @@
 module Numbers
   class MetricsIndexUsecase
+    LAUNCH_DATE = Date.new(2025, 10, 5)
     CACHE_KEY = "numbers/metrics_index".freeze
     CACHE_EXPIRES_IN = 1.hour
     CACHE = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
@@ -22,7 +23,7 @@ module Numbers
       metrics = MetricsPayloadBuilder.call(article_summary:)
       metrics[:trend] = MetricsTrendBuilder.call(
         articles: source_data.fetch(:articles),
-        start_date: MetricsPayloadBuilder::LAUNCH_DATE
+        start_date: LAUNCH_DATE
       )
 
       {
