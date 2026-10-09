@@ -1,5 +1,6 @@
 import ArticlesList from "./ArticlesList"
 import CalendarFeed from "./CalendarFeed"
+import RecommendedFeed from "./RecommendedFeed"
 import SentenceFeed from "./SentenceFeed"
 
 // Home-only features are registered here. Removing a tab is intentionally a
@@ -21,6 +22,11 @@ export const HOME_TABS = Object.freeze([
     id: "calendar",
     label: "こよみ",
     renderContent: () => <CalendarFeed />,
+  },
+  {
+    id: "recommended",
+    label: "おすすめ",
+    renderContent: () => <RecommendedFeed />,
   },
 ])
 

@@ -14,6 +14,7 @@ import SeoHead from "../shared/SeoHead"
 const HOME_TAB_HEIGHT = 38
 const compactTabSx = {
   minHeight: HOME_TAB_HEIGHT,
+  minWidth: 0,
   py: 0.75,
 }
 

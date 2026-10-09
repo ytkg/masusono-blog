@@ -417,3 +417,7 @@ Docker ComposeではViteのSSRエンドポイントをRailsから呼び出し、
 SSRに失敗したリクエストは初期propsを返してブラウザで描画します。Railsログの `[inertia-rails] SSR render failed` とPumaの `Inertia SSR` ログで障害を検知できます。
 
 検証には `npm run test:ssr`（実際の本番バンドルをNode.jsで描画）、 `bundle exec rspec spec/requests/ssr_spec.rb`（対象ページの選択・HTML・障害時の切り替え）、全画面の `scripts/check-visual.sh` を使用します。撮影環境では本番と同じSSRバンドルをPumaから起動し、クライアントとSSRの画像URLを一致させます。Visual RegressionにはJavaScript無効での本文・メタ情報検証と、hydration後の操作確認も含まれます。実際のCloud Runデプロイは別途実行します。
+
+### おすすめ記事 API
+
+`GET /api/app/recommended_articles` は全公開記事からランダムに最大3件をフィードと同じ形式で返します。「こよみ」の右隣の「おすすめ」タブを開くたび、また「再抽選」ボタンで再取得します。同じ3件内は重複せず、前回との重複は許容します。全件取得には既存のmicroCMSページング保護が適用されます。取得失敗時は表示済みの記事を残して再試行できます。

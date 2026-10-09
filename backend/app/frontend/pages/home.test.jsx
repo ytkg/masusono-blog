@@ -57,6 +57,64 @@ vi.mock("@/shared/lib/userId", () => ({
 }))
 
 describe("Home page", () => {
+  it("おすすめはタブを開くたびと再抽選で取得し、追加読み込みを表示しない", async () => {
+    requestJson.mockResolvedValue({ articles: [{ id: "one" }, { id: "two" }, { id: "three" }] })
+    render(<Home articles={[]} pagination={{ nextOffset: 10 }} />)
+    expect(requestJson).not.toHaveBeenCalled()
+    expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
+      "フィード",
+      "書き出し",
+      "こよみ",
+      "おすすめ",
+    ])
+    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
+    await waitFor(() => expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:3"))
+    expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "再抽選" }))
+    await waitFor(() => expect(screen.getByRole("button", { name: "再抽選" })).toBeEnabled())
+    fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
+    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
+    await waitFor(() => expect(screen.getByRole("button", { name: "再抽選" })).toBeEnabled())
+    expect(requestJson).toHaveBeenCalledTimes(3)
+    expect(requestJson).toHaveBeenLastCalledWith(
+      "/api/app/recommended_articles",
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    )
+  })
+
+  it("おすすめの再抽選失敗時は既存記事を維持し、再試行で置き換える", async () => {
+    requestJson
+      .mockResolvedValueOnce({ articles: [{ id: "one" }] })
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce({ articles: [{ id: "two" }, { id: "three" }] })
+    render(<Home articles={[]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
+    await waitFor(() => expect(screen.getByRole("button", { name: "再抽選" })).toBeEnabled())
+    fireEvent.click(screen.getByRole("button", { name: "再抽選" }))
+    await screen.findByText("記事を読み込めませんでした。")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
+    fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+    await waitFor(() => expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:2"))
+  })
+
+  it("おすすめの初回失敗から再試行して空の一覧を表示する", async () => {
+    requestJson.mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce({ articles: [] })
+    render(<Home articles={[]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
+    fireEvent.click(await screen.findByRole("button", { name: "再試行" }))
+    await waitFor(() => expect(screen.getByTestId("articles-list")).toHaveTextContent("empty:記事がありません。"))
+  })
+
+  it("おすすめの取得中は再抽選を無効にし、タブ離脱時に取得を中断する", () => {
+    requestJson.mockReturnValue(new Promise(() => {}))
+    render(<Home articles={[]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "おすすめ" }))
+    expect(screen.getByRole("button", { name: "再抽選" })).toBeDisabled()
+    const signal = requestJson.mock.calls[0][1].signal
+    fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
+    expect(signal.aborted).toBe(true)
+  })
+
   it("こよみを開いたときだけ全期間を取得し、切り替え後も取得済み一覧を維持する", async () => {
     requestJson.mockResolvedValue({
       groups: [
