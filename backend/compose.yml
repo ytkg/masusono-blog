@@ -1,5 +1,15 @@
 services:
+  node_modules_init:
+    image: node:22-bookworm
+    user: "0:0"
+    # Only initialize the volume root; never change the host tree or its contents.
+    command: ["chown", "1000:1000", "/rails/node_modules"]
+    volumes:
+      - node_modules_cache:/rails/node_modules
   backend:
+    depends_on:
+      node_modules_init:
+        condition: service_completed_successfully
     build:
       context: .
       dockerfile: Dockerfile
@@ -30,6 +40,9 @@ services:
     stdin_open: true
   vite:
     image: node:22-bookworm
+    depends_on:
+      node_modules_init:
+        condition: service_completed_successfully
     user: "1000:1000"
     environment:
       VITE_RUBY_HOST: 0.0.0.0
