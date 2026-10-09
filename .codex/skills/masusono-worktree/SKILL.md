@@ -38,7 +38,15 @@ worktree のルートで以下を使う。
 
 `compose.sh` は `.env.worktree` を読み込むため、別 worktree とホストポート・Compose プロジェクト名・名前付きボリュームが衝突しない。通常の `docker compose` を使う必要がある場合も、先に `.env.worktree` を読み込んで同じ環境変数を渡す。
 
-### 新規 node_modules ボリュームの権限エラー
+### node_modules ボリュームの初期化と権限エラー
+
+`compose.sh up` や `compose.sh run --rm vite npm ci --no-audit --no-fund` は、
+`node_modules_init` の正常終了後に backend / vite を起動する。初期化サービスは
+このプロジェクトの `node_modules_cache` だけをマウントし、ボリュームのルートを
+vite の実行ユーザー `1000:1000` に合わせる。通常は手動修復が不要。
+新規環境で `run --no-deps` を使う場合は、先に
+`compose.sh run --rm --no-deps node_modules_init` を実行する。
+初期化は再帰的に所有者を変更しないため、既存ファイルの権限エラーは別途調査する。
 
 新規 worktree の `npm ci` が `/rails/node_modules` の `EACCES` で失敗した場合は、依存未準備による Vite manifest エラーとアプリのテスト失敗を区別する。以下は worktree ルートで実行する。
 
