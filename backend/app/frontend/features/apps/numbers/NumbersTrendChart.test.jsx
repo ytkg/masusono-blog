@@ -32,20 +32,35 @@ describe("NumbersTrendChart", () => {
     expect(screen.getByText("総文字数")).toBeInTheDocument()
     expect(screen.getByText("12 字")).toBeInTheDocument()
     expect(screen.queryByText("増田RUN総プレイ回数")).not.toBeInTheDocument()
-    expect(screen.getByText("総文字数は1/300で表示しています。")).toBeInTheDocument()
+    expect(screen.getByText("左軸は記事数、右軸は文字数です。総文字数は1/300で表示しています。")).toBeInTheDocument()
     expect(screen.getByText("'25/10/05")).toBeInTheDocument()
     expect(screen.getByText("'25/10/06")).toBeInTheDocument()
     expect(screen.getByText("'25/10/07")).toBeInTheDocument()
     expect(screen.getByText("'25/10/08")).toBeInTheDocument()
+    expect(screen.getByText("本")).toBeInTheDocument()
+    expect(screen.getByText("字")).toBeInTheDocument()
+    expect(screen.getByText("1,200")).toBeInTheDocument()
     expect(screen.getAllByTestId("trend-date-grid-line")).toHaveLength(4)
   })
 
   it("総記事数と総文字数を描画する", () => {
     render(<NumbersTrendChart trend={trend} />)
 
-    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", expect.stringMatching(/^M 2 /))
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", expect.stringMatching(/^M 42 /))
     expect(screen.getByTestId("trend-line-totalChars")).toHaveAttribute("d", expect.stringMatching(/182\.34$/))
     expect(screen.queryByTestId("trend-line-masudaRunTotalPlays")).not.toBeInTheDocument()
+  })
+
+  it("文字数が大きい場合は右軸を万表記で表示する", () => {
+    render(
+      <NumbersTrendChart
+        trend={{ ...trend, points: [{ date: "2025-10-05", totalArticles: 1000, totalChars: 600000 }] }}
+      />,
+    )
+
+    expect(screen.getByText("2,000")).toBeInTheDocument()
+    expect(screen.getByText("30万")).toBeInTheDocument()
+    expect(screen.getByText("60万")).toBeInTheDocument()
   })
 
   it("推移データがなければ何も表示しない", () => {
@@ -57,7 +72,7 @@ describe("NumbersTrendChart", () => {
     render(<NumbersTrendChart trend={{ ...trend, points: [trend.points[0]] }} />)
     expect(screen.getByText("'25/10/05")).toBeInTheDocument()
     expect(screen.getAllByTestId("trend-date-grid-line")).toHaveLength(1)
-    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", "M 2 18")
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", "M 42 18")
   })
 
   it("無効値とゼロだけの系列に壊れたSVGパスを生成しない", () => {

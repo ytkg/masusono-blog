@@ -1,3 +1,4 @@
+import { TOTAL_CHARS_SCALE } from "./trendChartGeometry"
 import Box from "@mui/material/Box"
 import { useTheme } from "@mui/material/styles"
 import {
@@ -25,15 +26,31 @@ export default function TrendChartSvg({ trend }) {
       aria-label="総記事数、総文字数の累積推移"
       sx={{ display: "block", width: "100%", height: "auto", fontFamily: theme.typography.fontFamily }}
     >
-      <line x1={bounds.left} y1={bounds.bottom} x2={bounds.right} y2={bounds.bottom} stroke={theme.palette.divider} />
-      <line x1={bounds.left} y1={bounds.top} x2={bounds.right} y2={bounds.top} stroke={theme.palette.divider} />
-      <line
-        x1={bounds.left}
-        y1={(bounds.top + bounds.bottom) / 2}
-        x2={bounds.right}
-        y2={(bounds.top + bounds.bottom) / 2}
-        stroke={theme.palette.divider}
-      />
+      {[0, 0.5, 1].map((ratio) => {
+        const y = bounds.bottom - (bounds.bottom - bounds.top) * ratio
+        const value = chartMaxValue * ratio
+        const formatValue = (number) =>
+          number >= 10000
+            ? `${new Intl.NumberFormat("ja-JP", { maximumFractionDigits: 1 }).format(number / 10000)}万`
+            : new Intl.NumberFormat("ja-JP", { maximumFractionDigits: 1 }).format(number)
+        return (
+          <g key={ratio}>
+            <line x1={bounds.left} y1={y} x2={bounds.right} y2={y} stroke={theme.palette.divider} />
+            <text x={bounds.left - 6} y={y} dy="0.35em" textAnchor="end" fill={seriesColors[0]} fontSize="11">
+              {formatValue(value)}
+            </text>
+            <text x={bounds.right + 6} y={y} dy="0.35em" textAnchor="start" fill={seriesColors[1]} fontSize="11">
+              {formatValue(value * TOTAL_CHARS_SCALE)}
+            </text>
+          </g>
+        )
+      })}
+      <text x={bounds.left - 6} y="9" textAnchor="end" fill={seriesColors[0]} fontSize="10">
+        本
+      </text>
+      <text x={bounds.right + 6} y="9" textAnchor="start" fill={seriesColors[1]} fontSize="10">
+        字
+      </text>
       {dateLabels.map((dateLabel) => (
         <line
           key={`grid-${dateLabel.key}`}

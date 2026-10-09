@@ -526,7 +526,7 @@ test("numbers trend", async ({ page }) => {
   await chart.scrollIntoViewIfNeeded()
   await expect(chart.getByTestId("trend-line-totalArticles")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.getByTestId("trend-line-totalChars")).not.toHaveAttribute("stroke-dasharray")
-  await expect(chart.locator("svg[role=img] text").first()).toHaveAttribute("font-size", "12")
+  await expect(chart.getByText("'26/01/12", { exact: true })).toHaveAttribute("font-size", "12")
   await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
   await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(102, 102, 102)")
   await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
