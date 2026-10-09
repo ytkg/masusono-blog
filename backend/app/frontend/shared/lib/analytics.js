@@ -86,3 +86,12 @@ export function trackRelatedArticleClick(sourceId, targetId, position) {
     transport_type: "beacon",
   })
 }
+
+export function trackYearAgoArticleClick(sourceId, targetId, position) {
+  send("year_ago_article_click", {
+    source_article_id: sourceId,
+    target_article_id: targetId,
+    link_position: position,
+    transport_type: "beacon",
+  })
+}

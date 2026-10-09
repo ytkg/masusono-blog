@@ -10,6 +10,7 @@ class BlogShowUsecase
   def call
     article = Article.find(@article_id)
     related_articles = article ? RelatedArticlesBuilder.call(article:) : []
+    year_ago_articles = article ? YearAgoArticlesBuilder.call(article:) : []
     image = ArticleOgpImage.path(article:) if article
     article = ArticlePayloadBuilder.call(article:) if article
 
@@ -17,6 +18,7 @@ class BlogShowUsecase
       props: {
         article: article,
         relatedArticles: related_articles,
+        yearAgoArticles: year_ago_articles,
         ogpImagePath: image
       },
       status: article.nil? ? :not_found : :ok

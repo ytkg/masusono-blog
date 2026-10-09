@@ -56,6 +56,7 @@ describe("analytics", () => {
     browser.location = new URL(href)
     analytics.trackPageView("Excluded")
     analytics.trackRelatedArticleClick("a", "b", 1)
+    analytics.trackYearAgoArticleClick("a", "b", 1)
     expect(events()).toEqual([])
     expect(document.querySelector("script")).toBeNull()
   })
@@ -76,6 +77,23 @@ describe("analytics", () => {
           source_article_id: "a",
           target_article_id: "b",
           link_position: 2,
+          transport_type: "beacon",
+          send_to: "G-5930S30RWS",
+        },
+      ],
+    ])
+  })
+
+  it("records year ago clicks separately with source, target and position", () => {
+    analytics.trackYearAgoArticleClick("a", "b", 4)
+    expect(events()).toEqual([
+      [
+        "event",
+        "year_ago_article_click",
+        {
+          source_article_id: "a",
+          target_article_id: "b",
+          link_position: 4,
           transport_type: "beacon",
           send_to: "G-5930S30RWS",
         },

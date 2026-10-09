@@ -1,4 +1,4 @@
-import { trackRelatedArticleClick } from "../../shared/lib/analytics"
+import { trackRelatedArticleClick, trackYearAgoArticleClick } from "../../shared/lib/analytics"
 import { formatArticleStats } from "./articleStats"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
@@ -14,7 +14,36 @@ function getAuthorHref(article) {
   return article.authorId ? `/authors/${article.authorId}` : undefined
 }
 
-export default function ArticleCard({ article, mode = "list", sx, relatedArticles = [] }) {
+function ArticleLinkSection({ title, articles, sourceId, trackClick }) {
+  if (articles.length === 0) return null
+
+  return (
+    <Box component="section" aria-label={title} sx={{ mt: 3, pt: 3, borderTop: 1, borderColor: "divider" }}>
+      <Typography component="h2" variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
+        {title}
+      </Typography>
+      <Box component="ul" sx={{ m: 0, pl: 3, display: "grid", gap: 1.5 }}>
+        {articles.map((linked, index) => (
+          <Box component="li" key={linked.id} sx={{ overflowWrap: "anywhere" }}>
+            <Link
+              href={`/articles/${linked.id}`}
+              underline="always"
+              color="inherit"
+              onClick={() => trackClick(sourceId, linked.id, index + 1)}
+              onAuxClick={(event) => {
+                if (event.button === 1) trackClick(sourceId, linked.id, index + 1)
+              }}
+            >
+              {linked.title}
+            </Link>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  )
+}
+
+export default function ArticleCard({ article, mode = "list", sx, relatedArticles = [], yearAgoArticles = [] }) {
   if (!article) {
     return (
       <ContentItemCard title="記事" titleComponent="h3" sx={sx}>
@@ -63,29 +92,21 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
     >
       <ArticleTags tags={article.tags} />
       <ArticleBody enableRubyRunner={isDetail || isList} html={html} hasBody={hasBody} shouldCollapse={isList} />
-      {isDetail && relatedArticles.length > 0 && (
-        <Box component="section" aria-label="関連記事" sx={{ mt: 3, pt: 3, borderTop: 1, borderColor: "divider" }}>
-          <Typography component="h2" variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
-            関連記事
-          </Typography>
-          <Box component="ul" sx={{ m: 0, pl: 3, display: "grid", gap: 1.5 }}>
-            {relatedArticles.map((related, index) => (
-              <Box component="li" key={related.id} sx={{ overflowWrap: "anywhere" }}>
-                <Link
-                  href={`/articles/${related.id}`}
-                  underline="always"
-                  color="inherit"
-                  onClick={() => trackRelatedArticleClick(article.id, related.id, index + 1)}
-                  onAuxClick={(event) => {
-                    if (event.button === 1) trackRelatedArticleClick(article.id, related.id, index + 1)
-                  }}
-                >
-                  {related.title}
-                </Link>
-              </Box>
-            ))}
-          </Box>
-        </Box>
+      {isDetail && (
+        <>
+          <ArticleLinkSection
+            title="関連記事"
+            articles={relatedArticles}
+            sourceId={article.id}
+            trackClick={trackRelatedArticleClick}
+          />
+          <ArticleLinkSection
+            title="1年前の記事"
+            articles={yearAgoArticles}
+            sourceId={article.id}
+            trackClick={trackYearAgoArticleClick}
+          />
+        </>
       )}
       {isDetail && (
         <Box sx={{ mt: 3 }}>
