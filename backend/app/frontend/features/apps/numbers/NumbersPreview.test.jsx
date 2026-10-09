@@ -21,6 +21,7 @@ describe("NumbersPreview", () => {
     render(<NumbersPreview metrics={{ rows: [{ label: "記事数" }] }} />)
 
     expect(screen.getByTestId("numbers-grid")).toHaveTextContent("1 rows")
+    expect(screen.getByRole("heading", { name: "集計", level: 2 })).toBeInTheDocument()
   })
 
   it("推移データがあればグラフを表示する", () => {
