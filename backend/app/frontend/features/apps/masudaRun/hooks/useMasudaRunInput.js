@@ -19,10 +19,7 @@ export const useMasudaRunInput = ({ state, canvasRef, startOrRestart, doJump, su
     }, 300)
   }
 
-  const onPrimaryClick = () => {
-    if (suppressClickRef.current) return false
-    return true
-  }
+  const onPrimaryClick = () => !suppressClickRef.current
 
   return { onPrimaryPointerDown, onPrimaryClick }
 }
