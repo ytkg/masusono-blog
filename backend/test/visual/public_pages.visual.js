@@ -111,7 +111,7 @@ for (const [name, path, heading] of [
     }
     if (name === "numbers") {
       const table = page.getByRole("table", { name: "対象別の記事の指標" })
-      await expect(table.getByRole("columnheader")).toHaveText(["対象", "総記事数", "総文字数", "平均文字数"])
+      await expect(table.getByRole("columnheader")).toHaveText(["対象", "記事数", "文字数", "平均文字数"])
       await expect(table.getByRole("rowheader")).toHaveText(["全体", "増田愛美", "チャーリー"])
       await expectNoPageOverflow(page)
     }
