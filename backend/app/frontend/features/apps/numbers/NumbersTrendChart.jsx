@@ -28,7 +28,7 @@ export default function NumbersTrendChart({ trend }) {
       </Box>
 
       <Typography variant="caption" sx={{ color: "text.secondary" }}>
-        総文字数は1/300で表示しています。
+        カーソルを合わせるか、指で触れると数値を表示します。総文字数は1/300で表示しています。
       </Typography>
     </Stack>
   )
