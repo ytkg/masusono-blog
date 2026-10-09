@@ -60,7 +60,7 @@ export default function CalendarFeed() {
 
   return (
     <Box>
-      {[...months].map(([month, days]) => (
+      {[...months].map(([month, days], index) => (
         <Accordion
           key={month}
           expanded={expandedMonths.at(-1) === month}
@@ -79,7 +79,15 @@ export default function CalendarFeed() {
             id={`calendar-month-${month}-heading`}
             aria-controls={`calendar-month-${month}-content`}
             expandIcon={<ExpandMoreIcon />}
-            sx={{ px: 0, minHeight: 56 }}
+            sx={{
+              px: 0,
+              minHeight: index === 0 ? 44 : 56,
+              ...(index === 0 && {
+                alignItems: "flex-start",
+                "& .MuiAccordionSummary-content": { mt: 0, mb: 1.5 },
+                "& .MuiAccordionSummary-expandIconWrapper": { mt: 0.5 },
+              }),
+            }}
           >
             <Typography component="span" variant="h6" sx={{ fontWeight: 700 }}>
               {Number(month)}月

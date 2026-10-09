@@ -61,7 +61,7 @@ export default function Home({ articles = [], pagination }) {
               ))}
             </Tabs>
           </Box>
-          <Box sx={{ pt: 1 }}>
+          <Box sx={{ pt: mode === "calendar" ? 0.5 : 1 }}>
             {activeTab?.renderContent({
               articles: feed.articles,
             })}

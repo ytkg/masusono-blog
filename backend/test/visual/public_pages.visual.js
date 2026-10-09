@@ -73,6 +73,18 @@ test("home calendar", async ({ page }) => {
   await page.getByRole("tab", { name: "こよみ" }).click()
   const month = page.getByRole("button", { name: "1月", exact: true })
   await expect(month).toHaveAttribute("aria-expanded", "false")
+  const spacing = await page.getByRole("heading", { name: "1月", exact: true }).evaluate((heading) => {
+    const label = heading.querySelector(".MuiTypography-root")
+    const tabs = document.querySelector('[role="tablist"]').parentElement
+    return {
+      topGap: label.getBoundingClientRect().top - tabs.getBoundingClientRect().bottom,
+      buttonHeight: heading.querySelector("button").getBoundingClientRect().height,
+    }
+  })
+  // The sticky tabs can move by their 1px border relative to the grid layout.
+  expect(spacing.topGap).toBeGreaterThanOrEqual(16)
+  expect(spacing.topGap).toBeLessThanOrEqual(17)
+  expect(spacing.buttonHeight).toBeGreaterThanOrEqual(44)
   await screenshot(page, "home-calendar-collapsed")
   await month.focus()
   await page.keyboard.press("Enter")
