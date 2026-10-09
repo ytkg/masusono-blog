@@ -57,7 +57,7 @@ vi.mock("@/shared/lib/userId", () => ({
 }))
 
 describe("Home page", () => {
-  it("カレンダーを開いたときだけ全期間を取得し、切り替え後も取得済み一覧を維持する", async () => {
+  it("こよみを開いたときだけ全期間を取得し、切り替え後も取得済み一覧を維持する", async () => {
     requestJson.mockResolvedValue({
       groups: [
         { monthDay: "01/01", articles: [{ id: "new" }, { id: "old" }] },
@@ -66,7 +66,7 @@ describe("Home page", () => {
     })
     render(<Home articles={[]} pagination={{ nextOffset: 10 }} />)
     expect(requestJson).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole("tab", { name: "カレンダー" }))
+    fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
     const january = await screen.findByRole("button", { name: "1月", exact: true })
     const february = screen.getByRole("button", { name: "2月", exact: true })
     expect(january).toHaveAttribute("aria-expanded", "false")
@@ -77,7 +77,7 @@ describe("Home page", () => {
     expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
-    fireEvent.click(screen.getByRole("tab", { name: "カレンダー" }))
+    fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
     expect(requestJson).toHaveBeenCalledTimes(1)
     expect(screen.getByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "true")
     expect(screen.getByRole("heading", { name: "1月1日" })).toBeInTheDocument()
@@ -87,10 +87,10 @@ describe("Home page", () => {
     expect(screen.getByRole("button", { name: "2月", exact: true })).toHaveAttribute("aria-expanded", "true")
   })
 
-  it("カレンダーの取得失敗から再試行し、空の一覧を表示する", async () => {
+  it("こよみの取得失敗から再試行し、空の一覧を表示する", async () => {
     requestJson.mockRejectedValueOnce(new Error("failed")).mockResolvedValueOnce({ groups: [] })
     render(<Home articles={[]} />)
-    fireEvent.click(screen.getByRole("tab", { name: "カレンダー" }))
+    fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
     fireEvent.click(await screen.findByRole("button", { name: "再試行" }))
     expect(await screen.findByText("記事がありません。")).toBeInTheDocument()
     expect(requestJson).toHaveBeenCalledTimes(2)

@@ -70,7 +70,7 @@ test("home feed", async ({ page }) => {
 
 test("home calendar", async ({ page }) => {
   await openPage(page, "/")
-  await page.getByRole("tab", { name: "カレンダー" }).click()
+  await page.getByRole("tab", { name: "こよみ" }).click()
   const month = page.getByRole("button", { name: "1月", exact: true })
   await expect(month).toHaveAttribute("aria-expanded", "false")
   await screenshot(page, "home-calendar-collapsed")

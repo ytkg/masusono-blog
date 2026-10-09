@@ -17,7 +17,7 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 
 ## GET /api/app/calendar_articles
 
-カレンダータブ用。認証不要。全期間の記事を取得し、日本時間の公開日の月日でまとめる。全件取得の上限は既存の microCMS ページング保護と同じ。通常のホーム表示では呼び出さず、タブを開いたときに取得する。
+「こよみ」タブ用。認証不要。全期間の記事を取得し、日本時間の公開日の月日でまとめる。全件取得の上限は既存の microCMS ページング保護と同じ。通常のホーム表示では呼び出さず、タブを開いたときに取得する。
 
 Response: `{ "groups": Array<{ "monthDay": String, "articles": Array<Article> }> }`
 
