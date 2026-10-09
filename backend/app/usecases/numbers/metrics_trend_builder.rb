@@ -83,7 +83,7 @@ module Numbers
     end
 
     def date_range
-      @date_range ||= (start_date..effective_end_date).to_a
+      @date_range ||= (start_date..effective_end_date)
     end
 
     def effective_end_date
