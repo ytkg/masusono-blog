@@ -19,7 +19,7 @@ export const HOME_TABS = Object.freeze([
   },
   {
     id: "calendar",
-    label: "カレンダー",
+    label: "こよみ",
     renderContent: () => <CalendarFeed />,
   },
 ])
