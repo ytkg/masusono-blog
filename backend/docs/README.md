@@ -21,6 +21,9 @@
 
 ## 運用
 
+- [PR のステージングデプロイ手順](./staging-deployment.md)
+  - ラベル付与、対象コミットの実行状況、URL と反映内容の確認
+
 - [Cloud Run ウォーム維持戦略](./cloud-run-warmup-strategy.md)
   - キャッシュではなくウォーム維持で運用する前提と監視方針
 - [本番 HTTPS と Host Authorization](./production-https-host-authorization.md)
