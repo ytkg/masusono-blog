@@ -14,7 +14,7 @@ ID 未設定・無効時は読み込まない。`/others`（管理ミニアプ�
    自動イベントを管理ページに混ぜないため、この導入では拡張計測機能全体をオフにする。
    コードの `send_page_view: false` だけでは履歴変更の自動イベントは止まらない。
 3. イベントスコープのカスタムディメンションを `source_article_id`、`target_article_id`、`link_position` で作成する。
-   表示順は1始まり。イベント名は `related_article_click`。
+   表示順は1始まり。イベント名は関連記事が `related_article_click`、1年前の記事が `year_ago_article_click`。
 4. 現行サイトには計測のプライバシー告知がない。オーナーが利用対象と告知・同意方針を確認し、必要な表示を公開前に整える。
    告知案: 「当サイトは利用状況の把握に Google Analytics を使用します。Cookie 等を用いて閲覧ページや流入元を収集します。」
    [Google のデータ利用説明](https://policies.google.com/technologies/partner-sites)へのリンクも添える。
@@ -33,13 +33,15 @@ Tag Assistant を使う場合は DebugView も利用できる。開発環境か�
 - 同じURLの部分更新とハッシュ変更は追加しない。再読込は新しい閲覧として1件送る。
 - 関連記事をクリック・キーボード選択・中ボタンで開く: 各選択で `related_article_click` が1件。
   `source_article_id`、`target_article_id`、`link_position` が表示と一致する。
+- 1年前の記事をクリック・キーボード選択・中ボタンで開く: 各選択で `year_ago_article_click` が1件。
+  関連記事と同じパラメータで元記事・遷移先・表示位置を記録する。
 - `/others` では管理操作を含め計測しない。プレビュー、ローカル、ID 未設定で GA タグ通信がなく、通常の閲覧ができる。
 - 例: `https://masusono.com/?utm_source=x&utm_medium=social&utm_campaign=ga4_launch`
   から入り、「レポート → 集客 → トラフィック獲得」でセッションの参照元/メディアとキャンペーンを確認する。
   UTM は運営が投稿 URL に付ける。認証情報や個人情報を URL に入れない。
 
 記事別閲覧は「エンゲージメント → ページとスクリーン」のページパス/タイトルを使う。
-関連記事は「エンゲージメント → イベント」の `related_article_click`、詳細分析は「探索」で上記カスタムディメンションを使う。
+関連記事と1年前の記事は「エンゲージメント → イベント」の `related_article_click` と `year_ago_article_click`、詳細分析は「探索」で上記カスタムディメンションを使う。
 通常レポートとカスタム定義への反映は即時とは限らない。
 
 ## 計測開始の記録

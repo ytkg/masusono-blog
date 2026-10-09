@@ -9,8 +9,8 @@ vi.mock("@inertiajs/react", async () => {
   }
 })
 
-vi.mock("../../shared/lib/analytics", () => ({ trackRelatedArticleClick: vi.fn() }))
-import { trackRelatedArticleClick } from "../../shared/lib/analytics"
+vi.mock("../../shared/lib/analytics", () => ({ trackRelatedArticleClick: vi.fn(), trackYearAgoArticleClick: vi.fn() }))
+import { trackRelatedArticleClick, trackYearAgoArticleClick } from "../../shared/lib/analytics"
 
 describe("ArticleCard", () => {
   it.each([[[]], [[{ id: "related", title: "関連記事のタイトル" }]]])(
@@ -102,6 +102,47 @@ describe("ArticleCard", () => {
       />,
     )
     expect(screen.queryByRole("region", { name: "関連記事" })).not.toBeInTheDocument()
+  })
+
+  it("1年前の記事は関連記事の下に全件表示し、重複も許容してクリックを計測する", () => {
+    trackYearAgoArticleClick.mockClear()
+    const articles = ["a", "b", "c", "d"].map((id) => ({ id, title: id }))
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{ id: "current", title: "本文" }}
+        relatedArticles={[articles[0]]}
+        yearAgoArticles={articles}
+      />,
+    )
+    const section = screen.getByRole("region", { name: "1年前の記事" })
+    expect(section.querySelectorAll("a")).toHaveLength(4)
+    expect(screen.getAllByRole("link", { name: "a", exact: true })).toHaveLength(2)
+    expect(
+      screen.getByRole("region", { name: "関連記事" }).compareDocumentPosition(section) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      section.compareDocumentPosition(screen.getByRole("link", { name: "にほんブログ村 その他日記ブログへ" })) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    const link = screen.getByRole("link", { name: "d", exact: true })
+    expect(link).toHaveAttribute("href", "/articles/d")
+    fireEvent.click(link)
+    fireEvent(link, new MouseEvent("auxclick", { bubbles: true, button: 1 }))
+    fireEvent(link, new MouseEvent("auxclick", { bubbles: true, button: 2 }))
+    expect(trackYearAgoArticleClick).toHaveBeenCalledTimes(2)
+    expect(trackYearAgoArticleClick).toHaveBeenLastCalledWith("current", "d", 4)
+  })
+
+  it.each(["list", "detail"])("%sで1年前の記事が空なら枠を表示しない", (mode) => {
+    render(<ArticleCard mode={mode} article={{ id: "current", title: "本文" }} />)
+    expect(screen.queryByRole("region", { name: "1年前の記事" })).not.toBeInTheDocument()
+  })
+
+  it("一覧では1年前の記事を表示しない", () => {
+    render(<ArticleCard article={{ id: "current", title: "本文" }} yearAgoArticles={[{ id: "past", title: "過去" }]} />)
+    expect(screen.queryByRole("region", { name: "1年前の記事" })).not.toBeInTheDocument()
   })
 
   function mockClipboard() {

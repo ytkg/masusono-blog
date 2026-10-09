@@ -18,6 +18,7 @@ RSpec.describe BlogShowUsecase do
 
     before do
       allow(Article).to receive(:find).with(article_id).and_return(article)
+      allow(YearAgoArticlesBuilder).to receive(:call).with(article: article).and_return([])
       allow(RelatedArticlesBuilder).to receive(:call).with(article: article).and_return([])
     end
 
@@ -26,6 +27,7 @@ RSpec.describe BlogShowUsecase do
         {
           props: {
             relatedArticles: [],
+            yearAgoArticles: [],
             ogpImagePath: ArticleOgpImage.path(article: article),
             article: {
               id: "article-1",
@@ -55,11 +57,38 @@ RSpec.describe BlogShowUsecase do
             props: {
               article: nil,
               relatedArticles: [],
+              yearAgoArticles: [],
               ogpImagePath: nil
             },
             status: :not_found
           }
         )
+      end
+    end
+
+    context "1年前の記事がある場合" do
+      before do
+        allow(YearAgoArticlesBuilder).to receive(:call).with(article: article)
+          .and_return([ { id: "past", title: "前年の記事" } ])
+      end
+
+      it "本文と別のpropsで返す" do
+        expect(result[:props][:yearAgoArticles]).to eq([ { id: "past", title: "前年の記事" } ])
+        expect(result[:props][:article][:content]).to eq(article[:content])
+      end
+    end
+
+    context "1年前の記事の取得が失敗した場合" do
+      before do
+        allow(YearAgoArticlesBuilder).to receive(:call).and_call_original
+        allow(Article).to receive(:fetch_by_filter)
+          .and_raise(Microcms::FetchContentsService::FetchError.new(status: 503, body: "unavailable"))
+      end
+
+      it "本文の正常表示を維持する" do
+        expect(result[:status]).to eq(:ok)
+        expect(result[:props][:article][:content]).to eq(article[:content])
+        expect(result[:props][:yearAgoArticles]).to eq([])
       end
     end
 

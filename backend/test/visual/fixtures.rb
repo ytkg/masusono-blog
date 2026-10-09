@@ -82,6 +82,8 @@ module VisualTestFixtures
   ].freeze
 
   module Articles
+    def fetch_by_filter(filters) = []
+
     def all = VisualTestFixtures::ARTICLES
 
     def page(limit:, offset:)
