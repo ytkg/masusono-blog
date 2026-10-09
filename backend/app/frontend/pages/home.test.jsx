@@ -72,19 +72,39 @@ describe("Home page", () => {
     expect(january).toHaveAttribute("aria-expanded", "false")
     expect(screen.queryByRole("heading", { name: "1月1日" })).not.toBeInTheDocument()
     fireEvent.click(january)
-    fireEvent.click(february)
     expect(screen.getByRole("heading", { name: "1月1日" })).toBeInTheDocument()
+    fireEvent.click(february)
+    expect(january).toHaveAttribute("aria-expanded", "false")
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "1月1日" })).not.toBeInTheDocument())
     expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
     fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
     expect(requestJson).toHaveBeenCalledTimes(1)
-    expect(screen.getByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "true")
-    expect(screen.getByRole("heading", { name: "1月1日" })).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "3月", exact: true })).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole("button", { name: "1月", exact: true }))
     expect(screen.getByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "false")
     expect(screen.getByRole("button", { name: "2月", exact: true })).toHaveAttribute("aria-expanded", "true")
+    expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "3月", exact: true })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "2月", exact: true }))
+    expect(screen.getByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "false")
+    expect(screen.getByRole("button", { name: "2月", exact: true })).toHaveAttribute("aria-expanded", "false")
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "2月29日" })).not.toBeInTheDocument())
+  })
+
+  it("以前に複数月を開いていた履歴では最後の月だけを復元する", async () => {
+    rememberedStates.set("home-calendar-months", ["01", "02"])
+    requestJson.mockResolvedValue({
+      groups: [
+        { monthDay: "01/01", articles: [{ id: "january" }] },
+        { monthDay: "02/29", articles: [{ id: "february" }] },
+      ],
+    })
+    render(<Home articles={[]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
+    expect(await screen.findByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "false")
+    expect(screen.getByRole("button", { name: "2月", exact: true })).toHaveAttribute("aria-expanded", "true")
+    expect(screen.queryByRole("heading", { name: "1月1日" })).not.toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
   })
 
   it("こよみの取得失敗から再試行し、空の一覧を表示する", async () => {

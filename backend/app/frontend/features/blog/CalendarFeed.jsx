@@ -13,11 +13,7 @@ import ArticlesList from "./ArticlesList"
 
 export default function CalendarFeed() {
   const { state: groups, commit } = useImmediateRemember(null, "home-calendar")
-  const {
-    state: expandedMonths,
-    stateRef: expandedMonthsRef,
-    commit: commitExpandedMonths,
-  } = useImmediateRemember([], "home-calendar-months")
+  const { state: expandedMonths, commit: commitExpandedMonths } = useImmediateRemember([], "home-calendar-months")
   const [attempt, setAttempt] = useState(0)
   const [failed, setFailed] = useState(false)
   const retry = useCallback(() => {
@@ -59,8 +55,7 @@ export default function CalendarFeed() {
   }
 
   function changeMonth(month, expanded) {
-    const current = expandedMonthsRef.current
-    commitExpandedMonths(expanded ? [...current, month] : current.filter((value) => value !== month))
+    commitExpandedMonths(expanded ? [month] : [])
   }
 
   return (
@@ -68,7 +63,7 @@ export default function CalendarFeed() {
       {[...months].map(([month, days]) => (
         <Accordion
           key={month}
-          expanded={expandedMonths.includes(month)}
+          expanded={expandedMonths.at(-1) === month}
           onChange={(_, expanded) => changeMonth(month, expanded)}
           disableGutters
           elevation={0}
