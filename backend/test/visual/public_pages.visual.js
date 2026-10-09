@@ -533,6 +533,54 @@ test("numbers trend", async ({ page }) => {
   await expect(chart).toHaveScreenshot("numbers-trend.png")
 })
 
+test("numbers trend selection", async ({ page }, testInfo) => {
+  await openPage(page, "/numbers")
+  const chart = page.getByTestId("numbers-trend")
+  const graph = chart.getByRole("img", { name: "総記事数、総文字数の累積推移" })
+  await chart.scrollIntoViewIfNeeded()
+  await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
+  const box = await graph.boundingBox()
+  const first = { x: box.x + box.width * 0.1, y: box.y + box.height * 0.6 }
+  const last = { x: box.x + box.width * 0.9, y: first.y }
+  const values = chart.getByRole("status")
+
+  if (testInfo.project.name === "mobile") {
+    await page.touchscreen.tap(first.x, first.y)
+  } else {
+    await page.mouse.move(first.x, first.y)
+  }
+  await expect(values).toContainText("2026/01/12")
+  await expect(values).toContainText("36 字")
+
+  if (testInfo.project.name === "mobile") {
+    const session = await page.context().newCDPSession(page)
+    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [first] })
+    await session.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [last] })
+    await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] })
+    await session.detach()
+  } else {
+    await page.mouse.move(last.x, last.y)
+  }
+  await expect(values).toContainText("2026/01/15")
+  await expect(values).toContainText("2 本")
+  await expect(values).toContainText("96 字")
+  await expect(chart.getByTestId("trend-selected-date")).toHaveCount(1)
+  await expect(chart).toHaveScreenshot("numbers-trend-selected.png")
+  await expectNoPageOverflow(page)
+
+  if (testInfo.project.name === "desktop") {
+    await page.mouse.move(0, 0)
+    await expect(values).toHaveCount(0)
+    await graph.focus()
+    await graph.press("End")
+    await expect(values).toContainText("2026/01/15")
+    await graph.press("ArrowLeft")
+    await expect(values).toContainText("2026/01/12")
+    await graph.press("Escape")
+    await expect(values).toHaveCount(0)
+  }
+})
+
 for (const state of ["success", "error"]) {
   test(`copy ${state}`, async ({ page }) => {
     await page.clock.install()

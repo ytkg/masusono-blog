@@ -1,8 +1,8 @@
 export const CHART_WIDTH = 360
 export const CHART_HEIGHT = 220
-const CHART_PADDING = Object.freeze({ top: 18, right: 48, bottom: 36, left: 42 })
+const CHART_PADDING = Object.freeze({ top: 18, right: 2, bottom: 36, left: 2 })
 const TOTAL_CHARS_SERIES_KEY = "totalChars"
-export const TOTAL_CHARS_SCALE = 300
+const TOTAL_CHARS_SCALE = 300
 
 export function chartBounds() {
   return {
