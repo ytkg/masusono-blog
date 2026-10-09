@@ -18,7 +18,7 @@ class SitemapEntriesBuilder
   end
 
   def call(articles:, authors:)
-    static_entries + author_entries(authors) + article_entries(articles)
+    static_entries.concat(author_entries(authors), article_entries(articles))
   end
 
   private
