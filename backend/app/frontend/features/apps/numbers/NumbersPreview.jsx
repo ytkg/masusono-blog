@@ -1,13 +1,14 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import NumbersMetricsGrid from "./NumbersMetricsGrid"
+import SectionHeading from "@/shared/SectionHeading"
+import NumbersMetricsTable from "./NumbersMetricsTable"
 import NumbersTrendChart from "./NumbersTrendChart"
 
 export default function NumbersPreview({ metrics }) {
-  const metricBlocks = metrics?.blocks ?? []
+  const metricRows = metrics?.rows ?? []
   const trend = metrics?.trend
 
-  if (metricBlocks.length === 0) {
+  if (metricRows.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
         データがありません。
@@ -17,7 +18,10 @@ export default function NumbersPreview({ metrics }) {
 
   return (
     <Stack spacing={3}>
-      <NumbersMetricsGrid blocks={metricBlocks} />
+      <Stack spacing={1.5}>
+        <SectionHeading>集計</SectionHeading>
+        <NumbersMetricsTable rows={metricRows} />
+      </Stack>
       <NumbersTrendChart trend={trend} />
     </Stack>
   )

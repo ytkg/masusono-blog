@@ -2,26 +2,6 @@ module Numbers
   class MetricsPayloadBuilder
     include ActiveSupport::NumberHelper
 
-    LAUNCH_DATE = Date.new(2025, 10, 5)
-    DATE_FORMAT = "%Y/%m/%d"
-
-    UNITS = {
-      articles: "本",
-      chars: "字"
-    }.freeze
-
-    LABELS = {
-      launch: "増田とその他！始動から",
-      total_articles: "総記事数",
-      total_chars: "総文字数",
-      average_chars: "平均文字数"
-    }.freeze
-
-    BLOG_METRIC_DEFINITIONS = [
-      { metric_key: :articles, label_key: :total_articles },
-      { metric_key: :chars, label_key: :total_chars }
-    ].freeze
-
     def self.call(article_summary:)
       new(article_summary:).call
     end
@@ -32,10 +12,9 @@ module Numbers
 
     def call
       {
-        blocks: [
-          build_launch_block,
-          *build_blog_metric_blocks,
-          build_average_chars_block
+        rows: [
+          build_row("全体", article_summary.fetch(:totals)),
+          *article_summary.fetch(:author_rows).map { |name, counts| build_row(name, counts) }
         ]
       }
     end
@@ -44,42 +23,13 @@ module Numbers
 
     attr_reader :article_summary
 
-    def build_launch_block
-      build_block(label: launch_label, value: days_since_launch_text)
-    end
-
-    def build_blog_metric_blocks
-      BLOG_METRIC_DEFINITIONS.map do |definition|
-        metric_key = definition.fetch(:metric_key)
-        label_key = definition.fetch(:label_key)
-
-        build_count_block(
-          label_key: label_key,
-          value: totals.fetch(metric_key),
-          unit_key: metric_key,
-          children: build_author_metric_children(metric_key:, label_key:)
-        )
-      end
-    end
-
-    def build_author_metric_children(metric_key:, label_key:)
-      build_author_children(label_key:) do |data|
-        format_count(data.fetch(metric_key), unit(metric_key))
-      end
-    end
-
-    def build_average_chars_block
-      build_block(
-        label: label(:average_chars),
-        value: format_average_chars(totals),
-        children: build_author_children(label_key: :average_chars) { |data| format_average_chars(data) }
-      )
-    end
-
-    def build_author_children(label_key:)
-      author_rows.map do |name, data|
-        { label: "#{name}の#{label(label_key)}", value: yield(data) }
-      end
+    def build_row(name, counts)
+      {
+        label: name,
+        articles: format_count(counts.fetch(:articles), "本"),
+        chars: format_count(counts.fetch(:chars), "字"),
+        averageChars: format_average_chars(counts)
+      }
     end
 
     def format_average_chars(counts)
@@ -87,46 +37,7 @@ module Numbers
       return "—" if article_count.zero?
 
       average = counts.fetch(:chars).quo(article_count).round
-      format_count(average, unit(:chars))
-    end
-
-    def build_block(label:, value:, children: nil)
-      block = { label: label, value: value }
-      block[:children] = children if children
-      block
-    end
-
-    def build_count_block(label_key:, value:, unit_key:, children: nil)
-      formatted_value = value.nil? ? nil : format_count(value, unit(unit_key))
-      build_block(label: label(label_key), value: formatted_value, children: children)
-    end
-
-    def totals
-      article_summary.fetch(:totals)
-    end
-
-    def author_rows
-      article_summary.fetch(:author_rows)
-    end
-
-    def launch_label
-      "#{label(:launch)}（#{LAUNCH_DATE.strftime(DATE_FORMAT)}〜）"
-    end
-
-    def label(key)
-      LABELS.fetch(key)
-    end
-
-    def unit(key)
-      UNITS.fetch(key)
-    end
-
-    def days_since_launch
-      (Date.current - LAUNCH_DATE).to_i
-    end
-
-    def days_since_launch_text
-      "#{days_since_launch} 日"
+      format_count(average, "字")
     end
 
     def format_count(value, unit)

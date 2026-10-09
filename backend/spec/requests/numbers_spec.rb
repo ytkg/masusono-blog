@@ -9,8 +9,8 @@ RSpec.describe "WebNumbers", type: :request do
         {
           props: {
             metrics: {
-              blocks: [
-                { label: "記事数", value: "12 本" }
+              rows: [
+                { label: "全体", articles: "12 本", chars: "120 字", averageChars: "10 字" }
               ]
             }
           },
@@ -25,7 +25,7 @@ RSpec.describe "WebNumbers", type: :request do
       expect(response).to have_http_status(:ok)
       expect(inertia).to be_inertia_response
       expect(inertia).to render_component("numbers/index")
-      expect(inertia.props.dig("metrics", "blocks", 0, "label")).to eq("記事数")
+      expect(inertia.props.dig("metrics", "rows", 0, "label")).to eq("全体")
     end
   end
 end
