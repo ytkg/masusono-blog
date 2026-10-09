@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test"
 
+test.afterEach(async ({ page }) => {
+  // Finish production-origin proxies before the page fixture is closed.
+  await page.unrouteAll({ behavior: "wait" })
+})
+
 // Serve real Rails/Vite output under the production origin without sending data to Google.
 test("GA4 hydration, Inertia history and related links", async ({ page, baseURL }) => {
   const queued = []
