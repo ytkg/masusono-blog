@@ -8,8 +8,8 @@ RSpec.describe NumbersIndexUsecase do
       allow(Numbers::MetricsIndexUsecase).to receive(:call).and_return(
         {
           metrics: {
-            blocks: [
-              { label: "記事数", value: "12 本" }
+            rows: [
+              { label: "全体", articles: "12 本", chars: "120 字", averageChars: "10 字" }
             ]
           },
           status: :ok
@@ -22,8 +22,8 @@ RSpec.describe NumbersIndexUsecase do
         {
           props: {
             metrics: {
-              blocks: [
-                { label: "記事数", value: "12 本" }
+              rows: [
+                { label: "全体", articles: "12 本", chars: "120 字", averageChars: "10 字" }
               ]
             }
           },

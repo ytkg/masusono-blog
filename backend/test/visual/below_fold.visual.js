@@ -52,6 +52,11 @@ test("long article list bottom with navigation", async ({ page }) => {
 })
 
 test("numbers bottom with navigation", async ({ page }) => {
+  await mockPageProps(page, "/numbers", (props) => {
+    props.metrics.rows.push(...Array.from({ length: 8 }, (_, index) => ({
+      label: `著者${index + 1}`, articles: "1 本", chars: "36 字", averageChars: "36 字",
+    })))
+  })
   await openPage(page, "/numbers")
   const chart = page.getByTestId("numbers-trend")
   await expect(chart.getByTestId("trend-line-totalArticles")).toBeVisible()

@@ -17,7 +17,7 @@ test("author without articles", async ({ page }) => {
 
 test("numbers without data", async ({ page }) => {
   await mockPageProps(page, "/numbers", (props) => {
-    props.metrics = { blocks: [], trend: null }
+    props.metrics = { rows: [], trend: null }
   })
   await openPage(page, "/numbers")
   await expect(page.getByRole("heading", { name: "数字でわかる、増田とその他！", level: 1 })).toBeVisible()
