@@ -23,7 +23,10 @@ class RelatedArticlesBuilder
   end
 
   def self.eligible_tags(value)
-    value.to_s.split(",").map(&:strip).reject(&:empty?).uniq - EXCLUDED_TAGS
+    value.to_s.split(",").filter_map do |tag|
+      normalized_tag = tag.strip
+      normalized_tag unless normalized_tag.empty?
+    end.uniq - EXCLUDED_TAGS
   end
   private_class_method :eligible_tags
 

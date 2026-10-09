@@ -134,8 +134,10 @@ module Articles
     def split_tags(tags)
       tags.to_s
         .split(",")
-        .map(&:strip)
-        .filter_map { |tag| tag if tag.present? }
+        .filter_map do |tag|
+          normalized_tag = tag.strip
+          normalized_tag if normalized_tag.present?
+        end
     end
 
     def parse_limit(raw_limit)
