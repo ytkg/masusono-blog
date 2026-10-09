@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react"
 import { notifyLocationChange } from "@/shared/lib/locationEvents"
 
-const HISTORY_MODES = Object.freeze({
-  push: "push",
-  replace: "replace",
-})
-
 function readInitialQuery() {
   if (typeof window === "undefined") {
     return ""
@@ -14,7 +9,7 @@ function readInitialQuery() {
   return new URLSearchParams(window.location.search).get("q") ?? ""
 }
 
-function writeQueryToUrl(query, mode = HISTORY_MODES.replace) {
+function writeQueryToUrl(query, mode = "replace") {
   if (typeof window === "undefined") {
     return
   }
@@ -27,7 +22,7 @@ function writeQueryToUrl(query, mode = HISTORY_MODES.replace) {
   }
 
   const nextUrl = `${url.pathname}${url.search}${url.hash}`
-  if (mode === HISTORY_MODES.push) {
+  if (mode === "push") {
     window.history.pushState(window.history.state, "", nextUrl)
   } else {
     window.history.replaceState(window.history.state, "", nextUrl)
@@ -39,12 +34,12 @@ export default function useArticleSearchQuery() {
   const [query, setQuery] = useState(readInitialQuery)
 
   function replaceQuery(nextQuery) {
-    writeQueryToUrl(nextQuery, HISTORY_MODES.replace)
+    writeQueryToUrl(nextQuery, "replace")
     setQuery(nextQuery)
   }
 
   function pushQuery(nextQuery) {
-    writeQueryToUrl(nextQuery, HISTORY_MODES.push)
+    writeQueryToUrl(nextQuery, "push")
     setQuery(nextQuery)
   }
 
