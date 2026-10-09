@@ -63,8 +63,8 @@ module Numbers
     end
 
     def build_author_metric_children(metric_key:, label_key:)
-      author_rows.map do |name, data|
-        { label: "#{name}の#{label(label_key)}", value: format_count(data.fetch(metric_key), unit(metric_key)) }
+      build_author_children(label_key:) do |data|
+        format_count(data.fetch(metric_key), unit(metric_key))
       end
     end
 
@@ -72,10 +72,14 @@ module Numbers
       build_block(
         label: label(:average_chars),
         value: format_average_chars(totals),
-        children: author_rows.map do |name, data|
-          { label: "#{name}の#{label(:average_chars)}", value: format_average_chars(data) }
-        end
+        children: build_author_children(label_key: :average_chars) { |data| format_average_chars(data) }
       )
+    end
+
+    def build_author_children(label_key:)
+      author_rows.map do |name, data|
+        { label: "#{name}の#{label(label_key)}", value: yield(data) }
+      end
     end
 
     def format_average_chars(counts)
