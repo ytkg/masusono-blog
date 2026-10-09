@@ -10,11 +10,11 @@ export default function NumbersMetricsTable({ rows }) {
     <TableContainer tabIndex={0} role="region" aria-label="記事の指標（横スクロールできます）">
       <Table
         aria-label="対象別の記事の指標"
-        sx={{ minWidth: 480, "& th, & td": { whiteSpace: "nowrap", border: "1px solid", borderColor: "divider" } }}
+        sx={{ "& th, & td": { whiteSpace: "nowrap", border: "1px solid", borderColor: "divider" } }}
       >
         <TableHead>
           <TableRow>
-            <TableCell scope="col">対象</TableCell>
+            <TableCell scope="col" aria-label="対象" />
             <TableCell scope="col" align="right">
               記事数
             </TableCell>
