@@ -48,10 +48,10 @@ module Numbers
     def build_points
       @build_points ||= begin
         article_events = grouped_article_events
-        totals = { total_articles: 0, total_chars: 0 }
+        totals = initial_totals
 
         date_range.map do |date|
-          article_data = article_events.fetch(date, { total_articles: 0, total_chars: 0 })
+          article_data = article_events.fetch(date, initial_totals)
           totals[:total_articles] += article_data.fetch(:total_articles)
           totals[:total_chars] += article_data.fetch(:total_chars)
 
@@ -75,7 +75,7 @@ module Numbers
           date = article_date(article)
           next if date.nil?
 
-          grouped[date] ||= { total_articles: 0, total_chars: 0 }
+          grouped[date] ||= initial_totals
           grouped[date][:total_articles] += 1
           grouped[date][:total_chars] += ArticleMetric.character_count(article)
         end
@@ -100,7 +100,11 @@ module Numbers
           total_articles: values.fetch(:totalArticles),
           total_chars: values.fetch(:totalChars)
         }
-      end || { total_articles: 0, total_chars: 0 }
+      end || initial_totals
+    end
+
+    def initial_totals
+      { total_articles: 0, total_chars: 0 }
     end
 
     def article_date(article)
