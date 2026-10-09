@@ -43,7 +43,7 @@ describe("NumbersTrendChart", () => {
   it("総記事数と総文字数を描画する", () => {
     render(<NumbersTrendChart trend={trend} />)
 
-    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", expect.stringMatching(/^M 18 /))
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", expect.stringMatching(/^M 2 /))
     expect(screen.getByTestId("trend-line-totalChars")).toHaveAttribute("d", expect.stringMatching(/182\.34$/))
     expect(screen.queryByTestId("trend-line-masudaRunTotalPlays")).not.toBeInTheDocument()
   })
@@ -57,7 +57,7 @@ describe("NumbersTrendChart", () => {
     render(<NumbersTrendChart trend={{ ...trend, points: [trend.points[0]] }} />)
     expect(screen.getByText("'25/10/05")).toBeInTheDocument()
     expect(screen.getAllByTestId("trend-date-grid-line")).toHaveLength(1)
-    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", "M 18 18")
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", "M 2 18")
   })
 
   it("無効値とゼロだけの系列に壊れたSVGパスを生成しない", () => {

@@ -1,6 +1,6 @@
 export const CHART_WIDTH = 360
 export const CHART_HEIGHT = 220
-const CHART_PADDING = Object.freeze({ top: 18, right: 18, bottom: 36, left: 18 })
+const CHART_PADDING = Object.freeze({ top: 18, right: 2, bottom: 36, left: 2 })
 const TOTAL_CHARS_SERIES_KEY = "totalChars"
 const TOTAL_CHARS_SCALE = 300
 
