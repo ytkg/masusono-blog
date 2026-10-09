@@ -15,6 +15,14 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 
 検索、RSS、サイトマップは全記事、著者別ページはその著者の記事全件を対象とする（全件取得の上限は README の microCMS ページング保護を参照）。
 
+## GET /api/app/calendar_articles
+
+カレンダータブ用。認証不要。全期間の記事を取得し、日本時間の公開日の月日でまとめる。全件取得の上限は既存の microCMS ページング保護と同じ。通常のホーム表示では呼び出さず、タブを開いたときに取得する。
+
+Response: `{ "groups": Array<{ "monthDay": String, "articles": Array<Article> }> }`
+
+`monthDay` は `MM/DD`。グループは1月1日から12月31日へ昇順、各グループ内の記事は公開日時の降順。記事形式はフィードと同じで年月日も維持する。公開日がない記事と記事がない月日は省略し、2月29日は記事があれば含める。記事0件は `groups: []`。`Cache-Control: no-store` と upstream の共通エラー形式を維持する。
+
 ## Users API
 
 ### GET /api/app/users/:user_id.json

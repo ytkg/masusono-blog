@@ -65,7 +65,9 @@ export default function Home({ articles = [], pagination }) {
             {activeTab?.renderContent({
               articles: feed.articles,
             })}
-            <LoadMoreArticles {...feed} buffer={activeTab?.articleLoadBuffer} />
+            {activeTab?.articleLoadBuffer !== undefined ? (
+              <LoadMoreArticles {...feed} buffer={activeTab.articleLoadBuffer} />
+            ) : null}
           </Box>
         </Box>
       </PageContainer>
