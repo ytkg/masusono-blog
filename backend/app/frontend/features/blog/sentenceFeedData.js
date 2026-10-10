@@ -1,78 +1,13 @@
-import { extractHtmlText } from "./articleHtmlText"
+import { makeSentenceItems, shuffleArticles, SENTENCE_REVEAL_MAX_DELAY_MS } from "./sentenceFeedItems"
+
+export { firstSentenceFromHtml, prepareSentenceArticles } from "./sentenceArticleData"
+export { makeSentenceItems, shuffleArticles, SENTENCE_REVEAL_MAX_DELAY_MS } from "./sentenceFeedItems"
 
 export const INITIAL_SENTENCE_COUNT = 80
 export const APPEND_SENTENCE_COUNT = 24
 export const SENTENCE_REVEAL_DURATION_MS = 800
-export const SENTENCE_REVEAL_MAX_DELAY_MS = 620
 export const SENTENCE_REVEAL_SETTLE_MS = SENTENCE_REVEAL_DURATION_MS + SENTENCE_REVEAL_MAX_DELAY_MS + 80
 export const SENTENCE_STATE_VERSION = 1
-
-const SENTENCE_END_PATTERN = /[。！？!?]+[」』）)］\]｝}”’】〕〉》〙〗〟'"]*|\n/g
-
-const SENTENCE_CLOSING_MARK_PATTERN = /[」』）)］\]｝}”’】〕〉》〙〗〟'"]$/
-const SENTENCE_CONTINUATION_PATTERN = /^[ぁ-んァ-ヶー一-龠々〆ヵヶA-Za-z0-9]/
-
-export function firstSentenceFromHtml(html = "") {
-  const text = extractHtmlText(html)
-    .replace(/[ \t\f\v]+/g, " ")
-    .replace(/\n{2,}/g, "\n")
-    .trim()
-  const match = firstSentenceBoundary(text)
-
-  return match ? text.slice(0, match.index + match[0].length).trim() : text.slice(0, 80)
-}
-
-function firstSentenceBoundary(text) {
-  for (const candidate of text.matchAll(SENTENCE_END_PATTERN)) {
-    const end = candidate[0]
-    const nextCharacter = text[candidate.index + end.length] || ""
-    const hasClosingMark = SENTENCE_CLOSING_MARK_PATTERN.test(end)
-
-    if (end === "\n" || !hasClosingMark || !SENTENCE_CONTINUATION_PATTERN.test(nextCharacter)) {
-      return candidate
-    }
-  }
-}
-
-export function shuffleArticles(articles) {
-  const result = [...articles]
-
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1))
-    const current = result[index]
-    result[index] = result[randomIndex]
-    result[randomIndex] = current
-  }
-
-  return result
-}
-
-export function prepareSentenceArticles(articles) {
-  return articles
-    .map((article) => ({ ...article, sentence: firstSentenceFromHtml(article.content) }))
-    .filter((article) => article.id && article.sentence)
-}
-
-export function makeSentenceItems(source, count, cursor) {
-  const items = []
-  let nextCursor = cursor
-  let pool = source
-
-  for (let index = 0; index < count; index += 1) {
-    if (nextCursor > 0 && nextCursor % pool.length === 0) pool = shuffleArticles(pool)
-
-    const article = pool[nextCursor % pool.length]
-    items.push({
-      article,
-      key: `${nextCursor}-${article.id}`,
-      sentence: article.sentence,
-      revealDelay: Math.floor(Math.random() * SENTENCE_REVEAL_MAX_DELAY_MS),
-    })
-    nextCursor += 1
-  }
-
-  return { items, nextCursor, pool }
-}
 
 function serializeSentenceItems(items) {
   return items.map(({ article, key, revealDelay, sentence }) => ({
