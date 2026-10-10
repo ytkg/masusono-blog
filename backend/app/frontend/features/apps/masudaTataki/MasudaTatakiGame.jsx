@@ -106,7 +106,7 @@ export default function MasudaTatakiGame({ active = true }) {
       }}
     >
       {phase === "title" ? (
-        <Box sx={{ my: "auto", textAlign: "center" }}>
+        <Box sx={{ my: { xs: 2, sm: "auto" }, textAlign: "center" }}>
           <Typography variant="h4" component="h3" sx={{ fontWeight: 700, mb: 2 }}>
             増田たたき
           </Typography>
