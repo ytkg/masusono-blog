@@ -6,6 +6,7 @@ import { useAppLoading } from "../shared/AppsLoadingContext"
 import { IMAGES, loadImages } from "./assets"
 import { advance, DURATION, hit, initialGame, multiplier, rank } from "./game"
 import { createSound } from "./sound"
+import { FieldGround, HoleArt } from "./TatakiFieldArt"
 
 const getTime = () => performance.now()
 
@@ -199,10 +200,14 @@ export default function MasudaTatakiGame({ active = true }) {
               my: "auto",
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 1,
+              gap: 0.5,
+              p: "6%",
+              boxSizing: "border-box",
+              isolation: "isolate",
               touchAction: "none",
             }}
           >
+            <FieldGround />
             {game.holes.map((character, index) => (
               <Box
                 component="button"
@@ -220,8 +225,9 @@ export default function MasudaTatakiGame({ active = true }) {
                   position: "relative",
                   aspectRatio: "1",
                   border: 0,
-                  borderRadius: "50%",
-                  bgcolor: "action.hover",
+                  borderRadius: 2,
+                  background: "transparent",
+                  p: 0,
                   overflow: "hidden",
                   cursor: "pointer",
                   touchAction: "none",
@@ -230,32 +236,37 @@ export default function MasudaTatakiGame({ active = true }) {
                   "@keyframes emerge": { from: { transform: "translateY(90%)" }, to: { transform: "translateY(0)" } },
                 }}
               >
+                <HoleArt />
                 {character && (
-                  <Box
-                    component="img"
-                    src={IMAGES[character.image]}
-                    alt=""
-                    draggable={false}
-                    sx={{
-                      width: "85%",
-                      height: "90%",
-                      objectFit: "cover",
-                      objectPosition: "center top",
-                      position: "absolute",
-                      bottom: 0,
-                      left: "7.5%",
-                      animation: "emerge 120ms ease-out",
-                      transform: character.hit
-                        ? "scaleY(.45) rotate(-10deg)"
-                        : character.until - game.elapsed < 120
-                          ? "translateY(90%)"
-                          : "none",
-                      transformOrigin: "bottom",
-                      transition: "transform 100ms ease",
-                      "@media (prefers-reduced-motion: reduce)": { animation: "none", transition: "none" },
-                    }}
-                  />
+                  <Box sx={{ position: "absolute", inset: "0 0 25%", overflow: "hidden", zIndex: 1 }}>
+                    <Box
+                      component="img"
+                      src={IMAGES[character.image]}
+                      alt=""
+                      draggable={false}
+                      sx={{
+                        width: "74%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "center top",
+                        position: "absolute",
+                        bottom: 0,
+                        left: "13%",
+                        borderRadius: "45% 45% 0 0",
+                        animation: "emerge 120ms ease-out",
+                        transform: character.hit
+                          ? "scaleY(.45) rotate(-10deg)"
+                          : character.until - game.elapsed < 120
+                            ? "translateY(90%)"
+                            : "none",
+                        transformOrigin: "bottom",
+                        transition: "transform 100ms ease",
+                        "@media (prefers-reduced-motion: reduce)": { animation: "none", transition: "none" },
+                      }}
+                    />
+                  </Box>
                 )}
+                <HoleArt foreground />
                 {character?.hit && (
                   <Typography
                     sx={{
@@ -265,8 +276,10 @@ export default function MasudaTatakiGame({ active = true }) {
                       placeItems: "center",
                       fontWeight: 900,
                       fontSize: 24,
+                      zIndex: 3,
+                      textShadow: "0 1px 2px white",
                       color: character.points > 0 ? "success.main" : "error.main",
-                      bgcolor: "rgba(255,255,255,.7)",
+                      bgcolor: "transparent",
                     }}
                   >
                     {character.points > 0 ? "+" : ""}
@@ -283,7 +296,8 @@ export default function MasudaTatakiGame({ active = true }) {
                   inset: 0,
                   display: "grid",
                   placeItems: "center",
-                  bgcolor: "rgba(255,255,255,.88)",
+                  bgcolor: "rgba(255,244,218,.6)",
+                  zIndex: 4,
                   borderRadius: 3,
                 }}
               >
