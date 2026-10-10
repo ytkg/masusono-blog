@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import MasudaTatakiGame from "./MasudaTatakiGame"
 import { loadImages } from "./assets"
 vi.mock("./assets", () => ({ IMAGES: ["/masuda.webp", "/other1.webp", "/other2.webp"], loadImages: vi.fn() }))
-vi.mock("./sound", () => ({ createSound: () => ({ unlock: vi.fn(), play: vi.fn(), dispose: vi.fn() }) }))
 describe("増田たたきの進行", () => {
   beforeEach(() => {
     vi.useFakeTimers()

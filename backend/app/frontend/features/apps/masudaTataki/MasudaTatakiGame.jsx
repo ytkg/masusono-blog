@@ -5,7 +5,6 @@ import Typography from "@mui/material/Typography"
 import { useAppLoading } from "../shared/AppsLoadingContext"
 import { IMAGES, loadImages } from "./assets"
 import { advance, DURATION, hit, initialGame, multiplier, rank } from "./game"
-import { createSound } from "./sound"
 import { FieldGround, HoleArt } from "./TatakiFieldArt"
 
 const getTime = () => performance.now()
@@ -17,9 +16,7 @@ export default function MasudaTatakiGame({ active = true }) {
   const [phase, setPhase] = useState("title")
   const [countdown, setCountdown] = useState(3)
   const [game, setGame] = useState(initialGame)
-  const [muted, setMuted] = useState(false)
   const gameRef = useRef(game)
-  const sound = useRef(null)
   const startedAt = useRef(0)
 
   useEffect(() => {
@@ -37,14 +34,6 @@ export default function MasudaTatakiGame({ active = true }) {
       disposed = true
     }
   }, [registerLoadingTask, attempt])
-
-  useEffect(() => {
-    sound.current = createSound()
-    return () => {
-      sound.current?.dispose()
-      sound.current = null
-    }
-  }, [])
 
   useEffect(() => {
     if (!active || phase !== "countdown") return
@@ -67,11 +56,10 @@ export default function MasudaTatakiGame({ active = true }) {
       setGame(next)
       if (next.elapsed >= DURATION) {
         setPhase("timeup")
-        if (!muted) sound.current?.play("end")
       }
     }, 30)
     return () => window.clearInterval(timer)
-  }, [active, phase, muted])
+  }, [active, phase])
 
   useEffect(() => {
     if (!active || phase !== "timeup") return
@@ -80,7 +68,6 @@ export default function MasudaTatakiGame({ active = true }) {
   }, [active, phase])
 
   const start = () => {
-    sound.current?.unlock()
     const next = initialGame()
     gameRef.current = next
     setGame(next)
@@ -95,7 +82,6 @@ export default function MasudaTatakiGame({ active = true }) {
     if (next === now) return
     gameRef.current = next
     setGame(next)
-    if (!muted) sound.current?.play(next.holes[index].kind === "masuda" ? "hit" : "miss")
   }
 
   return (
@@ -113,17 +99,6 @@ export default function MasudaTatakiGame({ active = true }) {
         userSelect: "none",
       }}
     >
-      <Button
-        size="small"
-        aria-pressed={muted}
-        onClick={() => {
-          sound.current?.unlock()
-          setMuted(!muted)
-        }}
-        sx={{ alignSelf: "flex-end" }}
-      >
-        {muted ? "音声：OFF" : "音声：ON"}
-      </Button>
       {phase === "title" ? (
         <Box sx={{ my: "auto", textAlign: "center" }}>
           <Typography variant="h4" component="h3" sx={{ fontWeight: 700, mb: 2 }}>
