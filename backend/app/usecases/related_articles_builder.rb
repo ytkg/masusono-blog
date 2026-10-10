@@ -7,20 +7,30 @@ class RelatedArticlesBuilder
 
     # Article.all uses the public microCMS API, so unpublished/deleted articles
     # are absent. Fetch afresh to reflect publication and tag changes immediately.
-    Article.all.uniq { |candidate| candidate[:id] }.filter_map do |candidate|
-      next if candidate[:id].blank? || candidate[:id] == article[:id]
-
-      common_count = (tags & eligible_tags(candidate[:tags])).size
-      next if common_count.zero?
-
-      [ candidate, common_count, published_time(candidate[:publishedAt]) ]
-    end.sort_by do |candidate, common_count, published_time|
-      [ -common_count, published_time.nil? ? 1 : 0, -(published_time || 0), candidate[:id] ]
-    end.first(3).map { |candidate, _count, _time| candidate.slice(:id, :title) }
+    ranked_candidates(article:, tags:).first(3).map { |candidate, _count, _time| candidate.slice(:id, :title) }
   rescue Microcms::FetchContentsService::FetchError, Faraday::Error, JSON::ParserError => error
     Rails.logger.warn("Related articles fetch failed: #{error.class.name}")
     []
   end
+
+  def self.ranked_candidates(article:, tags:)
+    Article.all.uniq { |candidate| candidate[:id] }.filter_map do |candidate|
+      candidate_rank(candidate, article:, tags:)
+    end.sort_by do |candidate, common_count, published_time|
+      [ -common_count, published_time.nil? ? 1 : 0, -(published_time || 0), candidate[:id] ]
+    end
+  end
+  private_class_method :ranked_candidates
+
+  def self.candidate_rank(candidate, article:, tags:)
+    return if candidate[:id].blank? || candidate[:id] == article[:id]
+
+    common_count = (tags & eligible_tags(candidate[:tags])).size
+    return if common_count.zero?
+
+    [ candidate, common_count, published_time(candidate[:publishedAt]) ]
+  end
+  private_class_method :candidate_rank
 
   def self.eligible_tags(value)
     value.to_s.split(",").filter_map do |tag|
