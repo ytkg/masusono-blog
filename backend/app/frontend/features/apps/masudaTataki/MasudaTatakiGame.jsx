@@ -178,7 +178,7 @@ export default function MasudaTatakiGame({ active = true }) {
               position: "relative",
               width: "100%",
               maxWidth: "min(460px, calc(100dvh - 230px))",
-              my: "auto",
+              my: { xs: 2, sm: "auto" },
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
               gap: 0.5,
