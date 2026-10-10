@@ -101,12 +101,13 @@ export default function MasudaTatakiGame({ active = true }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        justifyContent: "center",
         gap: 1,
         userSelect: "none",
       }}
     >
       {phase === "title" ? (
-        <Box sx={{ my: { xs: 2, sm: "auto" }, textAlign: "center" }}>
+        <Box sx={{ textAlign: "center" }}>
           <Typography variant="h4" component="h3" sx={{ fontWeight: 700, mb: 2 }}>
             増田たたき
           </Typography>
@@ -147,7 +148,7 @@ export default function MasudaTatakiGame({ active = true }) {
           )}
         </Box>
       ) : phase === "result" ? (
-        <Box sx={{ my: "auto", textAlign: "center" }}>
+        <Box sx={{ textAlign: "center" }}>
           <Typography variant="h4" component="h3">
             結果：{rank(game.score)}ランク
           </Typography>
@@ -178,7 +179,7 @@ export default function MasudaTatakiGame({ active = true }) {
               position: "relative",
               width: "100%",
               maxWidth: "min(460px, calc(100dvh - 230px))",
-              my: { xs: 2, sm: "auto" },
+              my: 2,
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
               gap: 0.5,
