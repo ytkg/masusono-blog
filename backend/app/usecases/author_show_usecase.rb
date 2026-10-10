@@ -1,6 +1,6 @@
 class AuthorShowUsecase
   def self.call(author_id:)
-    new(author_id: author_id).call
+    new(author_id:).call
   end
 
   def initialize(author_id:)

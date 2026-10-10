@@ -5,7 +5,7 @@ module Numbers
     UNKNOWN_AUTHOR_NAME = "不明"
 
     def self.call(articles:)
-      new(articles: articles).call
+      new(articles:).call
     end
 
     def initialize(articles:)

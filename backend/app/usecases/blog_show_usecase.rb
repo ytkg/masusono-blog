@@ -1,6 +1,6 @@
 class BlogShowUsecase
   def self.call(article_id:)
-    new(article_id: article_id).call
+    new(article_id:).call
   end
 
   def initialize(article_id:)
