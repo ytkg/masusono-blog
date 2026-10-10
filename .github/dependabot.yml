@@ -4,6 +4,22 @@ updates:
     directory: "/backend"
     schedule:
       interval: "weekly"
+    groups:
+      react:
+        applies-to: version-updates
+        patterns:
+          - "react"
+          - "react-dom"
+      mui:
+        applies-to: version-updates
+        patterns:
+          - "@mui/material"
+          - "@mui/icons-material"
+      inertia:
+        applies-to: version-updates
+        patterns:
+          - "@inertiajs/react"
+          - "@inertiajs/vite"
 
   - package-ecosystem: "bundler"
     directory: "/backend"
