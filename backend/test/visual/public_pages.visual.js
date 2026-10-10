@@ -550,6 +550,12 @@ test("numbers trend selection", async ({ page }, testInfo) => {
   await openPage(page, "/numbers")
   const chart = page.getByTestId("numbers-trend")
   const graph = chart.getByRole("img", { name: "総記事数、総文字数の累積推移" })
+  // Element screenshots expand a short viewport, which can clear mouse selection.
+  if (testInfo.project.name === "desktop") {
+    const viewport = page.viewportSize()
+    const chartBox = await chart.boundingBox()
+    await page.setViewportSize({ ...viewport, height: Math.max(viewport.height, Math.ceil(chartBox.height) + 32) })
+  }
   await chart.scrollIntoViewIfNeeded()
   await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
   const box = await graph.boundingBox()
