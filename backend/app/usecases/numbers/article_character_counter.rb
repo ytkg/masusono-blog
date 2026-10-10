@@ -14,9 +14,7 @@ module Numbers
     end
 
     def call
-      text = visible_text
-      text.gsub!(WHITESPACE_PATTERN, "")
-      text.each_grapheme_cluster.count
+      visible_text.gsub(WHITESPACE_PATTERN, "").each_grapheme_cluster.count
     end
 
     private
