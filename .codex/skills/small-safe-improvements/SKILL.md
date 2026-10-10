@@ -49,7 +49,8 @@ description: masusono-blog のコードから、既存テストで安全性を�
 
 ### 検証準備と実行順序
 
-- npm 依存は lockfile に従って `npm ci` で準備する。worktree のルートで、vite サービス起動前に `.codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm ci --no-audit --no-fund` を実行し、成功を確認する。すでに vite が起動している場合は、この worktree の vite サービスを止めてから実行し、依存のインストールを重ねない。
+- npm 依存は lockfile に従って `npm ci` で準備する。すでに vite が起動している場合は、この worktree の vite サービスを止め、依存のインストールを重ねない。worktree のルートでベースの Compose 定義に `node_modules_init` があることを確認し、ある場合は `.codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps node_modules_init` を実行する。初期化の終了コードが0であることを確認してから、`.codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm ci --no-audit --no-fund` を実行し、成功を確認する。`--no-deps` の npm ci は初期化サービスを起動しないため、この順番を省略しない。
+- `node_modules_init` 導入前のベースでは従来どおり npm ci を実行する。初期化が失敗した場合は npm ci や RSpec に進まず、原因を確認する。権限エラーが疑われる場合は、下記のマウント・所有者確認と対象 worktree に限定した復旧手順を使い、確認なしに権限変更を広げない。
 - 新規の専用 `node_modules` ボリュームで `npm ci` が `EACCES` になった場合は、[masusono-worktree の権限エラー復旧手順](../masusono-worktree/SKILL.md#新規-node_modules-ボリュームの権限エラー)でマウントと所有者を確認し、対象 worktree に限定して復旧する。依存未準備のまま RSpec を開始しない。
 - `compose.sh up --build -d` の終了だけで準備完了と判断しない。`compose.sh logs vite` で依存準備が正常に完了し、Vite が起動したことを確認してから RSpec を開始する。起動時にも npm install が実行されるため、`git diff -- backend/package.json backend/package-lock.json` で意図しない依存定義・lockfile の差分がないことを確認する。
 - RSpec と Visual Regression（`scripts/push.sh` が実行する全画面比較を含む）は、同じ `backend/public/vite` にビルド出力を書き込むため並列実行しない。RSpec の終了と成功を確認してから Visual Regression または `scripts/push.sh` を開始する。絞り込んだテストで必須の全画面比較を代替しない。
@@ -105,6 +106,9 @@ with_validation_lock .codex/skills/masusono-worktree/scripts/compose.sh run --rm
 ### PR 作成後の CI 確認
 
 - 作成した PR の先端コミットとチェック結果を確認し、対象の検証ジョブが完了して成功したことを確認する。古いコミットの成功や、待機中・実行中のチェックを成功として扱わない。スキップされたジョブは変更範囲や実行条件から理由を確認する。
+- 期待する検証 workflow の結果がまだ見えない場合は、PR の先端SHA・作成/更新時刻と run 一覧を照合する。先端と過去コミットの run を区別し、待機中・実行中や起動の遅れを確認する。適切な間隔で再確認し、作成直後の一覧にないことだけで恒久的な未起動や異常と断定しない。待機を打ち切る場合は結果を「未確認」と報告する。
+- 結果が引き続き見えない場合は、workflow の有効状態、イベント条件・path filter、PR の競合状態を確認する。対象外のチェックや deploy のスキップを検証成功の代わりにしない。接続方式との因果関係が未確定なら、特定ツールの問題と断定しない。
+- 空コミットによる synchronize は通常の診断手順にしない。診断で必要性と影響を確認できた場合のみ復旧策として検討する。実行する場合は元の PR ブランチから環境を再作成し、ファイル差分がないことを確認して指定の push 検証を行う。新旧SHAの CI 結果と再片付けを記録し、新しい run の成功だけで元の未表示の原因が解消したとは断定しない。
 - 複数件を続けて実行する場合は、作成した PR のリンクと先端コミットを記録し、他の作業を進める間も適切な間隔で CI 結果を追跡する。最終報告前に全 PR の最新結果を確認する。
 - CI が失敗したら、失敗ジョブのログと artifact を調べる。画面比較では実画像・期待画像・差分画像を確認し、変更起因、環境起因、一時的な失敗を判断する。変更前からある失敗が疑われる場合は、必要に応じてベースでも確認する。
 - 環境起因・一時的な失敗を示す根拠がある場合に限り、該当ジョブを1回再実行して結果を確認する。調査なしで再実行を繰り返したり、基準画像の更新や許容差の緩和だけで失敗を隠したりしない。再実行でも失敗した場合は再実行を続けず、原因を調べる。今回の小さな変更の範囲で解消できなければ、既存の Issue・PR に確認結果と残る作業を記録し、無関係な変更を加えず未完了として報告する。
