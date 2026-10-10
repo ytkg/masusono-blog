@@ -8,6 +8,12 @@ import { advance, DURATION, hit, initialGame, multiplier, rank } from "./game"
 import { FieldGround, HoleArt } from "./TatakiFieldArt"
 
 const getTime = () => performance.now()
+// 顔の大きさと中心を揃え、元写真の透明な余白を調整する。
+const PORTRAITS = [
+  { width: "100%", left: "4%", top: "-12%" },
+  { width: "125%", left: "-17%", top: "2%" },
+  { width: "120%", left: "18%", top: "2%" },
+]
 
 export default function MasudaTatakiGame({ active = true }) {
   const registerLoadingTask = useAppLoading()
@@ -213,20 +219,19 @@ export default function MasudaTatakiGame({ active = true }) {
               >
                 <HoleArt />
                 {character && (
-                  <Box sx={{ position: "absolute", inset: "0 0 25%", overflow: "hidden", zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: "0 0 25%",
+                      overflow: "hidden",
+                      borderRadius: "0 0 20% 20% / 0 0 45% 45%",
+                      zIndex: 1,
+                    }}
+                  >
                     <Box
-                      component="img"
-                      src={IMAGES[character.image]}
-                      alt=""
-                      draggable={false}
                       sx={{
-                        width: "74%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: "center top",
                         position: "absolute",
-                        bottom: 0,
-                        left: "13%",
+                        inset: 0,
                         animation: "emerge 120ms ease-out",
                         transform: character.hit
                           ? "scaleY(.45) rotate(-10deg)"
@@ -237,7 +242,15 @@ export default function MasudaTatakiGame({ active = true }) {
                         transition: "transform 100ms ease",
                         "@media (prefers-reduced-motion: reduce)": { animation: "none", transition: "none" },
                       }}
-                    />
+                    >
+                      <Box
+                        component="img"
+                        src={IMAGES[character.image]}
+                        alt=""
+                        draggable={false}
+                        sx={{ position: "absolute", height: "auto", maxWidth: "none", ...PORTRAITS[character.image] }}
+                      />
+                    </Box>
                   </Box>
                 )}
                 <HoleArt foreground />
