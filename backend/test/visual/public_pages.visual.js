@@ -912,3 +912,15 @@ test("masuda tataki play and replay", async ({ page }) => {
   await page.clock.runFor(1000)
   await expect(page.getByRole("dialog")).not.toBeVisible()
 })
+
+test("masuda tataki other character", async ({ page }) => {
+  await openPage(page, "/others")
+  await page.getByRole("button", { name: "増田たたきを開く" }).click()
+  await expect(page.getByRole("button", { name: "スタート", exact: true })).toBeEnabled()
+  await page.evaluate(() => { Math.random = () => 0.99 })
+  await page.clock.install()
+  await page.getByRole("button", { name: "スタート", exact: true }).click()
+  await page.clock.runFor(3300)
+  await expect(page.getByRole("button", { name: "穴9 その他", exact: true })).toBeVisible()
+  await expect(page).toHaveScreenshot("masuda-tataki-other-character.png")
+})

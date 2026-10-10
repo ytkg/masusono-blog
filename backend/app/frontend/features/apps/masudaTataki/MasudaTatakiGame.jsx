@@ -227,7 +227,6 @@ export default function MasudaTatakiGame({ active = true }) {
                         position: "absolute",
                         bottom: 0,
                         left: "13%",
-                        borderRadius: "45% 45% 0 0",
                         animation: "emerge 120ms ease-out",
                         transform: character.hit
                           ? "scaleY(.45) rotate(-10deg)"
