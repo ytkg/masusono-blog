@@ -1,5 +1,6 @@
 import { trackRelatedArticleClick, trackYearAgoArticleClick } from "../../shared/lib/analytics"
 import { formatArticleStats } from "./articleStats"
+import { supportingActionSx } from "../../shared/supportingActionStyles"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Link from "@mui/material/Link"
@@ -94,23 +95,35 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
       <ArticleBody enableRubyRunner={isDetail || isList} html={html} hasBody={hasBody} shouldCollapse={isList} />
       {isDetail && (
         <>
+          {authorHref && (
+            <Box sx={{ mt: 2, textAlign: "right", overflowWrap: "anywhere" }}>
+              <Link
+                href={authorHref}
+                underline="hover"
+                sx={{ ...supportingActionSx, display: "inline-flex", alignItems: "center" }}
+              >
+                {author}の記事をもっと読む →
+              </Link>
+            </Box>
+          )}
           <ArticleLinkSection
             title="関連記事"
             articles={relatedArticles}
             sourceId={article.id}
             trackClick={trackRelatedArticleClick}
+            sx={authorHref ? { mt: 1, pt: 1 } : undefined}
           />
           <ArticleLinkSection
             title="1年前の記事"
             articles={yearAgoArticles}
             sourceId={article.id}
             trackClick={trackYearAgoArticleClick}
-            sx={relatedArticles.length > 0 ? { pt: 0 } : undefined}
+            sx={relatedArticles.length > 0 ? { pt: 0 } : authorHref ? { mt: 1, pt: 1 } : undefined}
           />
         </>
       )}
       {isDetail && (
-        <Box sx={{ mt: 3 }}>
+        <Box sx={{ mt: authorHref && relatedArticles.length === 0 && yearAgoArticles.length === 0 ? 1 : 3 }}>
           <Link
             href="https://diary.blogmura.com/ranking/in?p_cid=11218704"
             target="_blank"
