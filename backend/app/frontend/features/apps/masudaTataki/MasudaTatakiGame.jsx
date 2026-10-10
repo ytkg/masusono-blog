@@ -10,9 +10,9 @@ import { FieldGround, HoleArt } from "./TatakiFieldArt"
 const getTime = () => performance.now()
 // 顔の大きさと中心を揃え、元写真の透明な余白を調整する。
 const PORTRAITS = [
-  { width: "100%", left: "4%", top: "-12%" },
-  { width: "125%", left: "-17%", top: "2%" },
-  { width: "120%", left: "18%", top: "2%" },
+  { width: "80%", left: "13%", top: "-12%" },
+  { width: "100%", left: "-4%", top: "2%" },
+  { width: "96%", left: "24%", top: "2%" },
 ]
 
 export default function MasudaTatakiGame({ active = true }) {
