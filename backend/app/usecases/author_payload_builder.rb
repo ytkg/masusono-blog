@@ -12,7 +12,7 @@ class AuthorPayloadBuilder
   def call
     id = author[:id].to_s
     name = author[:name].to_s
-    return nil if id.empty? || name.empty?
+    return if id.empty? || name.empty?
 
     {
       id:,

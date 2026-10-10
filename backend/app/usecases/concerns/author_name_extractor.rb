@@ -10,7 +10,7 @@ module AuthorNameExtractor
   end
 
   def extract_author_image_url(raw_author)
-    return nil unless raw_author.is_a?(Hash)
+    return unless raw_author.is_a?(Hash)
 
     image = raw_author[:icon] || raw_author[:image] || raw_author[:imageUrl] || raw_author[:profileImage]
     url = image if image.is_a?(String)
