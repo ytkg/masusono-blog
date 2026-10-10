@@ -1,5 +1,6 @@
 import { trackRelatedArticleClick, trackYearAgoArticleClick } from "../../shared/lib/analytics"
 import { formatArticleStats } from "./articleStats"
+import { supportingActionSx } from "../../shared/supportingActionStyles"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Link from "@mui/material/Link"
@@ -94,6 +95,17 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
       <ArticleBody enableRubyRunner={isDetail || isList} html={html} hasBody={hasBody} shouldCollapse={isList} />
       {isDetail && (
         <>
+          {authorHref && (
+            <Box sx={{ mt: 2, textAlign: "right", overflowWrap: "anywhere" }}>
+              <Link
+                href={authorHref}
+                underline="hover"
+                sx={{ ...supportingActionSx, display: "inline-flex", alignItems: "center" }}
+              >
+                {author}の記事をもっと読む →
+              </Link>
+            </Box>
+          )}
           <ArticleLinkSection
             title="関連記事"
             articles={relatedArticles}
