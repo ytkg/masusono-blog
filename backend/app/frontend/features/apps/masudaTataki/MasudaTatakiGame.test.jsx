@@ -1,0 +1,64 @@
+import { act, fireEvent, render, screen } from "@testing-library/react"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import MasudaTatakiGame from "./MasudaTatakiGame"
+import { loadImages } from "./assets"
+vi.mock("./assets", () => ({ IMAGES: ["/masuda.webp", "/other1.webp", "/other2.webp"], loadImages: vi.fn() }))
+describe("増田たたきの進行", () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    loadImages.mockResolvedValue([])
+    vi.spyOn(Math, "random").mockReturnValue(0)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+  const ready = async () => {
+    await act(async () => {})
+  }
+  const advance = (ms) => act(() => vi.advanceTimersByTime(ms))
+  it("画像読み込み後に開始、カウントダウン、連打防止、結果、再プレイ", async () => {
+    render(<MasudaTatakiGame />)
+    await ready()
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    expect(screen.getByRole("status")).toHaveTextContent("3")
+    advance(1000)
+    expect(screen.getByRole("status")).toHaveTextContent("2")
+    advance(2000)
+    advance(30)
+    const target = screen.getByRole("button", { name: "穴1 増田" })
+    fireEvent.pointerDown(target)
+    fireEvent.pointerDown(target)
+    expect(screen.getByText("100点")).toBeInTheDocument()
+    advance(30000)
+    expect(screen.getByRole("status")).toHaveTextContent("TIME UP!")
+    advance(1000)
+    expect(screen.getByText("増田ヒット数：1")).toBeInTheDocument()
+    expect(screen.getByText("最大コンボ：1")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "もう一度遊ぶ" }))
+    expect(screen.getByRole("status")).toHaveTextContent("3")
+    expect(screen.getByText("0点")).toBeInTheDocument()
+  })
+  it("画像の失敗時は再試行し、読み込むまで開始しない", async () => {
+    loadImages.mockRejectedValueOnce(new Error("offline"))
+    render(<MasudaTatakiGame />)
+    expect(screen.getByRole("button", { name: "画像を読み込み中…" })).toBeDisabled()
+    await ready()
+    expect(screen.getByRole("alert")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "再読み込み" }))
+    await ready()
+    expect(screen.getByRole("button", { name: "スタート" })).toBeEnabled()
+  })
+  it("閉じると進行が止まり、アンマウント時にタイマーを解除", async () => {
+    const { rerender, unmount } = render(<MasudaTatakiGame active />)
+    await ready()
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    advance(3000)
+    advance(3000)
+    rerender(<MasudaTatakiGame active={false} />)
+    advance(30000)
+    expect(screen.getByText("残り 27秒")).toBeInTheDocument()
+    unmount()
+    expect(vi.getTimerCount()).toBe(0)
+  })
+})

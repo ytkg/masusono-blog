@@ -5,6 +5,7 @@ import PageHeading from "../../shared/PageHeading"
 import SeoHead from "../../shared/SeoHead"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
+const MasudaTatakiApp = lazy(() => import("../../features/apps/masudaTataki/MasudaTatakiApp"))
 const SettingsApp = lazy(() => import("../../features/apps/settings/SettingsApp"))
 const AdminApp = lazy(() => import("../../features/apps/admin/AdminApp"))
 
@@ -40,6 +41,7 @@ export default function OthersIndex() {
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
           <Suspense fallback={<OthersAppFallback />}>
             <MasudaRunApp />
+            <MasudaTatakiApp />
             <SettingsApp />
             <AdminApp />
           </Suspense>

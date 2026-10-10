@@ -296,6 +296,7 @@ test.describe("article titles", () => {
 
 for (const [name, button] of [
   ["masuda-run", "増田RUNを開く"],
+  ["masuda-tataki", "増田たたきを開く"],
   ["settings", "設定を開く"],
 ]) {
   test(name, async ({ page }) => {
@@ -879,4 +880,52 @@ for (const width of [390, 600, 1280]) {
       await screenshot(page, `sticky-${path === "/" ? "home" : "search"}-${width}`)
     })
   }
+}
+
+test("masuda tataki play and replay", async ({ page }) => {
+  await openPage(page, "/others")
+  await page.getByRole("button", { name: "増田たたきを開く" }).click()
+  await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
+  await expect(page.getByRole("button", { name: "スタート", exact: true })).toBeEnabled()
+  await page.evaluate(() => { Math.random = () => 0 })
+  await page.clock.install()
+  await page.getByRole("button", { name: "スタート", exact: true }).click()
+  await page.clock.runFor(1000)
+  await expect(page.getByRole("status")).toHaveText("2")
+  await expect.soft(page).toHaveScreenshot("masuda-tataki-countdown.png")
+  await page.clock.runFor(2300)
+  await expect(page.getByRole("button", { name: "穴1 増田", exact: true })).toBeVisible()
+  const grid = page.getByRole("button", { name: "穴9", exact: true })
+  await expect(grid).toBeInViewport()
+  await expect.soft(page).toHaveScreenshot("masuda-tataki-playing.png", { maxDiffPixelRatio: 0 })
+  await page.getByRole("button", { name: "穴1 増田", exact: true }).click()
+  await expect(page.getByText("100点", { exact: true })).toBeVisible()
+  await page.clock.fastForward(30000)
+  await expect(page.getByRole("status")).toHaveText("TIME UP!")
+  await page.clock.runFor(1000)
+  await expect(page.getByText("増田ヒット数：1")).toBeVisible()
+  await expect(page.getByText("最大コンボ：1")).toBeVisible()
+  await expect.soft(page).toHaveScreenshot("masuda-tataki-result.png")
+  await page.getByRole("button", { name: "もう一度遊ぶ" }).click()
+  await expect(page.getByText("0点", { exact: true })).toBeVisible()
+  await page.getByRole("button", { name: "閉じる", exact: true }).click()
+  await page.clock.runFor(1000)
+  await expect(page.getByRole("dialog")).not.toBeVisible()
+})
+
+for (const image of [1, 2]) {
+  test(`masuda tataki other character ${image}`, async ({ page }) => {
+    await openPage(page, "/others")
+    await page.getByRole("button", { name: "増田たたきを開く" }).click()
+    await expect(page.getByRole("button", { name: "スタート", exact: true })).toBeEnabled()
+    await page.evaluate((image) => {
+      let calls = 0
+      Math.random = () => ++calls % 3 === 0 ? (image - 1) / 2 : 0.99
+    }, image)
+    await page.clock.install()
+    await page.getByRole("button", { name: "スタート", exact: true }).click()
+    await page.clock.runFor(3300)
+    await expect(page.getByRole("button", { name: "穴9 その他", exact: true })).toBeVisible()
+    await expect(page).toHaveScreenshot(image === 2 ? "masuda-tataki-other-character.png" : "masuda-tataki-other-character-1.png", { maxDiffPixelRatio: 0 })
+  })
 }
