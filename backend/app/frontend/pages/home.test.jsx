@@ -16,13 +16,16 @@ vi.mock("@inertiajs/react", async (importOriginal) => {
     router: { remember: vi.fn(), on: vi.fn(() => () => {}) },
     useRemember: (initialState, key) => {
       const [state, setState] = React.useState(() => rememberedStates.get(key) ?? initialState)
-      const setRememberedState = (nextState) => {
-        setState((currentState) => {
-          const resolvedState = typeof nextState === "function" ? nextState(currentState) : nextState
-          rememberedStates.set(key, resolvedState)
-          return resolvedState
-        })
-      }
+      const setRememberedState = React.useCallback(
+        (nextState) => {
+          setState((currentState) => {
+            const resolvedState = typeof nextState === "function" ? nextState(currentState) : nextState
+            rememberedStates.set(key, resolvedState)
+            return resolvedState
+          })
+        },
+        [key],
+      )
 
       return [state, setRememberedState]
     },
@@ -108,10 +111,30 @@ describe("Home page", () => {
   })
 
   it("こよみの取得失敗から再試行し、空の一覧を表示する", async () => {
-    requestJson.mockRejectedValueOnce(new Error("failed")).mockResolvedValueOnce({ groups: [] })
+    let rejectInitialRequest
+    let resolveRetryRequest
+    requestJson
+      .mockReturnValueOnce(
+        new Promise((_, reject) => {
+          rejectInitialRequest = reject
+        }),
+      )
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveRetryRequest = resolve
+        }),
+      )
     render(<Home articles={[]} />)
     fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
-    fireEvent.click(await screen.findByRole("button", { name: "再試行" }))
+    await act(async () => {
+      rejectInitialRequest(new Error("failed"))
+    })
+    expect(requestJson).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+    expect(requestJson).toHaveBeenCalledTimes(2)
+    await act(async () => {
+      resolveRetryRequest({ groups: [] })
+    })
     expect(await screen.findByText("記事がありません。")).toBeInTheDocument()
     expect(requestJson).toHaveBeenCalledTimes(2)
   })
