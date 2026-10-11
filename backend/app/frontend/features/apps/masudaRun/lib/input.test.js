@@ -39,6 +39,39 @@ describe("attachKeyboardHandlers", () => {
 
     gameoverCleanup()
   })
+
+  it.each([" ", "ArrowUp"])("%sのkeyupでは既定操作だけを抑止し、長押しと解除後は反応しない", (key) => {
+    const startOrRestart = vi.fn()
+    const doJump = vi.fn()
+    const cleanup = attachKeyboardHandlers("gameover", startOrRestart, doJump)
+    const release = new KeyboardEvent("keyup", { key, cancelable: true })
+
+    window.dispatchEvent(release)
+    window.dispatchEvent(new KeyboardEvent("keydown", { key, repeat: true }))
+    expect(release.defaultPrevented).toBe(true)
+    expect(startOrRestart).not.toHaveBeenCalled()
+    expect(doJump).not.toHaveBeenCalled()
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key }))
+    expect(startOrRestart).toHaveBeenCalledTimes(1)
+    cleanup()
+    window.dispatchEvent(new KeyboardEvent("keydown", { key }))
+    expect(startOrRestart).toHaveBeenCalledTimes(1)
+  })
+
+  it("対象外のキーを抑止せず、大文字Rでも再開できる", () => {
+    const startOrRestart = vi.fn()
+    const cleanup = attachKeyboardHandlers("gameover", startOrRestart, vi.fn())
+    const unrelated = new KeyboardEvent("keyup", { key: "a", cancelable: true })
+
+    window.dispatchEvent(unrelated)
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }))
+    expect(unrelated.defaultPrevented).toBe(false)
+    expect(startOrRestart).not.toHaveBeenCalled()
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "R" }))
+    expect(startOrRestart).toHaveBeenCalledTimes(1)
+    cleanup()
+  })
 })
 
 describe("attachPointerHandler", () => {

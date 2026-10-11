@@ -55,6 +55,16 @@ RSpec.describe Numbers::MetricsTrendBuilder do
       end
     end
 
+    context "終了日が開始日より前で記事がない場合" do
+      let(:articles) { [] }
+      let(:end_date) { start_date - 1 }
+
+      it "空のポイントとゼロの最終値を返す" do
+        expect(result.fetch(:points)).to eq([])
+        expect(result.fetch(:series).pluck(:finalValue)).to eq([ "0 本", "0 字" ])
+      end
+    end
+
     context "終了日より後の記事がある場合" do
       let(:articles) do
         [

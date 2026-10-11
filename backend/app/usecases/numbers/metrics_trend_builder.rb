@@ -6,8 +6,8 @@ module Numbers
     POINT_DATE_FORMAT = "%Y-%m-%d"
 
     SERIES = [
-      { key: :total_articles, data_key: :totalArticles, label: "総記事数", unit: "本" },
-      { key: :total_chars, data_key: :totalChars, label: "総文字数", unit: "字" }
+      { key: :totalArticles, label: "総記事数", unit: "本" },
+      { key: :totalChars, label: "総文字数", unit: "字" }
     ].freeze
 
     def self.call(articles:, start_date:, end_date: Date.current, character_counter: ArticleMetric.method(:character_count))
@@ -35,13 +35,14 @@ module Numbers
     attr_reader :articles, :start_date, :end_date, :character_counter
 
     def build_series
+      final_point = build_points.last || {}
       SERIES.map do |definition|
         key = definition.fetch(:key)
         {
-          key: definition.fetch(:data_key),
+          key:,
           label: definition.fetch(:label),
           unit: definition.fetch(:unit),
-          finalValue: format_value(final_values[key], definition.fetch(:unit))
+          finalValue: format_value(final_point.fetch(key, 0), definition.fetch(:unit))
         }
       end
     end
@@ -91,15 +92,6 @@ module Numbers
 
     def latest_event_date
       grouped_article_events.each_key.max
-    end
-
-    def final_values
-      @final_values ||= build_points.last&.slice(:totalArticles, :totalChars)&.then do |values|
-        {
-          total_articles: values.fetch(:totalArticles),
-          total_chars: values.fetch(:totalChars)
-        }
-      end || initial_totals
     end
 
     def initial_totals

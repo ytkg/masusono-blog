@@ -13,6 +13,10 @@ describe("ArticleSearchSuggestions", () => {
           { author: "増田", tags: " Rails, , JavaScript " },
           { author: "", tags: "" },
           { author: "", tags: null },
+          { author: " その他 ", tags: "" },
+          { author: "   ", tags: "" },
+          { author: null, tags: "" },
+          { author: "その他", tags: "" },
         ]}
         onSelect={onSelect}
       />,
@@ -21,6 +25,11 @@ describe("ArticleSearchSuggestions", () => {
     expect(screen.getByText("著者から探す")).toBeInTheDocument()
     expect(screen.getAllByText("@増田")).toHaveLength(1)
     expect(screen.getAllByText("#Rails")).toHaveLength(1)
+    const authors = screen
+      .getAllByRole("button")
+      .map((button) => button.textContent)
+      .filter((text) => text.startsWith("@"))
+    expect(authors).toEqual(["@増田", "@その他"])
 
     fireEvent.click(screen.getByText("#JavaScript"))
 

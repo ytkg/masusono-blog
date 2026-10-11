@@ -18,13 +18,8 @@ function extractArticleTags(articles) {
 }
 
 function extractArticleAuthors(articles) {
-  const authors = new Set()
-  articles.forEach((article) => {
-    const author = String(article.author || "").trim()
-    if (author) authors.add(author)
-  })
-
-  return Array.from(authors)
+  const authors = articles.map((article) => String(article.author || "").trim()).filter(Boolean)
+  return [...new Set(authors)]
 }
 
 function SearchSuggestionSection({ items, label, prefix, onSelect }) {
