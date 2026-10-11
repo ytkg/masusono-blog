@@ -35,10 +35,7 @@ function readCopyNode(node, inPre = false) {
   const tag = node.tagName
   if (EXCLUDED_TAGS.has(tag)) return ""
   if (tag === "BR") return "\n"
-  let text = ""
-  for (const child of node.childNodes) {
-    text += readCopyNode(child, inPre || tag === "PRE")
-  }
+  const text = Array.from(node.childNodes, (child) => readCopyNode(child, inPre || tag === "PRE")).join("")
   if (["TD", "TH"].includes(tag)) return `${text}\t`
   if (!BLOCK_TAGS.has(tag)) return text
   const blockText = tag === "PRE" ? text : text.replace(/^\n+|\n+$/g, "")

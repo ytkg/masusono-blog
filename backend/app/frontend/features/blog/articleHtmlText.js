@@ -25,9 +25,6 @@ function readText(node) {
   const tagName = node.tagName?.toLowerCase()
   if (tagName === "br") return "\n"
 
-  let text = ""
-  for (const child of node.childNodes ?? []) {
-    text += readText(child)
-  }
+  const text = Array.from(node.childNodes ?? [], readText).join("")
   return LINE_BOUNDARY_TAGS.has(tagName) ? `${text}\n` : text
 }
