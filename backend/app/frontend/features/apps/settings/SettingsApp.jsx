@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react"
+import { ensureUserIdCookie } from "@/shared/lib/userId"
 import SettingsSection from "./SettingsSection"
 import useDisplayName from "./useDisplayName"
 import useWebPushSettings from "./useWebPushSettings"
@@ -125,6 +127,37 @@ function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUn
   )
 }
 
+function BrowserIdSection() {
+  const [browserId, setBrowserId] = useState("")
+  const [message, setMessage] = useState("")
+  useEffect(() => {
+    setBrowserId(ensureUserIdCookie() ?? "")
+  }, [])
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(browserId)
+      setMessage("コピーしました")
+    } catch {
+      setMessage("IDを選択して手動でコピーしてください。")
+    }
+  }
+
+  return (
+    <SettingsSection label="このブラウザのID">
+      <Typography component="p" sx={{ overflowWrap: "anywhere", userSelect: "text" }}>
+        {browserId || "IDを保存できません。このブラウザのCookie設定を確認してください。"}
+      </Typography>
+      <Button variant="outlined" size="small" disabled={!browserId} onClick={copy}>
+        IDをコピー
+      </Button>
+      <Typography variant="body2" sx={supportingTextSx} role="status">
+        {message}
+      </Typography>
+    </SettingsSection>
+  )
+}
+
 export function SettingsContent({ loadOnMount = false }) {
   const registerLoadingTask = useAppLoading()
   const { name, draftName, isEditing, isSaving, inputError, errorMessage, startEditing, saveName, setDraftName } =
@@ -144,6 +177,7 @@ export function SettingsContent({ loadOnMount = false }) {
         onSave={saveName}
         onDraftChange={setDraftName}
       />
+      <BrowserIdSection />
       <NotificationsSection
         state={notifications.state}
         isSaving={notifications.isSaving}
