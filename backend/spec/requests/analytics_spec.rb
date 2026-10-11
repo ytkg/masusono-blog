@@ -53,26 +53,27 @@ RSpec.describe "Analytics configuration", type: :request do
   describe "GET /api/app/analytics.json" do
     let(:browser_id) { "11111111-1111-4111-8111-111111111111" }
 
+    let(:legacy_excluded_ids) { browser_id }
+
     before do
-      allow(ENV).to receive(:fetch).with("GA4_EXCLUDED_BROWSER_IDS", "").and_return(excluded_ids)
+      allow(ENV).to receive(:fetch).with("GA4_EXCLUDED_BROWSER_IDS", "").and_return(legacy_excluded_ids)
     end
 
-    let(:excluded_ids) { "22222222-2222-4222-8222-222222222222" }
-
-    it "returns only the policy decision for the current Cookie without caching" do
+    it "returns only the policy decision for the current Cookie without caching, ignoring the legacy exclusion environment variable" do
       get "/api/app/analytics.json", headers: { "Cookie" => "user_id=#{browser_id}" }
       expect(response.parsed_body).to eq("allowed" => true)
       expect(response.headers["Cache-Control"]).to include("no-store")
     end
 
     context "for an excluded browser" do
-      let(:excluded_ids) { "22222222-2222-4222-8222-222222222222, #{browser_id}" }
+      let(:browser_id) { "1fa05d1c-e9d5-4fc7-b0d2-578bc6951e0c" }
+      let(:legacy_excluded_ids) { "" }
 
-      it "excludes without exposing either identifier" do
+      it "excludes without exposing the exclusion list" do
         get "/api/app/analytics.json", headers: { "Cookie" => "user_id=#{browser_id}" }
         expect(response.parsed_body).to eq("allowed" => false)
         get "/about"
-        expect(response.body).not_to include(browser_id, "22222222-2222-4222-8222-222222222222")
+        expect(response.body).not_to include(*Analytics::ConfigurationUsecase::EXCLUDED_BROWSER_IDS)
       end
     end
 
