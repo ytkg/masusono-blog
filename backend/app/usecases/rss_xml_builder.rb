@@ -25,9 +25,7 @@ class RssXmlBuilder
       "    <atom:link href=\"#{escape_xml(feed_url)}\" rel=\"self\" type=\"application/rss+xml\" />"
     ]
 
-    items.each do |item|
-      lines.concat(item_lines(item))
-    end
+    items.each { |item| lines.concat(item_lines(item)) }
 
     lines.concat([ "  </channel>", "</rss>" ])
     "#{lines.join("\n")}\n"

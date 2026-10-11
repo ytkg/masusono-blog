@@ -16,9 +16,7 @@ class SitemapXmlBuilder
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     ]
 
-    entries.each do |entry|
-      lines.concat(entry_lines(entry))
-    end
+    entries.each { |entry| lines.concat(entry_lines(entry)) }
 
     lines << "</urlset>"
     "#{lines.join("\n")}\n"
