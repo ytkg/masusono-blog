@@ -7,10 +7,6 @@ class FeedsShowUsecase
   FEED_URL = "#{SITE_URL}/feed.xml".freeze
 
   def self.call
-    new.call
-  end
-
-  def call
     {
       body: build_rss_xml(Article.all),
       content_type: CONTENT_TYPE,
@@ -18,9 +14,7 @@ class FeedsShowUsecase
     }
   end
 
-  private
-
-  def build_rss_xml(articles)
+  def self.build_rss_xml(articles)
     RssXmlBuilder.call(
       title: SITE_TITLE,
       link: SITE_URL,
@@ -29,4 +23,5 @@ class FeedsShowUsecase
       items: RssArticleItemsBuilder.call(articles:, site_url: SITE_URL)
     )
   end
+  private_class_method :build_rss_xml
 end
