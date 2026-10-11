@@ -40,3 +40,11 @@ describe("buildCodeBlockDataFromHtml", () => {
     expect(buildCodeBlockDataFromHtml("<p>本文</p>")).toBeUndefined()
   })
 })
+
+it.each(["constructor", "toString", "__proto__"])("does not infer language from inherited class %s", (name) => {
+  expect(buildCodeBlockDataFromHtml(`<pre><code class="${name}">code</code></pre>`)).toBeUndefined()
+  expect(buildCodeBlockDataFromHtml(`<pre><code class="language-${name}">code</code></pre>`)).toMatchObject({
+    languageLabel: name,
+    prismLanguage: name.toLowerCase(),
+  })
+})

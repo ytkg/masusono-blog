@@ -19,7 +19,8 @@ function rawCodeLanguage(codeElement) {
   const classNames = Array.from(codeElement.classList)
   const languageClass = classNames.find((className) => LANGUAGE_PREFIX_PATTERN.test(className))
   return (
-    languageClass?.replace(LANGUAGE_PREFIX_PATTERN, "") || classNames.find((className) => LANGUAGE_CONFIGS[className])
+    languageClass?.replace(LANGUAGE_PREFIX_PATTERN, "") ||
+    classNames.find((className) => Object.hasOwn(LANGUAGE_CONFIGS, className))
   )
 }
 
@@ -28,7 +29,7 @@ export function codeLanguage(codeElement) {
   if (!rawLanguage) return undefined
 
   const normalizedLanguage = rawLanguage.toLowerCase()
-  const config = LANGUAGE_CONFIGS[normalizedLanguage]
+  const config = Object.hasOwn(LANGUAGE_CONFIGS, normalizedLanguage) ? LANGUAGE_CONFIGS[normalizedLanguage] : undefined
 
   return {
     key: normalizedLanguage,
