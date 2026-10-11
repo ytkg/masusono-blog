@@ -85,3 +85,12 @@ RSpec.describe Numbers::MetricsTrendBuilder do
     end
   end
 end
+
+RSpec.describe Numbers::MetricsTrendBuilder do
+  it "preserves cumulative values across long gaps without new articles" do
+    result = described_class.call(articles: [ { publishedAt: "2026-01-01T00:00:00Z", content: "abc" } ],
+      start_date: Date.new(2026, 1, 1), end_date: Date.new(2026, 2, 1))
+    expect(result[:points].size).to eq(32)
+    expect(result[:points].map { |point| point.values_at(:totalArticles, :totalChars) }.uniq).to eq([ [ 1, 3 ] ])
+  end
+end

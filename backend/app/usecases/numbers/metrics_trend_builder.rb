@@ -53,9 +53,10 @@ module Numbers
         totals = initial_totals
 
         date_range.map do |date|
-          article_data = article_events.fetch(date) { initial_totals }
-          totals[:total_articles] += article_data.fetch(:total_articles)
-          totals[:total_chars] += article_data.fetch(:total_chars)
+          if (article_data = article_events[date])
+            totals[:total_articles] += article_data.fetch(:total_articles)
+            totals[:total_chars] += article_data.fetch(:total_chars)
+          end
 
           build_point(date, totals)
         end
