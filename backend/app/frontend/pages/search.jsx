@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import Box from "@mui/material/Box"
 import ArticleSearchBox from "../features/blog/ArticleSearchBox"
 import ArticleSearchSuggestions from "../features/blog/ArticleSearchSuggestions"
-import { articleMatchesQuery, normalizeArticleSearchText } from "../features/blog/articleSearch"
+import { normalizeArticleSearchText, prepareArticleQuery } from "../features/blog/articleSearch"
 import ArticlesList from "../features/blog/ArticlesList"
 import useArticleSearchQuery from "../features/blog/useArticleSearchQuery"
 import PageContainer from "../shared/PageContainer"
@@ -13,7 +13,7 @@ export default function Search({ articles = [] }) {
   const normalizedQuery = normalizeArticleSearchText(query)
   const isSearching = Boolean(normalizedQuery)
   const filteredArticles = useMemo(
-    () => articles.filter((article) => articleMatchesQuery(article, normalizedQuery)),
+    () => articles.filter(prepareArticleQuery(normalizedQuery)),
     [articles, normalizedQuery],
   )
 
