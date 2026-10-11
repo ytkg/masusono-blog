@@ -47,3 +47,34 @@ describe("useMasudaRunAssets", () => {
     expect(obsTallRef.current).toBeNull()
   })
 })
+
+it("disposes pending image events and settles loading tasks on unmount", async () => {
+  const images = []
+  vi.stubGlobal(
+    "Image",
+    class {
+      constructor() {
+        images.push(this)
+      }
+    },
+  )
+  const tasks = []
+  const refs = [{ current: null }, { current: null }, { current: null }]
+  const { unmount } = renderHook(() =>
+    useMasudaRunAssets({
+      imgRef: refs[0],
+      obsShortRef: refs[1],
+      obsTallRef: refs[2],
+      sources: { player: "p", short: "s", tall: "t" },
+      registerLoadingTask: (task) => tasks.push(task),
+    }),
+  )
+  unmount()
+  images.forEach((image) => {
+    expect(image.onload).toBeNull()
+    expect(image.onerror).toBeNull()
+  })
+  await Promise.all(tasks)
+  expect(refs.every((ref) => ref.current === null)).toBe(true)
+  vi.unstubAllGlobals()
+})

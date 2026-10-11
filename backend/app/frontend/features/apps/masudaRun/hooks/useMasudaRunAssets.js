@@ -4,7 +4,9 @@ const noop = () => {}
 
 const initImageRef = (ref, src) => {
   const img = new Image()
+  let settle
   const loaded = new Promise((resolve) => {
+    settle = resolve
     img.onload = () => {
       ref.current = img
       resolve()
@@ -13,6 +15,9 @@ const initImageRef = (ref, src) => {
   })
   img.src = src
   const dispose = () => {
+    img.onload = null
+    img.onerror = null
+    settle()
     ref.current = null
   }
   return { loaded, dispose }
