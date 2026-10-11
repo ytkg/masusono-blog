@@ -102,7 +102,7 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
                 underline="hover"
                 sx={{ ...supportingActionSx, display: "inline-flex", alignItems: "center" }}
               >
-                {author}の記事をもっと読む →
+                {author}の他の記事を読む →
               </Link>
             </Box>
           )}

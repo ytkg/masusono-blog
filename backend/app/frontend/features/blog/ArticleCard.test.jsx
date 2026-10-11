@@ -21,7 +21,7 @@ describe("ArticleCard", () => {
         relatedArticles={[{ id: "related", title: "関連" }]}
       />,
     )
-    const link = screen.getByRole("link", { name: `${author}の記事をもっと読む →` })
+    const link = screen.getByRole("link", { name: `${author}の他の記事を読む →` })
     expect(link).toHaveAttribute("href", screen.getByRole("link", { name: author, exact: true }).getAttribute("href"))
     expect(screen.getByText("本文です").compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(
@@ -33,7 +33,7 @@ describe("ArticleCard", () => {
     render(
       <ArticleCard mode="detail" article={{ id: "current", title: "記事", author: "その他1", authorId: "author" }} />,
     )
-    expect(screen.getByRole("link", { name: "その他1の記事をもっと読む →" })).toHaveAttribute("href", "/authors/author")
+    expect(screen.getByRole("link", { name: "その他1の他の記事を読む →" })).toHaveAttribute("href", "/authors/author")
   })
 
   it.each([
@@ -42,7 +42,7 @@ describe("ArticleCard", () => {
     ["list", "author"],
   ])("%s・著者ID %sでは読後リンクを表示しない", (mode, authorId) => {
     render(<ArticleCard mode={mode} article={{ id: "current", title: "記事", author: "その他1", authorId }} />)
-    expect(screen.queryByRole("link", { name: /の記事をもっと読む/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole("link", { name: /の他の記事を読む/ })).not.toBeInTheDocument()
   })
 
   it.each([[[]], [[{ id: "related", title: "関連記事のタイトル" }]]])(

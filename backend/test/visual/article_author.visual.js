@@ -11,7 +11,7 @@ for (const authorId of ["visual-author-1", "visual-author-2", undefined]) {
       props.yearAgoArticles = []
     })
     await openPage(page, "/articles/visual-article-1")
-    const link = page.getByRole("link", { name: /の記事をもっと読む →/ })
+    const link = page.getByRole("link", { name: /の他の記事を読む →/ })
     await expect(link).toHaveCount(authorId ? 1 : 0)
     if (authorId) {
       await expect(link).toHaveAttribute("href", `/authors/${authorId}`)
