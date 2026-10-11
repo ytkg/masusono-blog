@@ -19,6 +19,7 @@ export function chartPointX(index, pointCount) {
 }
 
 export function chartPointIndex(clientX, rectangle, pointCount) {
+  if (pointCount <= 1 || rectangle.width <= 0) return 0
   const bounds = chartBounds()
   const x = ((clientX - rectangle.left) / rectangle.width) * CHART_WIDTH
   const ratio = Math.max(0, Math.min(1, (x - bounds.left) / (bounds.right - bounds.left)))
