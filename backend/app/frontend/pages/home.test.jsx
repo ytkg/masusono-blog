@@ -16,13 +16,16 @@ vi.mock("@inertiajs/react", async (importOriginal) => {
     router: { remember: vi.fn(), on: vi.fn(() => () => {}) },
     useRemember: (initialState, key) => {
       const [state, setState] = React.useState(() => rememberedStates.get(key) ?? initialState)
-      const setRememberedState = (nextState) => {
-        setState((currentState) => {
-          const resolvedState = typeof nextState === "function" ? nextState(currentState) : nextState
-          rememberedStates.set(key, resolvedState)
-          return resolvedState
-        })
-      }
+      const setRememberedState = React.useCallback(
+        (nextState) => {
+          setState((currentState) => {
+            const resolvedState = typeof nextState === "function" ? nextState(currentState) : nextState
+            rememberedStates.set(key, resolvedState)
+            return resolvedState
+          })
+        },
+        [key],
+      )
 
       return [state, setRememberedState]
     },
