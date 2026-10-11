@@ -53,13 +53,13 @@ export function fetchJson(url) {
 export function postJson(url, payload, options = {}) {
   return requestJson(url, {
     method: "POST",
+    body: JSON.stringify(payload),
+    ...options,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
       ...(options.headers ?? {}),
     },
-    body: JSON.stringify(payload),
-    ...options,
   })
 }
 
