@@ -1,7 +1,7 @@
 import { parseArticleTags } from "./parseArticleTags"
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
-import SectionHeading from "@/shared/SectionHeading"
+import SectionHeading from "@/shared/components/SectionHeading"
 
 const READING_TIME_SUGGESTIONS = Object.freeze(
   [

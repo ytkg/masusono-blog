@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import { PAGE_HORIZONTAL_PADDING } from "./pageLayout"
+import { PAGE_HORIZONTAL_PADDING } from "../../layouts/pageLayout"
 
 export default function PageContainer({ children, component = "section", id, sx }) {
   return (

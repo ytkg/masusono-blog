@@ -1,5 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close"
-import AuxiliaryIconButton from "../../../shared/AuxiliaryIconButton"
+import AuxiliaryIconButton from "../../../shared/components/AuxiliaryIconButton"
 import Box from "@mui/material/Box"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"

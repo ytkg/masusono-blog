@@ -32,7 +32,7 @@ vi.mock("@inertiajs/react", async (importOriginal) => {
   }
 })
 
-vi.mock("../shared/SeoHead", () => ({
+vi.mock("../shared/components/SeoHead", () => ({
   default: () => <div>seo</div>,
 }))
 

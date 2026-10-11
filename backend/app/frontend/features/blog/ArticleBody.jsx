@@ -1,4 +1,4 @@
-import { supportingActionSx } from "../../shared/supportingActionStyles"
+import { supportingActionSx } from "../../shared/styles/supportingActionStyles"
 import { useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"

@@ -1,4 +1,4 @@
-import { FOCUS_RING_OUTSET } from "../../shared/focusStyles"
+import { FOCUS_RING_OUTSET } from "../../shared/styles/focusStyles"
 import Box from "@mui/material/Box"
 import EmptyStatus from "../../shared/components/EmptyStatus"
 import SentenceFeedCard from "./SentenceFeedCard"

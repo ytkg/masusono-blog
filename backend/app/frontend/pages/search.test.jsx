@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import Search from "./search"
 
-vi.mock("../shared/SeoHead", () => ({
+vi.mock("../shared/components/SeoHead", () => ({
   default: () => <div>seo</div>,
 }))
 

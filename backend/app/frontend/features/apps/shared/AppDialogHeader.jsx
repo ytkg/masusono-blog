@@ -1,8 +1,8 @@
-import { titleTextSx } from "@/shared/typographyStyles"
+import { titleTextSx } from "@/shared/styles/typographyStyles"
 import CloseIcon from "@mui/icons-material/Close"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import AuxiliaryIconButton from "../../../shared/AuxiliaryIconButton"
+import AuxiliaryIconButton from "../../../shared/components/AuxiliaryIconButton"
 
 const dialogHeaderSx = {
   display: "flex",

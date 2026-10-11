@@ -1,8 +1,8 @@
 import { createInertiaApp } from "@inertiajs/react"
 import createServer from "@inertiajs/react/server"
 import { renderToString } from "react-dom/server"
-import InertiaApp from "../shared/InertiaApp"
-import { resolvePage } from "../shared/pageResolver"
+import InertiaApp from "../application/InertiaApp"
+import { resolvePage } from "../application/pageResolver"
 
 createServer(
   (page) =>

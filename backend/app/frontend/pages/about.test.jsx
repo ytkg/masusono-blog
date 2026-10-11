@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import About from "./about"
 
-vi.mock("../shared/SeoHead", () => ({
+vi.mock("../shared/components/SeoHead", () => ({
   default: () => null,
 }))
 

@@ -2,8 +2,8 @@ import { Head, Link } from "@inertiajs/react"
 import MuiLink from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
 import { requestHomeFeed } from "@/shared/lib/homeNavigation"
-import PageContainer from "../../shared/PageContainer"
-import PageHeading from "../../shared/PageHeading"
+import PageContainer from "../../shared/components/PageContainer"
+import PageHeading from "../../shared/components/PageHeading"
 
 const SITE_TITLE = "増田とその他！"
 

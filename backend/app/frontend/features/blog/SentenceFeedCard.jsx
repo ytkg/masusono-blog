@@ -1,4 +1,4 @@
-import { focusRingSx } from "../../shared/focusStyles"
+import { focusRingSx } from "../../shared/styles/focusStyles"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import { SENTENCE_REVEAL_DURATION_MS } from "./sentenceFeedData"

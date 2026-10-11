@@ -1,4 +1,4 @@
-import { focusVisibleSx } from "./focusStyles"
+import { focusVisibleSx } from "../styles/focusStyles"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"

@@ -3,7 +3,7 @@ import { Link, usePage } from "@inertiajs/react"
 import BottomNavigation from "@mui/material/BottomNavigation"
 import BottomNavigationAction from "@mui/material/BottomNavigationAction"
 import Paper from "@mui/material/Paper"
-import { MAIN_NAVIGATION_LINKS } from "../shared/mainNavigationLinks"
+import { MAIN_NAVIGATION_LINKS } from "./mainNavigationLinks"
 import { requestHomeFeed } from "../shared/lib/homeNavigation"
 import { navigationPrefetchKey, navigationPrefetchProps } from "../shared/lib/navigationPrefetch"
 

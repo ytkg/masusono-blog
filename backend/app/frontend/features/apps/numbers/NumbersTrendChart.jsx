@@ -1,7 +1,7 @@
 import TrendChartSvg from "./TrendChartSvg"
 import TrendLegend from "./TrendLegend"
 import { hasTrendData } from "./trendChartData"
-import SectionHeading from "@/shared/SectionHeading"
+import SectionHeading from "@/shared/components/SectionHeading"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"

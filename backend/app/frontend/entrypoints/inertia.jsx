@@ -1,7 +1,7 @@
 import { createRoot, hydrateRoot } from "react-dom/client"
 import { createInertiaApp, router } from "@inertiajs/react"
-import InertiaApp from "../shared/InertiaApp"
-import { resolvePage } from "../shared/pageResolver"
+import InertiaApp from "../application/InertiaApp"
+import { resolvePage } from "../application/pageResolver"
 import { installAnalyticsNavigation } from "../shared/lib/analytics"
 import { installNavigationRecovery } from "../shared/lib/navigationRecovery"
 
