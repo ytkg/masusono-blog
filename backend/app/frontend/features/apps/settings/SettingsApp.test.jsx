@@ -136,4 +136,8 @@ describe("SettingsContent", () => {
     expect(await screen.findByText("ブラウザのサイト設定から通知を許可してください。")).toBeInTheDocument()
     expect(screen.getByRole("switch", { name: "新着記事の通知" })).toBeDisabled()
   })
+  it("現在のCookieのIDをユーザーIDとして表示する", () => {
+    render(<SettingsContent />)
+    expect(screen.getByText("ユーザーID：cookie-user")).toBeInTheDocument()
+  })
 })

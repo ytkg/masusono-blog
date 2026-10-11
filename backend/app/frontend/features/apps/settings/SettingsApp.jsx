@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react"
+import { ensureUserIdCookie } from "@/shared/lib/userId"
 import SettingsSection from "./SettingsSection"
 import useDisplayName from "./useDisplayName"
 import useWebPushSettings from "./useWebPushSettings"
@@ -125,6 +127,19 @@ function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUn
   )
 }
 
+function BrowserIdDisplay() {
+  const [browserId, setBrowserId] = useState("")
+  useEffect(() => {
+    setBrowserId(ensureUserIdCookie() ?? "")
+  }, [])
+
+  return (
+    <Typography variant="caption" color="text.secondary" sx={{ overflowWrap: "anywhere", userSelect: "text" }}>
+      ユーザーID：{browserId || "IDを保存できません。このブラウザのCookie設定を確認してください。"}
+    </Typography>
+  )
+}
+
 export function SettingsContent({ loadOnMount = false }) {
   const registerLoadingTask = useAppLoading()
   const { name, draftName, isEditing, isSaving, inputError, errorMessage, startEditing, saveName, setDraftName } =
@@ -151,6 +166,7 @@ export function SettingsContent({ loadOnMount = false }) {
         onSubscribe={notifications.subscribe}
         onUnsubscribe={notifications.unsubscribe}
       />
+      <BrowserIdDisplay />
     </Box>
   )
 }

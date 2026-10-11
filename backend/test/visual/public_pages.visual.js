@@ -300,6 +300,9 @@ for (const [name, button] of [
   ["settings", "設定を開く"],
 ]) {
   test(name, async ({ page }) => {
+    if (name === "settings") {
+      await page.context().addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
+    }
     await openPage(page, "/others")
     await page.getByRole("button", { name: button }).click()
     await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
@@ -475,7 +478,7 @@ test("article body spacing and expansion", async ({ page }) => {
 
 for (const state of ["input", "save", "notification"]) {
   test(`settings ${state} error`, async ({ page }) => {
-    await page.context().addCookies([{ name: "user_id", value: "visual-user", url: "http://localhost:3000" }])
+    await page.context().addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
     await page.route("**/api/app/users.json", (route) => route.fulfill({ status: 500, body: "{}" }))
     await page.addInitScript(() => {
       Object.defineProperty(window, "Notification", {

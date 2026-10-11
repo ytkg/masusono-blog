@@ -37,4 +37,15 @@ describe("userId", () => {
     expect(ensureUserIdCookie()).toBe("generated-id")
     expect(getUserIdFromCookie()).toBe("generated-id")
   })
+  it("不正なエンコードでも閲覧を壊さない", () => {
+    document.cookie = "user_id=%ZZ; Path=/"
+    expect(getUserIdFromCookie()).toBeNull()
+    expect(ensureUserIdCookie()).toMatch(/^[0-9a-f-]{36}$/i)
+  })
+
+  it("Cookieを保存できない場合は共通のダミーIDを返さない", () => {
+    const cookie = vi.spyOn(document, "cookie", "set").mockImplementation(() => {})
+    expect(ensureUserIdCookie()).toBeNull()
+    cookie.mockRestore()
+  })
 })

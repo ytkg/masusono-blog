@@ -159,3 +159,10 @@ Request: `{ "failure": { ... } }`
 - `elapsed_ms`: ページ読み込みからの経過時間 (0〜86,400,000)。
 
 不正な任意項目と未知のキーは記録から除外する。本文・Cookie・トークン・検索語・例外メッセージは送信しない。標準のパラメータログでは `failure` 全体をフィルタし、検証済み項目だけを `navigation_failed` イベントに出す。
+
+## GA4 計測可否
+
+`GET /api/app/analytics.json` は現在の `user_id` Cookie のUUIDについて
+`{ "allowed": true }` または `{ "allowed": false }` のみを返す。
+IDなし・不正ID・除外対象は false。クエリでのID指定は受け付けない。
+除外一覧やプロフィールは返さず、共通の `Cache-Control: no-store` を維持する。

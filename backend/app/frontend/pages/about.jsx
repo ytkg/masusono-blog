@@ -57,6 +57,21 @@ export default function About() {
         <Typography component="p" sx={{ mb: 0 }}>
           仕事帰りの一杯のように、気楽に立ち寄ってもらえる場所を目指しています。
         </Typography>
+        <Typography component="h2" variant="h6" sx={{ mt: 4, mb: 2 }}>
+          プライバシーについて
+        </Typography>
+        <Typography component="p" sx={{ mb: 2 }}>
+          当サイトは利用状況の把握にGoogle Analyticsを使用し、閲覧ページや流入元を収集します。
+          ランキングで使用するCookieのブラウザIDを、再訪や回遊を把握するためにも使用します。
+          表示名・メール・プロフィール情報はGoogle Analyticsに送りません。
+          ブラウザIDはログイン認証や管理権限には使用しません。
+          Cookieを削除したり別のブラウザを使ったりすると、別のIDになります。
+        </Typography>
+        <Typography component="p">
+          <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noreferrer">
+            Googleによるデータの利用について
+          </a>
+        </Typography>
       </PageContainer>
     </>
   )
