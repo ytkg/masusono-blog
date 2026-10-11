@@ -58,3 +58,12 @@ describe("増田たたき", () => {
     expect(hit({ ...withCharacter(), elapsed: DURATION }, 0).score).toBe(0)
   })
 })
+
+it("advances without changing the previous game or its characters", () => {
+  const game = withCharacter("masuda", 5)
+  const original = structuredClone(game)
+  const next = advance(game, 1200, () => 0)
+  expect(game).toEqual(original)
+  expect(next.holes).not.toBe(game.holes)
+  expect(next.combo).toBe(0)
+})

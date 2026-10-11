@@ -1,4 +1,4 @@
-const EXCLUDED_TAGS = new Set(["SCRIPT", "STYLE", "IFRAME"])
+const EXCLUDED_TAGS = new Set(["SCRIPT", "STYLE", "IFRAME", "TEMPLATE", "NOSCRIPT"])
 const TEXT_NODE = 3
 const ELEMENT_NODE = 1
 

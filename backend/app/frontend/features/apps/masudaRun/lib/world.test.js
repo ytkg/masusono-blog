@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { CFG, HIGH_SCORE_KEY, HIT_H, HIT_W } from "./constants"
 import { createInitialWorld, getStoredHighScore, persistHighScore, rectsIntersect } from "./world"
 
@@ -42,4 +42,22 @@ describe("world", () => {
     expect(localStorage.getItem(HIGH_SCORE_KEY)).toBe("3210")
     expect(getStoredHighScore()).toBe(3210)
   })
+})
+
+it.each(["invalid", "NaN", "Infinity", "-1"])("ignores a corrupt stored score: %s", (value) => {
+  localStorage.setItem(HIGH_SCORE_KEY, value)
+  expect(getStoredHighScore()).toBe(0)
+  localStorage.removeItem(HIGH_SCORE_KEY)
+})
+it("continues when storage reads or writes are denied", () => {
+  const get = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+    throw new Error("denied")
+  })
+  const set = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+    throw new Error("denied")
+  })
+  expect(getStoredHighScore()).toBe(0)
+  expect(() => persistHighScore(10)).not.toThrow()
+  get.mockRestore()
+  set.mockRestore()
 })

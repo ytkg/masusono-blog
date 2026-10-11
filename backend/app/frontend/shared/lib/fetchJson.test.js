@@ -99,3 +99,19 @@ describe("fetchJson", () => {
     ).toBe("タイムアウトしました。")
   })
 })
+
+it("preserves JSON headers when callers add headers and cancellation", async () => {
+  const fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
+  vi.stubGlobal("fetch", fetch)
+  const controller = new AbortController()
+  await postJson("/example", { value: 1 }, { headers: { "X-Request-ID": "test" }, signal: controller.signal })
+  expect(fetch).toHaveBeenCalledWith(
+    "/example",
+    expect.objectContaining({
+      headers: { "Content-Type": "application/json", Accept: "application/json", "X-Request-ID": "test" },
+      signal: controller.signal,
+      body: '{"value":1}',
+    }),
+  )
+  vi.unstubAllGlobals()
+})

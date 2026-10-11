@@ -23,10 +23,19 @@ export function rectsIntersect(ax, ay, aw, ah, bx, by, bw, bh) {
 
 export function getStoredHighScore() {
   if (typeof window === "undefined") return 0
-  return Number(window.localStorage.getItem(HIGH_SCORE_KEY) || 0)
+  try {
+    const score = Number(window.localStorage.getItem(HIGH_SCORE_KEY) || 0)
+    return Number.isFinite(score) && score >= 0 ? score : 0
+  } catch {
+    return 0
+  }
 }
 
 export function persistHighScore(value) {
   if (typeof window === "undefined") return
-  window.localStorage.setItem(HIGH_SCORE_KEY, String(value))
+  try {
+    window.localStorage.setItem(HIGH_SCORE_KEY, String(value))
+  } catch {
+    // A storage restriction must not interrupt the game-over transition.
+  }
 }

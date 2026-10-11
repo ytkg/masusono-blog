@@ -11,7 +11,8 @@ function matchesReadingTime(article, query) {
   const readingTimeQuery = query.trim()
   const readingTimeMinutes = Number(article?.readingTimeMinutes)
 
-  if (!readingTimeQuery || !Number.isFinite(readingTimeMinutes)) return false
+  if (!/^\d+(?:\.\d+)?(?:\+|-\d+(?:\.\d+)?)?$/.test(readingTimeQuery) || !Number.isFinite(readingTimeMinutes))
+    return false
 
   if (readingTimeQuery.endsWith("+")) {
     const minReadingTime = Number(readingTimeQuery.slice(0, -1))

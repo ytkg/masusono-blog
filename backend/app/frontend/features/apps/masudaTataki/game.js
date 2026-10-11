@@ -39,8 +39,8 @@ export const initialGame = () => ({
 
 export function advance(game, elapsed, random = Math.random) {
   if (game.elapsed >= DURATION) return game
-  const next = { ...game, elapsed: Math.min(elapsed, DURATION), holes: [...game.holes] }
-  next.holes = next.holes.map((character) => {
+  const next = { ...game, elapsed: Math.min(elapsed, DURATION) }
+  next.holes = game.holes.map((character) => {
     if (!character || character.until > next.elapsed) return character
     if (character.kind === "masuda" && !character.hit) next.combo = 0
     return null

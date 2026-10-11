@@ -28,3 +28,10 @@ describe("sentenceFeedLayout", () => {
     expect(layout.height).toBe(20)
   })
 })
+
+it("gives an empty feed zero height", () => {
+  expect(sentenceFeedLayout({ containerWidth: 200, itemHeights: [], viewportWidth: 1000 })).toEqual({
+    height: 0,
+    items: [],
+  })
+})

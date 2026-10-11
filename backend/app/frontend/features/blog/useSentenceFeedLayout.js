@@ -6,7 +6,11 @@ export default function useSentenceFeedLayout(items) {
   const [height, setHeight] = useState(0)
   useLayoutEffect(() => {
     const container = containerRef.current
-    if (!container || items.length === 0) return undefined
+    if (!container) return undefined
+    if (items.length === 0) {
+      setHeight(0)
+      return undefined
+    }
 
     function layout() {
       const cardElements = Array.from(container.querySelectorAll(".sentence-card"))
