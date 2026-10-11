@@ -12,6 +12,8 @@ function columnGapFor(viewportWidth, isNarrow) {
 }
 
 export function sentenceFeedLayout({ containerWidth, itemHeights, viewportWidth }) {
+  if (itemHeights.length === 0) return { height: 0, items: [] }
+
   const { columnCount, columnWidth, gap } = columnGeometry(containerWidth, viewportWidth)
   const columnHeights = Array.from({ length: columnCount }, () => 0)
 
