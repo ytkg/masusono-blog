@@ -3,11 +3,14 @@ import { articleMatchesToken } from "./articleSearchToken"
 
 export { normalizeArticleSearchText } from "./articleSearchText"
 
+const OR_SEPARATOR_PATTERN = /\s+or\s+/i
+const TOKEN_SEPARATOR_PATTERN = /\s+/
+
 function parseSearchQuery(normalizedQuery) {
   return normalizedQuery
-    .split(/\s+or\s+/i)
-    .map((group) => group.split(/\s+/).filter((token) => token && token !== "and"))
-    .filter((group) => group.length)
+    .split(OR_SEPARATOR_PATTERN)
+    .map((group) => group.split(TOKEN_SEPARATOR_PATTERN).filter((token) => token && token !== "and"))
+    .filter((group) => group.length > 0)
 }
 
 export function prepareArticleQuery(normalizedQuery) {
@@ -15,7 +18,7 @@ export function prepareArticleQuery(normalizedQuery) {
 
   const queryGroups = parseSearchQuery(normalizedQuery)
 
-  if (!queryGroups.length) return () => false
+  if (queryGroups.length === 0) return () => false
 
   return (article) => {
     // Parse the body only for plain-text tokens, at most once per article/query.

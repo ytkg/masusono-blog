@@ -1,4 +1,6 @@
-const EXCLUDED_TAGS = ["SCRIPT", "STYLE", "IFRAME"]
+const EXCLUDED_TAGS = new Set(["SCRIPT", "STYLE", "IFRAME"])
+const TEXT_NODE = 3
+const ELEMENT_NODE = 1
 
 const BLOCK_TAGS = new Set([
   "P",
@@ -28,10 +30,10 @@ export function buildArticleCopyText(article) {
 }
 
 function readCopyNode(node, inPre = false) {
-  if (node.nodeType === 3) return inPre ? node.textContent : node.textContent.replace(/\s+/g, " ")
-  if (node.nodeType !== 1) return ""
+  if (node.nodeType === TEXT_NODE) return inPre ? node.textContent : node.textContent.replace(/\s+/g, " ")
+  if (node.nodeType !== ELEMENT_NODE) return ""
   const tag = node.tagName
-  if (EXCLUDED_TAGS.includes(tag)) return ""
+  if (EXCLUDED_TAGS.has(tag)) return ""
   if (tag === "BR") return "\n"
   let text = ""
   for (const child of node.childNodes) {

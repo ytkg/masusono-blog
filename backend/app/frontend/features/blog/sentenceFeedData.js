@@ -6,7 +6,9 @@ export { makeSentenceItems, shuffleArticles, SENTENCE_REVEAL_MAX_DELAY_MS } from
 export const INITIAL_SENTENCE_COUNT = 80
 export const APPEND_SENTENCE_COUNT = 24
 export const SENTENCE_REVEAL_DURATION_MS = 800
-export const SENTENCE_REVEAL_SETTLE_MS = SENTENCE_REVEAL_DURATION_MS + SENTENCE_REVEAL_MAX_DELAY_MS + 80
+const SENTENCE_REVEAL_BUFFER_MS = 80
+export const SENTENCE_REVEAL_SETTLE_MS =
+  SENTENCE_REVEAL_DURATION_MS + SENTENCE_REVEAL_MAX_DELAY_MS + SENTENCE_REVEAL_BUFFER_MS
 export const SENTENCE_STATE_VERSION = 1
 
 function serializeSentenceItems(items) {
@@ -61,7 +63,7 @@ export function markSentenceItemsRevealed(state) {
 
 export function mergeSentenceArticleSources(state, articles) {
   const knownIds = new Set(state.sourceIds)
-  const newIds = articles.filter((article) => !knownIds.has(article.id)).map((article) => article.id)
+  const newIds = articles.flatMap((article) => (knownIds.has(article.id) ? [] : [article.id]))
   if (newIds.length === 0) return state
   if (state.items.length === 0) return createInitialSentenceState(articles)
   return { ...state, sourceIds: [...state.sourceIds, ...newIds] }

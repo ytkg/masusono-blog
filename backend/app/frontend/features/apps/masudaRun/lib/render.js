@@ -1,6 +1,8 @@
 import { CFG, CHAR_H, CHAR_W } from "./constants"
 import { drawCenterText } from "./draw"
 
+const STATE_TEXT_FONT = '24px "M PLUS Rounded 1c", sans-serif'
+
 export const drawGround = (ctx, w, W) => {
   ctx.fillStyle = "#EBCB72"
   ctx.fillRect(0, w.groundY, W, CFG.BASE_H - w.groundY)
@@ -13,10 +15,10 @@ export const drawGround = (ctx, w, W) => {
 
 export const drawStateText = (ctx, W, H, state) => {
   if (state === "ready") {
-    ctx.font = '24px "M PLUS Rounded 1c", sans-serif'
+    ctx.font = STATE_TEXT_FONT
     drawCenterText(ctx, W, H, "増田RUN - スペース/タップで開始")
   } else if (state === "gameover") {
-    ctx.font = '24px "M PLUS Rounded 1c", sans-serif'
+    ctx.font = STATE_TEXT_FONT
     drawCenterText(ctx, W, H, "GAME OVER  -  スペース/タップで再開")
   }
 }

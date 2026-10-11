@@ -26,22 +26,22 @@ export const maybeSpawnObstacle = (w, W, dt) => {
   const h = tall ? CFG.TALL_H : CFG.SHORT_H_MIN + Math.random() * CFG.SHORT_H_RANGE
   const y = w.groundY - h
   const kind = tall ? "tall" : "short"
-  const obs = {
+  const obstacle = {
     x: W + 20,
     y,
     w: CFG.OBS_W_MIN + Math.random() * CFG.OBS_W_RANGE,
     h,
     kind,
   }
-  w.obstacles.push(obs)
+  w.obstacles.push(obstacle)
   w.nextSpawn =
     CFG.SPAWN_BASE - Math.min(CFG.SPAWN_REDUCE_MAX, w.t * CFG.SPAWN_REDUCE_RATE) + Math.random() * CFG.SPAWN_RAND
 }
 
 export const updateObstacles = (w) => {
-  w.obstacles = w.obstacles.filter((o) => {
-    o.x -= w.speed
-    return o.x + o.w > -10
+  w.obstacles = w.obstacles.filter((obstacle) => {
+    obstacle.x -= w.speed
+    return obstacle.x + obstacle.w > -10
   })
 }
 
@@ -54,17 +54,17 @@ export const maybeSpawnCloud = (w, W, dt) => {
 }
 
 export const updateClouds = (w) => {
-  w.clouds = w.clouds.filter((c) => {
-    c.x -= w.speed * 0.35 + c.speed
-    return c.x + c.w > -20
+  w.clouds = w.clouds.filter((cloud) => {
+    cloud.x -= w.speed * 0.35 + cloud.speed
+    return cloud.x + cloud.w > -20
   })
 }
 
 export const updateScoreDisplay = (scoreRef, scoreDisplayRef, setScore) => {
-  const sc = Math.floor(scoreRef.current)
-  if (scoreDisplayRef.current !== sc) {
-    scoreDisplayRef.current = sc
-    setScore(sc)
+  const integerScore = Math.floor(scoreRef.current)
+  if (scoreDisplayRef.current !== integerScore) {
+    scoreDisplayRef.current = integerScore
+    setScore(integerScore)
   }
 }
 

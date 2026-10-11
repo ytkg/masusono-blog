@@ -3,23 +3,25 @@ const NARROW_COLUMN_WIDTH = 58
 const DEFAULT_COLUMN_WIDTH = 72
 const MIN_COLUMN_GAP = 12
 const MAX_COLUMN_GAP = 22
+const COLUMN_GAP_VIEWPORT_RATIO = 0.018
 
 function columnGapFor(viewportWidth, isNarrow) {
   if (isNarrow) return MIN_COLUMN_GAP
 
-  return Math.min(MAX_COLUMN_GAP, Math.max(MIN_COLUMN_GAP, viewportWidth * 0.018))
+  return Math.min(MAX_COLUMN_GAP, Math.max(MIN_COLUMN_GAP, viewportWidth * COLUMN_GAP_VIEWPORT_RATIO))
 }
 
 export function sentenceFeedLayout({ containerWidth, itemHeights, viewportWidth }) {
   const { columnCount, columnWidth, gap } = columnGeometry(containerWidth, viewportWidth)
   const columnHeights = Array.from({ length: columnCount }, () => 0)
 
+  const columnStride = columnWidth + gap
   const items = itemHeights.map((height) => {
     const columnIndex = columnHeights.indexOf(Math.min(...columnHeights))
     const top = columnHeights[columnIndex]
     columnHeights[columnIndex] += height + gap
 
-    return { left: columnIndex * (columnWidth + gap), top, width: columnWidth }
+    return { left: columnIndex * columnStride, top, width: columnWidth }
   })
 
   return { height: Math.max(...columnHeights) - gap, items }

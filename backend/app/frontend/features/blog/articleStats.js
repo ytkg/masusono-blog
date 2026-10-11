@@ -9,9 +9,8 @@ export function formatArticleStats(article) {
   }
 
   const formattedCharacterCount = CHARACTER_COUNT_FORMATTER.format(characterCount)
-  const formattedReadingTimeMinutes = String(readingTimeMinutes)
   const formattedReadingTime =
-    Number.isFinite(readingTimeMinutes) && readingTimeMinutes > 0 ? `・約${formattedReadingTimeMinutes}分` : ""
+    Number.isFinite(readingTimeMinutes) && readingTimeMinutes > 0 ? `・約${readingTimeMinutes}分` : ""
 
   return `${formattedCharacterCount}字${formattedReadingTime}`
 }

@@ -1,3 +1,5 @@
+const LANGUAGE_PREFIX_PATTERN = /^(language|lang)-/
+
 const LANGUAGE_CONFIGS = Object.freeze({
   bash: { label: "Bash", prismLanguage: "bash" },
   css: { label: "CSS", prismLanguage: "css" },
@@ -15,10 +17,10 @@ const LANGUAGE_CONFIGS = Object.freeze({
 
 function rawCodeLanguage(codeElement) {
   const classNames = Array.from(codeElement.classList)
-  const languageClass = classNames.find(
-    (className) => className.startsWith("language-") || className.startsWith("lang-"),
+  const languageClass = classNames.find((className) => LANGUAGE_PREFIX_PATTERN.test(className))
+  return (
+    languageClass?.replace(LANGUAGE_PREFIX_PATTERN, "") || classNames.find((className) => LANGUAGE_CONFIGS[className])
   )
-  return languageClass?.replace(/^(language|lang)-/, "") || classNames.find((className) => LANGUAGE_CONFIGS[className])
 }
 
 export function codeLanguage(codeElement) {

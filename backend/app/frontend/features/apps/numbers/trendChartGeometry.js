@@ -31,18 +31,18 @@ export function normalizePoints(points, seriesKey, maxChartValue) {
   const bounds = chartBounds()
   const usableHeight = bounds.bottom - bounds.top
 
-  return points
-    .map((point, index) => {
-      const value = scaledSeriesValue(point, seriesKey)
-      if (!Number.isFinite(value)) return null
+  return points.flatMap((point, index) => {
+    const value = scaledSeriesValue(point, seriesKey)
+    if (!Number.isFinite(value)) return []
 
-      const ratio = value / maxChartValue
-      return {
+    const ratio = value / maxChartValue
+    return [
+      {
         x: chartPointX(index, points.length),
         y: bounds.bottom - usableHeight * ratio,
-      }
-    })
-    .filter(Boolean)
+      },
+    ]
+  })
 }
 
 export function maxChartValue(points, series) {

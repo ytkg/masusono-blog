@@ -11,10 +11,11 @@ export {
 } from "./trendChartGeometry"
 export { smoothPath } from "./trendChartPath"
 
+const SHORT_YEAR_PATTERN = /^(\d{2})(\d{2})\//
+
 export function chartDateLabels(points) {
   if (points.length === 0) return []
   const lastIndex = points.length - 1
-  const denominator = Math.max(lastIndex, 1)
 
   return dateLabelIndexes(lastIndex).map((index) => {
     const point = points[index]
@@ -22,13 +23,13 @@ export function chartDateLabels(points) {
       key: point.date,
       label: shortDateLabel(point.label ?? point.date),
       x: chartPointX(index, points.length),
-      textAnchor: index === 0 ? "start" : index === denominator ? "end" : "middle",
+      textAnchor: index === 0 ? "start" : index === lastIndex ? "end" : "middle",
     }
   })
 }
 
 function shortDateLabel(label) {
-  return String(label).replace(/^(\d{2})(\d{2})\//, "'$2/")
+  return String(label).replace(SHORT_YEAR_PATTERN, "'$2/")
 }
 
 export function hasTrendData(trend) {

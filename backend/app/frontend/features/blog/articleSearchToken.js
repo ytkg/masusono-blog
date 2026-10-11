@@ -1,6 +1,8 @@
 import { parseArticleTags } from "./parseArticleTags"
 import { normalizeArticleSearchText } from "./articleSearchText"
 
+const READING_TIME_PREFIX = "read:"
+
 function articleTags(article) {
   return parseArticleTags(article?.tags).map(normalizeArticleSearchText).filter(Boolean)
 }
@@ -31,8 +33,8 @@ function matchesReadingTime(article, query) {
 }
 
 export function articleMatchesToken(article, token, getSearchTarget) {
-  if (token.startsWith("read:")) {
-    return matchesReadingTime(article, token.slice(5))
+  if (token.startsWith(READING_TIME_PREFIX)) {
+    return matchesReadingTime(article, token.slice(READING_TIME_PREFIX.length))
   }
 
   if (token.startsWith("#")) {
