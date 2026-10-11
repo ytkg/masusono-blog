@@ -17,7 +17,7 @@ module Numbers
       totals = summarize_articles
 
       {
-        totals: totals,
+        totals:,
         author_rows: AuthorRowsSorter.call(authors: totals[:authors])
       }
     end
@@ -27,16 +27,12 @@ module Numbers
     attr_reader :articles, :character_counter
 
     def summarize_articles
-      totals = initial_article_totals
-
-      articles.each do |article|
+      articles.each_with_object(initial_article_totals) do |article, totals|
         char_count = character_counter.call(article)
         add_counts(totals, char_count)
         author_name = normalize_author_name(article[:author])
         add_counts(totals[:authors][author_name], char_count)
       end
-
-      totals
     end
 
     def initial_article_totals
