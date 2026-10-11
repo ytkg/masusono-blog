@@ -56,28 +56,29 @@ Tag Assistant を使う場合は DebugView も利用できる。開発環境か�
 
 このファイルの追加時点では、本番公開・GA 管理画面の設定・受信確認は未実施。
 
-## ブラウザIDとオーナー除外（Issue #626）
+## ブラウザIDとオーナー除外（Issue #626・#638）
 
 初回イベント前に既存ヘルパーで `user_id` Cookieを確保し、そのUUIDをGA4の
 `client_id`に設定する。ログイン用 `user_id` と一意IDのカスタムディメンションは使用しない。
 一般閲覧でプロフィール登録APIは呼ばない。Cookie保存不可・不正ID・判定API失敗時は
 計測を停止して通常閲覧を継続する。Cookie削除後は新しいUUIDを使用する。
 
-除外一覧はサーバーの `GA4_EXCLUDED_BROWSER_IDS`（カンマまたは空白区切り）に保持する。
+除外一覧はサーバーの `Analytics::ConfigurationUsecase::EXCLUDED_BROWSER_IDS` に固定リストとして保持する。
+`GA4_EXCLUDED_BROWSER_IDS` 環境変数は除外判定に使用しない。
 クライアントへは現在のCookieについて計測可否だけを返し、一覧はHTML・JS・API・URLへ出さない。
 初回送信・ページビュー送信前、Inertia遷移と戻る/進む時に判定する。
 クリックはそのページで承認済みのCookieのIDに対してのみ送信する。
 判定中・除外対象・管理ページでは `ga-disable` を有効にし、自動エンゲージメントも止める。
 除外ブラウザの初回表示ではGoogleタグの読込・初期化も行わない。
 
-### 公開後の登録手順
+### 固定リストの更新手順
 
 1. オーナーが対象のiPhone Safariで「その他！→設定→ユーザーID」の表示IDを選択し、手動コピーする。
-2. 実IDは公開Issue・PR・ソース・ログに貼らず、非公開の経路で運用担当者に渡す。
-3. 運用担当者がCloud Runの対象サービスの非公開設定で `GA4_EXCLUDED_BROWSER_IDS` に登録する。
-   既存の除外IDを保持して追加する。デプロイ用の公開スクリプトには実IDを書かない。
-   設定変更はユーザーの明示依頼と対象・影響範囲確認後に実施する。
-4. 設定反映後にページを再読込し、初回表示・再読込・ページ移動・戻る/進む・両クリックで
+2. 公開コードへの記載についてオーナーの許可を確認する。許可のない実IDは公開Issue・PR・ソース・ログに貼らない。
+3. `app/usecases/analytics/configuration_usecase.rb` の `EXCLUDED_BROWSER_IDS` にIDを追加する。
+   既存の除外IDを保持し、関連テストを更新して通常のPR・リリース手順で本番へ反映する。
+   IDの追加・変更にはコード変更とリリースが必要となる。
+4. リリース反映後にページを再読込し、初回表示・再読込・ページ移動・戻る/進む・両クリックで
    Googleタグと `collect` の通信が発生しないことをSafari実機で確認する。
    回線変更ではCookieが維持されるので除外継続。別ブラウザ・Cookie削除では再登録する。
 5. 未登録ブラウザの `collect` の `cid` が設定画面のUUIDと一致し、別日の再訪でも維持されること、
@@ -86,7 +87,8 @@ Tag Assistant を使う場合は DebugView も利用できる。開発環境か�
 この変更の公開日時・先端コミットと、除外登録の適用日時（JST）を別々に記録する。
 UUID移行によってユーザー数が変わるため、分析では移行前後を区別する。
 過去データへの付け直しや除外、別端末の同一人物への結合は行わない。
-現時点では本番公開・実ID提供/登録・Safari実機・GA4受信/探索の確認は未実施。
+Issue #638 で提供・公開記載を承認されたIDを固定リストに登録した。
+この固定リスト変更の本番公開・Safari実機・GA4受信/探索の確認は未実施。
 
 仕様: [client_id設定](https://developers.google.com/analytics/devguides/collection/ga4/reference/config#client_id)、
 [ga-disableによる送信停止](https://developers.google.com/tag-platform/security/guides/privacy)。
