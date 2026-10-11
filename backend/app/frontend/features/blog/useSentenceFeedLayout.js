@@ -6,7 +6,11 @@ export default function useSentenceFeedLayout(items) {
   const [height, setHeight] = useState(0)
   useLayoutEffect(() => {
     const container = containerRef.current
-    if (!container || items.length === 0) return undefined
+    if (!container) return undefined
+    if (items.length === 0) {
+      setHeight(0)
+      return undefined
+    }
 
     function layout() {
       const cardElements = Array.from(container.querySelectorAll(".sentence-card"))
@@ -25,9 +29,13 @@ export default function useSentenceFeedLayout(items) {
     }
 
     layout()
-    const observer = new ResizeObserver(layout)
-    observer.observe(container)
-    return () => observer.disconnect()
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(layout)
+    observer?.observe(container)
+    window.addEventListener("resize", layout)
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener("resize", layout)
+    }
   }, [items])
 
   return { containerRef, height }
