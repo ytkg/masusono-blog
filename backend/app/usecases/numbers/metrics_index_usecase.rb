@@ -19,17 +19,24 @@ module Numbers
 
     def build_result
       source_data = fetch_source_data
-      article_summary = ArticleMetricsSummary.call(articles: source_data.fetch(:articles))
+      character_counter = cached_character_counter
+      article_summary = ArticleMetricsSummary.call(articles: source_data.fetch(:articles), character_counter:)
       metrics = MetricsPayloadBuilder.call(article_summary:)
       metrics[:trend] = MetricsTrendBuilder.call(
         articles: source_data.fetch(:articles),
-        start_date: LAUNCH_DATE
+        start_date: LAUNCH_DATE,
+        character_counter:
       )
 
       {
         metrics:,
         status: :ok
       }
+    end
+
+    def cached_character_counter
+      counts = {}.compare_by_identity
+      ->(article) { counts.fetch(article) { counts[article] = ArticleMetric.character_count(article) } }
     end
 
     def fetch_source_data

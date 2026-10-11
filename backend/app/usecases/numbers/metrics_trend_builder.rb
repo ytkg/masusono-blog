@@ -10,12 +10,13 @@ module Numbers
       { key: :total_chars, data_key: :totalChars, label: "総文字数", unit: "字" }
     ].freeze
 
-    def self.call(articles:, start_date:, end_date: Date.current)
-      new(articles:, start_date:, end_date:).call
+    def self.call(articles:, start_date:, end_date: Date.current, character_counter: ArticleMetric.method(:character_count))
+      new(articles:, start_date:, end_date:, character_counter:).call
     end
 
-    def initialize(articles:, start_date:, end_date:)
+    def initialize(articles:, start_date:, end_date:, character_counter: ArticleMetric.method(:character_count))
       @articles = articles
+      @character_counter = character_counter
       @start_date = start_date
       @end_date = end_date
     end
@@ -31,7 +32,7 @@ module Numbers
 
     private
 
-    attr_reader :articles, :start_date, :end_date
+    attr_reader :articles, :start_date, :end_date, :character_counter
 
     def build_series
       SERIES.map do |definition|
@@ -77,7 +78,7 @@ module Numbers
 
           grouped[date] ||= initial_totals
           grouped[date][:total_articles] += 1
-          grouped[date][:total_chars] += ArticleMetric.character_count(article)
+          grouped[date][:total_chars] += character_counter.call(article)
         end
       end
     end

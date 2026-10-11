@@ -4,12 +4,13 @@ module Numbers
 
     UNKNOWN_AUTHOR_NAME = "不明"
 
-    def self.call(articles:)
-      new(articles:).call
+    def self.call(articles:, character_counter: ArticleMetric.method(:character_count))
+      new(articles:, character_counter:).call
     end
 
-    def initialize(articles:)
+    def initialize(articles:, character_counter: ArticleMetric.method(:character_count))
       @articles = articles
+      @character_counter = character_counter
     end
 
     def call
@@ -23,13 +24,13 @@ module Numbers
 
     private
 
-    attr_reader :articles
+    attr_reader :articles, :character_counter
 
     def summarize_articles
       totals = initial_article_totals
 
       articles.each do |article|
-        char_count = ArticleMetric.character_count(article)
+        char_count = character_counter.call(article)
         add_counts(totals, char_count)
         author_name = normalize_author_name(article[:author])
         add_counts(totals[:authors][author_name], char_count)
