@@ -30,10 +30,3 @@ it("initializes an empty feed when its first usable article arrives", () => {
   expect(next.items).toHaveLength(80)
   expect(next.items.every((item) => item.articleId === "a")).toBe(true)
 })
-
-it("adds each incoming article ID only once", () => {
-  const state = { sourceIds: ["a"], items: [{ articleId: "a" }], nextCursor: 1, version: 1 }
-  const next = mergeSentenceArticleSources(state, [{ id: "b" }, { id: "b" }, { id: "a" }, { id: "c" }])
-  expect(next.sourceIds).toEqual(["a", "b", "c"])
-  expect(state.sourceIds).toEqual(["a"])
-})

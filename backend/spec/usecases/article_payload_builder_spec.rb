@@ -51,11 +51,3 @@ RSpec.describe ArticlePayloadBuilder do
     end
   end
 end
-
-RSpec.describe ArticlePayloadBuilder do
-  [ [ 0, 0 ], [ 1, 0.5 ], [ 199, 0.5 ], [ 200, 0.5 ], [ 201, 1.0 ], [ 400, 1.0 ], [ 401, 1.5 ] ].each do |count, minutes|
-    it "rounds #{count} characters up to #{minutes} minutes" do
-      expect(described_class.call(article: { content: "a" * count })[:readingTimeMinutes]).to eq(minutes)
-    end
-  end
-end

@@ -63,13 +63,7 @@ export function markSentenceItemsRevealed(state) {
 
 export function mergeSentenceArticleSources(state, articles) {
   const knownIds = new Set(state.sourceIds)
-  const newIds = articles
-    .filter((article) => {
-      if (knownIds.has(article.id)) return false
-      knownIds.add(article.id)
-      return true
-    })
-    .map((article) => article.id)
+  const newIds = articles.flatMap((article) => (knownIds.has(article.id) ? [] : [article.id]))
   if (newIds.length === 0) return state
   if (state.items.length === 0) return createInitialSentenceState(articles)
   return { ...state, sourceIds: [...state.sourceIds, ...newIds] }

@@ -30,9 +30,7 @@ function firstSentenceBoundary(text) {
 }
 
 export function prepareSentenceArticles(articles) {
-  return articles.flatMap((article) => {
-    if (!article.id) return []
-    const sentence = firstSentenceFromHtml(article.content)
-    return sentence ? [{ ...article, sentence }] : []
-  })
+  return articles
+    .map((article) => ({ ...article, sentence: firstSentenceFromHtml(article.content) }))
+    .filter((article) => article.id && article.sentence)
 }

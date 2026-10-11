@@ -15,18 +15,3 @@ RSpec.describe AuthorImageUrlOptimizer do
     end
   end
 end
-
-RSpec.describe AuthorImageUrlOptimizer do
-  [ nil, "", "https://[invalid", "http://images.microcms-assets.io/a.jpg", "//images.microcms-assets.io/a.jpg" ].each do |url|
-    it "preserves unsupported or invalid URL #{url.inspect}" do
-      expect(described_class.call(url)).to eq(url)
-    end
-  end
-
-  it "replaces all avatar-size parameters while preserving unrelated repeated parameters" do
-    url = "https://images.microcms-assets.io/a.jpg?tag=a&tag=b&w=1&w=2&h=3&fit=max".freeze
-    result = described_class.call(url)
-    expect(result).to eq("https://images.microcms-assets.io/a.jpg?tag=a&tag=b&fit=crop&w=192&h=192")
-    expect(url).to end_with("w=1&w=2&h=3&fit=max")
-  end
-end

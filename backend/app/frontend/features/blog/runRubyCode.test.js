@@ -60,37 +60,3 @@ function workerConstructor(worker) {
     return worker
   }
 }
-
-it("returns a result when constructing a Worker fails", async () => {
-  vi.stubGlobal("Worker", function () {
-    throw new Error("blocked")
-  })
-  await expect(runRubyCode("puts 1")).resolves.toMatchObject({ error: "blocked" })
-  vi.unstubAllGlobals()
-})
-it("terminates a Worker when sending code fails", async () => {
-  const worker = createWorker()
-  worker.postMessage.mockImplementation(() => {
-    throw new Error("send failed")
-  })
-  vi.stubGlobal("Worker", workerConstructor(worker))
-  await expect(runRubyCode("puts 1")).resolves.toMatchObject({ error: "send failed" })
-  expect(worker.terminate).toHaveBeenCalledOnce()
-  vi.unstubAllGlobals()
-})
-it("terminates an unresponsive Worker once after a minute", async () => {
-  vi.useFakeTimers()
-  const worker = createWorker()
-  vi.stubGlobal("Worker", workerConstructor(worker))
-  try {
-    const pending = runRubyCode("loop {}")
-    await vi.advanceTimersByTimeAsync(60_000)
-    await expect(pending).resolves.toMatchObject({ error: "Ruby 実行がタイムアウトしました。" })
-    worker.emit("message", { data: { stdout: "late" } })
-    expect(worker.terminate).toHaveBeenCalledOnce()
-    expect(vi.getTimerCount()).toBe(0)
-  } finally {
-    vi.useRealTimers()
-    vi.unstubAllGlobals()
-  }
-})

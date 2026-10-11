@@ -29,13 +29,9 @@ export default function useSentenceFeedLayout(items) {
     }
 
     layout()
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(layout)
-    observer?.observe(container)
-    window.addEventListener("resize", layout)
-    return () => {
-      observer?.disconnect()
-      window.removeEventListener("resize", layout)
-    }
+    const observer = new ResizeObserver(layout)
+    observer.observe(container)
+    return () => observer.disconnect()
   }, [items])
 
   return { containerRef, height }

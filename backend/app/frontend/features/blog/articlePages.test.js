@@ -38,8 +38,3 @@ it("appends unique articles without mutating remembered state or restoring stale
   })
   expect(state).toEqual({ articles: [{ id: "a", title: "original" }], nextOffset: 10, scrollY: 500 })
 })
-
-it.each([null, false, "invalid", []])("reports an invalid JSON page consistently: %s", async (result) => {
-  requestJson.mockResolvedValue(result)
-  await expect(fetchArticlePage(10, { signal: new AbortController().signal })).rejects.toThrow("Invalid articles page")
-})

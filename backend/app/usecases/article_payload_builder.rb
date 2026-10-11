@@ -40,8 +40,6 @@ class ArticlePayloadBuilder
   def reading_time_minutes(character_count)
     return 0 unless character_count.positive?
 
-    characters_per_step = READING_CHARS_PER_MINUTE / READING_TIME_STEPS_PER_MINUTE
-    steps = (character_count + characters_per_step - 1) / characters_per_step
-    steps / READING_TIME_STEPS_PER_MINUTE.to_f
+    (character_count.to_f / READING_CHARS_PER_MINUTE * READING_TIME_STEPS_PER_MINUTE).ceil / READING_TIME_STEPS_PER_MINUTE.to_f
   end
 end

@@ -43,7 +43,7 @@ class RelatedArticlesBuilder
 
   def self.published_time(value)
     Time.iso8601(value).to_f if value.present?
-  rescue ArgumentError, TypeError
+  rescue ArgumentError
     nil
   end
   private_class_method :published_time

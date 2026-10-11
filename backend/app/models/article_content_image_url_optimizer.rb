@@ -48,10 +48,9 @@ class ArticleContentImageUrlOptimizer
     uri = URI.parse(url)
     return unless microcms_image_url?(uri)
 
-    src = optimized_url(uri)
     {
-      "src" => src,
-      "srcset" => responsive_srcset(uri, src:),
+      "src" => optimized_url(uri),
+      "srcset" => responsive_srcset(uri),
       "sizes" => RESPONSIVE_IMAGE_SIZES,
       "decoding" => "async"
     }
@@ -59,10 +58,9 @@ class ArticleContentImageUrlOptimizer
     nil
   end
 
-  def responsive_srcset(uri, src:)
+  def responsive_srcset(uri)
     RESPONSIVE_IMAGE_WIDTHS.map do |width|
-      url = width == OPTIMIZED_IMAGE_PARAMS.fetch("w").to_i ? src : optimized_url(uri, width:)
-      "#{url} #{width}w"
+      "#{optimized_url(uri, width:)} #{width}w"
     end.join(", ")
   end
 

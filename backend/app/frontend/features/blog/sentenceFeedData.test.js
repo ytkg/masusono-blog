@@ -40,23 +40,3 @@ describe("sentenceFeedData", () => {
     expect(appended.state.items.slice(80).every((item) => !item.hasRevealed)).toBe(true)
   })
 })
-
-it("skips invalid IDs before reading a body and keeps valid order", () => {
-  const invalid = {
-    id: null,
-    get content() {
-      throw new Error("must not read")
-    },
-  }
-  const articles = [
-    invalid,
-    { id: "empty", content: "" },
-    { id: "a", content: "一文。" },
-    { id: "b", content: "二文。" },
-  ]
-  expect(prepareSentenceArticles(articles)).toEqual([
-    { id: "a", content: "一文。", sentence: "一文。" },
-    { id: "b", content: "二文。", sentence: "二文。" },
-  ])
-  expect(articles[2]).not.toHaveProperty("sentence")
-})

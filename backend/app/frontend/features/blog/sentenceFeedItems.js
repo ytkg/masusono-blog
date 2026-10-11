@@ -12,8 +12,6 @@ export function shuffleArticles(articles) {
 }
 
 export function makeSentenceItems(source, count, cursor) {
-  if (source.length === 0) return { items: [], nextCursor: cursor, pool: source }
-
   const items = []
   let nextCursor = cursor
   let pool = source

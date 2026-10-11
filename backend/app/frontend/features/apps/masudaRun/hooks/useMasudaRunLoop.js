@@ -97,7 +97,7 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
     }
     resize()
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resize)
-    if (observer && canvasWrapRef.current) observer.observe(canvasWrapRef.current)
+    if (observer) observer.observe(canvasWrapRef.current)
     window.addEventListener("resize", resize)
     window.addEventListener("orientationchange", resize)
     return () => {

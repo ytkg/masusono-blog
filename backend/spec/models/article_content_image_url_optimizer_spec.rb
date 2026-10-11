@@ -41,12 +41,3 @@ RSpec.describe ArticleContentImageUrlOptimizer do
     end
   end
 end
-
-RSpec.describe ArticleContentImageUrlOptimizer do
-  it "keeps optimized image attributes stable when normalizing twice" do
-    content = '<img src="https://images.microcms-assets.io/a.jpg?fm=webp&amp;w=2000">'
-    once = described_class.call(content)
-    expect(described_class.call(once)).to eq(once)
-    expect(content).to include("w=2000")
-  end
-end

@@ -14,8 +14,6 @@ module Numbers
     end
 
     def call
-      return 0 if html.empty?
-
       visible_text.gsub(WHITESPACE_PATTERN, "").each_grapheme_cluster.count
     end
 

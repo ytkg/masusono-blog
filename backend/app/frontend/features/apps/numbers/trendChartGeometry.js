@@ -19,7 +19,6 @@ export function chartPointX(index, pointCount) {
 }
 
 export function chartPointIndex(clientX, rectangle, pointCount) {
-  if (pointCount <= 1 || rectangle.width <= 0) return 0
   const bounds = chartBounds()
   const x = ((clientX - rectangle.left) / rectangle.width) * CHART_WIDTH
   const ratio = Math.max(0, Math.min(1, (x - bounds.left) / (bounds.right - bounds.left)))
@@ -32,18 +31,18 @@ export function normalizePoints(points, seriesKey, maxChartValue) {
   const bounds = chartBounds()
   const usableHeight = bounds.bottom - bounds.top
 
-  const normalized = []
-  points.forEach((point, index) => {
+  return points.flatMap((point, index) => {
     const value = scaledSeriesValue(point, seriesKey)
-    if (!Number.isFinite(value)) return
+    if (!Number.isFinite(value)) return []
 
     const ratio = value / maxChartValue
-    normalized.push({
-      x: chartPointX(index, points.length),
-      y: bounds.bottom - usableHeight * ratio,
-    })
+    return [
+      {
+        x: chartPointX(index, points.length),
+        y: bounds.bottom - usableHeight * ratio,
+      },
+    ]
   })
-  return normalized
 }
 
 export function maxChartValue(points, series) {
