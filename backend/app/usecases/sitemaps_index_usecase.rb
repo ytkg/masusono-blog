@@ -5,10 +5,6 @@ class SitemapsIndexUsecase
   STATIC_ENTRIES = SitemapEntriesBuilder::STATIC_ENTRIES
 
   def self.call
-    new.call
-  end
-
-  def call
     {
       body: build_sitemap_xml(articles: Article.all, authors: Author.all),
       content_type: CONTENT_TYPE,
@@ -16,10 +12,9 @@ class SitemapsIndexUsecase
     }
   end
 
-  private
-
-  def build_sitemap_xml(articles:, authors:)
+  def self.build_sitemap_xml(articles:, authors:)
     entries = SitemapEntriesBuilder.call(articles:, authors:, base_url: BASE_URL)
     SitemapXmlBuilder.call(entries)
   end
+  private_class_method :build_sitemap_xml
 end
