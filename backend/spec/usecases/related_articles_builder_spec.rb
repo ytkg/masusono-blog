@@ -94,3 +94,13 @@ RSpec.describe RelatedArticlesBuilder do
     end
   end
 end
+
+RSpec.describe RelatedArticlesBuilder do
+  it "keeps matching articles with malformed date types at the end" do
+    allow(Article).to receive(:all).and_return([
+      { id: "wrong-type", tags: "Ruby", publishedAt: 123 },
+      { id: "dated", tags: "Ruby", publishedAt: "2026-01-01T00:00:00Z" }
+    ])
+    expect(described_class.call(article: { id: "current", tags: "Ruby" }).pluck(:id)).to eq([ "dated", "wrong-type" ])
+  end
+end
