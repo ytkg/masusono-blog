@@ -24,3 +24,23 @@ RSpec.describe NavigationFailurePayloadBuilder do
     end
   end
 end
+
+RSpec.describe NavigationFailurePayloadBuilder do
+  [ "/", "/about", "/others", "/search", "/authors", "/authors/a-1", "/numbers", "/articles/a_1", "/blog", "/blog/a-1" ].each do |path|
+    it "keeps public path #{path} without its query or fragment" do
+      expect(described_class.call("kind" => "http_exception", "path" => "#{path}?secret=value#private")[:path]).to eq(path)
+    end
+  end
+
+  it "keeps integer boundaries and boolean false, dropping values outside the bounds" do
+    params = { "kind" => "network_error", "status" => 100, "elapsed_ms" => 0, "prefetch_in_flight" => false }
+    expect(described_class.call(params)).to include(status: 100, elapsed_ms: 0, prefetch_in_flight: false)
+    expect(described_class.call(params.merge("status" => 599, "elapsed_ms" => 86_400_000))).to include(status: 599, elapsed_ms: 86_400_000)
+    expect(described_class.call(params.merge("status" => 600, "elapsed_ms" => -1, "prefetch_in_flight" => "false"))).to eq(kind: "network_error")
+  end
+
+  it "rejects unknown kinds and protocol-relative URLs" do
+    expect { described_class.call("kind" => "unknown") }.to raise_error(ArgumentError)
+    expect(described_class.call("kind" => "network_error", "path" => "//example.com/articles/a")).to eq(kind: "network_error")
+  end
+end
