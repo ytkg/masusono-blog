@@ -39,8 +39,10 @@ export const maybeSpawnObstacle = (w, W, dt) => {
 }
 
 export const updateObstacles = (w) => {
-  for (const o of w.obstacles) o.x -= w.speed
-  w.obstacles = w.obstacles.filter((o) => o.x + o.w > -10)
+  w.obstacles = w.obstacles.filter((o) => {
+    o.x -= w.speed
+    return o.x + o.w > -10
+  })
 }
 
 export const maybeSpawnCloud = (w, W, dt) => {
@@ -52,8 +54,10 @@ export const maybeSpawnCloud = (w, W, dt) => {
 }
 
 export const updateClouds = (w) => {
-  for (const c of w.clouds) c.x -= w.speed * 0.35 + c.speed
-  w.clouds = w.clouds.filter((c) => c.x + c.w > -20)
+  w.clouds = w.clouds.filter((c) => {
+    c.x -= w.speed * 0.35 + c.speed
+    return c.x + c.w > -20
+  })
 }
 
 export const updateScoreDisplay = (scoreRef, scoreDisplayRef, setScore) => {
