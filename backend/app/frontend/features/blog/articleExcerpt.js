@@ -8,7 +8,8 @@ function truncateText(text) {
     return text
   }
 
-  return `${text.slice(0, EXCERPT_MAX_LENGTH)}…`
+  const end = /[\uD800-\uDBFF]/.test(text[EXCERPT_MAX_LENGTH - 1]) ? EXCERPT_MAX_LENGTH - 1 : EXCERPT_MAX_LENGTH
+  return `${text.slice(0, end)}…`
 }
 
 export function buildArticleExcerpt(html, shouldCollapse) {

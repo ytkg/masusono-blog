@@ -12,7 +12,9 @@ export function firstSentenceFromHtml(html = "") {
     .trim()
   const match = firstSentenceBoundary(text)
 
-  return match ? text.slice(0, match.index + match[0].length).trim() : text.slice(0, 80)
+  if (match) return text.slice(0, match.index + match[0].length).trim()
+  const end = /[\uD800-\uDBFF]/.test(text[79]) ? 79 : 80
+  return text.slice(0, end)
 }
 
 function firstSentenceBoundary(text) {
