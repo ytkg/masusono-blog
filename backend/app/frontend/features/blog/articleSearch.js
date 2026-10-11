@@ -10,21 +10,27 @@ function parseSearchQuery(normalizedQuery) {
     .filter((group) => group.length)
 }
 
-export function articleMatchesQuery(article, normalizedQuery) {
-  if (!normalizedQuery) return true
+export function prepareArticleQuery(normalizedQuery) {
+  if (!normalizedQuery) return () => true
 
   const queryGroups = parseSearchQuery(normalizedQuery)
 
-  if (!queryGroups.length) return false
+  if (!queryGroups.length) return () => false
 
-  // Parse the body only for plain-text tokens, at most once per article/query.
-  let searchTarget
-  const getSearchTarget = () => {
-    searchTarget ??= [article?.title, article?.content, article?.author, article?.tags]
-      .map(normalizeArticleSearchText)
-      .join(" ")
-    return searchTarget
+  return (article) => {
+    // Parse the body only for plain-text tokens, at most once per article/query.
+    let searchTarget
+    const getSearchTarget = () => {
+      searchTarget ??= [article?.title, article?.content, article?.author, article?.tags]
+        .map(normalizeArticleSearchText)
+        .join(" ")
+      return searchTarget
+    }
+
+    return queryGroups.some((group) => group.every((token) => articleMatchesToken(article, token, getSearchTarget)))
   }
+}
 
-  return queryGroups.some((group) => group.every((token) => articleMatchesToken(article, token, getSearchTarget)))
+export function articleMatchesQuery(article, normalizedQuery) {
+  return prepareArticleQuery(normalizedQuery)(article)
 }
