@@ -20,3 +20,14 @@ RSpec.describe Numbers::AuthorRowsSorter do
     end
   end
 end
+
+RSpec.describe Numbers::AuthorRowsSorter do
+  it "sorts multiple numeric segments without modifying the original rows" do
+    authors = { "2班10号" => { articles: 3 }, "2班2号" => { articles: 2 }, "10班1号" => { articles: 1 }, "" => { articles: 0 } }
+    original = Marshal.load(Marshal.dump(authors))
+    result = described_class.call(authors:)
+    expect(result.map(&:first)).to eq([ "", "2班2号", "2班10号", "10班1号" ])
+    expect(authors).to eq(original)
+    expect(result.assoc("2班2号").last).to equal(authors["2班2号"])
+  end
+end
