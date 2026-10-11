@@ -2,19 +2,16 @@ export const attachKeyboardHandlers = (state, startOrRestart, doJump) => {
   const onKey = (e) => {
     if (e.repeat) return
     const isJumpKey = e.key === " " || e.key === "ArrowUp"
-    if (e.type === "keydown") {
-      if (isJumpKey) {
-        e.preventDefault()
-        if (state === "ready" || state === "gameover") {
-          startOrRestart()
-          return
-        }
-        doJump()
-      } else if ((e.key === "r" || e.key === "R") && state === "gameover") {
-        startOrRestart()
-      }
-    } else if (e.type === "keyup") {
+    if (e.type === "keyup") {
       if (isJumpKey) e.preventDefault()
+      return
+    }
+    if (isJumpKey) {
+      e.preventDefault()
+      if (state === "ready" || state === "gameover") return startOrRestart()
+      doJump()
+    } else if ((e.key === "r" || e.key === "R") && state === "gameover") {
+      startOrRestart()
     }
   }
   window.addEventListener("keydown", onKey)
