@@ -14,8 +14,8 @@ module DateDisplayFormatter
 
     date_only_match = trimmed.match(DATE_ONLY_PATTERN)
     if date_only_match
-      year, month, day = date_only_match.captures
-      return format_ymd(year.to_i, month.to_i, day.to_i)
+      year, month, day = date_only_match.captures.map(&:to_i)
+      return format_ymd(year, month, day)
     end
 
     format_timestamp(trimmed)

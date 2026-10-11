@@ -1,4 +1,5 @@
 class RelatedArticlesBuilder
+  MAX_ARTICLES = 3
   EXCLUDED_TAGS = %w[価値観 感情 自己理解 思い出 お金 節約 おすすめ].freeze
 
   def self.call(article:)
@@ -7,7 +8,7 @@ class RelatedArticlesBuilder
 
     # Article.all uses the public microCMS API, so unpublished/deleted articles
     # are absent. Fetch afresh to reflect publication and tag changes immediately.
-    ranked_candidates(article:, tags:).first(3).map { |candidate, _count, _time| candidate.slice(:id, :title) }
+    ranked_candidates(article:, tags:).first(MAX_ARTICLES).map { |candidate, _count, _time| candidate.slice(:id, :title) }
   rescue Microcms::FetchContentsService::FetchError, Faraday::Error, JSON::ParserError => error
     Rails.logger.warn("Related articles fetch failed: #{error.class.name}")
     []

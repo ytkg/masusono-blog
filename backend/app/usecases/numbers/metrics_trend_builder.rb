@@ -71,15 +71,13 @@ module Numbers
     end
 
     def grouped_article_events
-      @grouped_article_events ||= begin
-        articles.each_with_object({}) do |article, grouped|
-          date = article_date(article)
-          next if date.nil?
+      @grouped_article_events ||= articles.each_with_object({}) do |article, grouped|
+        date = article_date(article)
+        next if date.nil?
 
-          grouped[date] ||= initial_totals
-          grouped[date][:total_articles] += 1
-          grouped[date][:total_chars] += character_counter.call(article)
-        end
+        grouped[date] ||= initial_totals
+        grouped[date][:total_articles] += 1
+        grouped[date][:total_chars] += character_counter.call(article)
       end
     end
 
@@ -92,7 +90,7 @@ module Numbers
     end
 
     def latest_event_date
-      grouped_article_events.keys.max
+      grouped_article_events.each_key.max
     end
 
     def final_values
