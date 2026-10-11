@@ -9,6 +9,8 @@ import {
   CHART_WIDTH,
   CHART_HEIGHT,
   chartBounds,
+  chartPointX,
+  chartPointIndex,
   maxChartValue,
   chartDateLabels,
   trendSeriesStyles,
@@ -22,14 +24,12 @@ export default function TrendChartSvg({ trend }) {
   const chartMaxValue = maxChartValue(trend.points, trend.series)
   const dateLabels = chartDateLabels(trend.points)
   const selectedPoint = trend.points[selectedIndex]
-  const selectedX = bounds.left + ((bounds.right - bounds.left) * selectedIndex) / Math.max(trend.points.length - 1, 1)
+  const selectedX = chartPointX(selectedIndex, trend.points.length)
 
   const selectPoint = (event) => {
     const rectangle = event.currentTarget.getBoundingClientRect()
     if (rectangle.width === 0) return
-    const x = ((event.clientX - rectangle.left) / rectangle.width) * CHART_WIDTH
-    const ratio = Math.max(0, Math.min(1, (x - bounds.left) / (bounds.right - bounds.left)))
-    setSelectedIndex(Math.round(ratio * (trend.points.length - 1)))
+    setSelectedIndex(chartPointIndex(event.clientX, rectangle, trend.points.length))
   }
 
   const handleKeyDown = (event) => {
