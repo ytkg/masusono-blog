@@ -1,10 +1,17 @@
-import { chartBounds } from "./trendChartGeometry"
+import { chartPointX } from "./trendChartGeometry"
 
-export { CHART_WIDTH, CHART_HEIGHT, chartBounds, normalizePoints, maxChartValue } from "./trendChartGeometry"
+export {
+  CHART_WIDTH,
+  CHART_HEIGHT,
+  chartBounds,
+  chartPointX,
+  chartPointIndex,
+  normalizePoints,
+  maxChartValue,
+} from "./trendChartGeometry"
 export { smoothPath } from "./trendChartPath"
 
 export function chartDateLabels(points) {
-  const bounds = chartBounds()
   if (points.length === 0) return []
   const lastIndex = points.length - 1
   const denominator = Math.max(lastIndex, 1)
@@ -14,7 +21,7 @@ export function chartDateLabels(points) {
     return {
       key: point.date,
       label: shortDateLabel(point.label ?? point.date),
-      x: bounds.left + ((bounds.right - bounds.left) * index) / denominator,
+      x: chartPointX(index, points.length),
       textAnchor: index === 0 ? "start" : index === denominator ? "end" : "middle",
     }
   })
