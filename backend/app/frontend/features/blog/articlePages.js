@@ -2,9 +2,9 @@ import { requestJson } from "@/shared/lib/fetchJson"
 
 export async function fetchArticlePage(offset, { signal }) {
   const result = await requestJson(`/api/app/articles?offset=${offset}`, { signal })
-  const nextOffset = result.pagination?.nextOffset
+  const nextOffset = result?.pagination?.nextOffset
   if (
-    !Array.isArray(result.articles) ||
+    !Array.isArray(result?.articles) ||
     (nextOffset !== null && (!Number.isInteger(nextOffset) || nextOffset <= offset))
   ) {
     throw new Error("Invalid articles page")
