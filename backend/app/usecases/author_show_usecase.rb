@@ -16,8 +16,8 @@ class AuthorShowUsecase
 
     {
       props: {
-        author: author,
-        articles: articles
+        author:,
+        articles:
       },
       status: :ok
     }

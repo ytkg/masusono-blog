@@ -1,3 +1,8 @@
+const HOLE_COUNT = 9
+const BASE_HIT_POINTS = 100
+const HIT_DISPLAY_DURATION_MS = 220
+const OTHER_IMAGE_COUNT = 2
+
 export const DURATION = 30000
 export const MASUDA_RATIO = 0.75
 export const MAX_CHARACTERS = 3
@@ -24,7 +29,7 @@ export const pace = (elapsed) => PACES.find(([minimum]) => elapsed >= minimum).s
 export const initialGame = () => ({
   elapsed: 0,
   nextSpawn: 0,
-  holes: Array(9).fill(null),
+  holes: Array(HOLE_COUNT).fill(null),
   score: 0,
   combo: 0,
   maxCombo: 0,
@@ -40,7 +45,7 @@ export function advance(game, elapsed, random = Math.random) {
     if (character.kind === "masuda" && !character.hit) next.combo = 0
     return null
   })
-  if (next.elapsed >= DURATION) return { ...next, holes: Array(9).fill(null) }
+  if (next.elapsed >= DURATION) return { ...next, holes: Array(HOLE_COUNT).fill(null) }
   if (elapsed < next.nextSpawn) return next
   const [interval, lifetime] = pace(elapsed)
   next.nextSpawn = elapsed + interval
@@ -50,7 +55,7 @@ export function advance(game, elapsed, random = Math.random) {
   const kind = random() < MASUDA_RATIO ? "masuda" : "other"
   next.holes[index] = {
     kind,
-    image: kind === "masuda" ? 0 : 1 + Math.floor(random() * 2),
+    image: kind === "masuda" ? 0 : 1 + Math.floor(random() * OTHER_IMAGE_COUNT),
     until: elapsed + lifetime,
     hit: false,
   }
@@ -61,9 +66,14 @@ export function hit(game, index) {
   const character = game.holes[index]
   if (game.elapsed >= DURATION || !character || character.hit) return game
   const combo = character.kind === "masuda" ? game.combo + 1 : 0
-  const points = character.kind === "masuda" ? 100 * multiplier(combo) : -100
+  const points = character.kind === "masuda" ? BASE_HIT_POINTS * multiplier(combo) : -BASE_HIT_POINTS
   const holes = [...game.holes]
-  holes[index] = { ...character, hit: true, points, until: Math.min(character.until, game.elapsed + 220) }
+  holes[index] = {
+    ...character,
+    hit: true,
+    points,
+    until: Math.min(character.until, game.elapsed + HIT_DISPLAY_DURATION_MS),
+  }
   return {
     ...game,
     holes,

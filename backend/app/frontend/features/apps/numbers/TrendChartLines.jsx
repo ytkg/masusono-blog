@@ -1,9 +1,11 @@
 import { normalizePoints, smoothPath } from "./trendChartData"
 
+const GRID_RATIOS = [0, 0.5, 1]
+
 export default function TrendChartLines({ trend, bounds, chartMaxValue, dateLabels, seriesColors, theme }) {
   return (
     <>
-      {[0, 0.5, 1].map((ratio) => {
+      {GRID_RATIOS.map((ratio) => {
         const y = bounds.bottom - (bounds.bottom - bounds.top) * ratio
         return <line key={ratio} x1={bounds.left} y1={y} x2={bounds.right} y2={y} stroke={theme.palette.divider} />
       })}

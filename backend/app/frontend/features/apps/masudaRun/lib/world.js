@@ -1,12 +1,14 @@
 import { CFG, HIT_H, HIT_W, HIGH_SCORE_KEY } from "./constants"
 
+const INITIAL_PLAYER_X = 60
+
 export function createInitialWorld() {
   const groundY = Math.round(CFG.BASE_H * CFG.GROUND_RATIO)
   return {
     t: 0,
     speed: CFG.SPEED_BASE,
     groundY,
-    player: { x: 60, y: groundY - HIT_H, vy: 0, w: HIT_W, h: HIT_H, onGround: true, jumps: 0, spin: 0 },
+    player: { x: INITIAL_PLAYER_X, y: groundY - HIT_H, vy: 0, w: HIT_W, h: HIT_H, onGround: true, jumps: 0, spin: 0 },
     gravity: CFG.GRAVITY,
     obstacles: [],
     nextSpawn: 0,

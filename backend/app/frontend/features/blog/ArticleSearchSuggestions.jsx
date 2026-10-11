@@ -14,12 +14,7 @@ const READING_TIME_SUGGESTIONS = Object.freeze(
 )
 
 function extractArticleTags(articles) {
-  const tags = new Set()
-  articles.forEach((article) => {
-    parseArticleTags(article.tags || "").forEach((tag) => tags.add(tag))
-  })
-
-  return Array.from(tags)
+  return [...new Set(articles.flatMap((article) => parseArticleTags(article.tags || "")))]
 }
 
 function extractArticleAuthors(articles) {
