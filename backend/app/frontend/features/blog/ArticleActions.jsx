@@ -1,6 +1,6 @@
-import { navigationNoticeBottomSx } from "../../shared/pageLayout"
+import { navigationNoticeBottomSx } from "../../layouts/pageLayout"
 import { useState } from "react"
-import AuxiliaryIconButton from "../../shared/AuxiliaryIconButton"
+import AuxiliaryIconButton from "../../shared/components/AuxiliaryIconButton"
 import Button from "@mui/material/Button"
 import StatusAlert from "@/shared/components/StatusAlert"
 import Menu from "@mui/material/Menu"

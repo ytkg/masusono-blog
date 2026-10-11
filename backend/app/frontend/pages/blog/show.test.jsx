@@ -13,7 +13,7 @@ const { seoMock } = vi.hoisted(() => ({
   seoMock: vi.fn(() => null),
 }))
 
-vi.mock("../../shared/SeoHead", () => ({
+vi.mock("../../shared/components/SeoHead", () => ({
   default: seoMock,
 }))
 

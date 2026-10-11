@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import NumbersIndex from "./index"
 
-vi.mock("../../shared/SeoHead", () => ({
+vi.mock("../../shared/components/SeoHead", () => ({
   default: ({ title, canonicalPath }) => <div>{`seo:${title}:${canonicalPath}`}</div>,
 }))
 

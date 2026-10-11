@@ -1,6 +1,6 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import SectionHeading from "@/shared/SectionHeading"
+import SectionHeading from "@/shared/components/SectionHeading"
 import NumbersMetricsTable from "./NumbersMetricsTable"
 import NumbersTrendChart from "./NumbersTrendChart"
 

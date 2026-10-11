@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { trackPageView } from "./lib/analytics"
+import { trackPageView } from "../lib/analytics"
 import { Head } from "@inertiajs/react"
 
 const SITE_TITLE = "増田とその他！"

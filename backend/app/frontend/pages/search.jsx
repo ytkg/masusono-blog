@@ -5,8 +5,8 @@ import ArticleSearchSuggestions from "../features/blog/ArticleSearchSuggestions"
 import { normalizeArticleSearchText, prepareArticleQuery } from "../features/blog/articleSearch"
 import ArticlesList from "../features/blog/ArticlesList"
 import useArticleSearchQuery from "../features/blog/useArticleSearchQuery"
-import PageContainer from "../shared/PageContainer"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../shared/components/PageContainer"
+import SeoHead from "../shared/components/SeoHead"
 
 export default function Search({ articles = [] }) {
   const [query, setQuery, pushQuery] = useArticleSearchQuery()

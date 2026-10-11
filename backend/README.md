@@ -406,7 +406,7 @@ gcloud run deploy <ブランチに対応するサービス名> \
 
 記事詳細（`/articles/:id`）だけをInertia SSRで描画し、本文・リンク・SEO情報を初回HTMLに含めます。検索からの記事流入を優先し、全記事のSSRで初期応答が遅くなったホーム・著者ページはブラウザ描画に戻しています。紹介・検索・ミニアプリ・数字ページもブラウザで描画します。
 
-描画構成は `shared/InertiaApp.jsx` でブラウザとSSRに共通化しています。`ArticleBody` は抜粋と展開を担当し、`ArticleHtml` はSSRと初回描画のHTMLを揃え、コード操作部品をマウント後に読み込みます。HTMLからの文字抽出は、ブラウザでは非表示のtemplate、SSRではparse5を使います。
+描画構成は `application/InertiaApp.jsx` でブラウザとSSRに共通化しています。`ArticleBody` は抜粋と展開を担当し、`ArticleHtml` はSSRと初回描画のHTMLを揃え、コード操作部品をマウント後に読み込みます。HTMLからの文字抽出は、ブラウザでは非表示のtemplate、SSRではparse5を使います。
 
 トップページと追加取得APIは `ArticlesPageQuery` で同じ記事・ページング情報を作り、それぞれのusecaseがpropsまたはJSONとして返します。フロントエンドでは `articlePages.js` がレスポンス検証と重複除去、`useHomeArticles` が取得状態、`useHomeScrollRestoration` が履歴復元を担当します。自動取得の距離は `HOME_TABS` にタブごとに定義しています。
 

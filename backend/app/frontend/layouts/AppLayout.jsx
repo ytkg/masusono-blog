@@ -2,7 +2,7 @@ import Box from "@mui/material/Box"
 import Container from "@mui/material/Container"
 import FloatingBottomNavigation from "../components/FloatingBottomNavigation"
 import Header from "../components/Header"
-import { PAGE_MAX_WIDTH } from "../shared/pageLayout"
+import { PAGE_MAX_WIDTH } from "./pageLayout"
 
 export default function AppLayout({ children }) {
   return (

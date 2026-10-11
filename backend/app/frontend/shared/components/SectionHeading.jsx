@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography"
-import { sectionHeadingTextSx } from "./typographyStyles"
+import { sectionHeadingTextSx } from "../styles/typographyStyles"
 
 export default function SectionHeading({ children, variant = "h6", component = "h2", gutterBottom = true, sx }) {
   return (

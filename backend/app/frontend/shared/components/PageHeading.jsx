@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography"
-import { titleTextSx } from "./typographyStyles"
+import { titleTextSx } from "../styles/typographyStyles"
 
 export default function PageHeading({ children }) {
   return (

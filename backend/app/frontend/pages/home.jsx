@@ -1,4 +1,4 @@
-import { HEADER_HEIGHT } from "../shared/pageLayout"
+import { HEADER_HEIGHT } from "../layouts/pageLayout"
 import useHomeTabState from "../features/blog/useHomeTabState"
 import useHomeArticles from "../features/blog/useHomeArticles"
 import LoadMoreArticles from "../features/blog/LoadMoreArticles"
@@ -8,8 +8,8 @@ import Tab from "@mui/material/Tab"
 import Tabs from "@mui/material/Tabs"
 import { ensureUserIdCookie } from "@/shared/lib/userId"
 import { HOME_TABS } from "../features/blog/HomeTabs"
-import PageContainer from "../shared/PageContainer"
-import SeoHead from "../shared/SeoHead"
+import PageContainer from "../shared/components/PageContainer"
+import SeoHead from "../shared/components/SeoHead"
 
 const HOME_TAB_HEIGHT = 38
 const compactTabSx = {

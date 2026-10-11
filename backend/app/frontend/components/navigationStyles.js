@@ -8,8 +8,8 @@ import {
   NAVIGATION_BORDER_WIDTH,
   navigationBottomSx,
   PAGE_INNER_MAX_WIDTH,
-} from "../shared/pageLayout"
-import { MAIN_NAVIGATION_LINKS } from "../shared/mainNavigationLinks"
+} from "../layouts/pageLayout"
+import { MAIN_NAVIGATION_LINKS } from "./mainNavigationLinks"
 
 const INDICATOR_HALF_WIDTH = 16
 const INDICATOR_TRANSITION_DURATION = 280

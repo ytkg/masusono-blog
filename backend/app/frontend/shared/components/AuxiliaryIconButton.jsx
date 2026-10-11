@@ -1,4 +1,4 @@
-import { focusRingSx } from "./focusStyles"
+import { focusRingSx } from "../styles/focusStyles"
 import IconButton from "@mui/material/IconButton"
 
 const auxiliaryIconButtonSx = {

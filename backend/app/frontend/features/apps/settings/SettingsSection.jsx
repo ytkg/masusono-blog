@@ -1,4 +1,4 @@
-import { itemLabelTextSx } from "@/shared/typographyStyles"
+import { itemLabelTextSx } from "@/shared/styles/typographyStyles"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Typography from "@mui/material/Typography"

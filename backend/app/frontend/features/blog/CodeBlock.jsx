@@ -1,4 +1,4 @@
-import { supportingActionSx } from "../../shared/supportingActionStyles"
+import { supportingActionSx } from "../../shared/styles/supportingActionStyles"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import HighlightedCode from "./HighlightedCode"

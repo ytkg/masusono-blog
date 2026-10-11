@@ -1,6 +1,6 @@
-import PageHeading from "../../shared/PageHeading"
-import PageContainer from "../../shared/PageContainer"
-import SeoHead from "../../shared/SeoHead"
+import PageHeading from "../../shared/components/PageHeading"
+import PageContainer from "../../shared/components/PageContainer"
+import SeoHead from "../../shared/components/SeoHead"
 import AuthorsList from "../../features/authors/AuthorsList"
 
 export default function AuthorsIndex({ authors = [] }) {

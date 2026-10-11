@@ -1,8 +1,8 @@
-import { HEADER_HEIGHT } from "../../shared/pageLayout"
+import { HEADER_HEIGHT } from "../../layouts/pageLayout"
 import CloseIcon from "@mui/icons-material/Close"
 import SearchIcon from "@mui/icons-material/Search"
 import Box from "@mui/material/Box"
-import AuxiliaryIconButton from "../../shared/AuxiliaryIconButton"
+import AuxiliaryIconButton from "../../shared/components/AuxiliaryIconButton"
 import InputAdornment from "@mui/material/InputAdornment"
 import TextField from "@mui/material/TextField"
 

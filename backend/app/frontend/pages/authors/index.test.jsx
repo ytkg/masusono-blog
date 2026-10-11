@@ -12,7 +12,7 @@ const authors = [
   },
 ]
 
-vi.mock("../../shared/SeoHead", () => ({
+vi.mock("../../shared/components/SeoHead", () => ({
   default: ({ title, canonicalPath }) => <div>{`seo:${title}:${canonicalPath}`}</div>,
 }))
 

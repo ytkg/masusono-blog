@@ -1,8 +1,8 @@
 import { lazy, Suspense } from "react"
 import Box from "@mui/material/Box"
-import PageContainer from "../../shared/PageContainer"
-import PageHeading from "../../shared/PageHeading"
-import SeoHead from "../../shared/SeoHead"
+import PageContainer from "../../shared/components/PageContainer"
+import PageHeading from "../../shared/components/PageHeading"
+import SeoHead from "../../shared/components/SeoHead"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
 const MasudaTatakiApp = lazy(() => import("../../features/apps/masudaTataki/MasudaTatakiApp"))

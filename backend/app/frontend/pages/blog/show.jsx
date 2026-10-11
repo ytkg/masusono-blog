@@ -1,6 +1,6 @@
-import PageContainer from "../../shared/PageContainer"
+import PageContainer from "../../shared/components/PageContainer"
 import ArticleCard from "../../features/blog/ArticleCard"
-import SeoHead from "../../shared/SeoHead"
+import SeoHead from "../../shared/components/SeoHead"
 
 function extractMetaDescription(content) {
   const plainText =

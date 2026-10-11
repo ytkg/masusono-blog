@@ -2,8 +2,8 @@ import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import ArticlesList from "../../features/blog/ArticlesList"
-import PageContainer from "../../shared/PageContainer"
-import SeoHead from "../../shared/SeoHead"
+import PageContainer from "../../shared/components/PageContainer"
+import SeoHead from "../../shared/components/SeoHead"
 
 import AuthorProfile from "../../features/authors/AuthorProfile"
 
