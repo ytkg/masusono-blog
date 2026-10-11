@@ -127,34 +127,16 @@ function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUn
   )
 }
 
-function BrowserIdSection() {
+function BrowserIdDisplay() {
   const [browserId, setBrowserId] = useState("")
-  const [message, setMessage] = useState("")
   useEffect(() => {
     setBrowserId(ensureUserIdCookie() ?? "")
   }, [])
 
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(browserId)
-      setMessage("コピーしました")
-    } catch {
-      setMessage("IDを選択して手動でコピーしてください。")
-    }
-  }
-
   return (
-    <SettingsSection label="このブラウザのID">
-      <Typography component="p" sx={{ overflowWrap: "anywhere", userSelect: "text" }}>
-        {browserId || "IDを保存できません。このブラウザのCookie設定を確認してください。"}
-      </Typography>
-      <Button variant="outlined" size="small" disabled={!browserId} onClick={copy}>
-        IDをコピー
-      </Button>
-      <Typography variant="body2" sx={supportingTextSx} role="status">
-        {message}
-      </Typography>
-    </SettingsSection>
+    <Typography variant="caption" color="text.secondary" sx={{ overflowWrap: "anywhere", userSelect: "text" }}>
+      ユーザーID：{browserId || "IDを保存できません。このブラウザのCookie設定を確認してください。"}
+    </Typography>
   )
 }
 
@@ -177,7 +159,6 @@ export function SettingsContent({ loadOnMount = false }) {
         onSave={saveName}
         onDraftChange={setDraftName}
       />
-      <BrowserIdSection />
       <NotificationsSection
         state={notifications.state}
         isSaving={notifications.isSaving}
@@ -185,6 +166,7 @@ export function SettingsContent({ loadOnMount = false }) {
         onSubscribe={notifications.subscribe}
         onUnsubscribe={notifications.unsubscribe}
       />
+      <BrowserIdDisplay />
     </Box>
   )
 }

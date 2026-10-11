@@ -136,21 +136,8 @@ describe("SettingsContent", () => {
     expect(await screen.findByText("ブラウザのサイト設定から通知を許可してください。")).toBeInTheDocument()
     expect(screen.getByRole("switch", { name: "新着記事の通知" })).toBeDisabled()
   })
-  it("現在のCookieのIDをコピーする", async () => {
-    const writeText = vi.fn().mockResolvedValue()
-    vi.stubGlobal("navigator", { clipboard: { writeText } })
+  it("現在のCookieのIDをユーザーIDとして表示する", () => {
     render(<SettingsContent />)
-    expect(screen.getByText("cookie-user")).toBeInTheDocument()
-    fireEvent.click(screen.getByRole("button", { name: "IDをコピー" }))
-    await screen.findByText("コピーしました")
-    expect(writeText).toHaveBeenCalledWith("cookie-user")
-  })
-
-  it("コピーできない場合は選択できるIDと手動コピーの案内を残す", async () => {
-    vi.stubGlobal("navigator", {})
-    render(<SettingsContent />)
-    fireEvent.click(screen.getByRole("button", { name: "IDをコピー" }))
-    await screen.findByText("IDを選択して手動でコピーしてください。")
-    expect(screen.getByText("cookie-user")).toBeInTheDocument()
+    expect(screen.getByText("ユーザーID：cookie-user")).toBeInTheDocument()
   })
 })
