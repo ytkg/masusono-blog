@@ -8,9 +8,20 @@ export async function runRubyCode(code) {
   }
 
   return new Promise((resolve) => {
-    const worker = new Worker(new URL("./rubyCodeRunner.worker.js", import.meta.url), { type: "module" })
+    let worker
+    try {
+      worker = new Worker(new URL("./rubyCodeRunner.worker.js", import.meta.url), { type: "module" })
+    } catch (error) {
+      resolve(errorResult(formatError(error)))
+      return
+    }
+    let finished = false
+    const timer = setTimeout(() => finish(errorResult("Ruby 実行がタイムアウトしました。")), 60_000)
 
     const finish = (result) => {
+      if (finished) return
+      finished = true
+      clearTimeout(timer)
       worker.terminate()
       resolve(result)
     }
@@ -39,7 +50,11 @@ export async function runRubyCode(code) {
       { once: true },
     )
 
-    worker.postMessage({ code })
+    try {
+      worker.postMessage({ code })
+    } catch (error) {
+      finish(errorResult(formatError(error)))
+    }
   })
 }
 
