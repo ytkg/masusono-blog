@@ -1,0 +1,63 @@
+import { useEffect, useRef, useState } from "react"
+import { advance, DURATION, hit, initialGame } from "./game"
+
+const getTime = () => performance.now()
+
+export function useMasudaTatakiGame(active) {
+  const [phase, setPhase] = useState("title")
+  const [countdown, setCountdown] = useState(3)
+  const [game, setGame] = useState(initialGame)
+  const gameRef = useRef(game)
+  const startedAt = useRef(0)
+
+  useEffect(() => {
+    if (!active || phase !== "countdown") return
+    const started = performance.now()
+    const timer = window.setInterval(() => {
+      const remaining = 3 - Math.floor((performance.now() - started) / 1000)
+      setCountdown(Math.max(1, remaining))
+      if (remaining <= 0) setPhase("playing")
+    }, 50)
+    return () => window.clearInterval(timer)
+  }, [active, phase])
+
+  useEffect(() => {
+    if (!active || phase !== "playing") return
+    const started = performance.now() - gameRef.current.elapsed
+    startedAt.current = started
+    const timer = window.setInterval(() => {
+      const next = advance(gameRef.current, performance.now() - started)
+      gameRef.current = next
+      setGame(next)
+      if (next.elapsed >= DURATION) {
+        setPhase("timeup")
+      }
+    }, 30)
+    return () => window.clearInterval(timer)
+  }, [active, phase])
+
+  useEffect(() => {
+    if (!active || phase !== "timeup") return
+    const timer = window.setTimeout(() => setPhase("result"), 1000)
+    return () => window.clearTimeout(timer)
+  }, [active, phase])
+
+  const start = () => {
+    const next = initialGame()
+    gameRef.current = next
+    setGame(next)
+    setCountdown(3)
+    setPhase("countdown")
+  }
+  const tap = (index) => {
+    if (!active || phase !== "playing") return
+    // 描画を待たずに更新し、同じフレーム内の連打も一度だけ採点する。
+    const now = advance(gameRef.current, getTime() - startedAt.current)
+    const next = hit(now, index)
+    if (next === now) return
+    gameRef.current = next
+    setGame(next)
+  }
+
+  return { phase, countdown, game, start, tap }
+}

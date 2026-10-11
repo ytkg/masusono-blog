@@ -1,24 +1,18 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import { useAppLoading } from "../shared/AppsLoadingContext"
 import { IMAGES, loadImages } from "./assets"
-import { advance, DURATION, hit, initialGame, multiplier, rank } from "./game"
+import { DURATION, multiplier, rank } from "./game"
+import { useMasudaTatakiGame } from "./useMasudaTatakiGame"
 import { FieldGround } from "./TatakiFieldArt"
 import MasudaTatakiHole from "./MasudaTatakiHole"
-
-const getTime = () => performance.now()
 
 export default function MasudaTatakiGame({ active = true }) {
   const registerLoadingTask = useAppLoading()
   const [assets, setAssets] = useState("loading")
   const [attempt, setAttempt] = useState(0)
-  const [phase, setPhase] = useState("title")
-  const [countdown, setCountdown] = useState(3)
-  const [game, setGame] = useState(initialGame)
-  const gameRef = useRef(game)
-  const startedAt = useRef(0)
 
   useEffect(() => {
     let disposed = false
@@ -36,54 +30,7 @@ export default function MasudaTatakiGame({ active = true }) {
     }
   }, [registerLoadingTask, attempt])
 
-  useEffect(() => {
-    if (!active || phase !== "countdown") return
-    const started = performance.now()
-    const timer = window.setInterval(() => {
-      const remaining = 3 - Math.floor((performance.now() - started) / 1000)
-      setCountdown(Math.max(1, remaining))
-      if (remaining <= 0) setPhase("playing")
-    }, 50)
-    return () => window.clearInterval(timer)
-  }, [active, phase])
-
-  useEffect(() => {
-    if (!active || phase !== "playing") return
-    const started = performance.now() - gameRef.current.elapsed
-    startedAt.current = started
-    const timer = window.setInterval(() => {
-      const next = advance(gameRef.current, performance.now() - started)
-      gameRef.current = next
-      setGame(next)
-      if (next.elapsed >= DURATION) {
-        setPhase("timeup")
-      }
-    }, 30)
-    return () => window.clearInterval(timer)
-  }, [active, phase])
-
-  useEffect(() => {
-    if (!active || phase !== "timeup") return
-    const timer = window.setTimeout(() => setPhase("result"), 1000)
-    return () => window.clearTimeout(timer)
-  }, [active, phase])
-
-  const start = () => {
-    const next = initialGame()
-    gameRef.current = next
-    setGame(next)
-    setCountdown(3)
-    setPhase("countdown")
-  }
-  const tap = (index) => {
-    if (!active || phase !== "playing") return
-    // 描画を待たずに更新し、同じフレーム内の連打も一度だけ採点する。
-    const now = advance(gameRef.current, getTime() - startedAt.current)
-    const next = hit(now, index)
-    if (next === now) return
-    gameRef.current = next
-    setGame(next)
-  }
+  const { phase, countdown, game, start, tap } = useMasudaTatakiGame(active)
 
   return (
     <Box
