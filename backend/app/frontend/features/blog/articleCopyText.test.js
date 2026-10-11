@@ -24,3 +24,9 @@ describe("buildArticleCopyText", () => {
     expect(buildArticleCopyText({})).toBe("")
   })
 })
+
+it("omits inert template and fallback content from copied text", () => {
+  expect(
+    buildArticleCopyText({ content: "<p>本文</p><template>hidden</template><noscript>fallback</noscript><p>末尾</p>" }),
+  ).toBe("本文\n\n末尾")
+})
