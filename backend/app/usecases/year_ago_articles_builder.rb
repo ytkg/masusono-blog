@@ -1,4 +1,6 @@
 class YearAgoArticlesBuilder
+  JST_OFFSET = "+09:00".freeze
+
   def self.call(article:)
     date = published_time(article[:publishedAt])&.to_date
     return [] unless date
@@ -30,7 +32,7 @@ class YearAgoArticlesBuilder
   private_class_method :candidate_match
 
   def self.date_filters(target)
-    start_time = Time.new(target.year, target.month, target.day, 0, 0, 0, "+09:00").utc
+    start_time = Time.new(target.year, target.month, target.day, 0, 0, 0, JST_OFFSET).utc
     # microCMS's greater_than is exclusive; include midnight with a millisecond margin.
     "publishedAt[greater_than]#{(start_time - Rational(1, 1000)).iso8601(3)}" \
       "[and]publishedAt[less_than]#{(start_time + 1.day).iso8601(3)}"
@@ -38,7 +40,7 @@ class YearAgoArticlesBuilder
   private_class_method :date_filters
 
   def self.published_time(value)
-    Time.iso8601(value).getlocal("+09:00") if value.present?
+    Time.iso8601(value).getlocal(JST_OFFSET) if value.present?
   rescue ArgumentError, TypeError
     nil
   end

@@ -29,8 +29,10 @@ class SitemapXmlBuilder
   attr_reader :entries
 
   def entry_lines(entry)
-    lines = [ "  <url>" ]
-    lines << "    <loc>#{escape_xml(entry[:loc])}</loc>"
+    lines = [
+      "  <url>",
+      "    <loc>#{escape_xml(entry[:loc])}</loc>"
+    ]
     lastmod = format_xml_date(entry[:lastmod], &:iso8601)
     lines << "    <lastmod>#{escape_xml(lastmod)}</lastmod>" if lastmod
     lines << "    <changefreq>#{escape_xml(entry[:changefreq])}</changefreq>" if entry[:changefreq]

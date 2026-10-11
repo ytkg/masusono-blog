@@ -29,8 +29,7 @@ class RssXmlBuilder
       lines.concat(item_lines(item))
     end
 
-    lines << "  </channel>"
-    lines << "</rss>"
+    lines.concat([ "  </channel>", "</rss>" ])
     "#{lines.join("\n")}\n"
   end
 

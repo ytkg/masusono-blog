@@ -2,6 +2,7 @@ class ArticlePayloadBuilder
   include AuthorNameExtractor
 
   READING_CHARS_PER_MINUTE = 400
+  READING_TIME_STEPS_PER_MINUTE = 2
 
   def self.call(article:)
     new(article:).call
@@ -39,6 +40,6 @@ class ArticlePayloadBuilder
   def reading_time_minutes(character_count)
     return 0 unless character_count.positive?
 
-    (character_count.to_f / READING_CHARS_PER_MINUTE * 2).ceil / 2.0
+    (character_count.to_f / READING_CHARS_PER_MINUTE * READING_TIME_STEPS_PER_MINUTE).ceil / READING_TIME_STEPS_PER_MINUTE.to_f
   end
 end
