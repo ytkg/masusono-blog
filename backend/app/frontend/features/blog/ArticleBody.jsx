@@ -15,12 +15,11 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
 
   const { excerpt, canExpand } = shouldCollapse ? buildArticleExcerpt(html, true) : { canExpand: false }
   const showsHtml = !shouldCollapse || isExpanded || !canExpand
-  const showsRubyRunner = enableRubyRunner && showsHtml
 
   return (
     <Box sx={{ display: "grid", gap: 1 }}>
       {showsHtml ? (
-        <ArticleHtml enableRubyRunner={showsRubyRunner} html={html} />
+        <ArticleHtml enableRubyRunner={enableRubyRunner} html={html} />
       ) : (
         <Typography sx={{ ...articleBodyTextSx, color: "text.primary", overflowWrap: "anywhere" }}>
           {excerpt}
