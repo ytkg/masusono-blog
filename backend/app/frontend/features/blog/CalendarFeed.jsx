@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from "react"
 import Accordion from "@mui/material/Accordion"
 import AccordionDetails from "@mui/material/AccordionDetails"
 import AccordionSummary from "@mui/material/AccordionSummary"
@@ -6,34 +5,12 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
-import { requestJson } from "@/shared/lib/fetchJson"
-import useImmediateRemember from "@/shared/hooks/useImmediateRemember"
+import useCalendarFeed from "./useCalendarFeed"
 import EmptyStatus from "../../shared/components/EmptyStatus"
 import ArticlesList from "./ArticlesList"
 
 export default function CalendarFeed() {
-  const { state: groups, commit } = useImmediateRemember(null, "home-calendar")
-  const { state: expandedMonths, commit: commitExpandedMonths } = useImmediateRemember([], "home-calendar-months")
-  const [attempt, setAttempt] = useState(0)
-  const [failed, setFailed] = useState(false)
-  const retry = useCallback(() => {
-    setFailed(false)
-    setAttempt((value) => value + 1)
-  }, [])
-
-  useEffect(() => {
-    if (groups !== null) return
-    const controller = new AbortController()
-    requestJson("/api/app/calendar_articles", { signal: controller.signal })
-      .then((result) => {
-        if (!Array.isArray(result.groups)) throw new Error("Invalid calendar articles")
-        if (!controller.signal.aborted) commit(result.groups)
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setFailed(true)
-      })
-    return () => controller.abort()
-  }, [groups, commit, attempt])
+  const { groups, expandedMonths, failed, retry, changeMonth } = useCalendarFeed()
 
   if (groups === null) {
     return (
@@ -52,10 +29,6 @@ export default function CalendarFeed() {
     const month = group.monthDay.split("/")[0]
     if (!months.has(month)) months.set(month, [])
     months.get(month).push(group)
-  }
-
-  function changeMonth(month, expanded) {
-    commitExpandedMonths(expanded ? [month] : [])
   }
 
   return (
