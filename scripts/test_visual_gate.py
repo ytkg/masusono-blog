@@ -81,6 +81,19 @@ class VisualGateTest(unittest.TestCase):
     def remote_task(self):
         return self.git("ls-remote", "origin", "refs/heads/task")
 
+    def test_old_checkout_secrets_and_databases_remain_untracked(self):
+        shutil.copy2(SCRIPTS.parent / ".gitignore", self.root / ".gitignore")
+        for path in ("backend/config/master.key", "backend/storage/development.sqlite3",
+                     "backend/public/vite/assets/app.js", "config/master.key"):
+            target = self.root / path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text("fixture, not a real secret")
+            with self.subTest(path=path):
+                self.assertEqual(self.git("check-ignore", path), path)
+        self.git("add", ".")
+        self.assertNotIn("backend/", self.git("ls-files"))
+        self.assertNotIn("config/master.key", self.git("ls-files"))
+
     def test_full_comparison_runs_before_visual_push(self):
         self.change("app/frontend/Card.jsx")
         self.assertEqual(self.push().returncode, 0)

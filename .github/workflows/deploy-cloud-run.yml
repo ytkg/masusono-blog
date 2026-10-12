@@ -14,10 +14,12 @@ on:
       - lib/**
       - log/**
       - public/**
+      - script/**
       - spec/**
       - storage/**
       - test/**
       - tmp/**
+      - vendor/**
       - .github/workflows/deploy-cloud-run.yml
       - .github/scripts/deploy-policy.cjs
 

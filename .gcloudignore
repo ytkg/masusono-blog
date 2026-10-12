@@ -25,3 +25,6 @@ config/credentials/*.key
 /gha-creds-*.json
 /.env*
 /.github
+
+# Old checkouts can retain ignored secrets, databases, and build artifacts here.
+/backend

@@ -64,3 +64,6 @@
 /.agents
 /deployment-policy
 /gha-creds-*.json
+
+# Old checkouts can retain ignored secrets, databases, and build artifacts here.
+/backend

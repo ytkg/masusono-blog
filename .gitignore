@@ -69,3 +69,6 @@ public/vite-ssr/
 
 # Server-only SSR bundles.
 /ssr
+
+# Old checkouts can retain ignored secrets, databases, and build artifacts here.
+/backend
