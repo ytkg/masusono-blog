@@ -17,8 +17,7 @@ RSpec.describe Api::App::MasudaRun::RankingsCreateUsecase do
           id: "new-ranking-id",
           userId: "cookie-user",
           score: 1234
-        },
-        status: :created
+        }
       }
     )
   end

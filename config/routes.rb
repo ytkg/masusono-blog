@@ -6,8 +6,8 @@ Rails.application.routes.draw do
   get "up", to: "rails/health#show", as: :rails_health_check
 
   root "home#index"
-  inertia "about" => :about
-  inertia "others" => "others/index"
+  get "about", to: "about#index"
+  get "others", to: "others#index"
   get "search", to: "search#index"
   get "authors", to: "authors#index"
   get "zukan", to: redirect("/authors")

@@ -22,8 +22,7 @@ module Api
               id: created[:id],
               userId: user_id,
               score: normalized_score
-            },
-            status: :created
+            }
           }
         end
 

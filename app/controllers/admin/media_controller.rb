@@ -3,7 +3,7 @@ module Admin
     def index
       result = MediaIndexUsecase.call(query: params[:q].to_s.strip, page: params[:page].presence || 1, cursor: params[:token])
 
-      render json: result.fetch(:props), status: result.fetch(:status)
+      render json: result.fetch(:props)
     rescue ArgumentError
       render_admin_error(status: :bad_request, code: "invalid_request", message: "検索条件が正しくありません。")
     rescue Microcms::FetchMediaService::FetchError
@@ -11,9 +11,9 @@ module Admin
     end
 
     def create
-      media = Microcms::UploadMediaService.call(file: params[:file])
+      result = MediaCreateUsecase.call(file: params[:file])
 
-      render json: { media: }, status: :created
+      render json: result.fetch(:json), status: :created
     rescue Microcms::UploadMediaService::ValidationError => error
       render_admin_error(status: :unprocessable_content, code: error.code, message: error.message)
     rescue Microcms::UploadMediaService::UploadError

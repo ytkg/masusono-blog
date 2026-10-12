@@ -1,10 +1,5 @@
 class BlogIndexUsecase
   def self.call
-    {
-      props: {
-        articles: ArticlePayloadBuilder.collection(Article.all)
-      },
-      status: :ok
-    }
+    { redirect_path: "/" }
   end
 end

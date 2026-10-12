@@ -244,10 +244,12 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 
 ## レスポンス整形責務
 
-- Model: 取得責務
-- Usecase: API契約に合わせた整形責務
-- Controller: `render` のみ
+- Model / Service: データ取得と共通の業務処理
+- Usecase: 1 Controller アクションの処理手順と、API 契約に合わせた最終データの整形
+- Controller: HTTP 入出力、認証・CSRF・セッション、HTTP ステータスと `render` / `redirect`
 - Serializer: 現在は導入しない
+
+Usecase は Controller からのみ呼び、Usecase 同士や Job・Batch から呼ばない。URL の別名は同じアクションの Usecase を共有し、薄い Usecase も置く。Concern は独立した小さい補助メソッドの共有に留める。
 
 この方針により、レスポンス契約の変更点は Usecase と request spec の差分として追跡します。
 

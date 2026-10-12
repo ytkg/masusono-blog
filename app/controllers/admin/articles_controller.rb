@@ -7,7 +7,7 @@ module Admin
         page: params[:page].presence || 1
       )
 
-      render json: result.fetch(:props), status: result.fetch(:status)
+      render json: result.fetch(:props)
     rescue ArgumentError
       render_admin_error(status: :bad_request, code: "invalid_request", message: "検索条件が正しくありません。")
     rescue Microcms::FetchManagedArticlesService::FetchError

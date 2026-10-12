@@ -16,7 +16,7 @@ module Api
           endpoint, p256dh, auth = SubscriptionInput.call(subscription:)
           created = ::Microcms::WebPushSubscriptionsService.upsert(endpoint:, p256dh:, auth:)
 
-          { json: { id: created.fetch(:id) }, status: :created }
+          { json: { id: created.fetch(:id) } }
         end
       end
     end

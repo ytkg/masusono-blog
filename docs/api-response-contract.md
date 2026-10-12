@@ -5,6 +5,8 @@
 - 対象: 公開記事一覧 API、Navigation failure API、Users API、管理ミニアプリ API、増田RUN Rankings API、Web Push API、`GET /sitemap.xml`、`GET /feed.xml`
 - 目的: 内部実装変更時でも外部契約（キー/型/意味）を維持する
 
+Usecase は各 Controller アクション専用の入口としてレスポンスデータを整形する。HTTP ステータス、認証・CSRF・セッション、render は Controller が担う。内部の Usecase 戻り値に HTTP ステータスを含めず、この文書の公開レスポンス・ステータスは維持する。
+
 ## GET /api/app/articles?offset=0
 
 トップページの追加読み込み用。認証不要。`offset` は0以上の整数（省略時0）で、公開日時の降順に1回10記事まで取得する。不正なoffsetは400と共通エラー形式（`invalid_request`）。microCMSから取得するのもこの1ページだけで、全件取得はしない。

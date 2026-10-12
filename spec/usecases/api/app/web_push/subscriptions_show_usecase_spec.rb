@@ -12,14 +12,14 @@ RSpec.describe Api::App::WebPush::SubscriptionsShowUsecase do
   end
 
   it "配信対象に登録されたendpointは購読中として返す" do
-    expect(result).to eq(json: { subscribed: true }, status: :ok)
+    expect(result).to eq(json: { subscribed: true })
   end
 
   context "登録されていない場合" do
     let(:subscriptions) { [] }
 
     it "未購読として返す" do
-      expect(result).to eq(json: { subscribed: false }, status: :ok)
+      expect(result).to eq(json: { subscribed: false })
     end
   end
 
@@ -27,7 +27,7 @@ RSpec.describe Api::App::WebPush::SubscriptionsShowUsecase do
     let(:subscriptions) { [ { endpoint: "https://fcm.googleapis.com/fcm/send/other" } ] }
 
     it "未購読として返す" do
-      expect(result).to eq(json: { subscribed: false }, status: :ok)
+      expect(result).to eq(json: { subscribed: false })
     end
   end
 

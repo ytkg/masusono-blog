@@ -24,8 +24,7 @@ RSpec.describe "WebBlog", type: :request do
                 content: "<p>本文</p>",
                 author: "著者"
               }
-            },
-            status: :ok
+            }
           }
         )
       end
@@ -46,8 +45,7 @@ RSpec.describe "WebBlog", type: :request do
           {
             props: {
               article: nil
-            },
-            status: :not_found
+            }
           }
         )
       end

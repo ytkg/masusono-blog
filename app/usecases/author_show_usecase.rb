@@ -10,7 +10,7 @@ class AuthorShowUsecase
   def call
     author = Author.find(@author_id)
     author = AuthorPayloadBuilder.call(author:) if author
-    return { props: { author: nil, articles: [] }, status: :not_found } if author.nil?
+    return { props: { author: nil, articles: [] } } if author.nil?
 
     articles = ArticlePayloadBuilder.collection(Article.for_author(author.fetch(:id)))
 
@@ -18,8 +18,7 @@ class AuthorShowUsecase
       props: {
         author:,
         articles:
-      },
-      status: :ok
+      }
     }
   end
 end

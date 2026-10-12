@@ -12,7 +12,7 @@ RSpec.describe Api::App::WebPush::SubscriptionsCreateUsecase do
   end
 
   it "正規化したsubscriptionを保存する" do
-    expect(result).to eq(json: { id: "subscription-id" }, status: :created)
+    expect(result).to eq(json: { id: "subscription-id" })
     expect(Microcms::WebPushSubscriptionsService).to have_received(:upsert).with(
       endpoint: "https://fcm.googleapis.com/fcm/send/example", p256dh: "p256dh", auth: "auth"
     )

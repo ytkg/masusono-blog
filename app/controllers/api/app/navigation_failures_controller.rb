@@ -7,11 +7,11 @@ module Api
       def create
         return head :content_too_large if request.content_length > 2048
 
-        payload = NavigationFailurePayloadBuilder.call(params.expect(failure: [
+        failure = params.expect(failure: [
           :kind, :path, :source_path, :status, :response_request_id, :content_type,
           :prefetch, :prefetch_in_flight, :elapsed_ms, :online, :service_worker
-        ]).to_h)
-        StructuredLogging::EventLogger.navigation_failure(payload:)
+        ]).to_h
+        NavigationFailuresCreateUsecase.call(failure:)
         head :no_content
       rescue ActionController::ParameterMissing, ArgumentError
         render_error_response(status: :bad_request, code: "invalid_request", message: "Invalid navigation failure report.")

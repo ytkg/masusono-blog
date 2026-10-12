@@ -29,12 +29,12 @@ RSpec.describe "Article page SSR", type: :request do
     # Unit/request specs normally skip SSR; exercise the production selection here.
     allow(Rails.env).to receive(:test?).and_return(false)
     stub_request(:post, ssr_url).to_return(body: ssr_response.to_json, headers: { "Content-Type" => "application/json" })
-    allow(BlogIndexUsecase).to receive(:call).and_return(props: { articles: [] }, status: :ok)
-    allow(HomeIndexUsecase).to receive(:call).and_return(props: { articles: [] }, status: :ok)
-    allow(BlogShowUsecase).to receive(:call).and_return(props: { article: { id: "article-1" } }, status: :ok)
-    allow(AuthorsIndexUsecase).to receive(:call).and_return(props: { authors: [] }, status: :ok)
-    allow(NumbersIndexUsecase).to receive(:call).and_return(props: { metrics: {} }, status: :ok)
-    allow(AuthorShowUsecase).to receive(:call).and_return(props: { author: { id: "author-1" }, articles: [] }, status: :ok)
+    allow(SearchIndexUsecase).to receive(:call).and_return(props: { articles: [] })
+    allow(HomeIndexUsecase).to receive(:call).and_return(props: { articles: [] })
+    allow(BlogShowUsecase).to receive(:call).and_return(props: { article: { id: "article-1" } })
+    allow(AuthorsIndexUsecase).to receive(:call).and_return(props: { authors: [] })
+    allow(NumbersIndexUsecase).to receive(:call).and_return(props: { metrics: {} })
+    allow(AuthorShowUsecase).to receive(:call).and_return(props: { author: { id: "author-1" }, articles: [] })
   end
 
   it "PumaがコントローラなしでSSRの有効化設定を評価できる" do
@@ -99,7 +99,7 @@ RSpec.describe "Article page SSR", type: :request do
   end
 
   it "記事が存在しない場合の404を維持する" do
-    allow(BlogShowUsecase).to receive(:call).and_return(props: {}, status: :not_found)
+    allow(BlogShowUsecase).to receive(:call).and_return(props: { article: nil })
 
     get "/articles/missing", headers: html_headers
 

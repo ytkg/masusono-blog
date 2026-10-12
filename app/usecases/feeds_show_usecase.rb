@@ -9,8 +9,7 @@ class FeedsShowUsecase
   def self.call
     {
       body: build_rss_xml(Article.all),
-      content_type: CONTENT_TYPE,
-      status: :ok
+      content_type: CONTENT_TYPE
     }
   end
 

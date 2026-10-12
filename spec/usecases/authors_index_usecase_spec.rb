@@ -39,8 +39,7 @@ RSpec.describe AuthorsIndexUsecase do
                 imageUrl: "https://images.microcms-assets.io/assets/masuda.webp?fit=crop&w=192&h=192"
               }
             ]
-          },
-          status: :ok
+          }
         }
       )
     end

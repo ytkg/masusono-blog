@@ -7,12 +7,12 @@ class ApiController < ApplicationController
 
   private
 
-  def render_json_result(result)
-    render json: result.fetch(:json), status: result.fetch(:status)
+  def render_json_result(result, status: :ok)
+    render json: result.fetch(:json), status:
   end
 
-  def render_body_result(result)
-    render plain: result.fetch(:body), content_type: result.fetch(:content_type), status: result.fetch(:status)
+  def render_body_result(result, status: :ok)
+    render plain: result.fetch(:body), content_type: result.fetch(:content_type), status:
   end
 
   def skip_session_for_api

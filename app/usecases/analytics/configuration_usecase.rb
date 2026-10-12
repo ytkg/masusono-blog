@@ -6,7 +6,7 @@ module Analytics
 
     def self.call(browser_id)
       allowed = browser_id.to_s.match?(UUID_PATTERN) && !EXCLUDED_BROWSER_IDS.include?(browser_id)
-      { status: :ok, json: { allowed: } }
+      { json: { allowed: } }
     end
   end
 end

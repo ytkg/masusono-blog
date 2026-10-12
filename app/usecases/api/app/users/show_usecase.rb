@@ -17,8 +17,7 @@ module Api
             json: {
               userId: user_id,
               name: user[:name]
-            },
-            status: :ok
+            }
           }
         end
 

@@ -41,8 +41,7 @@ RSpec.describe BlogShowUsecase do
               authorId: nil,
               authorImageUrl: nil
             }
-          },
-          status: :ok
+          }
         }
       )
     end
@@ -59,8 +58,7 @@ RSpec.describe BlogShowUsecase do
               relatedArticles: [],
               yearAgoArticles: [],
               ogpImagePath: nil
-            },
-            status: :not_found
+            }
           }
         )
       end
@@ -86,7 +84,6 @@ RSpec.describe BlogShowUsecase do
       end
 
       it "本文の正常表示を維持する" do
-        expect(result[:status]).to eq(:ok)
         expect(result[:props][:article][:content]).to eq(article[:content])
         expect(result[:props][:yearAgoArticles]).to eq([])
       end
@@ -111,7 +108,6 @@ RSpec.describe BlogShowUsecase do
         end
 
         it "正常な本文表示を維持する" do
-          expect(result[:status]).to eq(:ok)
           expect(result[:props][:article][:content]).to eq(article[:content])
           expect(result[:props][:relatedArticles]).to eq([])
         end

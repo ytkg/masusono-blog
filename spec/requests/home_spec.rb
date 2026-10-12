@@ -14,8 +14,7 @@ RSpec.describe "WebHome", type: :request do
                 title: "記事1"
               }
             ]
-          },
-          status: :ok
+          }
         }
       )
     end
@@ -55,7 +54,7 @@ RSpec.describe "WebHome", type: :request do
 
   describe "GET /search" do
     before do
-      allow(BlogIndexUsecase).to receive(:call).and_return(
+      allow(SearchIndexUsecase).to receive(:call).and_return(
         {
           props: {
             articles: [
@@ -64,8 +63,7 @@ RSpec.describe "WebHome", type: :request do
                 title: "記事1"
               }
             ]
-          },
-          status: :ok
+          }
         }
       )
     end
@@ -106,8 +104,7 @@ RSpec.describe "WebHome", type: :request do
                 imageUrl: "https://images.microcms-assets.io/assets/masuda.webp"
               }
             ]
-          },
-          status: :ok
+          }
         }
       )
     end
@@ -146,8 +143,7 @@ RSpec.describe "WebHome", type: :request do
                 title: "記事1"
               }
             ]
-          },
-          status: :ok
+          }
         }
       )
     end

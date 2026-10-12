@@ -17,7 +17,7 @@ module Api
             build_response(ranking, index)
           end
 
-          { json: rankings, status: :ok }
+          { json: rankings }
         end
 
         private

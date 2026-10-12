@@ -78,10 +78,18 @@ URL 上の反映内容を確認して報告する。手順で解決できない�
 
 ## 実装方針
 
-- HTML ページは Inertia の props を返す。ページ固有のデータ整形は `app/usecases/`、表示は
-  `app/frontend/` に置き、コントローラは usecase 呼び出しと render に留める。
-- JSON API のレスポンス整形も usecase が担う。API を変更する場合は
-  `docs/api-response-contract.md` と request spec を同じ変更で更新する。
+- アプリケーションの Controller は、1 アクションにつき専用の Usecase を1つ呼ぶ。
+  URL の別名が同じアクションへ到達する場合は同じ Usecase を使う。薄い Usecase も許す。
+  Rails のヘルスチェックとルート定義のリダイレクトはアプリケーションのアクションに含めない。
+- Usecase は Controller からのみ呼ぶ。Usecase 同士の呼び出しや、Job・Batch からの呼び出しはしない。
+  共通の処理は `app/services/` または Model に置き、各入口から利用する。
+- Controller は HTTP の入出力、認証・CSRF・セッション管理、HTTP ステータス、render・redirect を担う。
+  Usecase の結果や例外を HTTP ステータスへ変換し、Usecase から HTTP ステータスを返さない。
+- Usecase は処理の順序を組み立て、最終的な Inertia props・JSON 等のレスポンスデータを整形する。
+  HTTP 固有の CSRF トークン等は Controller で付加する。表示は `app/frontend/` に置く。
+- Concern は独立した小さい補助メソッドの共有に使う。アクションの処理手順を隠す用途には使わない。
+  複数層で共有する補助メソッドは `app/services/concerns/` に置く。
+- JSON API を変更する場合は `docs/api-response-contract.md` と request spec を同じ変更で更新する。
 - API は `ApiController` の共通エラー形式、`Cache-Control: no-store`、request ID を維持する。
   upstream（microCMS）エラーを個別コントローラで握りつぶしたり、成功レスポンスとして返したりしない。
 - 外部 HTTP は既存の `Microcms::*` サービスを再利用し、テストでは WebMock でネットワークを

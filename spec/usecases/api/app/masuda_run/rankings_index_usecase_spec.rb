@@ -78,8 +78,7 @@ RSpec.describe Api::App::MasudaRun::RankingsIndexUsecase do
             rankedAt: "2026/01/30",
             rank: 4
           }
-        ],
-        status: :ok
+        ]
       }
     )
   end

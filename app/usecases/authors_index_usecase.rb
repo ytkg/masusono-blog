@@ -3,8 +3,7 @@ class AuthorsIndexUsecase
     {
       props: {
         authors: Author.all.filter_map { |author| AuthorPayloadBuilder.call(author:) }
-      },
-      status: :ok
+      }
     }
   end
 end

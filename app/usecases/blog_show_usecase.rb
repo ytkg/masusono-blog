@@ -11,8 +11,7 @@ class BlogShowUsecase
     article = Article.find(@article_id)
     unless article
       return {
-        props: { article: nil, relatedArticles: [], yearAgoArticles: [], ogpImagePath: nil },
-        status: :not_found
+        props: { article: nil, relatedArticles: [], yearAgoArticles: [], ogpImagePath: nil }
       }
     end
 
@@ -27,8 +26,7 @@ class BlogShowUsecase
         relatedArticles: related_articles,
         yearAgoArticles: year_ago_articles,
         ogpImagePath: image
-      },
-      status: :ok
+      }
     }
   end
 end

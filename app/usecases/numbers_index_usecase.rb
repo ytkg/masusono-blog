@@ -4,13 +4,12 @@ class NumbersIndexUsecase
   end
 
   def call
-    metrics_result = Numbers::MetricsIndexUsecase.call
+    metrics_result = Numbers::MetricsQuery.call
 
     {
       props: {
         metrics: metrics_result.fetch(:metrics)
-      },
-      status: metrics_result.fetch(:status)
+      }
     }
   end
 end

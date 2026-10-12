@@ -33,6 +33,22 @@ RSpec.describe "Webhooks::Microcms::Articles", type: :request do
     expect(WebPush::ArticlePublishedNotifier).not_to have_received(:call)
   end
 
+  it "署名が正しくても未公開の記事には404を返す" do
+    allow(Article).to receive(:find).and_return(nil)
+    post "/webhooks/microcms/articles", params: payload, headers: { "CONTENT_TYPE" => "application/json", "X-Microcms-Signature" => signature(payload) }
+
+    expect(response).to have_http_status(:not_found)
+    expect(WebPush::ArticlePublishedNotifier).not_to have_received(:call)
+  end
+
+  it "署名が正しくても不正なJSONには400を返す" do
+    body = "{"
+    post "/webhooks/microcms/articles", params: body, headers: { "CONTENT_TYPE" => "application/json", "X-Microcms-Signature" => signature(body) }
+
+    expect(response).to have_http_status(:bad_request)
+    expect(WebPush::ArticlePublishedNotifier).not_to have_received(:call)
+  end
+
   def signature(body)
     OpenSSL::HMAC.hexdigest("SHA256", secret, body)
   end

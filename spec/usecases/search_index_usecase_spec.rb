@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BlogIndexUsecase do
+RSpec.describe SearchIndexUsecase do
   describe ".call" do
     subject(:result) { described_class.call }
 
@@ -32,7 +32,6 @@ RSpec.describe BlogIndexUsecase do
     end
 
     it do
-      expect(result[:status]).to eq(:ok)
       expect(result[:props]).to eq(
         {
           articles: [
