@@ -5,47 +5,47 @@ on:
     branches:
       - main
     paths:
-      - backend/app/**
-      - "!backend/app/frontend/**"
-      - backend/config/**
-      - "!backend/config/vite.json"
-      - backend/db/**
-      - backend/lib/**
-      - backend/spec/**
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/.rspec
-      - backend/Rakefile
-      - backend/package.json
-      - backend/package-lock.json
-      - backend/vite.config.ts
-      - backend/config.ru
-      - backend/bin/rails
-      - backend/bin/rake
-      - backend/bin/setup
+      - app/**
+      - "!app/frontend/**"
+      - config/**
+      - "!config/vite.json"
+      - db/**
+      - lib/**
+      - spec/**
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - .rspec
+      - Rakefile
+      - package.json
+      - package-lock.json
+      - vite.config.ts
+      - config.ru
+      - bin/rails
+      - bin/rake
+      - bin/setup
       - .github/workflows/backend-rspec.yml
   pull_request:
     paths:
-      - backend/app/**
-      - "!backend/app/frontend/**"
-      - backend/config/**
-      - "!backend/config/vite.json"
-      - backend/db/**
-      - backend/lib/**
-      - backend/spec/**
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/.rspec
-      - backend/Rakefile
-      - backend/package.json
-      - backend/package-lock.json
-      - backend/vite.config.ts
-      - backend/config.ru
-      - backend/bin/rails
-      - backend/bin/rake
-      - backend/bin/setup
+      - app/**
+      - "!app/frontend/**"
+      - config/**
+      - "!config/vite.json"
+      - db/**
+      - lib/**
+      - spec/**
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - .rspec
+      - Rakefile
+      - package.json
+      - package-lock.json
+      - vite.config.ts
+      - config.ru
+      - bin/rails
+      - bin/rake
+      - bin/setup
       - .github/workflows/backend-rspec.yml
 
 jobs:
@@ -55,7 +55,7 @@ jobs:
       RAILS_ENV: test
     defaults:
       run:
-        working-directory: backend
+        working-directory: .
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -64,14 +64,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: backend
+          working-directory: .
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install frontend dependencies
         run: npm ci

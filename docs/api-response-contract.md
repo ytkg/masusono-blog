@@ -137,7 +137,7 @@ APIパスは次の2ファイルで一致させる。
 - `README.md`
 - `docs/api-response-contract.md`
 
-確認コマンド（`backend/` で実行）:
+確認コマンド（リポジトリルートで実行）:
 
 ```bash
 git grep -nE "(/api/app/users/:user_id\\.json|/api/app/masuda_run/rankings\\.json)" -- README.md docs/api-response-contract.md

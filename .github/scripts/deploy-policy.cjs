@@ -1,14 +1,16 @@
 const LABEL = 'デプロイなし';
 
 function isNonDeployFile(path) {
-  if (['backend/app/frontend/README.md', '.github/scripts/deploy-policy.test.cjs'].includes(path)) return true;
+  // Rename metadata and historical PRs can still contain the former app root.
+  path = path.replace(/^backend\//, '');
+  if (['app/frontend/README.md', '.github/scripts/deploy-policy.test.cjs'].includes(path)) return true;
   // Published assets/content must never be classified by extension alone.
-  if (/^backend\/(public|app|storage)\//.test(path)) {
-    return /^backend\/app\/frontend\/(.*\.(test|spec)\.(js|jsx|ts|tsx)|test\/.*)$/.test(path);
+  if (/^(public|app|storage)\//.test(path)) {
+    return /^app\/frontend\/(.*\.(test|spec)\.(js|jsx|ts|tsx)|test\/.*)$/.test(path);
   }
-  return /^backend\/(spec|test\/visual)\//.test(path) ||
-    ['backend/.rspec', 'backend/playwright.config.js', 'scripts/test_visual_gate.py'].includes(path) ||
-    /^(docs|backend\/docs)\//.test(path) || /\.md$/i.test(path);
+  return /^(spec|test\/visual)\//.test(path) ||
+    ['.rspec', 'playwright.config.js', 'scripts/test_visual_gate.py'].includes(path) ||
+    /^docs\//.test(path) || /\.md$/i.test(path);
 }
 
 function onlyNonDeployFiles(files, expectedCount) {

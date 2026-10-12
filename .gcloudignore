@@ -15,3 +15,16 @@ config/credentials/*.key
 
 # Local editor/OS artifacts
 .DS_Store
+
+# Repository tooling and alternate checkouts are not application sources.
+/.git
+/.worktrees
+/.codex
+/.agents
+/deployment-policy
+/gha-creds-*.json
+/.env*
+/.github
+
+# Old checkouts can retain ignored secrets, databases, and build artifacts here.
+/backend

@@ -27,7 +27,7 @@ jobs:
       - name: Build visual test images
         uses: docker/bake-action@v7
         with:
-          source: ./backend
+          source: .
           files: |
             ./compose.yml
             ./compose.visual.yml
@@ -41,18 +41,18 @@ jobs:
             visual.cache-from=type=gha,scope=frontend-visual-browser
             visual.cache-to=type=gha,scope=frontend-visual-browser,mode=max
       - name: Start visual test server
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml up --no-build -d backend vite
+        run: docker compose -f compose.yml -f compose.visual.yml up --no-build -d backend vite
       - name: Compare screenshots
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml run --rm visual
+        run: docker compose -f compose.yml -f compose.visual.yml run --rm visual
       - name: Upload screenshot differences
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: visual-test-results
           path: |
-            backend/test-results
-            backend/playwright-report
+            test-results
+            playwright-report
           if-no-files-found: ignore
       - name: Stop visual test server
         if: always()
-        run: docker compose -f backend/compose.yml -f backend/compose.visual.yml down --timeout 1
+        run: docker compose -f compose.yml -f compose.visual.yml down --timeout 1

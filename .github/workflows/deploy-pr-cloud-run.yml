@@ -20,20 +20,20 @@ jobs:
       pull-requests: write
     defaults:
       run:
-        working-directory: backend
+        working-directory: .
     steps:
       - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: backend
+          working-directory: .
 
       - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libsqlite3-dev sqlite3 libvips imagemagick libmagickcore-6.q16-7-extra fonts-noto-cjk fonts-noto-color-emoji
       - run: npm ci
@@ -80,7 +80,7 @@ jobs:
         if: steps.policy.outputs.result != 'true'
         uses: docker/build-push-action@v7
         with:
-          context: backend
+          context: .
           push: true
           tags: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
           cache-from: type=gha,scope=cloud-run-backend

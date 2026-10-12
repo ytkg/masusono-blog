@@ -5,25 +5,25 @@ on:
     branches:
       - main
     paths:
-      - backend/**/*.rb
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/.rubocop.yml
-      - backend/Rakefile
-      - backend/config.ru
-      - backend/bin/rubocop
+      - "**/*.rb"
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - .rubocop.yml
+      - Rakefile
+      - config.ru
+      - bin/rubocop
       - .github/workflows/backend-rubocop.yml
   pull_request:
     paths:
-      - backend/**/*.rb
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/.rubocop.yml
-      - backend/Rakefile
-      - backend/config.ru
-      - backend/bin/rubocop
+      - "**/*.rb"
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - .rubocop.yml
+      - Rakefile
+      - config.ru
+      - bin/rubocop
       - .github/workflows/backend-rubocop.yml
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: .
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -40,7 +40,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: backend
+          working-directory: .
 
       - name: Run RuboCop
         run: bin/rubocop

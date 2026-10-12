@@ -54,8 +54,8 @@ description: masusono-blog の小規模から中規模の改善を標準で30件
 - npm 依存は lockfile に従って `npm ci` で準備する。すでに vite が起動している場合は、この worktree の vite サービスを止め、依存のインストールを重ねない。worktree のルートでベースの Compose 定義に `node_modules_init` があることを確認し、ある場合は `.codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps node_modules_init` を実行する。初期化の終了コードが0であることを確認してから、`.codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm ci --no-audit --no-fund` を実行し、成功を確認する。`--no-deps` の npm ci は初期化サービスを起動しないため、この順番を省略しない。
 - `node_modules_init` 導入前のベースでは従来どおり npm ci を実行する。初期化が失敗した場合は npm ci や RSpec に進まず、原因を確認する。権限エラーが疑われる場合は、下記のマウント・所有者確認と対象 worktree に限定した復旧手順を使い、確認なしに権限変更を広げない。
 - 新規の専用 `node_modules` ボリュームで `npm ci` が `EACCES` になった場合は、[masusono-worktree の権限エラー復旧手順](../masusono-worktree/SKILL.md#新規-node_modules-ボリュームの権限エラー)でマウントと所有者を確認し、対象 worktree に限定して復旧する。依存未準備のまま RSpec を開始しない。
-- `compose.sh up --build -d` の終了だけで準備完了と判断しない。`compose.sh logs vite` で依存準備が正常に完了し、Vite が起動したことを確認してから RSpec を開始する。起動時にも npm install が実行されるため、`git diff -- backend/package.json backend/package-lock.json` で意図しない依存定義・lockfile の差分がないことを確認する。
-- RSpec と Visual Regression（`scripts/push.sh` が実行する全画面比較を含む）は、同じ `backend/public/vite` にビルド出力を書き込むため並列実行しない。RSpec の終了と成功を確認してから Visual Regression または `scripts/push.sh` を開始する。絞り込んだテストで必須の全画面比較を代替しない。
+- `compose.sh up --build -d` の終了だけで準備完了と判断しない。`compose.sh logs vite` で依存準備が正常に完了し、Vite が起動したことを確認してから RSpec を開始する。起動時にも npm install が実行されるため、`git diff -- package.json package-lock.json` で意図しない依存定義・lockfile の差分がないことを確認する。
+- RSpec と Visual Regression（`scripts/push.sh` が実行する全画面比較を含む）は、同じ `public/vite` にビルド出力を書き込むため並列実行しない。RSpec の終了と成功を確認してから Visual Regression または `scripts/push.sh` を開始する。絞り込んだテストで必須の全画面比較を代替しない。
 
 ### 並列作業の検証順番
 

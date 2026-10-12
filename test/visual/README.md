@@ -19,14 +19,14 @@ scripts/check-visual.sh
 このコマンドは同じ worktree の起動済みサーバーも停止するため、検証後に開発を再開する場合は
 Compose ラッパーで起動し直してください。
 
-通常のリポジトリで実行する場合は、`docker compose -f backend/compose.yml -f backend/compose.visual.yml up --build -d backend vite`、続いて `docker compose -f backend/compose.yml -f backend/compose.visual.yml run --build --rm visual` を使います。
+通常のリポジトリで実行する場合は、`docker compose -f compose.yml -f compose.visual.yml up --build -d backend vite`、続いて `docker compose -f compose.yml -f compose.visual.yml run --build --rm visual` を使います。
 
 Compose ラッパーや通常の `docker compose` で直接実行した場合は自動停止しません。
 検証後に同じ Compose 設定で `stop backend vite` を実行してください。
 
 ## push 前の検証
 
-コミット後、worktree ルートで `scripts/push.sh` を実行します。現在のブランチと `origin/main` の共通祖先からの差分を調べ、`backend/app/`（フロントエンド・ビュー・ページのデータを返す処理を含む）・ルート・基準画像・撮影設定などに変更があれば `scripts/check-visual.sh` を実行します。全比較が失敗すると push を中止します。初回の push と追加修正の push の両方で同じ確認を行います。追跡ファイルに未コミット変更がある場合も中止します。
+コミット後、worktree ルートで `scripts/push.sh` を実行します。現在のブランチと `origin/main` の共通祖先からの差分を調べ、`app/`（フロントエンド・ビュー・ページのデータを返す処理を含む）・ルート・基準画像・撮影設定などに変更があれば `scripts/check-visual.sh` を実行します。全比較が失敗すると push を中止します。初回の push と追加修正の push の両方で同じ確認を行います。追跡ファイルに未コミット変更がある場合も中止します。
 
 基準画像は自動更新しません。失敗した実画像・差分画像を確認し、意図した変更の画像だけを更新してコミットした後、再度 `scripts/push.sh` を実行してください。これにより、最初の比較で止まって撮影できなかった長文の詳細・本文展開なども含めて検証できます。
 
@@ -43,14 +43,14 @@ Compose ラッパーや通常の `docker compose` で直接実行した場合は
 画面変更が意図したものか確認したうえで、次を実行します。
 
 ```bash
-.codex/skills/masusono-worktree/scripts/compose.sh -f backend/compose.visual.yml run --build --rm visual npm run test:visual:update
+.codex/skills/masusono-worktree/scripts/compose.sh -f compose.visual.yml run --build --rm visual npm run test:visual:update
 ```
 
 基準画像は [public_pages.visual.js-snapshots](./public_pages.visual.js-snapshots) に保存し、テストコードと一緒に Git で管理します。差分が意図した変更なら、更新された画像を同じ PR でレビューしてください。CI は基準画像を自動更新しません。
 
 画面の見た目を変更した場合は、PR を作成・更新する前に全画面の通常の比較を実行してください。対象画面が未登録なら、比較テストも追加します。差分が意図した変更だった場合に限り基準画像を更新し、もう一度全画面の比較を成功させてからコミットします。GitHub Actions の `frontend-visual` はステージングデプロイの有無にかかわらず全 PR で比較を実行します。失敗時は `visual-test-results` artifact で差分を確認してください。
 
-失敗時の実画像・差分画像・トレースは `backend/test-results/`、HTML レポートは `backend/playwright-report/` に出力されます。CI では `visual-test-results` という成果物から確認できます。
+失敗時の実画像・差分画像・トレースは `test-results/`、HTML レポートは `playwright-report/` に出力されます。CI では `visual-test-results` という成果物から確認できます。
 
 Issue #220 の初期17状態に、設定画面の入力・保存・通知更新エラーの3状態を追加しています。以下の追加テストも全比較の対象であり、20状態・40画像は現在の全体件数ではありません。設定エラーは撮影用の API・ブラウザ機能のモックで再現し、操作対象との間隔が 8px であることも確認します。管理ミニアプリのログイン、ダッシュボード、メディア一覧、画像詳細も含みます。管理画面の認証 API と microCMS メディア一覧は撮影用サーバーで固定応答にし、画像はリポジトリ内のアイコンを表示します。
 

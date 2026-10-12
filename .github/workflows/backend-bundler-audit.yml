@@ -5,19 +5,19 @@ on:
     branches:
       - main
     paths:
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/config/bundler-audit.yml
-      - backend/bin/bundler-audit
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - config/bundler-audit.yml
+      - bin/bundler-audit
       - .github/workflows/backend-bundler-audit.yml
   pull_request:
     paths:
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/config/bundler-audit.yml
-      - backend/bin/bundler-audit
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - config/bundler-audit.yml
+      - bin/bundler-audit
       - .github/workflows/backend-bundler-audit.yml
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: .
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -34,7 +34,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: backend
+          working-directory: .
 
       - name: Run bundler-audit
         run: bin/bundler-audit

@@ -30,7 +30,7 @@ interrupt() {
 cleanup() {
   local result=$?
   trap - EXIT INT TERM
-  if "${compose}" -f backend/compose.visual.yml stop --timeout 10 backend vite; then
+  if "${compose}" -f compose.visual.yml stop --timeout 10 backend vite; then
     :
   else
     local stop_result=$?
@@ -46,5 +46,5 @@ trap cleanup EXIT
 trap 'interrupt 130' INT
 trap 'interrupt 143' TERM
 
-run_compose -f backend/compose.visual.yml up --build -d backend vite
-run_compose -f backend/compose.visual.yml run --build --rm visual npm run test:visual
+run_compose -f compose.visual.yml up --build -d backend vite
+run_compose -f compose.visual.yml run --build --rm visual npm run test:visual

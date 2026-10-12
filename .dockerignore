@@ -56,3 +56,14 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Repository tooling and alternate checkouts are not application sources.
+/.git
+/.worktrees
+/.codex
+/.agents
+/deployment-policy
+/gha-creds-*.json
+
+# Old checkouts can retain ignored secrets, databases, and build artifacts here.
+/backend

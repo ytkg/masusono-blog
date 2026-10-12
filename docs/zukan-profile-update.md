@@ -151,7 +151,6 @@
 ## 表示コードを変更した場合の確認コマンド
 
 ```bash
-cd backend
 npm test -- AuthorsList pages/authors
 npm run lint
 ```

@@ -1,7 +1,7 @@
 # 改善バックログ（2026-10-05 実装照合）
 
 - 最終更新: 2026-10-05
-- 目的: `backend` の改善候補を実装事実ベースで管理し、着手順を明確にする
+- 目的: アプリケーションの改善候補を実装事実ベースで管理し、着手順を明確にする
 - 調査範囲: `README.md`, `AGENTS.md`, `docs/*.md`, `.github/*`, `config/*`, `app/**/*`, `spec/**/*`
 
 本書は改善候補の一覧です。未完了項目の優先度・担当・期限は別途判断が必要です。
@@ -17,7 +17,7 @@
 - [x] バックログに残っていた `ApplicationController#inertia_render` / `MICROCMS_*_ENDPOINT` は現行コード上で未検出
 - [x] CI の test ジョブが `bundle exec rspec` ベースへ移行済み
 - [x] CI に frontend lint / format check を追加済み
-- [x] PR テンプレートを追加済み（`backend/.github/pull_request_template.md`。リポジトリルートの `.github/` には配置されていない）
+- [x] PR テンプレートを追加済み（`.github/pull_request_template.md`）
 - [x] 旧 API 表記（`/app/*`, `/app/*.json`）を修正済み
 - [x] 旧ショップ URL の不整合は解消済み。現行の routes / sitemap に `/shop`・`/shops` はない
 
@@ -38,8 +38,8 @@
 - [x] 未使用コードを整理する（`ApplicationController#inertia_render`, `MICROCMS_*_ENDPOINT`）
 - [x] `docs/` の目次ページを追加し、運用導線を一本化する
 - [x] `bundler-audit` 設定のプレースホルダ（`CVE-THAT-DOES-NOT-APPLY`）を削除し、ignore なし運用へ更新した
-- [x] `backend/.github/pull_request_template.md` に影響範囲/検証観点/ロールバック手順を記載済み
-- [ ] PR テンプレートを当初の配置予定であるリポジトリルートの `.github/` に配置する
+- [x] `.github/pull_request_template.md` に影響範囲/検証観点/ロールバック手順を記載済み
+- [x] PR テンプレートをリポジトリルートの `.github/` に配置する
 
 ## 3. P2（品質・設計）
 

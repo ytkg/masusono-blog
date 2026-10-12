@@ -11,4 +11,4 @@ set -a
 source ./.env.worktree
 set +a
 
-exec docker compose -f backend/compose.yml "$@"
+exec docker compose -f compose.yml "$@"

@@ -21,7 +21,7 @@ jobs:
       pull-requests: write
     defaults:
       run:
-        working-directory: backend
+        working-directory: .
     steps:
       - uses: actions/checkout@v7
 
