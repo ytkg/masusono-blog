@@ -36,6 +36,14 @@ RSpec.describe ArticlePayloadBuilder do
       )
     end
 
+    context "本文に結合絵文字を含む場合" do
+      let(:article) { { content: "👨‍👩‍👧‍👦" * 200 } }
+
+      it "書記素数から文字数と読了目安を算出する" do
+        expect(result).to include(characterCount: 200, readingTimeMinutes: 0.5)
+      end
+    end
+
     context "本文と著者情報がない場合" do
       let(:article) { { id: "article-2", title: "下書き", content: nil, author: nil } }
 

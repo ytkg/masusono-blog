@@ -14,7 +14,9 @@ module Numbers
     end
 
     def call
-      visible_text.gsub(WHITESPACE_PATTERN, "").each_grapheme_cluster.count
+      visible_text.each_grapheme_cluster.count do |grapheme|
+        !grapheme.gsub(WHITESPACE_PATTERN, "").empty?
+      end
     end
 
     private
