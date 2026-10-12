@@ -6,8 +6,8 @@ import useSentenceFeedState from "./useSentenceFeedState"
 import useSentenceFeedLayout from "./useSentenceFeedLayout"
 import useSentenceFeedProgress from "./useSentenceFeedProgress"
 
-export default function SentenceFeed({ articles = [] }) {
-  const feed = useSentenceFeedState(articles)
+export default function SentenceFeed({ articles = [], hasMore = false }) {
+  const feed = useSentenceFeedState(articles, hasMore)
   const { items } = feed
   const { containerRef, height } = useSentenceFeedLayout(items)
   useSentenceFeedProgress(feed)

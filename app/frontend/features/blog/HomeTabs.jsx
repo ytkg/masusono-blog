@@ -15,7 +15,7 @@ export const HOME_TABS = Object.freeze([
     id: "beginnings",
     label: "書き出し",
     articleLoadBuffer: 3000,
-    renderContent: ({ articles }) => <SentenceFeed articles={articles} />,
+    renderContent: ({ articles, hasMore }) => <SentenceFeed articles={articles} hasMore={hasMore} />,
   },
   {
     id: "calendar",

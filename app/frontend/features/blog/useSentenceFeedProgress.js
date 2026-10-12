@@ -3,7 +3,14 @@ import { appendSentenceItems, markSentenceItemsRevealed, SENTENCE_REVEAL_SETTLE_
 
 const INFINITE_SCROLL_THRESHOLD = 2600
 
-export default function useSentenceFeedProgress({ items, sourceRef, rememberedStateRef, commitRememberedState }) {
+export default function useSentenceFeedProgress({
+  items,
+  sourceCount,
+  hasMore,
+  sourceRef,
+  rememberedStateRef,
+  commitRememberedState,
+}) {
   const isAppendingRef = useRef(false)
   const frameRef = useRef(null)
   useEffect(() => {
@@ -12,16 +19,19 @@ export default function useSentenceFeedProgress({ items, sourceRef, rememberedSt
       if (isAppendingRef.current || distanceToBottom > INFINITE_SCROLL_THRESHOLD || sourceRef.current.length === 0)
         return
 
+      if (hasMore && rememberedStateRef.current.nextCursor >= sourceRef.current.length) return
+
       isAppendingRef.current = true
       frameRef.current = window.requestAnimationFrame(() => {
         frameRef.current = null
-        const next = appendSentenceItems(rememberedStateRef.current, sourceRef.current)
+        const next = appendSentenceItems(rememberedStateRef.current, sourceRef.current, hasMore)
         sourceRef.current = next.source
         commitRememberedState(next.state)
         isAppendingRef.current = false
       })
     }
 
+    if (rememberedStateRef.current.nextCursor < sourceRef.current.length) appendWhenNearBottom()
     window.addEventListener("scroll", appendWhenNearBottom, { passive: true })
     return () => {
       window.removeEventListener("scroll", appendWhenNearBottom)
@@ -29,7 +39,7 @@ export default function useSentenceFeedProgress({ items, sourceRef, rememberedSt
       frameRef.current = null
       isAppendingRef.current = false
     }
-  }, [commitRememberedState, sourceRef, rememberedStateRef])
+  }, [commitRememberedState, sourceCount, hasMore, sourceRef, rememberedStateRef])
 
   useEffect(() => {
     if (items.length === 0 || items.every((item) => item.hasRevealed)) return undefined
