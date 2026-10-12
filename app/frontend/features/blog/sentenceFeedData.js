@@ -21,14 +21,18 @@ function serializeSentenceItems(items) {
   }))
 }
 
-export function createInitialSentenceState(articles) {
+export function createInitialSentenceState(articles, hasMore = false) {
   const source = shuffleArticles(articles.filter((article) => article.id && article.sentence))
 
   if (source.length === 0) {
     return { items: [], nextCursor: 0, sourceIds: [], version: SENTENCE_STATE_VERSION }
   }
 
-  const initial = makeSentenceItems(source, INITIAL_SENTENCE_COUNT, 0)
+  const initial = makeSentenceItems(
+    source,
+    hasMore ? Math.min(INITIAL_SENTENCE_COUNT, source.length) : INITIAL_SENTENCE_COUNT,
+    0,
+  )
 
   return {
     items: serializeSentenceItems(initial.items),
@@ -38,8 +42,11 @@ export function createInitialSentenceState(articles) {
   }
 }
 
-export function appendSentenceItems(state, source) {
-  const next = makeSentenceItems(source, APPEND_SENTENCE_COUNT, state.nextCursor)
+export function appendSentenceItems(state, source, hasMore = false) {
+  const count = hasMore
+    ? Math.min(APPEND_SENTENCE_COUNT, Math.max(0, source.length - state.nextCursor))
+    : APPEND_SENTENCE_COUNT
+  const next = makeSentenceItems(source, count, state.nextCursor)
 
   return {
     state: {
@@ -61,10 +68,10 @@ export function markSentenceItemsRevealed(state) {
   }
 }
 
-export function mergeSentenceArticleSources(state, articles) {
+export function mergeSentenceArticleSources(state, articles, hasMore = false) {
   const knownIds = new Set(state.sourceIds)
   const newIds = articles.flatMap((article) => (knownIds.has(article.id) ? [] : [article.id]))
   if (newIds.length === 0) return state
-  if (state.items.length === 0) return createInitialSentenceState(articles)
+  if (state.items.length === 0) return createInitialSentenceState(articles, hasMore)
   return { ...state, sourceIds: [...state.sourceIds, ...newIds] }
 }

@@ -64,6 +64,7 @@ export default function Home({ articles = [], pagination }) {
           <Box sx={{ pt: mode === "calendar" ? 0.5 : 1 }}>
             {activeTab?.renderContent({
               articles: feed.articles,
+              hasMore: feed.hasMore,
             })}
             {activeTab?.articleLoadBuffer !== undefined ? (
               <LoadMoreArticles {...feed} buffer={activeTab.articleLoadBuffer} />

@@ -101,4 +101,50 @@ describe("SentenceFeed", () => {
     act(() => vi.advanceTimersByTime(20))
     expect(sentenceLinks().some((link) => link.getAttribute("href") === "/articles/second")).toBe(true)
   })
+
+  it("未取得の記事がある間は重複させず、追加取得後はスクロールなしでも続きを表示する", () => {
+    const firstPage = Array.from({ length: 10 }, (_, index) => ({
+      id: `article-${index}`,
+      content: `<p>記事${index}の書き出し。</p>`,
+    }))
+    const secondPage = Array.from({ length: 10 }, (_, index) => ({
+      id: `article-${index + 10}`,
+      content: `<p>記事${index + 10}の書き出し。</p>`,
+    }))
+    const view = render(<SentenceFeed articles={firstPage} hasMore />)
+    const firstLinks = sentenceLinks().map((link) => link.getAttribute("href"))
+    expect(firstLinks).toHaveLength(10)
+    expect(new Set(firstLinks).size).toBe(10)
+
+    fireEvent.scroll(window)
+    act(() => vi.advanceTimersByTime(20))
+    expect(sentenceLinks()).toHaveLength(10)
+
+    view.rerender(<SentenceFeed articles={[...firstPage, ...secondPage]} hasMore />)
+    act(() => vi.advanceTimersByTime(20))
+    const allLinks = sentenceLinks().map((link) => link.getAttribute("href"))
+    expect(allLinks).toHaveLength(20)
+    expect(new Set(allLinks).size).toBe(20)
+    expect(allLinks.slice(0, 10)).toEqual(firstLinks)
+    expect(allLinks.slice(10)).toEqual(secondPage.map((article) => `/articles/${article.id}`))
+
+    fireEvent.scroll(window)
+    act(() => vi.advanceTimersByTime(20))
+    expect(sentenceLinks()).toHaveLength(20)
+
+    // 全件の表示が終わった場合だけ、次の巡に進める。
+    view.rerender(<SentenceFeed articles={[...firstPage, ...secondPage]} hasMore={false} />)
+    fireEvent.scroll(window)
+    act(() => vi.advanceTimersByTime(20))
+    expect(sentenceLinks()).toHaveLength(20 + APPEND_SENTENCE_COUNT)
+  })
+
+  it("最初のページに書き出しがなくても、後続ページを重複なく表示する", () => {
+    const view = render(<SentenceFeed articles={[{ id: "empty", content: "" }]} hasMore />)
+    expect(screen.queryByRole("link")).not.toBeInTheDocument()
+    view.rerender(<SentenceFeed articles={articles} hasMore />)
+    act(() => vi.advanceTimersByTime(20))
+    expect(sentenceLinks()).toHaveLength(1)
+    expect(sentenceLinks()[0]).toHaveAttribute("href", "/articles/first")
+  })
 })

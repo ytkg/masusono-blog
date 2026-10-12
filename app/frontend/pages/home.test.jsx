@@ -52,7 +52,11 @@ vi.mock("../features/blog/ArticlesList", () => ({
 }))
 
 vi.mock("../features/blog/SentenceFeed", () => ({
-  default: ({ articles }) => <div data-testid="sentence-feed">articles:{articles.length}</div>,
+  default: ({ articles, hasMore }) => (
+    <div data-testid="sentence-feed" data-has-more={String(hasMore)}>
+      articles:{articles.length}
+    </div>
+  ),
 }))
 
 vi.mock("@/shared/lib/userId", () => ({
@@ -322,5 +326,15 @@ describe("Home page", () => {
     home.unmount()
     expect(signal.aborted).toBe(true)
     expect(requestJson).toHaveBeenCalledTimes(1)
+  })
+
+  it("書き出しへ未取得ページの有無を渡し、最終ページの取得後に更新する", async () => {
+    requestJson.mockResolvedValue({ articles: [{ id: "two" }], pagination: { nextOffset: null } })
+    render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
+    fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
+    expect(screen.getByTestId("sentence-feed")).toHaveAttribute("data-has-more", "true")
+    fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
+    await waitFor(() => expect(screen.getByTestId("sentence-feed")).toHaveAttribute("data-has-more", "false"))
+    expect(screen.getByTestId("sentence-feed")).toHaveTextContent("articles:2")
   })
 })

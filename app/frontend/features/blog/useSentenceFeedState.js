@@ -2,12 +2,13 @@ import { useLayoutEffect, useMemo, useRef } from "react"
 import useImmediateRemember from "@/shared/hooks/useImmediateRemember"
 import { prepareSentenceArticles, createInitialSentenceState, mergeSentenceArticleSources } from "./sentenceFeedData"
 
-const SENTENCE_STATE_KEY = "home-beginnings"
+// Discard histories containing repeated cards from partially loaded article pages.
+const SENTENCE_STATE_KEY = "home-beginnings-v2"
 
-export default function useSentenceFeedState(articles) {
+export default function useSentenceFeedState(articles, hasMore) {
   const sourceRef = useRef([])
   const sentenceArticles = useMemo(() => prepareSentenceArticles(articles), [articles])
-  const initialState = useMemo(() => createInitialSentenceState(sentenceArticles), [sentenceArticles])
+  const initialState = useMemo(() => createInitialSentenceState(sentenceArticles, hasMore), [sentenceArticles, hasMore])
   const {
     state: rememberedState,
     stateRef: rememberedStateRef,
@@ -25,15 +26,22 @@ export default function useSentenceFeedState(articles) {
 
   useLayoutEffect(() => {
     const state = rememberedStateRef.current
-    const nextState = mergeSentenceArticleSources(state, sentenceArticles)
+    const nextState = mergeSentenceArticleSources(state, sentenceArticles, hasMore)
     if (nextState !== state) commitRememberedState(nextState)
-  }, [sentenceArticles, rememberedStateRef, commitRememberedState])
+  }, [sentenceArticles, hasMore, rememberedStateRef, commitRememberedState])
 
   useLayoutEffect(() => {
     sourceRef.current = rememberedState.sourceIds.map((id) => sentenceArticlesById.get(id)).filter(Boolean)
   }, [rememberedState.sourceIds, sentenceArticlesById])
 
-  return { items, sourceRef, rememberedStateRef, commitRememberedState }
+  return {
+    items,
+    sourceCount: rememberedState.sourceIds.length,
+    hasMore,
+    sourceRef,
+    rememberedStateRef,
+    commitRememberedState,
+  }
 }
 
 function indexArticlesById(articles) {
