@@ -82,13 +82,13 @@ class VisualGateTest(unittest.TestCase):
         return self.git("ls-remote", "origin", "refs/heads/task")
 
     def test_full_comparison_runs_before_visual_push(self):
-        self.change("backend/app/frontend/Card.jsx")
+        self.change("app/frontend/Card.jsx")
         self.assertEqual(self.push().returncode, 0)
         calls = self.log.read_text().splitlines()
         self.assertEqual(len(calls), 3)
         self.assertIn("up --build -d backend vite", calls[0])
         self.assertTrue(calls[1].endswith("run --build --rm visual npm run test:visual"))
-        self.assertEqual(calls[2], "-f backend/compose.visual.yml stop --timeout 10 backend vite")
+        self.assertEqual(calls[2], "-f compose.visual.yml stop --timeout 10 backend vite")
         self.assertTrue(self.remote_task())
 
     def check_visual(self, **env):
@@ -100,7 +100,7 @@ class VisualGateTest(unittest.TestCase):
     def assert_servers_stopped(self):
         self.assertEqual(
             self.log.read_text().splitlines()[-1],
-            "-f backend/compose.visual.yml stop --timeout 10 backend vite",
+            "-f compose.visual.yml stop --timeout 10 backend vite",
         )
 
     def test_comparison_failure_stops_servers_and_preserves_status(self):
@@ -122,7 +122,7 @@ class VisualGateTest(unittest.TestCase):
                 self.assert_servers_stopped()
 
     def test_stop_failure_blocks_push(self):
-        self.change("backend/app/frontend/Card.jsx")
+        self.change("app/frontend/Card.jsx")
         command = self.run_command(
             "bash", "scripts/push.sh", check=False,
             env={**self.env, "GATE_STOP_RESULT": "9"},
@@ -156,12 +156,12 @@ class VisualGateTest(unittest.TestCase):
                         process.communicate()
 
     def test_failed_comparison_blocks_initial_and_subsequent_push(self):
-        self.change("backend/test/visual/example.png")
+        self.change("test/visual/example.png")
         self.assertEqual(self.push(result=7).returncode, 7)
         self.assertFalse(self.remote_task())
         self.assertEqual(self.push().returncode, 0)
         pushed = self.remote_task()
-        self.change("backend/app/views/example.html.erb")
+        self.change("app/views/example.html.erb")
         self.assertEqual(self.push(result=7).returncode, 7)
         self.assertEqual(self.remote_task(), pushed)
 
@@ -173,10 +173,10 @@ class VisualGateTest(unittest.TestCase):
 
     def test_page_data_and_visual_configuration_also_trigger_comparison(self):
         for path in (
-            "backend/app/controllers/home_controller.rb",
-            "backend/config/routes.rb", "backend/vite.config.ts",
-            "backend/playwright.config.js", "backend/package-lock.json",
-            "backend/compose.visual.yml", "backend/Dockerfile.visual",
+            "app/controllers/home_controller.rb",
+            "config/routes.rb", "vite.config.ts",
+            "playwright.config.js", "package-lock.json",
+            "compose.visual.yml", "Dockerfile.visual",
         ):
             with self.subTest(path=path):
                 self.change(path)

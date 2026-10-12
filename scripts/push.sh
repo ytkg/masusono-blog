@@ -16,10 +16,10 @@ fi
 
 base="$(git merge-base origin/main HEAD)"
 if git diff --quiet "${base}" HEAD -- \
-  backend/app backend/config/routes.rb \
-  backend/test/visual backend/playwright.config.js backend/vite.config.ts \
-  backend/package.json backend/package-lock.json \
-  backend/compose.yml backend/compose.visual.yml backend/Dockerfile backend/Dockerfile.visual \
+  app config/routes.rb \
+  test/visual playwright.config.js vite.config.ts \
+  package.json package-lock.json \
+  compose.yml compose.visual.yml Dockerfile Dockerfile.visual \
   scripts/check-visual.sh scripts/push.sh; then
   echo "No visual inputs changed; skipping screenshot comparison."
 else

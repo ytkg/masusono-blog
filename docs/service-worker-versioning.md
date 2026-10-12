@@ -1,6 +1,6 @@
 # Service Worker 更新手順
 
-- 対象ファイル: `backend/public/service-worker.js`
+- 対象ファイル: `public/service-worker.js`
 - 現行方針: `CACHE_NAME` を明示的に更新してキャッシュを切り替える
 
 ## 更新が必要なケース

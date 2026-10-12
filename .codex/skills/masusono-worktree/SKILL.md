@@ -65,7 +65,7 @@ vite の実行ユーザー `1000:1000` に合わせる。通常は手動修復�
    .codex/skills/masusono-worktree/scripts/compose.sh run --rm --no-deps vite npm ci --no-audit --no-fund
    ```
 
-   再帰的な chown、ホストの `backend/` や他のボリュームの権限変更、ボリューム削除は行わない。実行ユーザーが異なる、または再実行でも失敗する場合は原因を調査し、権限変更の範囲を広げない。
+   再帰的な chown、ホストの作業ツリー や他のボリュームの権限変更、ボリューム削除は行わない。実行ユーザーが異なる、または再実行でも失敗する場合は原因を調査し、権限変更の範囲を広げない。
 5. 成功後に `compose.sh up --build -d` と `compose.sh logs vite` で Vite の起動を確認し、依存定義・lockfile の意図しない差分がないことを確認してから検証を再実行する。終了時は下記の `down` を使う。
 
 ## 完了後

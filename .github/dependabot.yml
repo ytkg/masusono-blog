@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/backend"
+    directory: "/"
     schedule:
       interval: "weekly"
     groups:
@@ -22,7 +22,7 @@ updates:
           - "@inertiajs/vite"
 
   - package-ecosystem: "bundler"
-    directory: "/backend"
+    directory: "/"
     schedule:
       interval: "weekly"
 

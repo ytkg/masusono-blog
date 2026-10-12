@@ -58,7 +58,7 @@ gh run watch "$RUN_ID" --repo "$REPO" --exit-status
 gh pr checks "$PR_NUMBER" --repo "$REPO"
 ```
 
-workflow は CI → イメージのビルド・公開 → `backend/deploy.sh` → PR コメント更新の順に進む。
+workflow は CI → イメージのビルド・公開 → `deploy.sh` → PR コメント更新の順に進む。
 サービス反映後もキャッシュ保存などの後処理が続くことがある。
 失敗時は `gh run view "$RUN_ID" --repo "$REPO" --log-failed` で失敗箇所を確認する。
 現在のコミットの失敗を再試行する場合は `gh run rerun "$RUN_ID" --repo "$REPO" --failed` を使う。
@@ -86,8 +86,8 @@ gh pr view "$PR_NUMBER" --repo "$REPO" --comments
 
 実装の確認が必要な場合の参照先:
 
-- [デプロイ workflow](../../.github/workflows/deploy-pr-cloud-run.yml)
-- [デプロイ判定](../../.github/scripts/deploy-policy.cjs)
+- [デプロイ workflow](../.github/workflows/deploy-pr-cloud-run.yml)
+- [デプロイ判定](../.github/scripts/deploy-policy.cjs)
 - [デプロイスクリプト](../deploy.sh)
-- [ステージング削除 workflow](../../.github/workflows/cleanup-pr-cloud-run.yml)
+- [ステージング削除 workflow](../.github/workflows/cleanup-pr-cloud-run.yml)
 - [デプロイの全体像](../README.md#cloud-run-へのデプロイ)

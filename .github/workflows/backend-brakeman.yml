@@ -5,31 +5,31 @@ on:
     branches:
       - main
     paths:
-      - backend/app/**
-      - "!backend/app/frontend/**"
-      - backend/config/**
-      - "!backend/config/vite.json"
-      - backend/db/**
-      - backend/lib/**
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/config.ru
-      - backend/bin/brakeman
+      - app/**
+      - "!app/frontend/**"
+      - config/**
+      - "!config/vite.json"
+      - db/**
+      - lib/**
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - config.ru
+      - bin/brakeman
       - .github/workflows/backend-brakeman.yml
   pull_request:
     paths:
-      - backend/app/**
-      - "!backend/app/frontend/**"
-      - backend/config/**
-      - "!backend/config/vite.json"
-      - backend/db/**
-      - backend/lib/**
-      - backend/Gemfile
-      - backend/Gemfile.lock
-      - backend/.ruby-version
-      - backend/config.ru
-      - backend/bin/brakeman
+      - app/**
+      - "!app/frontend/**"
+      - config/**
+      - "!config/vite.json"
+      - db/**
+      - lib/**
+      - Gemfile
+      - Gemfile.lock
+      - .ruby-version
+      - config.ru
+      - bin/brakeman
       - .github/workflows/backend-brakeman.yml
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: .
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -46,7 +46,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: backend
+          working-directory: .
 
       - name: Run Brakeman
         run: bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error

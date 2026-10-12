@@ -2,7 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { LABEL, isNonDeployFile, onlyNonDeployFiles, reconcileLabel, skipStaging, skipProduction } = require('./deploy-policy.cjs');
 
-function fixture({ paths = ['backend/spec/models/example_spec.rb'], labels = [], actor = 'github-actions[bot]', action = 'synchronize', commits = ['merge'], associated = true } = {}) {
+function fixture({ paths = ['spec/models/example_spec.rb'], labels = [], actor = 'github-actions[bot]', action = 'synchronize', commits = ['merge'], associated = true } = {}) {
   const calls = [];
   const pr = { number: 1, state: 'open', labels: labels.map((name) => ({ name })), changed_files: paths.length,
     merged_at: '2026-10-03', merge_commit_sha: 'merge', base: { ref: 'main', repo: { full_name: 'owner/repo' } } };
@@ -27,24 +27,33 @@ function fixture({ paths = ['backend/spec/models/example_spec.rb'], labels = [],
 }
 
 test('tests/docs are allowed; application, shared config, dependencies and published Markdown deploy', () => {
-  for (const path of ['.github/scripts/deploy-policy.test.cjs', 'backend/app/frontend/README.md', 'README.md', 'backend/AGENTS.md', 'docs/diagram.png', 'backend/docs/a.md',
-    'backend/spec/support/helper.rb', 'backend/test/visual/baselines/a.png', 'backend/.rspec',
-    'backend/playwright.config.js', 'backend/app/frontend/a.test.jsx', 'backend/app/frontend/a.spec.ts',
-    'backend/app/frontend/test/setup.js', 'scripts/test_visual_gate.py']) assert.equal(isNonDeployFile(path), true, path);
-  for (const path of ['backend/app/models/a.rb', 'backend/app/frontend/a.jsx', 'backend/app/content.md',
-    'backend/public/readme.md', 'backend/storage/a.md', 'backend/vite.config.ts', 'backend/package-lock.json',
-    'backend/Gemfile', '.github/workflows/test.yml', 'backend/config/a.yml']) assert.equal(isNonDeployFile(path), false, path);
+  for (const path of ['.github/scripts/deploy-policy.test.cjs', 'app/frontend/README.md', 'README.md', 'AGENTS.md', 'docs/diagram.png', 'docs/a.md',
+    'spec/support/helper.rb', 'test/visual/baselines/a.png', '.rspec',
+    'playwright.config.js', 'app/frontend/a.test.jsx', 'app/frontend/a.spec.ts',
+    'app/frontend/test/setup.js', 'scripts/test_visual_gate.py']) assert.equal(isNonDeployFile(path), true, path);
+  for (const path of ['app/models/a.rb', 'app/frontend/a.jsx', 'app/content.md',
+    'public/readme.md', 'storage/a.md', 'vite.config.ts', 'package-lock.json',
+    'Gemfile', '.github/workflows/test.yml', 'config/a.yml']) assert.equal(isNonDeployFile(path), false, path);
 });
 
 test('empty/truncated lists and renames from app files cannot skip deployment', () => {
   assert.equal(onlyNonDeployFiles([], 0), false);
   assert.equal(onlyNonDeployFiles([{ filename: 'README.md' }], 2), false);
-  assert.equal(onlyNonDeployFiles([{ filename: 'README.md', previous_filename: 'backend/app/a.rb' }], 1), false);
+  assert.equal(onlyNonDeployFiles([{ filename: 'README.md', previous_filename: 'app/a.rb' }], 1), false);
   assert.equal(onlyNonDeployFiles([{ filename: 'README.md', previous_filename: 'docs/old.md' }], 1), true);
 });
 
+test('former app paths in rename metadata retain deployment classification', () => {
+  for (const path of ['backend/app/content.md', 'backend/public/readme.md', 'backend/storage/a.md']) {
+    assert.equal(isNonDeployFile(path), false, path);
+    assert.equal(onlyNonDeployFiles([{ filename: 'docs/moved.md', previous_filename: path }], 1), false);
+  }
+  assert.equal(isNonDeployFile('backend/spec/models/a.rb'), true);
+  assert.equal(isNonDeployFile('backend/app/frontend/a.test.jsx'), true);
+});
+
 test('automatically labels mixed tests/docs and creates missing repository label', async () => {
-  const f = fixture({ paths: ['README.md', 'backend/spec/a.rb'] });
+  const f = fixture({ paths: ['README.md', 'spec/a.rb'] });
   f.github.rest.issues.getLabel = async () => { if (!f.calls.length) throw { status: 404 }; };
   await reconcileLabel(f);
   assert.deepEqual(f.calls.map(([name]) => name), ['create', 'add']);
@@ -52,14 +61,14 @@ test('automatically labels mixed tests/docs and creates missing repository label
 
 test('removes only automatic labels after runtime changes, preserving manual labels', async () => {
   for (const actor of ['github-actions[bot]', 'maintainer']) {
-    const f = fixture({ paths: ['backend/app/a.rb'], labels: [LABEL], actor });
+    const f = fixture({ paths: ['app/a.rb'], labels: [LABEL], actor });
     await reconcileLabel(f);
     assert.deepEqual(f.calls.map(([name]) => name), actor === 'maintainer' ? [] : ['remove']);
   }
 });
 
 test('no changes for runtime-only, already labeled or closed PRs', async () => {
-  for (const f of [fixture({ paths: ['backend/app/a.rb'] }), fixture({ labels: [LABEL] }), fixture()]) {
+  for (const f of [fixture({ paths: ['app/a.rb'] }), fixture({ labels: [LABEL] }), fixture()]) {
     if (!f.pr.labels.length && f.files[0].filename.includes('spec')) f.pr.state = 'closed';
     await reconcileLabel(f);
     assert.deepEqual(f.calls, []);
@@ -68,18 +77,18 @@ test('no changes for runtime-only, already labeled or closed PRs', async () => {
 
 test('staging handles manual labels, automatic add/remove races and human unlabel', async () => {
   const staging = 'ステージングデプロイ';
-  assert.equal(await skipStaging(fixture({ paths: ['backend/app/a.rb'], labels: [staging, LABEL], actor: 'maintainer' })), true);
+  assert.equal(await skipStaging(fixture({ paths: ['app/a.rb'], labels: [staging, LABEL], actor: 'maintainer' })), true);
   assert.equal(await skipStaging(fixture({ labels: [staging] })), true);
-  assert.equal(await skipStaging(fixture({ paths: ['backend/app/a.rb'], labels: [staging, LABEL] })), false);
+  assert.equal(await skipStaging(fixture({ paths: ['app/a.rb'], labels: [staging, LABEL] })), false);
   assert.equal(await skipStaging(fixture({ labels: [staging], action: 'unlabeled' })), false);
-  assert.equal(await skipStaging(fixture({ paths: ['backend/app/a.rb'], labels: [] })), true);
+  assert.equal(await skipStaging(fixture({ paths: ['app/a.rb'], labels: [] })), true);
 });
 
 test('production skips a labeled merge or tests/docs merged before labeler completes', async () => {
-  assert.equal(await skipProduction(fixture({ paths: ['backend/app/a.rb'], labels: [LABEL], actor: 'maintainer' })), true);
+  assert.equal(await skipProduction(fixture({ paths: ['app/a.rb'], labels: [LABEL], actor: 'maintainer' })), true);
   assert.equal(await skipProduction(fixture()), true);
-  assert.equal(await skipProduction(fixture({ paths: ['backend/app/a.rb'], labels: [LABEL] })), false);
-  assert.equal(await skipProduction(fixture({ paths: ['backend/app/a.rb'] })), false);
+  assert.equal(await skipProduction(fixture({ paths: ['app/a.rb'], labels: [LABEL] })), false);
+  assert.equal(await skipProduction(fixture({ paths: ['app/a.rb'] })), false);
 });
 
 test('production deploys direct/mixed pushes, old associated PRs, truncated pushes and API failures', async () => {
