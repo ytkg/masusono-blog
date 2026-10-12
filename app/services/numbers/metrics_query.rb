@@ -1,5 +1,5 @@
 module Numbers
-  class MetricsIndexUsecase
+  class MetricsQuery
     LAUNCH_DATE = Date.new(2025, 10, 5)
     CACHE_KEY = "numbers/metrics_index".freeze
     CACHE_EXPIRES_IN = 1.hour
@@ -29,8 +29,7 @@ module Numbers
       )
 
       {
-        metrics:,
-        status: :ok
+        metrics:
       }
     end
 

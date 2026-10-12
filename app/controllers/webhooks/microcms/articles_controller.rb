@@ -10,14 +10,8 @@ module Webhooks
         raw_payload = request.raw_post
         return head :unauthorized unless valid_signature?(raw_payload)
 
-        payload = JSON.parse(raw_payload)
-        return head :no_content unless new_article?(payload)
-
-        article = Article.find(payload.fetch("id"))
-        return head :not_found unless article
-
-        WebPush::ArticlePublishedNotifier.call(article:)
-        head :no_content
+        result = ArticlesCreateUsecase.call(raw_payload:)
+        head(result.fetch(:article_missing) ? :not_found : :no_content)
       rescue JSON::ParserError, KeyError
         head :bad_request
       end
@@ -36,10 +30,6 @@ module Webhooks
         raise "web_push.microcms_webhook_secret is missing" if secret.empty?
 
         secret
-      end
-
-      def new_article?(payload)
-        payload["api"] == "articles" && payload["type"] == "new" && payload["id"].present?
       end
     end
   end

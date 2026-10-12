@@ -34,8 +34,6 @@ RSpec.describe FeedsShowUsecase do
 
     it do
       xml = result[:body]
-
-      expect(result[:status]).to eq(:ok)
       expect(result[:content_type]).to eq("application/rss+xml; charset=utf-8")
       expect(xml).to include('<rss version="2.0"')
       expect(xml).to include("<title>増田とその他！</title>")

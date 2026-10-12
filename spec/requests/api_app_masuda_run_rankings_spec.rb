@@ -13,8 +13,7 @@ RSpec.describe "Api::App::MasudaRun::Rankings", type: :request do
               rankedAt: "2026/02/11",
               rank: 1
             }
-          ],
-          status: :ok
+          ]
         }
       )
     end
@@ -50,8 +49,7 @@ RSpec.describe "Api::App::MasudaRun::Rankings", type: :request do
             id: "new-ranking-id",
             userId: "cookie-user",
             score: 1234
-          },
-          status: :created
+          }
         }
       )
     end

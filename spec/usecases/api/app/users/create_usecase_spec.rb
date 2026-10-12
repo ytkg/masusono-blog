@@ -18,8 +18,7 @@ RSpec.describe Api::App::Users::CreateUsecase do
           id: "u-e329d2ee785ead849d97f03f875fd338",
           userId: "cookie-user",
           name: "表示名太郎"
-        },
-        status: :created
+        }
       }
     )
   end

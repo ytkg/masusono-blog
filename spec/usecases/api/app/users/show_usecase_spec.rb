@@ -16,8 +16,7 @@ RSpec.describe Api::App::Users::ShowUsecase do
         json: {
           userId: "cookie-user",
           name: "表示名太郎"
-        },
-        status: :ok
+        }
       }
     )
   end
@@ -31,8 +30,7 @@ RSpec.describe Api::App::Users::ShowUsecase do
           json: {
             userId: "cookie-user",
             name: nil
-          },
-          status: :ok
+          }
         }
       )
     end

@@ -51,6 +51,22 @@ RSpec.describe "Admin mini app", type: :request do
     expect(response.parsed_body["authenticated"]).to be(true)
   end
 
+  it "ログイン時にセッションを再生成し以前のCSRFトークンを無効にする" do
+    allow(auth_client).to receive(:login).and_return(
+      { "access_token" => "access", "refresh_token" => "refresh" }
+    )
+    allow(auth_client).to receive(:verify).and_return(true)
+    get "/api/app/management/session"
+    old_token = response.parsed_body.fetch("csrf_token")
+    post "/api/app/management/session", params: { username: "owner", password: "correct" }.to_json,
+         headers: { "CONTENT_TYPE" => "application/json", "X-CSRF-Token" => old_token }
+    expect(response).to have_http_status(:ok)
+
+    post "/api/app/management/media", params: {}.to_json,
+         headers: { "CONTENT_TYPE" => "application/json", "X-CSRF-Token" => old_token }
+    expect(response).to have_http_status(:unprocessable_content)
+  end
+
   it "認証失敗時はメディアを取得できない" do
     allow(auth_client).to receive(:login).and_return(nil)
 
@@ -75,7 +91,7 @@ RSpec.describe "Admin mini app", type: :request do
     )
     allow(auth_client).to receive(:verify).and_return(true)
     allow(Admin::MediaIndexUsecase).to receive(:call).with(query: "sample", page: "2", cursor: "next").and_return(
-      { props: { media: [ { id: "image-1", url: "https://example.com/sample.png" } ], page: 2, has_more: false }, status: :ok }
+      { props: { media: [ { id: "image-1", url: "https://example.com/sample.png" } ], page: 2, has_more: false } }
     )
 
     login(username: "owner", password: "correct")
@@ -92,7 +108,7 @@ RSpec.describe "Admin mini app", type: :request do
     )
     allow(auth_client).to receive(:verify).and_return(true)
     allow(Admin::ArticlesIndexUsecase).to receive(:call).with(query: "下書き", status: "published_and_draft", page: "2").and_return(
-      { props: { articles: [ { id: "article-1", title: "下書きタイトル", status: "PUBLISH_AND_DRAFT" } ], page: 2, has_more: false }, status: :ok }
+      { props: { articles: [ { id: "article-1", title: "下書きタイトル", status: "PUBLISH_AND_DRAFT" } ], page: 2, has_more: false } }
     )
 
     login(username: "owner", password: "correct")

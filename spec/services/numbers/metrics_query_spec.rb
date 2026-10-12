@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Numbers::MetricsIndexUsecase do
+RSpec.describe Numbers::MetricsQuery do
   describe ".call" do
     subject(:result) { described_class.call }
 
@@ -46,7 +46,6 @@ RSpec.describe Numbers::MetricsIndexUsecase do
     let(:trend) { result[:metrics][:trend] }
 
     it "全体を先頭に著者順で記事の指標を返す" do
-      expect(result[:status]).to eq(:ok)
       expect(rows).to eq([
         { label: "全体", articles: "4 本", chars: "12 字", averageChars: "3 字" },
         { label: "増田太郎", articles: "1 本", chars: "3 字", averageChars: "3 字" },

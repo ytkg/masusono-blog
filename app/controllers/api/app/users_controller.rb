@@ -14,7 +14,7 @@ module Api
           user_id: params[:userId]
         )
 
-        render_json_result(result)
+        render_json_result(result, status: :created)
       end
     end
   end

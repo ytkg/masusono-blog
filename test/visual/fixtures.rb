@@ -101,11 +101,11 @@ module VisualTestFixtures
   end
 
   module Numbers
-    def call = { metrics: VisualTestFixtures::METRICS, status: :ok }
+    def call = { metrics: VisualTestFixtures::METRICS }
   end
 
   module Rankings
-    def call = { json: VisualTestFixtures::RANKINGS, status: :ok }
+    def call = { json: VisualTestFixtures::RANKINGS }
   end
 
   module AdminAuth
@@ -134,8 +134,7 @@ module VisualTestFixtures
           next_token: nil,
           page: page.to_i,
           query: query
-        },
-        status: :ok
+        }
       }
     end
   end

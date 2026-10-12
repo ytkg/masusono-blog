@@ -5,14 +5,13 @@ RSpec.describe NumbersIndexUsecase do
     subject(:result) { described_class.call }
 
     before do
-      allow(Numbers::MetricsIndexUsecase).to receive(:call).and_return(
+      allow(Numbers::MetricsQuery).to receive(:call).and_return(
         {
           metrics: {
             rows: [
               { label: "全体", articles: "12 本", chars: "120 字", averageChars: "10 字" }
             ]
-          },
-          status: :ok
+          }
         }
       )
     end
@@ -26,8 +25,7 @@ RSpec.describe NumbersIndexUsecase do
                 { label: "全体", articles: "12 本", chars: "120 字", averageChars: "10 字" }
               ]
             }
-          },
-          status: :ok
+          }
         }
       )
     end

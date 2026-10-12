@@ -34,7 +34,7 @@
 ## 2. P1（過去の対応履歴）
 
 - [x] `bin/ci` を CI 本体と同じ実行内容に揃える（Ruby lint/test + frontend lint）
-- [x] controller / usecase の返却契約を統一する（Inertia は `{ props:, status: }`、API は `{ json:, status: }`、XML は `{ body:, content_type:, status: }`）
+- [x] controller / usecase の返却契約を統一する（Inertia は `{ props: }`、API は `{ json: }`、XML は `{ body:, content_type: }`）
 - [x] 未使用コードを整理する（`ApplicationController#inertia_render`, `MICROCMS_*_ENDPOINT`）
 - [x] `docs/` の目次ページを追加し、運用導線を一本化する
 - [x] `bundler-audit` 設定のプレースホルダ（`CVE-THAT-DOES-NOT-APPLY`）を削除し、ignore なし運用へ更新した
@@ -49,7 +49,7 @@
 - [x] 共通の `useApiSWR` を導入済み。現行の利用箇所は増田RUNランキング（公開ページは Inertia props、管理一覧は `useAdminList` を使用）
 - [x] `SeoHead` の canonical を絶対URL出力へ統一する
 - [x] `ApiController` の `no-store` 契約を request spec で網羅し、回帰を防止する
-- [x] `MetricsIndexUsecase` の責務を分割した（article 集計 / payload 構築 / orchestration）
+- [x] `MetricsQuery` の責務を分割した（article 集計 / payload 構築 / orchestration）
 
 ## 4. セキュリティ・運用
 

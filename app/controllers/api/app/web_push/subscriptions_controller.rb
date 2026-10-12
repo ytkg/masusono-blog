@@ -9,11 +9,11 @@ module Api
         end
 
         def create
-          render_json_result(SubscriptionsCreateUsecase.call(subscription: params[:subscription]))
+          render_json_result(SubscriptionsCreateUsecase.call(subscription: params[:subscription]), status: :created)
         end
 
         def destroy
-          render_json_result(SubscriptionsDestroyUsecase.call(endpoint: params[:endpoint]))
+          render_json_result(SubscriptionsDestroyUsecase.call(endpoint: params[:endpoint]), status: :no_content)
         end
       end
     end

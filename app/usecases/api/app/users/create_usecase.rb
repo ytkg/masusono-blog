@@ -25,8 +25,7 @@ module Api
               id: content_id,
               userId: normalized_user_id,
               name: normalized_name
-            },
-            status: :created
+            }
           }
         end
 

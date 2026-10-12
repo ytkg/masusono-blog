@@ -7,8 +7,7 @@ class SitemapsIndexUsecase
   def self.call
     {
       body: build_sitemap_xml(articles: Article.all, authors: Author.all),
-      content_type: CONTENT_TYPE,
-      status: :ok
+      content_type: CONTENT_TYPE
     }
   end
 

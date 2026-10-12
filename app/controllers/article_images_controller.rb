@@ -1,15 +1,11 @@
 class ArticleImagesController < ApplicationController
   def show
-    # Verify current publication before reading cached bytes, including old URLs.
     response.headers["Cache-Control"] = "no-store"
-    article = Article.find(params[:article_id])
-    return head :not_found unless article
+    result = ArticleImagesShowUsecase.call(article_id: params[:article_id], version: params[:version])
+    return head :not_found unless result.fetch(:found)
+    return redirect_to result[:redirect_path], status: :temporary_redirect if result[:redirect_path]
 
-    unless params[:version] == ArticleOgpImage.version(article:)
-      return redirect_to ArticleOgpImage.path(article:), status: :temporary_redirect
-    end
-
-    send_data ArticleOgpImage.call(article:), type: "image/png", disposition: "inline"
+    send_data result.fetch(:image), type: "image/png", disposition: "inline"
   rescue Microcms::FetchContentsService::FetchError, Faraday::Error
     head :service_unavailable
   end

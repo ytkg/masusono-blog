@@ -13,8 +13,7 @@ RSpec.describe "WebNumbers", type: :request do
                 { label: "全体", articles: "12 本", chars: "120 字", averageChars: "10 字" }
               ]
             }
-          },
-          status: :ok
+          }
         }
       )
     end

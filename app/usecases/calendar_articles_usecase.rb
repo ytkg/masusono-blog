@@ -10,6 +10,6 @@ class CalendarArticlesUsecase
         { monthDay: month_day, articles: entries }
       end
 
-    { json: { groups: groups }, status: :ok }
+    { json: { groups: groups } }
   end
 end

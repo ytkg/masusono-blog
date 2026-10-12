@@ -12,7 +12,7 @@ module Api
 
           subscriptions = ::Microcms::WebPushSubscriptionsService.execute(filters: "endpoint[equals]#{normalized_endpoint}")
           subscribed = subscriptions.any? { |subscription| subscription[:endpoint] == normalized_endpoint }
-          { json: { subscribed: }, status: :ok }
+          { json: { subscribed: } }
         end
       end
     end

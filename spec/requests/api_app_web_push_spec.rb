@@ -51,7 +51,7 @@ RSpec.describe "Api::App::WebPush", type: :request do
   describe "GET /api/app/web_push/vapid_key.json" do
     before do
       allow(Api::App::WebPush::VapidPublicKeyUsecase).to receive(:call).and_return(
-        { json: { publicKey: "public-vapid-key" }, status: :ok }
+        { json: { publicKey: "public-vapid-key" } }
       )
     end
 
@@ -71,7 +71,7 @@ RSpec.describe "Api::App::WebPush", type: :request do
 
     before do
       allow(Api::App::WebPush::SubscriptionsCreateUsecase).to receive(:call).and_return(
-        { json: { id: "subscription-id" }, status: :created }
+        { json: { id: "subscription-id" } }
       )
     end
 
@@ -88,7 +88,7 @@ RSpec.describe "Api::App::WebPush", type: :request do
   describe "DELETE /api/app/web_push/subscription.json" do
     before do
       allow(Api::App::WebPush::SubscriptionsDestroyUsecase).to receive(:call).and_return(
-        { json: {}, status: :no_content }
+        { json: {} }
       )
     end
 
