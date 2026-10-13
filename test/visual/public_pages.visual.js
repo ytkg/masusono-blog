@@ -167,18 +167,12 @@ test.describe("author profiles", () => {
   test("long profiles and missing images", async ({ page }) => {
     const title = "日常の発見を記録する人".repeat(8)
     const bio = "散歩と食事が好きです。気になった出来事を、肩の力を抜いて書いています。".repeat(6)
-    await page.route("**/*", async (route) => {
-      const path = new URL(route.request().url()).pathname
-      if (!["/authors", "/authors/visual-author-1", "/authors/visual-author-2"].includes(path)) {
-        return route.continue()
-      }
-      const response = await route.fetch()
-      const body = (await response.text())
-        .replaceAll("日常の発見を記録する人", title)
-        .replaceAll("散歩と食事が好きです。気になった出来事を、肩の力を抜いて書いています。", bio)
-        .replace(/("id":"visual-author-1"[^}]*"imageUrl":)null/, '$1"/icons/icon-512.png"')
-      await route.fulfill({ response, body })
-    })
+    for (const path of ["/authors", "/authors/visual-author-1", "/authors/visual-author-2"]) {
+      await mockPageProps(page, path, (props) => {
+        const author = props.authors?.find(({ id }) => id === "visual-author-1") ?? props.author
+        if (author.id === "visual-author-1") Object.assign(author, { title, bio, imageUrl: "/icons/icon-512.png" })
+      })
+    }
     for (const [name, path] of [
       ["list", "/authors"],
       ["detail", "/authors/visual-author-1"],
@@ -204,6 +198,12 @@ test.describe("author profiles", () => {
     await expect(page.locator("main img")).toHaveCount(0)
     await expect(page.getByRole("heading", { name: "チャーリー", level: 1 })).toBeVisible()
     await expect.soft(page).toHaveScreenshot("author-profile-no-image.png")
+    await openPage(page, "/authors")
+    await page.getByRole("link", { name: "増田愛美の記事を読む", exact: true }).click()
+    await expect(page).toHaveURL(/\/authors\/visual-author-1$/)
+    await expect(page.getByText(title, { exact: true })).toBeVisible()
+    await expect(page.getByText(bio, { exact: true })).toBeVisible()
+    await expect(page.locator("main img").first()).toHaveAttribute("src", "/icons/icon-512.png")
     await openPage(page, "/authors")
     await page.getByRole("link", { name: "チャーリーの記事を読む", exact: true }).click()
     await expect(page).toHaveURL(/\/authors\/visual-author-2$/)
@@ -257,18 +257,11 @@ test.describe("article titles", () => {
 
   test("long article title wraps in list and detail", async ({ page }) => {
     const title = "週末の散歩で見つけたもの".repeat(5) + "LongUnbrokenArticleTitle".repeat(4)
-    await page.route("**/*", async (route) => {
-      const path = new URL(route.request().url()).pathname
-      if (path !== "/" && path !== "/articles/visual-article-1") return route.continue()
-      const response = await route.fetch()
-      if (response.headers()["content-type"]?.includes("application/json")) {
-        const json = await response.json()
-        if (json.props?.article) json.props.article.title = title
-        await route.fulfill({ response, body: JSON.stringify(json) })
-        return
-      }
-      const body = (await response.text()).replaceAll("週末の散歩で見つけたもの", title)
-      await route.fulfill({ response, body })
+    await mockPageProps(page, "/", (props) => {
+      props.articles.find(({ id }) => id === "visual-article-1").title = title
+    })
+    await mockPageProps(page, "/articles/visual-article-1", (props) => {
+      props.article.title = title
     })
     await openPage(page, "/")
     const listTitle = page.getByRole("heading", { name: title, level: 3 })
@@ -444,13 +437,12 @@ test("collapsed excerpts do not request body images", async ({ page }) => {
 })
 
 test("article body spacing and expansion", async ({ page }) => {
-  await page.route("**/", async (route) => {
-    const response = await route.fetch()
-    const body = (await response.text()).replaceAll(
+  await mockPageProps(page, "/", (props) => {
+    const article = props.articles.find(({ id }) => id === "visual-article-1")
+    article.content = article.content.replace(
       "駅を出て、いつもと違う道を歩きました。",
       "駅を出て、いつもと違う道を歩きました。".repeat(6),
     )
-    await route.fulfill({ response, body })
   })
   await openPage(page, "/")
   const shortBody = page.getByTestId("article-body-html").last()
@@ -684,13 +676,11 @@ for (const state of ["loading", "warning", "error"]) {
         terminate() {}
       }
     }, state)
-    await page.route("**/articles/visual-article-1", async (route) => {
-      const response = await route.fetch()
-      const body = (await response.text()).replaceAll(
+    await mockPageProps(page, "/articles/visual-article-1", (props) => {
+      props.article.content = props.article.content.replace(
         "ゆっくり過ごした週末の記録です。",
-        JSON.stringify('</p><pre><code class="language-ruby">puts :hello</code></pre><p>').slice(1, -1),
+        '</p><pre><code class="language-ruby">puts :hello</code></pre><p>',
       )
-      await route.fulfill({ response, body })
     })
     await openPage(page, "/articles/visual-article-1")
     const run = page.getByRole("button", { name: "▶ 実行" })
