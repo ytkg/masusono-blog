@@ -7,8 +7,9 @@ export async function runRubyCode(code) {
     return errorResult("この環境では Ruby 実行に対応していません。")
   }
 
+  let worker
   return new Promise((resolve) => {
-    const worker = new Worker(new URL("./rubyCodeRunner.worker.js", import.meta.url), { type: "module" })
+    worker = new Worker(new URL("./rubyCodeRunner.worker.js", import.meta.url), { type: "module" })
 
     const finish = (result) => {
       worker.terminate()
@@ -40,6 +41,9 @@ export async function runRubyCode(code) {
     )
 
     worker.postMessage({ code })
+  }).catch((error) => {
+    worker?.terminate()
+    return errorResult(formatError(error))
   })
 }
 

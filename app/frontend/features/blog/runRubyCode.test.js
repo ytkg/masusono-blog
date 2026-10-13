@@ -16,6 +16,33 @@ describe("runRubyCode", () => {
     })
   })
 
+  it("Workerの生成に失敗した場合にエラー結果を返す", async () => {
+    vi.stubGlobal("Worker", function WorkerMock() {
+      throw new DOMException("worker blocked", "SecurityError")
+    })
+
+    await expect(runRubyCode("puts :hello")).resolves.toEqual({
+      error: "SecurityError: worker blocked",
+      stderr: "",
+      stdout: "",
+    })
+  })
+
+  it("コードの送信に失敗した場合にエラー結果を返し、Workerを終了する", async () => {
+    const worker = createWorker()
+    worker.postMessage.mockImplementation(() => {
+      throw new DOMException("message failed", "DataCloneError")
+    })
+    vi.stubGlobal("Worker", workerConstructor(worker))
+
+    await expect(runRubyCode("puts :hello")).resolves.toEqual({
+      error: "DataCloneError: message failed",
+      stderr: "",
+      stdout: "",
+    })
+    expect(worker.terminate).toHaveBeenCalledOnce()
+  })
+
   it("Workerの実行結果を返し、Workerを終了する", async () => {
     const worker = createWorker()
     vi.stubGlobal("Worker", workerConstructor(worker))
