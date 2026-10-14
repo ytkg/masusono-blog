@@ -34,3 +34,9 @@ describe("ArticleTags", () => {
     expect(screen.queryByTestId("article-tags")).not.toBeInTheDocument()
   })
 })
+
+it("空白を含むタグのリンクを引用付き条件にする", () => {
+  render(<ArticleTags tags="Ruby on Rails" />)
+  const href = screen.getByRole("link", { name: "#Ruby on Rails" }).getAttribute("href")
+  expect(new URL(href, "https://example.test").searchParams.get("q")).toBe('#"Ruby on Rails"')
+})

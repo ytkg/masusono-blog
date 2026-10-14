@@ -1,3 +1,4 @@
+import { buildArticleSearchTerm } from "./articleSearchTerm"
 import { describe, expect, it } from "vitest"
 import { articleMatchesQuery, normalizeArticleSearchText } from "./articleSearch"
 
@@ -94,4 +95,19 @@ describe("articleSearch", () => {
     expect(articleMatchesQuery(encoded, normalizeArticleSearchText("Ruby ©"))).toBe(true)
     expect(articleMatchesQuery(encoded, normalizeArticleSearchText("Rails &"))).toBe(true)
   })
+})
+
+it.each(["Ruby on Rails", "research and development", 'say "hi"', "a\\b"])(
+  "選択したタグを1つの検索条件として扱う: %s",
+  (tag) => {
+    const query = normalizeArticleSearchText(buildArticleSearchTerm("#", tag))
+    expect(articleMatchesQuery({ tags: tag }, query)).toBe(true)
+    expect(articleMatchesQuery({ tags: "other", content: tag }, query)).toBe(false)
+  },
+)
+it("著者名中のORを演算子とせず、引用語と通常のORを組み合わせる", () => {
+  const author = "A or B"
+  const query = normalizeArticleSearchText(`${buildArticleSearchTerm("@", author)} #missing OR #ruby`)
+  expect(articleMatchesQuery({ author, tags: "ruby" }, query)).toBe(true)
+  expect(articleMatchesQuery({ author: "A", tags: "missing" }, query)).toBe(false)
 })

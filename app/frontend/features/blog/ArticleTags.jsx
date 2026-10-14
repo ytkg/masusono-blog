@@ -1,3 +1,4 @@
+import { buildArticleSearchTerm } from "./articleSearchTerm"
 import { parseArticleTags } from "./parseArticleTags"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
@@ -14,7 +15,7 @@ export default function ArticleTags({ tags }) {
         <Chip
           key={tag}
           component={Link}
-          href={`/search?q=${encodeURIComponent(`#${tag}`)}`}
+          href={`/search?q=${encodeURIComponent(buildArticleSearchTerm("#", tag))}`}
           label={`#${tag}`}
           size="small"
           variant="outlined"

@@ -45,3 +45,12 @@ describe("ArticleSearchSuggestions", () => {
     expect(screen.getByText("5分~")).toBeInTheDocument()
   })
 })
+
+it("表示はそのままに、空白を含む候補を引用付き条件で選択する", () => {
+  const onSelect = vi.fn()
+  render(<ArticleSearchSuggestions articles={[{ tags: "Ruby on Rails", author: "A or B" }]} onSelect={onSelect} />)
+  fireEvent.click(screen.getByRole("button", { name: "#Ruby on Rails" }))
+  expect(onSelect).toHaveBeenLastCalledWith('#"Ruby on Rails"')
+  fireEvent.click(screen.getByRole("button", { name: "@A or B" }))
+  expect(onSelect).toHaveBeenLastCalledWith('@"A or B"')
+})
