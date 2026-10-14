@@ -25,3 +25,10 @@ test("numbers without data", async ({ page }) => {
   await expect(page.getByTestId("numbers-trend")).toHaveCount(0)
   await expect(page).toHaveScreenshot("numbers-without-data.png")
 })
+
+test("authors without entries", async ({ page }) => {
+  await mockPageProps(page, "/authors", (props) => { props.authors = [] })
+  await openPage(page, "/authors")
+  await expect(page.getByText("著者がいません。")).toBeVisible()
+  await expect(page).toHaveScreenshot("authors-without-entries.png")
+})

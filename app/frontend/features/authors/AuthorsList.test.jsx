@@ -56,3 +56,9 @@ describe("AuthorsList", () => {
     expect(profiles[1]).toHaveStyle({ paddingBottom: "0px" })
   })
 })
+
+it("著者が0件なら空白の代わりに案内を表示する", () => {
+  render(<AuthorsList />)
+  expect(screen.getByText("著者がいません。")).toBeInTheDocument()
+  expect(screen.queryByRole("link")).not.toBeInTheDocument()
+})
