@@ -112,7 +112,8 @@ export default function AppsDialogLauncher({
     setIsTransitionComplete(false)
     resetLoadingTasks()
     setIsTransitioning(true)
-    onOpen?.(registerLoadingTask)
+    const opening = onOpen?.(registerLoadingTask)
+    if (opening?.then) registerLoadingTask(opening)
     setOpen(true)
   }
 

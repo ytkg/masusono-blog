@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import AppsDialogLauncher from "./AppsDialogLauncher"
 
@@ -92,4 +92,31 @@ describe("AppsDialogLauncher", () => {
     )
     expect(loadingIndicator).not.toBeVisible()
   })
+})
+
+it.each([false, true])("onOpenのPromiseを待ち、失敗でも表示を続ける: reject=%s", async (reject) => {
+  vi.useFakeTimers()
+  let settle
+  const loading = new Promise((resolve, fail) => {
+    settle = () => (reject ? fail(new Error("offline")) : resolve())
+  })
+  const { unmount } = render(
+    <AppsDialogLauncher title="Awaited" buttonAriaLabel="待機アプリ" onOpen={() => loading}>
+      <div>読み込み後の内容</div>
+    </AppsDialogLauncher>,
+  )
+  try {
+    fireEvent.click(screen.getByRole("button", { name: "待機アプリ" }))
+    await act(async () => vi.advanceTimersByTimeAsync(2000))
+    expect(screen.getByTestId("app-content")).not.toBeVisible()
+    await act(async () => {
+      settle()
+      await Promise.resolve()
+    })
+    await act(async () => vi.advanceTimersByTimeAsync(500))
+    expect(screen.getByTestId("app-content")).toBeVisible()
+  } finally {
+    unmount()
+    vi.useRealTimers()
+  }
 })
