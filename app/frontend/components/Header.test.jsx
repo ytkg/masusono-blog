@@ -132,3 +132,9 @@ describe("Header", () => {
     expect(screen.queryByRole("link", { name: "設定を開く" })).not.toBeInTheDocument()
   })
 })
+
+it("ハッシュの文字列を検索語として扱わない", () => {
+  vi.mocked(usePage).mockReturnValue({ url: "/search?q=#results" })
+  render(<Header />)
+  expect(screen.queryByRole("button", { name: "前のページに戻る" })).not.toBeInTheDocument()
+})

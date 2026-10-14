@@ -137,3 +137,9 @@ describe("FloatingBottomNavigation", () => {
     expect(screen.getByText("その他！").closest(".Mui-selected")).not.toBeNull()
   })
 })
+
+it.each(["/search#results", "/search?q=ruby#results"])("ハッシュ付きURLでも現在のナビを選択する: %s", (url) => {
+  vi.mocked(usePage).mockReturnValue({ url })
+  render(<FloatingBottomNavigation />)
+  expect(screen.getByText("検索").closest(".Mui-selected")).not.toBeNull()
+})

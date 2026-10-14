@@ -18,7 +18,7 @@ function currentNavigationIndex(path) {
 }
 
 function navigationPathFromUrl(url) {
-  return String(url || "/").split("?")[0]
+  return String(url || "/").split(/[?#]/, 1)[0]
 }
 
 export default function FloatingBottomNavigation() {
