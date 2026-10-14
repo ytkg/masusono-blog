@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test"
 
 test.afterEach(async ({ page }) => {
-  // Finish production-origin proxies before the page fixture is closed.
+  // Drain background requests before removing the production-origin proxy.
+  await page.waitForLoadState("networkidle")
   await page.unrouteAll({ behavior: "wait" })
 })
 
