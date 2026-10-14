@@ -41,5 +41,15 @@ RSpec.describe "Sitemaps", type: :request do
         expect(response.headers["Cache-Control"]).to eq("no-store")
       end
     end
+    context "取得した記事に同じIDが含まれる場合" do
+      let(:articles) { [ { id: "duplicate", title: "最初" }, { id: "duplicate", title: "後" } ] }
+
+      it "同じ記事URLを重複出力しない" do
+        get "/sitemap.xml"
+        document = Nokogiri::XML(response.body) { |config| config.strict.nonet }
+        expect(document.xpath("//*[local-name()='loc']").map(&:text).count("https://masusono.com/articles/duplicate")).to eq(1)
+        expect(response.headers["Cache-Control"]).to eq("no-store")
+      end
+    end
   end
 end

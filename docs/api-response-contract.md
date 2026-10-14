@@ -98,14 +98,14 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 ## GET /sitemap.xml
 
 - Content-Type: `application/xml; charset=utf-8`
-- Response: XML sitemap
+- Response: XML sitemap。記事・著者の各IDは最初の項目を採用し、同じURLを重複出力しない。
 - `lastmod` は空でない改訂日時・更新日時・公開日時の順に選び、有効な日時だけを出力する。
 
 ## GET /feed.xml
 
 - Content-Type: `application/rss+xml; charset=utf-8`
 - Response: RSS 2.0 feed
-- 対象: ブログ記事全件
+- 対象: ブログ記事全件。同じ記事IDが重複した場合は最初の項目を採用する。
 
 ## Error contract
 

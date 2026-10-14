@@ -25,4 +25,13 @@ RSpec.describe SitemapEntriesBuilder do
       expect(result.last(2).pluck(:lastmod)).to eq([ "2026-01-02T00:00:00Z", "2026-01-01T00:00:00Z" ])
     end
   end
+  context "同じIDが重複した場合" do
+    let(:articles) { [ { id: "same" }, { id: "same" } ] }
+    let(:authors) { [ { id: "same" }, { id: "same" } ] }
+
+    it "記事と著者の別URLを維持し、各URLは一度だけ出力する" do
+      expect(result.last(2).pluck(:loc)).to eq([ "https://example.test/authors/same", "https://example.test/articles/same" ])
+      expect(result).to have_attributes(size: 7)
+    end
+  end
 end

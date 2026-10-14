@@ -20,4 +20,11 @@ RSpec.describe RssArticleItemsBuilder do
       expect(result.first[:author]).to eq("")
     end
   end
+  context "同じ記事IDが重複した場合" do
+    let(:articles) { [ { id: "duplicate", title: "最初" }, { id: "duplicate", title: "後" } ] }
+
+    it "最初のitemだけを出力する" do
+      expect(result.pluck(:title)).to eq([ "最初" ])
+    end
+  end
 end
