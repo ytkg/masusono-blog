@@ -7,7 +7,7 @@ const BUTTON_LABELS = Object.freeze({
   gameover: "リスタート",
 })
 
-export default function GamePrimaryAction({ state, restartCooling, inputHandlers, onAction }) {
+export default function GamePrimaryAction({ state, restartCooling, onAction }) {
   return (
     <Box sx={{ width: "100%", flexShrink: 0 }}>
       <Button
@@ -18,13 +18,13 @@ export default function GamePrimaryAction({ state, restartCooling, inputHandlers
         disableRipple
         disabled={restartCooling}
         onPointerDown={(e) => {
+          if (e.button > 0) return
           e.preventDefault()
-          inputHandlers.onPrimaryPointerDown()
           onAction()
         }}
         onClick={(e) => {
           e.preventDefault()
-          if (!inputHandlers.onPrimaryClick()) return
+          if (e.detail !== 0) return
           onAction()
         }}
       >
