@@ -55,3 +55,8 @@ it("SEO本文で文字参照と属性内の記号・段落境界を正しく扱�
   render(<BlogDetail article={{ id: "html", title: "HTML", content: '<p title="a > b">A &amp; B</p><p>続き</p>' }} />)
   expect(seoMock.mock.calls.at(-1)[0].description).toBe("A & B 続き")
 })
+
+it("SEOの文字数境界で結合絵文字を切らない", () => {
+  render(<BlogDetail article={{ id: "joined", content: "あ".repeat(119) + "👨‍👩‍👧‍👦後" }} />)
+  expect(seoMock.mock.calls.at(-1)[0].description).toBe("あ".repeat(119) + "…")
+})

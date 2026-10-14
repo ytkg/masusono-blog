@@ -1,3 +1,4 @@
+import { truncateText } from "../../shared/lib/truncateText"
 import { extractTextFromHtml } from "../../features/blog/articleHtmlText"
 import PageContainer from "../../shared/components/PageContainer"
 import ArticleCard from "../../features/blog/ArticleCard"
@@ -6,7 +7,7 @@ import SeoHead from "../../shared/components/SeoHead"
 function extractMetaDescription(content) {
   const plainText = extractTextFromHtml(content)
 
-  return plainText ? `${plainText.slice(0, 120)}${plainText.length > 120 ? "…" : ""}` : undefined
+  return plainText ? `${truncateText(plainText, 120)}${plainText.length > 120 ? "…" : ""}` : undefined
 }
 
 export default function BlogDetail({ article = null, relatedArticles = [], yearAgoArticles = [], ogpImagePath }) {
