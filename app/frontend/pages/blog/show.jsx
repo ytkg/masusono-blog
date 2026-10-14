@@ -1,15 +1,10 @@
+import { extractTextFromHtml } from "../../features/blog/articleHtmlText"
 import PageContainer from "../../shared/components/PageContainer"
 import ArticleCard from "../../features/blog/ArticleCard"
 import SeoHead from "../../shared/components/SeoHead"
 
 function extractMetaDescription(content) {
-  const plainText =
-    typeof content === "string"
-      ? content
-          .replace(/<[^>]*>/g, "")
-          .replace(/\s+/g, " ")
-          .trim()
-      : ""
+  const plainText = extractTextFromHtml(content)
 
   return plainText ? `${plainText.slice(0, 120)}${plainText.length > 120 ? "…" : ""}` : undefined
 }

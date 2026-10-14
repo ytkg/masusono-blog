@@ -50,3 +50,8 @@ describe("BlogDetail page", () => {
     expect(canonicalPath).toBe("/")
   })
 })
+
+it("SEO本文で文字参照と属性内の記号・段落境界を正しく扱う", () => {
+  render(<BlogDetail article={{ id: "html", title: "HTML", content: '<p title="a > b">A &amp; B</p><p>続き</p>' }} />)
+  expect(seoMock.mock.calls.at(-1)[0].description).toBe("A & B 続き")
+})
