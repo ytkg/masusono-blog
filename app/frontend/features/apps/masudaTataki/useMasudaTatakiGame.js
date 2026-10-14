@@ -9,16 +9,20 @@ export function useMasudaTatakiGame(active) {
   const [game, setGame] = useState(initialGame)
   const gameRef = useRef(game)
   const startedAt = useRef(0)
+  const countdownElapsed = useRef(0)
 
   useEffect(() => {
     if (!active || phase !== "countdown") return
-    const started = performance.now()
+    const started = performance.now() - countdownElapsed.current
     const timer = window.setInterval(() => {
       const remaining = 3 - Math.floor((performance.now() - started) / 1000)
       setCountdown(Math.max(1, remaining))
       if (remaining <= 0) setPhase("playing")
     }, 50)
-    return () => window.clearInterval(timer)
+    return () => {
+      countdownElapsed.current = performance.now() - started
+      window.clearInterval(timer)
+    }
   }, [active, phase])
 
   useEffect(() => {
@@ -46,6 +50,7 @@ export function useMasudaTatakiGame(active) {
     const next = initialGame()
     gameRef.current = next
     setGame(next)
+    countdownElapsed.current = 0
     setCountdown(3)
     setPhase("countdown")
   }
