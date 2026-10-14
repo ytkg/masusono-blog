@@ -699,9 +699,12 @@ for (const state of ["loading", "warning", "error"]) {
     await expect(message).toHaveCSS("color", state === "loading" ? "rgb(102, 102, 102)" : "rgb(0, 0, 0)")
     await expect(runner).toHaveScreenshot(`ruby-${state}.png`)
     if (state === "loading") {
+      await runner.getByRole("button", { name: "■ 停止" }).click()
+      await expect.poll(() => page.evaluate(() => window.Worker.terminated)).toBe(1)
+      await runner.getByRole("button", { name: "▶ 実行" }).click()
       await page.getByRole("link", { name: "ホーム", exact: true }).click()
       await expect(page).toHaveURL("/")
-      await expect.poll(() => page.evaluate(() => window.Worker.terminated)).toBe(1)
+      await expect.poll(() => page.evaluate(() => window.Worker.terminated)).toBe(2)
     }
   })
 }

@@ -30,7 +30,7 @@ describe("CodeBlock", () => {
 
     rerender(<CodeBlockRunButton disabled isRunning onClick={onClick} />)
 
-    expect(screen.getByRole("button", { name: "実行中" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "■ 停止" })).toBeDisabled()
   })
   it("インデントと空行を保ち、行番号を3桁で表示する", () => {
     const code = "\tputs :hello\n\n  puts :world"
