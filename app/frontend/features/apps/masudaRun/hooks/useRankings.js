@@ -15,7 +15,7 @@ export default function useRankings(enabled) {
     rankings: Array.isArray(data) ? data : null,
     rankingsLoading: isLoading,
     error,
-    rankingsError: Boolean(error),
+    rankingsError: Boolean(error) || (data !== undefined && !Array.isArray(data)),
     refreshRankings: mutate,
     submitRanking,
   }

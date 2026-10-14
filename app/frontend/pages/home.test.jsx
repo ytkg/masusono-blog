@@ -343,4 +343,16 @@ describe("Home page", () => {
     await waitFor(() => expect(screen.getByTestId("sentence-feed")).toHaveAttribute("data-has-more", "false"))
     expect(screen.getByTestId("sentence-feed")).toHaveTextContent("articles:2")
   })
+
+  it.each([[{}], [null], [{ monthDay: 12, articles: [] }], [{ monthDay: "01/01", articles: null }]])(
+    "不正なこよみグループを保存せず再試行できる: %j",
+    async (...groups) => {
+      requestJson.mockResolvedValueOnce({ groups }).mockResolvedValueOnce({ groups: [] })
+      render(<Home articles={[]} />)
+      fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
+      expect(await screen.findByText("記事を読み込めませんでした。")).toBeInTheDocument()
+      fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+      expect(await screen.findByText("記事がありません。")).toBeInTheDocument()
+    },
+  )
 })

@@ -60,3 +60,10 @@ describe("useRankings", () => {
     expect(mutate).toHaveBeenCalledTimes(1)
   })
 })
+
+it.each([null, {}, "invalid"])("非配列のランキング応答を空ランキングと区別する: %j", (data) => {
+  useApiSWR.mockReturnValue({ data, error: null, isLoading: false, mutate: vi.fn() })
+  const { result } = renderHook(() => useRankings(true))
+  expect(result.current.rankings).toBeNull()
+  expect(result.current.rankingsError).toBe(true)
+})
