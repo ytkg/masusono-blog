@@ -77,10 +77,7 @@ describe("fetchJson", () => {
     expect(fetch).toHaveBeenCalledWith("/api/example.json", {
       cache: "no-store",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      headers: expect.any(Headers),
       body: JSON.stringify({ score: 1234 }),
     })
   })
@@ -108,10 +105,37 @@ it("preserves JSON headers when callers add headers and cancellation", async () 
   expect(fetch).toHaveBeenCalledWith(
     "/example",
     expect.objectContaining({
-      headers: { "Content-Type": "application/json", Accept: "application/json", "X-Request-ID": "test" },
+      headers: expect.any(Headers),
       signal: controller.signal,
       body: '{"value":1}',
     }),
   )
+  const headers = fetch.mock.calls[0][1].headers
+  expect(headers.get("Content-Type")).toBe("application/json")
+  expect(headers.get("Accept")).toBe("application/json")
+  expect(headers.get("X-Request-ID")).toBe("test")
   vi.unstubAllGlobals()
+})
+
+it.each([
+  { headers: new Headers({ "X-Custom": "value", "content-type": "custom/json" }) },
+  {
+    headers: [
+      ["X-Custom", "value"],
+      ["content-type", "custom/json"],
+    ],
+  },
+])("preserves RequestInit headers without duplicate content types", async ({ headers }) => {
+  const fetch = vi.fn().mockResolvedValue({ ok: true, status: 204 })
+  vi.stubGlobal("fetch", fetch)
+  try {
+    await postJson("/example", {}, { headers })
+    expect(Object.fromEntries(fetch.mock.calls[0][1].headers)).toEqual({
+      accept: "application/json",
+      "content-type": "custom/json",
+      "x-custom": "value",
+    })
+  } finally {
+    vi.unstubAllGlobals()
+  }
 })

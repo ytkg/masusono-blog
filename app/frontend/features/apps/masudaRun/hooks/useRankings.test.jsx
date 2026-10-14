@@ -54,10 +54,7 @@ describe("useRankings", () => {
     expect(fetch).toHaveBeenCalledWith("/api/app/masuda_run/rankings.json", {
       cache: "no-store",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      headers: expect.any(Headers),
       body: JSON.stringify({ score: "1234", userId: "cookie-user" }),
     })
     expect(mutate).toHaveBeenCalledTimes(1)
