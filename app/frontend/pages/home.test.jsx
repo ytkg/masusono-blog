@@ -325,7 +325,9 @@ describe("Home page", () => {
     const home = render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
     fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
     expect(screen.getByText("記事を読み込んでいます…")).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "さらに読み込む" })).toBeDisabled()
+    fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
+    expect(requestJson).toHaveBeenCalledOnce()
     const signal = requestJson.mock.calls[0][1].signal
     home.unmount()
     expect(signal.aborted).toBe(true)
