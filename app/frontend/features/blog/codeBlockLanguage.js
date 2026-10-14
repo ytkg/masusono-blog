@@ -1,4 +1,4 @@
-const LANGUAGE_PREFIX_PATTERN = /^(language|lang)-/
+const LANGUAGE_PREFIX_PATTERN = /^(language|lang)-/i
 
 const LANGUAGE_CONFIGS = Object.freeze({
   bash: { label: "Bash", prismLanguage: "bash" },
@@ -15,12 +15,17 @@ const LANGUAGE_CONFIGS = Object.freeze({
   typescript: { label: "TypeScript", prismLanguage: "typescript" },
 })
 
+export const LANGUAGE_CODE_PATTERN = new RegExp(
+  `<pre\\b[^>]*>\\s*<code\\b[^>]*\\bclass\\s*=\\s*["'][^"']*\\b(?:(?:language|lang)-|${Object.keys(LANGUAGE_CONFIGS).join("|")}(?=[\\s"']))`,
+  "i",
+)
+
 function rawCodeLanguage(codeElement) {
   const classNames = Array.from(codeElement.classList)
   const languageClass = classNames.find((className) => LANGUAGE_PREFIX_PATTERN.test(className))
   return (
     languageClass?.replace(LANGUAGE_PREFIX_PATTERN, "") ||
-    classNames.find((className) => Object.hasOwn(LANGUAGE_CONFIGS, className))
+    classNames.find((className) => Object.hasOwn(LANGUAGE_CONFIGS, className.toLowerCase()))
   )
 }
 
