@@ -46,3 +46,21 @@ describe("extractTextFromHtml", () => {
     expect(extractTextFromHtml('<p title="a > b">Ru<strong>by</strong></p>')).toBe("Ruby")
   })
 })
+
+it.each([false, true])("非表示の埋め込み内容を検索・抜粋へ含めない SSR=%s", (ssr) => {
+  vi.stubEnv("SSR", ssr)
+  expect(
+    extractTextFromHtml(
+      "<p>本文</p><script>secret()</script><style>p{color:red}</style><template>hidden</template><noscript>fallback</noscript><iframe>fallback frame</iframe><p>末尾</p>",
+    ),
+  ).toBe("本文 末尾")
+})
+
+it.each([false, true])("表や引用のテキストを結合しない SSR=%s", (ssr) => {
+  vi.stubEnv("SSR", ssr)
+  expect(
+    extractTextFromHtml(
+      "<table><tr><td>左</td><td>右</td></tr></table><blockquote>引用</blockquote><pre>code</pre><p>後</p>",
+    ),
+  ).toBe("左 右 引用 code 後")
+})

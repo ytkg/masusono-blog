@@ -2,7 +2,23 @@ import { parseFragment } from "parse5"
 
 const HTML_MARKUP_PATTERN = /[<&]/
 const WHITESPACE_PATTERN = /\s+/g
-const LINE_BOUNDARY_TAGS = new Set(["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li"])
+const EXCLUDED_TAGS = new Set(["script", "style", "template", "noscript", "iframe"])
+const LINE_BOUNDARY_TAGS = new Set([
+  "p",
+  "div",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "li",
+  "pre",
+  "blockquote",
+  "tr",
+  "td",
+  "th",
+])
 
 // Both parsers use inert HTML fragments and preserve the same text boundaries.
 export function extractHtmlText(html = "") {
@@ -23,6 +39,7 @@ export function extractTextFromHtml(html) {
 function readText(node) {
   if (node.nodeName === "#text") return node.value ?? node.nodeValue
   const tagName = node.tagName?.toLowerCase()
+  if (EXCLUDED_TAGS.has(tagName)) return ""
   if (tagName === "br") return "\n"
 
   const text = Array.from(node.childNodes ?? [], readText).join("")
