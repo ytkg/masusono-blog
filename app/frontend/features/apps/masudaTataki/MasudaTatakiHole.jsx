@@ -17,6 +17,7 @@ export default function MasudaTatakiHole({ character, index, elapsed, onTap }) {
       type="button"
       aria-label={`穴${index + 1}${character && !character.hit ? (character.kind === "masuda" ? " 増田" : " その他") : ""}`}
       onPointerDown={(event) => {
+        if (event.button > 0) return
         event.preventDefault()
         onTap(index)
       }}

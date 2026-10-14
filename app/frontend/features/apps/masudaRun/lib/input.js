@@ -28,7 +28,8 @@ export const attachKeyboardHandlers = (state, startOrRestart, doJump) => {
 }
 
 export const attachPointerHandler = (canvas, state, startOrRestart, doJump) => {
-  const onPointerDown = () => {
+  const onPointerDown = (event) => {
+    if (event.button > 0) return
     if (state === "ready" || state === "gameover") return startOrRestart()
     if (state === "playing") doJump()
   }

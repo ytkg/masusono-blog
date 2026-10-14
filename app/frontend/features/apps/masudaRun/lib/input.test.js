@@ -87,7 +87,7 @@ describe("attachPointerHandler", () => {
     const doJump = vi.fn()
     const cleanup = attachPointerHandler(canvas, "playing", startOrRestart, doJump)
 
-    pointerdownHandler()
+    pointerdownHandler({ button: 0 })
     expect(doJump).toHaveBeenCalledTimes(1)
 
     cleanup()
@@ -123,3 +123,14 @@ it.each([{ ctrlKey: true }, { metaKey: true }, { altKey: true }, { isComposing: 
     cleanup()
   },
 )
+
+it("ignores secondary pointers on the RUN canvas", () => {
+  const canvas = document.createElement("canvas")
+  const start = vi.fn()
+  const cleanup = attachPointerHandler(canvas, "ready", start, vi.fn())
+  for (const button of [1, 2]) canvas.dispatchEvent(new MouseEvent("pointerdown", { button }))
+  expect(start).not.toHaveBeenCalled()
+  canvas.dispatchEvent(new MouseEvent("pointerdown", { button: 0 }))
+  expect(start).toHaveBeenCalledOnce()
+  cleanup()
+})
