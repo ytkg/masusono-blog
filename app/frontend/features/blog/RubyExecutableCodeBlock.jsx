@@ -42,7 +42,14 @@ export default function RubyExecutableCodeBlock({ code, html }) {
   const [result, setResult] = useState(null)
   const [isRunning, setIsRunning] = useState(false)
   const [showsRunningWarning, setShowsRunningWarning] = useState(false)
-  const runIdRef = useRef(0)
+  const runRef = useRef(null)
+
+  useEffect(() => {
+    setResult(null)
+    setIsRunning(false)
+    setShowsRunningWarning(false)
+    return () => runRef.current?.abort()
+  }, [code])
 
   useEffect(() => {
     if (!isRunning) {
@@ -58,15 +65,17 @@ export default function RubyExecutableCodeBlock({ code, html }) {
   }, [isRunning])
 
   async function handleRun() {
-    const runId = runIdRef.current + 1
-    runIdRef.current = runId
+    runRef.current?.abort()
+    const controller = new AbortController()
+    runRef.current = controller
     setResult(null)
     setIsRunning(true)
 
-    const nextResult = await runRubyCode(code)
+    const nextResult = await runRubyCode(code, { signal: controller.signal })
 
-    if (runIdRef.current !== runId) return
+    if (controller.signal.aborted) return
 
+    runRef.current = null
     setResult(nextResult)
     setIsRunning(false)
   }

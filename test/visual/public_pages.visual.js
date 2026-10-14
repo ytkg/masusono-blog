@@ -667,13 +667,14 @@ for (const state of ["loading", "warning", "error"]) {
     if (state === "warning") await page.clock.install()
     await page.addInitScript((state) => {
       window.Worker = class {
+        static terminated = 0
         addEventListener(type, listener) {
           if (type === "message") this.listener = listener
         }
         postMessage() {
           if (state === "error") this.listener({ data: { error: "Ruby の実行に失敗しました。" } })
         }
-        terminate() {}
+        terminate() { window.Worker.terminated++ }
       }
     }, state)
     await mockPageProps(page, "/articles/visual-article-1", (props) => {
@@ -697,6 +698,11 @@ for (const state of ["loading", "warning", "error"]) {
     await expect(message).toHaveCSS("line-height", "21px")
     await expect(message).toHaveCSS("color", state === "loading" ? "rgb(102, 102, 102)" : "rgb(0, 0, 0)")
     await expect(runner).toHaveScreenshot(`ruby-${state}.png`)
+    if (state === "loading") {
+      await page.getByRole("link", { name: "ホーム", exact: true }).click()
+      await expect(page).toHaveURL("/")
+      await expect.poll(() => page.evaluate(() => window.Worker.terminated)).toBe(1)
+    }
   })
 }
 
