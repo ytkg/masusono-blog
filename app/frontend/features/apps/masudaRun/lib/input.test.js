@@ -94,3 +94,32 @@ describe("attachPointerHandler", () => {
     expect(canvas.removeEventListener).toHaveBeenCalledWith("pointerdown", pointerdownHandler)
   })
 })
+
+it.each(["input", "textarea", "select", "button", "a", "div"])("keeps native editing and controls on %s", (tag) => {
+  const target = document.createElement(tag)
+  if (tag === "div") target.contentEditable = "true"
+  if (tag === "div") target.setAttribute("contenteditable", "true")
+  document.body.append(target)
+  const start = vi.fn()
+  const jump = vi.fn()
+  const cleanup = attachKeyboardHandlers("ready", start, jump)
+  const event = new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true })
+  target.dispatchEvent(event)
+  expect(event.defaultPrevented).toBe(false)
+  expect(start).not.toHaveBeenCalled()
+  cleanup()
+  target.remove()
+})
+
+it.each([{ ctrlKey: true }, { metaKey: true }, { altKey: true }, { isComposing: true }])(
+  "ignores modified/composing keys: %j",
+  (options) => {
+    const start = vi.fn()
+    const cleanup = attachKeyboardHandlers("ready", start, vi.fn())
+    const event = new KeyboardEvent("keydown", { key: " ", cancelable: true, ...options })
+    window.dispatchEvent(event)
+    expect(start).not.toHaveBeenCalled()
+    expect(event.defaultPrevented).toBe(false)
+    cleanup()
+  },
+)
