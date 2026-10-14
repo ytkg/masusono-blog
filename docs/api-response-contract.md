@@ -99,6 +99,7 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 
 - Content-Type: `application/xml; charset=utf-8`
 - Response: XML sitemap
+- `lastmod` は空でない改訂日時・更新日時・公開日時の順に選び、有効な日時だけを出力する。
 
 ## GET /feed.xml
 

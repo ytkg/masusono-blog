@@ -53,7 +53,7 @@ class SitemapEntriesBuilder
 
     {
       loc: "#{base_url}/#{section}/#{id}",
-      lastmod: content[:revisedAt] || content[:updatedAt] || content[:publishedAt],
+      lastmod: content.values_at(:revisedAt, :updatedAt, :publishedAt).find(&:present?),
       changefreq:,
       priority:
     }

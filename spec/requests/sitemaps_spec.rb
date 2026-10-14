@@ -32,5 +32,14 @@ RSpec.describe "Sitemaps", type: :request do
       expect(blog_entry_count).to eq(article_count)
       expect(blog_entry_count).to eq(120)
     end
+    context "改訂日時が空文字の場合" do
+      let(:articles) { [ { id: "blank-revision", revisedAt: "", updatedAt: "2026-01-01T00:00:00Z" } ] }
+
+      it "更新日時をlastmodへ出力する" do
+        get "/sitemap.xml"
+        expect(response.body).to include("<lastmod>2026-01-01T00:00:00Z</lastmod>")
+        expect(response.headers["Cache-Control"]).to eq("no-store")
+      end
+    end
   end
 end
