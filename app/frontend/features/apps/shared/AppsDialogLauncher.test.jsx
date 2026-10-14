@@ -120,3 +120,27 @@ it.each([false, true])("onOpenのPromiseを待ち、失敗でも表示を続け�
     vi.useRealTimers()
   }
 })
+
+it("動きを減らす設定では内部の内容・読み込み画面もフェードさせない", () => {
+  const matchMedia = vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
+    matches: query.includes("prefers-reduced-motion"),
+    media: query,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+  }))
+  const { unmount } = render(
+    <AppsDialogLauncher title="Reduced" buttonAriaLabel="低モーション">
+      <div>内容</div>
+    </AppsDialogLauncher>,
+  )
+  try {
+    fireEvent.click(screen.getByRole("button", { name: "低モーション" }))
+    expect(screen.getByTestId("app-content")).toHaveStyle({ transition: "none" })
+    expect(screen.getByRole("status", { name: "Reducedを読み込み中" })).toHaveStyle({ transition: "none" })
+  } finally {
+    unmount()
+    matchMedia.mockRestore()
+  }
+})
