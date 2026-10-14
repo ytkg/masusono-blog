@@ -134,3 +134,23 @@ it("ignores secondary pointers on the RUN canvas", () => {
   expect(start).toHaveBeenCalledOnce()
   cleanup()
 })
+
+it("ランキングのスクロール領域では上矢印をゲーム操作として奪わない", () => {
+  const region = document.createElement("div")
+  region.setAttribute("role", "region")
+  region.tabIndex = 0
+  document.body.append(region)
+  const jump = vi.fn()
+  const cleanup = attachKeyboardHandlers("playing", vi.fn(), jump)
+  try {
+    for (const type of ["keydown", "keyup"]) {
+      const event = new KeyboardEvent(type, { key: "ArrowUp", bubbles: true, cancelable: true })
+      region.dispatchEvent(event)
+      expect(event.defaultPrevented).toBe(false)
+    }
+    expect(jump).not.toHaveBeenCalled()
+  } finally {
+    cleanup()
+    region.remove()
+  }
+})

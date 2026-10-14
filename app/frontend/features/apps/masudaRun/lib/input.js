@@ -3,7 +3,9 @@ export const attachKeyboardHandlers = (state, startOrRestart, doJump) => {
     if (e.repeat || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return
     if (
       e.target instanceof Element &&
-      e.target.closest('input, textarea, select, button, a, [contenteditable=""], [contenteditable="true"]')
+      e.target.closest(
+        'input, textarea, select, button, a, [role="region"][tabindex], [contenteditable=""], [contenteditable="true"]',
+      )
     )
       return
     const isJumpKey = e.key === " " || e.key === "ArrowUp"
