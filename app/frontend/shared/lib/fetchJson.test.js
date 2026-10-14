@@ -139,3 +139,29 @@ it.each([
     vi.unstubAllGlobals()
   }
 })
+
+it.each([null, { error: { code: "failure", request_id: "body-id" } }])(
+  "keeps header request IDs when the error body cannot provide one: %j",
+  async (payload) => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 502,
+        headers: new Headers({ "X-Request-ID": "header-id" }),
+        json: async () => {
+          if (payload === null) throw new SyntaxError("not JSON")
+          return payload
+        },
+      }),
+    )
+    try {
+      await expect(fetchJson("/example")).rejects.toMatchObject({
+        status: 502,
+        requestId: payload === null ? "header-id" : "body-id",
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  },
+)

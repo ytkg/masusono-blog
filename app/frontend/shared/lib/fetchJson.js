@@ -11,7 +11,7 @@ export class ApiError extends Error {
 async function buildApiError(response) {
   let code = null
   let message = `Request failed with status ${response.status}`
-  let requestId = null
+  let requestId = response.headers?.get("x-request-id") ?? null
 
   try {
     const payload = await response.json()
