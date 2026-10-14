@@ -84,4 +84,12 @@ RSpec.describe Numbers::MetricsTrendBuilder do
       end
     end
   end
+  it "表示開始日前の記事も累積の初期値に含める" do
+    result = described_class.call(
+      articles: [ { publishedAt: "2025-10-04T00:00:00Z", content: "abc" }, { publishedAt: "2025-10-06T00:00:00Z", content: "de" } ],
+      start_date: Date.new(2025, 10, 5), end_date: Date.new(2025, 10, 6))
+    expect(result.fetch(:points).pluck(:totalArticles)).to eq([ 1, 2 ])
+    expect(result.fetch(:points).pluck(:totalChars)).to eq([ 3, 5 ])
+    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "2 本", "5 字" ])
+  end
 end

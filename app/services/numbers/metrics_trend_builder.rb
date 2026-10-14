@@ -51,6 +51,12 @@ module Numbers
       @build_points ||= begin
         article_events = grouped_article_events
         totals = initial_totals
+        article_events.each do |date, counts|
+          next unless date < start_date
+
+          totals[:total_articles] += counts.fetch(:total_articles)
+          totals[:total_chars] += counts.fetch(:total_chars)
+        end
 
         date_range.map do |date|
           article_data = article_events.fetch(date) { initial_totals }
