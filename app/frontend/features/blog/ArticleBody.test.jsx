@@ -18,13 +18,14 @@ describe("ArticleBody", () => {
 
     expect(screen.queryByTestId("article-body-html")).not.toBeInTheDocument()
 
+    expect(screen.getByRole("button", { name: "続きを読む" })).toHaveAttribute("aria-expanded", "false")
     fireEvent.click(screen.getByRole("button", { name: "続きを読む" }))
 
     const expandedBody = screen.getByTestId("article-body-html")
 
     expect(expandedBody).toHaveTextContent("あ".repeat(81))
     expect(getComputedStyle(excerpt).color).toBe(getComputedStyle(expandedBody).color)
-    expect(screen.getByRole("button", { name: "閉じる" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "閉じる" })).toHaveAttribute("aria-expanded", "true")
   })
 
   it("折りたたみ対象でない本文をそのまま表示する", () => {

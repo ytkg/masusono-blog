@@ -2,7 +2,7 @@ import { HEADER_HEIGHT } from "../layouts/pageLayout"
 import useHomeTabState from "../features/blog/useHomeTabState"
 import useHomeArticles from "../features/blog/useHomeArticles"
 import LoadMoreArticles from "../features/blog/LoadMoreArticles"
-import { useEffect } from "react"
+import { useEffect, useId } from "react"
 import Box from "@mui/material/Box"
 import Tab from "@mui/material/Tab"
 import Tabs from "@mui/material/Tabs"
@@ -18,6 +18,7 @@ const compactTabSx = {
 }
 
 export default function Home({ articles = [], pagination }) {
+  const tabsId = useId()
   const { mode, changeMode } = useHomeTabState()
   const feed = useHomeArticles(articles, pagination)
   const activeTab = HOME_TABS.find((tab) => tab.id === mode)
@@ -57,11 +58,23 @@ export default function Home({ articles = [], pagination }) {
               sx={{ minHeight: HOME_TAB_HEIGHT }}
             >
               {HOME_TABS.map((tab) => (
-                <Tab key={tab.id} label={tab.label} value={tab.id} sx={compactTabSx} />
+                <Tab
+                  key={tab.id}
+                  id={`${tabsId}-${tab.id}`}
+                  aria-controls={`${tabsId}-panel`}
+                  label={tab.label}
+                  value={tab.id}
+                  sx={compactTabSx}
+                />
               ))}
             </Tabs>
           </Box>
-          <Box sx={{ pt: mode === "calendar" ? 0.5 : 1 }}>
+          <Box
+            role="tabpanel"
+            id={`${tabsId}-panel`}
+            aria-labelledby={`${tabsId}-${mode}`}
+            sx={{ pt: mode === "calendar" ? 0.5 : 1 }}
+          >
             {activeTab?.renderContent({
               articles: feed.articles,
               hasMore: feed.hasMore,

@@ -36,6 +36,8 @@ describe("FloatingBottomNavigation", () => {
     expect(screen.getByText("その他！").closest("a")).toHaveAttribute("href", "/others")
     expect(screen.queryByText("ブログ")).not.toBeInTheDocument()
     expect(screen.getByText("ホーム").closest(".Mui-selected")).not.toBeNull()
+    expect(screen.getByRole("link", { name: "ホーム" })).toHaveAttribute("aria-current", "page")
+    expect(screen.getByRole("link", { name: "検索" })).not.toHaveAttribute("aria-current")
     expect(screen.queryByText(/©/)).not.toBeInTheDocument()
     expect(screen.queryByText("増田とその他！")).not.toBeInTheDocument()
   })

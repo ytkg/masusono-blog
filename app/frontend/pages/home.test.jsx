@@ -86,6 +86,10 @@ describe("Home page", () => {
     expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
+    expect(screen.getByRole("tabpanel", { name: "フィード" })).toHaveAttribute(
+      "id",
+      screen.getByRole("tab", { name: "フィード" }).getAttribute("aria-controls"),
+    )
     fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
     expect(requestJson).toHaveBeenCalledTimes(1)
     expect(screen.getByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "false")
