@@ -46,4 +46,13 @@ RSpec.describe "Calendar articles", type: :request do
     expect(response.parsed_body.dig("error", "request_id")).to be_present
     expect(response.headers["Cache-Control"]).to include("no-store")
   end
+  context "形式は日付でも暦に存在しない場合" do
+    let(:articles) { [ { id: "invalid", publishedAt: "2026/02/29", content: "本文" }, { id: "invalid-time", publishedAt: "2026-02-29T12:00:00Z", content: "本文" }, { id: "valid", publishedAt: "2024/02/29", content: "閏日" } ] }
+
+    it "存在する閏日だけを含め、no-storeを維持する" do
+      get "/api/app/calendar_articles"
+      expect(response.parsed_body.fetch("groups").sole.fetch("articles").pluck("id")).to eq([ "valid" ])
+      expect(response.headers["Cache-Control"]).to include("no-store")
+    end
+  end
 end

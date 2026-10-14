@@ -23,7 +23,7 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 
 Response: `{ "groups": Array<{ "monthDay": String, "articles": Array<Article> }> }`
 
-`monthDay` は `MM/DD`。グループは1月1日から12月31日へ昇順、各グループ内の記事は公開日時の降順。記事形式はフィードと同じで年月日も維持する。公開日がない記事と記事がない月日は省略し、2月29日は記事があれば含める。記事0件は `groups: []`。`Cache-Control: no-store` と upstream の共通エラー形式を維持する。
+`monthDay` は `MM/DD`。グループは1月1日から12月31日へ昇順、各グループ内の記事は公開日時の降順。記事形式はフィードと同じで年月日も維持する。公開日がない記事・暦に存在しない公開日の記事と記事がない月日は省略し、2月29日は記事があれば含める。記事0件は `groups: []`。`Cache-Control: no-store` と upstream の共通エラー形式を維持する。
 
 ## Users API
 
