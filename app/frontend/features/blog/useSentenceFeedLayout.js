@@ -28,10 +28,19 @@ export default function useSentenceFeedLayout(items) {
       setHeight(nextLayout.height)
     }
 
+    let disposed = false
     layout()
-    const observer = new ResizeObserver(layout)
-    observer.observe(container)
-    return () => observer.disconnect()
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(layout)
+    observer?.observe(container)
+    window.addEventListener("resize", layout)
+    document.fonts?.ready.then(() => {
+      if (!disposed) layout()
+    })
+    return () => {
+      disposed = true
+      observer?.disconnect()
+      window.removeEventListener("resize", layout)
+    }
   }, [items])
 
   return { containerRef, height }
