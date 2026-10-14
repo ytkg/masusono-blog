@@ -137,3 +137,18 @@ describe("NumbersTrendChart", () => {
     expect(screen.getByText("総記事数")).toBeInTheDocument()
   })
 })
+
+it("データが短くなった後も有効な日付を表示し、矢印キーで選択できる", () => {
+  const { rerender } = render(<NumbersTrendChart trend={trend} />)
+  fireEvent.keyDown(screen.getByRole("img"), { key: "End" })
+  rerender(
+    <ThemeProvider theme={theme}>
+      <NumbersTrendChart trend={{ ...trend, points: trend.points.slice(0, 2) }} />
+    </ThemeProvider>,
+  )
+  expect(screen.getByRole("status")).toHaveTextContent("2025/10/06")
+  fireEvent.keyDown(screen.getByRole("img"), { key: "ArrowLeft" })
+  expect(screen.getByRole("status")).toHaveTextContent("2025/10/05")
+  fireEvent.keyDown(screen.getByRole("img"), { key: "Escape" })
+  expect(screen.queryByRole("status")).not.toBeInTheDocument()
+})

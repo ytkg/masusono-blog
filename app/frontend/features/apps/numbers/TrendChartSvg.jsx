@@ -23,8 +23,9 @@ export default function TrendChartSvg({ trend }) {
   const bounds = chartBounds()
   const chartMaxValue = maxChartValue(trend.points, trend.series)
   const dateLabels = chartDateLabels(trend.points)
-  const selectedPoint = trend.points[selectedIndex]
-  const selectedX = chartPointX(selectedIndex, trend.points.length)
+  const activeIndex = selectedIndex === null ? null : Math.min(selectedIndex, trend.points.length - 1)
+  const selectedPoint = trend.points[activeIndex]
+  const selectedX = chartPointX(activeIndex, trend.points.length)
 
   const selectPoint = (event) => {
     const rectangle = event.currentTarget.getBoundingClientRect()
@@ -34,7 +35,7 @@ export default function TrendChartSvg({ trend }) {
 
   const handleKeyDown = (event) => {
     const lastIndex = trend.points.length - 1
-    const currentIndex = selectedIndex ?? lastIndex
+    const currentIndex = activeIndex ?? lastIndex
     const indexes = {
       ArrowLeft: Math.max(0, currentIndex - 1),
       ArrowRight: Math.min(lastIndex, currentIndex + 1),
