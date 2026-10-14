@@ -37,6 +37,12 @@ describe("MasudaRunRankings", () => {
     rerender(<MasudaRunRankings rankings={rankings} isLoading={false} hasError={false} error={null} />)
 
     expect(screen.getByRole("table", { name: "増田RUNランキング" })).toBeInTheDocument()
+    expect(screen.getByRole("region", { name: "増田RUNランキング（スクロールできます）" })).toHaveAttribute(
+      "tabindex",
+      "0",
+    )
+    expect(screen.getAllByRole("rowheader")).toHaveLength(10)
+    expect(screen.getAllByRole("columnheader")).toHaveLength(4)
     expect(screen.getByText("1,000")).toBeInTheDocument()
     expect(screen.getByText("User 10")).toBeInTheDocument()
     expect(screen.queryByText("User 11")).not.toBeInTheDocument()
