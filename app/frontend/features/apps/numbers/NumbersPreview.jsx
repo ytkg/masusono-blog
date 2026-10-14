@@ -17,7 +17,7 @@ export default function NumbersPreview({ metrics }) {
   }
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2}>
       <Stack spacing={1.5}>
         <SectionHeading>集計</SectionHeading>
         <NumbersMetricsTable rows={metricRows} />
