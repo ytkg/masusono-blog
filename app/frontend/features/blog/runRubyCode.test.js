@@ -65,6 +65,57 @@ describe("runRubyCode", () => {
     await expect(resultPromise).resolves.toEqual({ error: "worker failed", stderr: "", stdout: "" })
     expect(worker.terminate).toHaveBeenCalledOnce()
   })
+
+  it("中止済みならWorkerを生成しない", async () => {
+    const WorkerMock = vi.fn(workerConstructor(createWorker()))
+    vi.stubGlobal("Worker", WorkerMock)
+    const controller = new AbortController()
+    controller.abort()
+
+    await expect(runRubyCode("loop {}", { signal: controller.signal })).resolves.toEqual({
+      error: "Ruby 実行を中止しました。",
+      stderr: "",
+      stdout: "",
+    })
+    expect(WorkerMock).not.toHaveBeenCalled()
+  })
+
+  it("実行中の中止でWorkerを一度だけ終了し、遅い結果を無視する", async () => {
+    const worker = createWorker()
+    vi.stubGlobal("Worker", workerConstructor(worker))
+    const controller = new AbortController()
+    const resultPromise = runRubyCode("loop {}", { signal: controller.signal })
+    controller.abort()
+    worker.emit("message", { data: { stdout: "late", stderr: "" } })
+    worker.emit("error", { message: "late error" })
+
+    await expect(resultPromise).resolves.toEqual({
+      error: "Ruby 実行を中止しました。",
+      stderr: "",
+      stdout: "",
+    })
+    expect(worker.terminate).toHaveBeenCalledOnce()
+  })
+
+  it.each(["message", "messageerror", "error", "postMessage"])("%sで完了したら中止リスナーを解除する", async (type) => {
+    const worker = createWorker()
+    vi.stubGlobal("Worker", workerConstructor(worker))
+    const controller = new AbortController()
+    const removeListener = vi.spyOn(controller.signal, "removeEventListener")
+    if (type === "postMessage")
+      worker.postMessage.mockImplementation(() => {
+        throw new Error("send failed")
+      })
+    const resultPromise = runRubyCode("puts :hello", { signal: controller.signal })
+    if (type !== "postMessage") worker.emit(type, { data: { stdout: "hello", stderr: "" }, message: "failed" })
+    const result = await resultPromise
+    controller.abort()
+
+    expect(removeListener).toHaveBeenCalledWith("abort", expect.any(Function))
+    expect(worker.terminate).toHaveBeenCalledOnce()
+    if (type === "message") expect(result).toEqual({ stdout: "hello", stderr: "" })
+    else expect(result.error).toBeTruthy()
+  })
 })
 
 function createWorker() {

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import RubyExecutableCodeBlock from "./RubyExecutableCodeBlock"
 import { runRubyCode } from "./runRubyCode"
@@ -26,7 +26,7 @@ describe("RubyExecutableCodeBlock", () => {
     fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
 
     await waitFor(() => {
-      expect(runRubyCode).toHaveBeenCalledWith("puts :hello\nputs :world")
+      expect(runRubyCode).toHaveBeenCalledWith("puts :hello\nputs :world", { signal: expect.any(AbortSignal) })
     })
     expect(await screen.findByTestId("ruby-code-runner-output")).toHaveTextContent("hello world")
   })
@@ -63,5 +63,57 @@ describe("RubyExecutableCodeBlock", () => {
 
     expect(await screen.findByRole("alert")).toBeInTheDocument()
     expect(screen.getByText("boom")).toBeInTheDocument()
+  })
+
+  it("表示を閉じたら実行を中止する", () => {
+    vi.mocked(runRubyCode).mockReturnValue(new Promise(() => {}))
+    const { unmount } = render(
+      <RubyExecutableCodeBlock code="loop {}" html={'<pre><code class="language-ruby">loop {}</code></pre>'} />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
+    const options = vi.mocked(runRubyCode).mock.calls.at(-1)[1]
+    unmount()
+    expect(options?.signal.aborted).toBe(true)
+  })
+
+  it("実行済みコードが変わったら以前の出力を消す", async () => {
+    vi.mocked(runRubyCode).mockResolvedValueOnce({ stdout: "old", stderr: "" })
+    const { rerender } = render(
+      <RubyExecutableCodeBlock code="puts :old" html={'<pre><code class="language-ruby">puts :old</code></pre>'} />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
+    expect(await screen.findByTestId("ruby-code-runner-output")).toHaveTextContent("old")
+    rerender(
+      <RubyExecutableCodeBlock code="puts :new" html={'<pre><code class="language-ruby">puts :new</code></pre>'} />,
+    )
+    expect(screen.queryByTestId("ruby-code-runner-output")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "▶ 実行" })).toBeEnabled()
+  })
+
+  it("コード変更で古い実行を中止し、遅い結果に上書きされず新しいコードを実行できる", async () => {
+    let finishOldRun
+    vi.mocked(runRubyCode).mockReturnValueOnce(
+      new Promise((resolve) => {
+        finishOldRun = resolve
+      }),
+    )
+    const { rerender } = render(
+      <RubyExecutableCodeBlock code="loop {}" html={'<pre><code class="language-ruby">loop {}</code></pre>'} />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
+    const oldOptions = vi.mocked(runRubyCode).mock.calls.at(-1)[1]
+    rerender(
+      <RubyExecutableCodeBlock code="puts :new" html={'<pre><code class="language-ruby">puts :new</code></pre>'} />,
+    )
+    expect(oldOptions?.signal.aborted).toBe(true)
+    expect(screen.getByRole("button", { name: "▶ 実行" })).toBeEnabled()
+
+    vi.mocked(runRubyCode).mockResolvedValueOnce({ stdout: "new", stderr: "" })
+    fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
+    expect(await screen.findByTestId("ruby-code-runner-output")).toHaveTextContent("new")
+    await act(async () => {
+      finishOldRun({ stdout: "old", stderr: "" })
+    })
+    expect(screen.getByTestId("ruby-code-runner-output")).toHaveTextContent("new")
   })
 })
