@@ -117,3 +117,23 @@ describe("RubyExecutableCodeBlock", () => {
     expect(screen.getByTestId("ruby-code-runner-output")).toHaveTextContent("new")
   })
 })
+
+it("実行を停止して再実行でき、古い実行結果が混入しない", async () => {
+  let finishOld
+  runRubyCode.mockReturnValueOnce(
+    new Promise((resolve) => {
+      finishOld = resolve
+    }),
+  )
+  render(<RubyExecutableCodeBlock code="loop {}" html={'<pre><code class="language-ruby">loop {}</code></pre>'} />)
+  fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
+  const signal = runRubyCode.mock.calls.at(-1)[1].signal
+  fireEvent.click(screen.getByRole("button", { name: "■ 停止" }))
+  expect(signal.aborted).toBe(true)
+  expect(screen.queryByRole("status")).not.toBeInTheDocument()
+  runRubyCode.mockResolvedValueOnce({ stdout: "new", stderr: "" })
+  fireEvent.click(screen.getByRole("button", { name: "▶ 実行" }))
+  expect(await screen.findByTestId("ruby-code-runner-output")).toHaveTextContent("new")
+  await act(async () => finishOld({ stdout: "old", stderr: "" }))
+  expect(screen.getByTestId("ruby-code-runner-output")).toHaveTextContent("new")
+})

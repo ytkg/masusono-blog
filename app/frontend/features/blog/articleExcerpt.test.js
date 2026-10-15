@@ -12,3 +12,10 @@ it("keeps an emoji which fits within the preview", () => {
   expect(buildArticleExcerpt(text, true)).toEqual({ excerpt: text, canExpand: false })
   expect(firstSentenceFromHtml(text)).toBe(text)
 })
+
+it.each(["👨‍👩‍👧‍👦", "🇯🇵", "á"])("does not split a joined character %s", (joined) => {
+  const prefix = "あ".repeat(79)
+  const text = prefix + joined + "後"
+  expect(buildArticleExcerpt(text, true).excerpt).toBe(prefix + "…")
+  expect(firstSentenceFromHtml(text)).toBe(prefix)
+})

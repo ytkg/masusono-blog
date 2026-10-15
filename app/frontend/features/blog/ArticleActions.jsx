@@ -35,9 +35,9 @@ export default function ArticleActions({ article }) {
 
     try {
       await navigator.clipboard.writeText(kind === "full" ? buildArticleCopyText(article) : buildArticleUrl(article.id))
-      setFeedback(copyFeedback(kind, "success"))
+      setFeedback((previous) => ({ ...copyFeedback(kind, "success"), sequence: (previous?.sequence ?? 0) + 1 }))
     } catch {
-      setFeedback(copyFeedback(kind, "error"))
+      setFeedback((previous) => ({ ...copyFeedback(kind, "error"), sequence: (previous?.sequence ?? 0) + 1 }))
     }
   }
 
@@ -62,7 +62,7 @@ export default function ArticleActions({ article }) {
         </MenuItem>
       </Menu>
       <Snackbar
-        key={feedback?.severity}
+        key={feedback?.sequence}
         open={Boolean(feedback)}
         autoHideDuration={feedback?.severity === "success" ? 3000 : null}
         onClose={(_event, reason) => {

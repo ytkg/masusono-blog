@@ -10,7 +10,7 @@ class RssArticleItemsBuilder
   end
 
   def call(articles:)
-    articles.filter_map { |article| article_item(article) }
+    articles.uniq { |article| article[:id] }.filter_map { |article| article_item(article) }
   end
 
   private

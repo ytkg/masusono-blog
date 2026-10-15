@@ -1,3 +1,4 @@
+import EmptyStatus from "@/shared/components/EmptyStatus"
 import { Link } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
@@ -34,6 +35,7 @@ function AuthorListProfile({ member, isLast }) {
 }
 
 export default function AuthorsList({ authors = [] }) {
+  if (authors.length === 0) return <EmptyStatus>著者がいません。</EmptyStatus>
   return (
     <Stack>
       {authors.map((member, index) => (

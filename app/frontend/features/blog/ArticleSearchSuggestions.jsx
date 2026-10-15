@@ -1,3 +1,4 @@
+import { buildArticleSearchTerm } from "./articleSearchTerm"
 import { parseArticleTags } from "./parseArticleTags"
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
@@ -69,6 +70,6 @@ export default function ArticleSearchSuggestions({ articles, onSelect }) {
 function suggestionData(item, prefix) {
   if (typeof item !== "string") return { label: item.label, query: item.query }
 
-  const query = `${prefix}${item}`
-  return { label: query, query }
+  const query = buildArticleSearchTerm(prefix, item)
+  return { label: `${prefix}${item}`, query }
 }

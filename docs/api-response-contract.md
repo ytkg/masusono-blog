@@ -23,7 +23,7 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 
 Response: `{ "groups": Array<{ "monthDay": String, "articles": Array<Article> }> }`
 
-`monthDay` は `MM/DD`。グループは1月1日から12月31日へ昇順、各グループ内の記事は公開日時の降順。記事形式はフィードと同じで年月日も維持する。公開日がない記事と記事がない月日は省略し、2月29日は記事があれば含める。記事0件は `groups: []`。`Cache-Control: no-store` と upstream の共通エラー形式を維持する。
+`monthDay` は `MM/DD`。グループは1月1日から12月31日へ昇順、各グループ内の記事は公開日時の降順。記事形式はフィードと同じで年月日も維持する。公開日がない記事・暦に存在しない公開日の記事と記事がない月日は省略し、2月29日は記事があれば含める。記事0件は `groups: []`。`Cache-Control: no-store` と upstream の共通エラー形式を維持する。
 
 ## Users API
 
@@ -98,13 +98,14 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 ## GET /sitemap.xml
 
 - Content-Type: `application/xml; charset=utf-8`
-- Response: XML sitemap
+- Response: XML sitemap。記事・著者の各IDは最初の項目を採用し、同じURLを重複出力しない。
+- `lastmod` は空でない改訂日時・更新日時・公開日時の順に選び、有効な日時だけを出力する。
 
 ## GET /feed.xml
 
 - Content-Type: `application/rss+xml; charset=utf-8`
 - Response: RSS 2.0 feed
-- 対象: ブログ記事全件
+- 対象: ブログ記事全件。同じ記事IDが重複した場合は最初の項目を採用する。
 
 ## Error contract
 

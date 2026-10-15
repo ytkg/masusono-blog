@@ -15,6 +15,7 @@ module DateDisplayFormatter
     date_only_match = trimmed.match(DATE_ONLY_PATTERN)
     if date_only_match
       year, month, day = date_only_match.captures.map(&:to_i)
+      return value unless Date.valid_date?(year, month, day)
       return format_ymd(year, month, day)
     end
 
@@ -24,6 +25,9 @@ module DateDisplayFormatter
   end
 
   def format_timestamp(value)
+    date_parts = Date._parse(value).values_at(:year, :mon, :mday)
+    raise ArgumentError if date_parts.all? && !Date.valid_date?(*date_parts)
+
     time = parse_time(value)
     jst_time = time.getlocal(JST_OFFSET)
     format_ymd(jst_time.year, jst_time.month, jst_time.day)

@@ -54,12 +54,16 @@ describe("useRankings", () => {
     expect(fetch).toHaveBeenCalledWith("/api/app/masuda_run/rankings.json", {
       cache: "no-store",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      headers: expect.any(Headers),
       body: JSON.stringify({ score: "1234", userId: "cookie-user" }),
     })
     expect(mutate).toHaveBeenCalledTimes(1)
   })
+})
+
+it.each([null, {}, "invalid"])("非配列のランキング応答を空ランキングと区別する: %j", (data) => {
+  useApiSWR.mockReturnValue({ data, error: null, isLoading: false, mutate: vi.fn() })
+  const { result } = renderHook(() => useRankings(true))
+  expect(result.current.rankings).toBeNull()
+  expect(result.current.rankingsError).toBe(true)
 })

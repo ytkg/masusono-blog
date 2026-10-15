@@ -25,4 +25,10 @@ RSpec.describe DateDisplayFormatter do
       expect(described_class.format("   ")).to eq("")
     end
   end
+  it "存在しない日付を有効な表示日へ整形しない" do
+    expect(described_class.format("2026/2/29")).to eq("2026/2/29")
+    expect(described_class.format("2026-02-29T12:00:00Z")).to eq("2026-02-29T12:00:00Z")
+    expect(described_class.format("2026-13-01")).to eq("2026-13-01")
+    expect(described_class.format("2024/2/29")).to eq("2024/02/29")
+  end
 end

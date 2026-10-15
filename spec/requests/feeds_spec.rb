@@ -41,5 +41,15 @@ RSpec.describe "Feeds", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
     end
+    context "取得した記事に同じIDが含まれる場合" do
+      let(:articles) { [ { id: "duplicate", title: "最初" }, { id: "duplicate", title: "後" } ] }
+
+      it "同じ記事URLを重複出力しない" do
+        get "/feed.xml"
+        document = Nokogiri::XML(response.body) { |config| config.strict.nonet }
+        expect(document.xpath("//*[local-name()='guid']").map(&:text).count("https://masusono.com/articles/duplicate")).to eq(1)
+        expect(response.headers["Cache-Control"]).to eq("no-store")
+      end
+    end
   end
 end

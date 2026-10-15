@@ -64,6 +64,12 @@ export default function RubyExecutableCodeBlock({ code, html }) {
     return () => window.clearTimeout(timer)
   }, [isRunning])
 
+  function handleStop() {
+    runRef.current?.abort()
+    runRef.current = null
+    setIsRunning(false)
+  }
+
   async function handleRun() {
     runRef.current?.abort()
     const controller = new AbortController()
@@ -89,7 +95,7 @@ export default function RubyExecutableCodeBlock({ code, html }) {
       {block ? (
         <CodeBlock
           block={block}
-          action={<CodeBlockRunButton disabled={isRunning} isRunning={isRunning} onClick={handleRun} />}
+          action={<CodeBlockRunButton isRunning={isRunning} onClick={isRunning ? handleStop : handleRun} />}
         />
       ) : null}
       {isRunning ? <LoadingStatus>実行中...</LoadingStatus> : null}

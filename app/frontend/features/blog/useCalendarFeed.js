@@ -17,7 +17,16 @@ export default function useCalendarFeed() {
     const controller = new AbortController()
     requestJson("/api/app/calendar_articles", { signal: controller.signal })
       .then((result) => {
-        if (!Array.isArray(result.groups)) throw new Error("Invalid calendar articles")
+        if (
+          !Array.isArray(result?.groups) ||
+          result.groups.some(
+            (group) =>
+              typeof group?.monthDay !== "string" ||
+              !/^\d{2}\/\d{2}$/.test(group.monthDay) ||
+              !Array.isArray(group.articles),
+          )
+        )
+          throw new Error("Invalid calendar articles")
         if (!controller.signal.aborted) commit(result.groups)
       })
       .catch(() => {

@@ -49,20 +49,31 @@ export default function MasudaRunRankings({ rankings, isLoading, hasError, error
         <EmptyStatus>まだランキングがありません。</EmptyStatus>
       ) : null}
       {topRankings.length > 0 ? (
-        <TableContainer sx={tableContainerSx}>
+        <TableContainer
+          tabIndex={0}
+          role="region"
+          aria-label="増田RUNランキング（スクロールできます）"
+          sx={tableContainerSx}
+        >
           <Table size="small" aria-label="増田RUNランキング">
             <TableHead>
               <TableRow>
-                <TableCell>順位</TableCell>
-                <TableCell>ユーザー</TableCell>
-                <TableCell align="right">スコア</TableCell>
-                <TableCell align="right">日付</TableCell>
+                <TableCell scope="col">順位</TableCell>
+                <TableCell scope="col">ユーザー</TableCell>
+                <TableCell scope="col" align="right">
+                  スコア
+                </TableCell>
+                <TableCell scope="col" align="right">
+                  日付
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {topRankings.map((ranking) => (
                 <TableRow key={`${ranking.rank}-${ranking.userId}-${ranking.score}`} hover>
-                  <TableCell>{ranking.rank}</TableCell>
+                  <TableCell component="th" scope="row">
+                    {ranking.rank}
+                  </TableCell>
                   <TableCell>{ranking.name}</TableCell>
                   <TableCell align="right" sx={monoSx}>
                     {formatScore(ranking.score)}

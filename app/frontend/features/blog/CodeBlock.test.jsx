@@ -16,7 +16,9 @@ describe("CodeBlock", () => {
 
     expect(shell?.querySelector("[data-code-language-label]")).toHaveTextContent("JavaScript")
     expect(shell?.querySelector('[data-code-language="JavaScript"]')).toHaveTextContent("const first = 1")
-    expect(shell?.querySelectorAll(".react-syntax-highlighter-line-number")).toHaveLength(2)
+    const numbers = shell?.querySelectorAll(".react-syntax-highlighter-line-number")
+    expect(numbers).toHaveLength(2)
+    numbers.forEach((number) => expect(number).toHaveAttribute("aria-hidden", "true"))
     expect(screen.getByRole("button", { name: "実行する" })).toBeInTheDocument()
   })
 
@@ -30,7 +32,7 @@ describe("CodeBlock", () => {
 
     rerender(<CodeBlockRunButton disabled isRunning onClick={onClick} />)
 
-    expect(screen.getByRole("button", { name: "実行中" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "■ 停止" })).toBeDisabled()
   })
   it("インデントと空行を保ち、行番号を3桁で表示する", () => {
     const code = "\tputs :hello\n\n  puts :world"

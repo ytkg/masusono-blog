@@ -32,5 +32,24 @@ RSpec.describe "Sitemaps", type: :request do
       expect(blog_entry_count).to eq(article_count)
       expect(blog_entry_count).to eq(120)
     end
+    context "改訂日時が空文字の場合" do
+      let(:articles) { [ { id: "blank-revision", revisedAt: "", updatedAt: "2026-01-01T00:00:00Z" } ] }
+
+      it "更新日時をlastmodへ出力する" do
+        get "/sitemap.xml"
+        expect(response.body).to include("<lastmod>2026-01-01T00:00:00Z</lastmod>")
+        expect(response.headers["Cache-Control"]).to eq("no-store")
+      end
+    end
+    context "取得した記事に同じIDが含まれる場合" do
+      let(:articles) { [ { id: "duplicate", title: "最初" }, { id: "duplicate", title: "後" } ] }
+
+      it "同じ記事URLを重複出力しない" do
+        get "/sitemap.xml"
+        document = Nokogiri::XML(response.body) { |config| config.strict.nonet }
+        expect(document.xpath("//*[local-name()='loc']").map(&:text).count("https://masusono.com/articles/duplicate")).to eq(1)
+        expect(response.headers["Cache-Control"]).to eq("no-store")
+      end
+    end
   end
 end

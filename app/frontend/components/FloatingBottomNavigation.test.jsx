@@ -36,6 +36,8 @@ describe("FloatingBottomNavigation", () => {
     expect(screen.getByText("その他！").closest("a")).toHaveAttribute("href", "/others")
     expect(screen.queryByText("ブログ")).not.toBeInTheDocument()
     expect(screen.getByText("ホーム").closest(".Mui-selected")).not.toBeNull()
+    expect(screen.getByRole("link", { name: "ホーム" })).toHaveAttribute("aria-current", "page")
+    expect(screen.getByRole("link", { name: "検索" })).not.toHaveAttribute("aria-current")
     expect(screen.queryByText(/©/)).not.toBeInTheDocument()
     expect(screen.queryByText("増田とその他！")).not.toBeInTheDocument()
   })
@@ -136,4 +138,10 @@ describe("FloatingBottomNavigation", () => {
 
     expect(screen.getByText("その他！").closest(".Mui-selected")).not.toBeNull()
   })
+})
+
+it.each(["/search#results", "/search?q=ruby#results"])("ハッシュ付きURLでも現在のナビを選択する: %s", (url) => {
+  vi.mocked(usePage).mockReturnValue({ url })
+  render(<FloatingBottomNavigation />)
+  expect(screen.getByText("検索").closest(".Mui-selected")).not.toBeNull()
 })

@@ -3,14 +3,16 @@ import { articleMatchesToken } from "./articleSearchToken"
 
 export { normalizeArticleSearchText } from "./articleSearchText"
 
-const OR_SEPARATOR_PATTERN = /\s+or\s+/i
-const TOKEN_SEPARATOR_PATTERN = /\s+/
-
 function parseSearchQuery(normalizedQuery) {
-  return normalizedQuery
-    .split(OR_SEPARATOR_PATTERN)
-    .map((group) => group.split(TOKEN_SEPARATOR_PATTERN).filter((token) => token && token !== "and"))
-    .filter((group) => group.length > 0)
+  const tokens = normalizedQuery.match(/(?:[^\s"]+|"(?:\\.|[^"\\])*")+/g) ?? []
+  const groups = [[]]
+  tokens.forEach((token, index) => {
+    if (token === "or" && index > 0 && index < tokens.length - 1) groups.push([])
+    else if (token !== "and") {
+      groups.at(-1).push(token.replace(/"((?:\\.|[^"\\])*)"/g, (_quoted, text) => text.replace(/\\(["\\])/g, "$1")))
+    }
+  })
+  return groups.filter((group) => group.length > 0)
 }
 
 export function prepareArticleQuery(normalizedQuery) {

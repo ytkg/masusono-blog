@@ -1,6 +1,13 @@
 export const attachKeyboardHandlers = (state, startOrRestart, doJump) => {
   const onKey = (e) => {
-    if (e.repeat) return
+    if (e.repeat || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return
+    if (
+      e.target instanceof Element &&
+      e.target.closest(
+        'input, textarea, select, button, a, [role="region"][tabindex], [contenteditable=""], [contenteditable="true"]',
+      )
+    )
+      return
     const isJumpKey = e.key === " " || e.key === "ArrowUp"
     if (e.type === "keyup") {
       if (isJumpKey) e.preventDefault()
@@ -23,7 +30,8 @@ export const attachKeyboardHandlers = (state, startOrRestart, doJump) => {
 }
 
 export const attachPointerHandler = (canvas, state, startOrRestart, doJump) => {
-  const onPointerDown = () => {
+  const onPointerDown = (event) => {
+    if (event.button > 0) return
     if (state === "ready" || state === "gameover") return startOrRestart()
     if (state === "playing") doJump()
   }

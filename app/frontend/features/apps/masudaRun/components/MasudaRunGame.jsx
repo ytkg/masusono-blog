@@ -55,7 +55,6 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
   const scoreDisplayRef = useRef(0)
   const [score, setScore] = useState(0)
   const [high, setHigh] = useState(() => getStoredHighScore())
-  const suppressClickRef = useRef(false)
   const restartReadyAtRef = useRef(0)
   const [restartReadyAt, setRestartReadyAt] = useState(0)
   const roundIdRef = useRef(0)
@@ -132,7 +131,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
 
   useMasudaRunRestartCooldown(state, restartReadyAt, restartReadyAtRef, setRestartReadyAt)
 
-  const inputHandlers = useMasudaRunInput({ state, canvasRef, startOrRestart, doJump, suppressClickRef })
+  useMasudaRunInput({ state, canvasRef, startOrRestart, doJump })
   const loopRefs = {
     scoreRef,
     scoreDisplayRef,
@@ -174,12 +173,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
           <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={canvasStyle} />
         </Box>
       </Box>
-      <GamePrimaryAction
-        state={state}
-        restartCooling={restartCooling}
-        inputHandlers={inputHandlers}
-        onAction={handlePrimaryAction}
-      />
+      <GamePrimaryAction state={state} restartCooling={restartCooling} onAction={handlePrimaryAction} />
       <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>

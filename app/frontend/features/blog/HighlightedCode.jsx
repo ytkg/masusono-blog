@@ -64,7 +64,7 @@ export default function HighlightedCode({ block }) {
       renderer={({ rows, stylesheet, useInlineStyles }) =>
         rows.map((row, index) => (
           <span key={index} data-code-line style={codeRowStyle}>
-            <span className="react-syntax-highlighter-line-number" style={lineNumberSx}>
+            <span className="react-syntax-highlighter-line-number" aria-hidden="true" style={lineNumberSx}>
               {paddedLineNumber(index)}
             </span>
             <span style={codeTextStyle}>

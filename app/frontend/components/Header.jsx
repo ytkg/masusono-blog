@@ -42,7 +42,7 @@ export default function Header() {
     }
   }, [])
 
-  const [path, search = ""] = currentUrl.split("?")
+  const [path, search = ""] = currentUrl.split("#", 1)[0].split("?")
   const hasSearchQuery = path === "/search" && Boolean(new URLSearchParams(search).get("q")?.trim())
   const showsBackButton = path.startsWith("/articles/") || path.startsWith("/authors/") || hasSearchQuery
 

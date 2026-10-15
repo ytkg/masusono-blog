@@ -1,3 +1,4 @@
+import { truncateText } from "@/shared/lib/truncateText"
 import { extractHtmlText } from "./articleHtmlText"
 
 const SENTENCE_END_PATTERN = /[。！？!?]+[」』）)］\]｝}”’】〕〉》〙〗〟'"]*|\n/g
@@ -13,8 +14,7 @@ export function firstSentenceFromHtml(html = "") {
   const match = firstSentenceBoundary(text)
 
   if (match) return text.slice(0, match.index + match[0].length).trim()
-  const end = /[\uD800-\uDBFF]/.test(text[79]) ? 79 : 80
-  return text.slice(0, end)
+  return truncateText(text, 80)
 }
 
 function firstSentenceBoundary(text) {

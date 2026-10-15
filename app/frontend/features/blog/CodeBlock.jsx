@@ -65,7 +65,7 @@ export default function CodeBlock({ block, action }) {
 export function CodeBlockRunButton({ disabled, isRunning, onClick }) {
   return (
     <Button disabled={disabled} onClick={onClick} size="small" variant="text" sx={supportingActionSx}>
-      {isRunning ? "実行中" : "▶ 実行"}
+      {isRunning ? "■ 停止" : "▶ 実行"}
     </Button>
   )
 }

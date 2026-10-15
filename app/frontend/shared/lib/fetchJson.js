@@ -11,7 +11,7 @@ export class ApiError extends Error {
 async function buildApiError(response) {
   let code = null
   let message = `Request failed with status ${response.status}`
-  let requestId = null
+  let requestId = response.headers?.get("x-request-id") ?? null
 
   try {
     const payload = await response.json()
@@ -51,15 +51,13 @@ export function fetchJson(url) {
 }
 
 export function postJson(url, payload, options = {}) {
+  const headers = new Headers({ "Content-Type": "application/json", Accept: "application/json" })
+  new Headers(options.headers).forEach((value, key) => headers.set(key, value))
   return requestJson(url, {
     method: "POST",
     body: JSON.stringify(payload),
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(options.headers ?? {}),
-    },
+    headers,
   })
 }
 

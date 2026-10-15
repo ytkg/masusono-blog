@@ -30,6 +30,7 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
           <Box
             component="button"
             type="button"
+            aria-expanded={isExpanded}
             onClick={() => setIsExpanded((current) => !current)}
             sx={{
               ...supportingActionSx,

@@ -21,6 +21,8 @@ import {
   updateSpeed,
 } from "../lib"
 
+const FRAME_MS = 1000 / 60
+
 export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, setRestartReadyAt, refs }) => {
   const {
     scoreRef,
@@ -38,7 +40,7 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
   const update = useCallback(
     (dt, W) => {
       const w = worldRef.current
-      if (state !== "playing") return
+      if (state !== "playing") return false
 
       updateSpeed(w, dt)
       updatePlayer(w)
@@ -59,11 +61,12 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
           restartReadyAtRef.current = readyAt
           setRestartReadyAt(readyAt)
           setState("gameover")
-          return
+          return false
         }
       }
 
       scoreRef.current += w.speed * dt * 0.01
+      return true
     },
     [state, high, setHigh, setState, setRestartReadyAt, restartReadyAtRef, scoreRef, worldRef],
   )
@@ -113,10 +116,19 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
     const ctx = canvas.getContext("2d")
     if (!ctx) return
     let last = performance.now()
+    let accumulated = 0
     const loop = (now) => {
-      const dt = Math.min(32, now - last)
+      const dt = Math.max(0, Math.min(100, now - last))
       last = now
-      update(dt, CFG.BASE_W)
+      accumulated += dt
+      // Physics values are per 60 Hz step, regardless of the display refresh rate.
+      while (accumulated + 1e-6 >= FRAME_MS) {
+        accumulated -= FRAME_MS
+        if (!update(FRAME_MS, CFG.BASE_W)) {
+          accumulated = 0
+          break
+        }
+      }
       const p = worldRef.current.player
       if (p.spin > 0) p.spin = Math.max(0, p.spin - dt)
       ctx.setTransform(scaleRef.current, 0, 0, scaleRef.current, 0, 0)

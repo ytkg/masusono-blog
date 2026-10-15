@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import ArticleActions from "./ArticleActions"
 
@@ -84,4 +84,30 @@ describe("ArticleActions", () => {
     expect(await screen.findByText("記事全文をコピーしました")).toBeInTheDocument()
     expect(writeText).toHaveBeenNthCalledWith(2, "タイトル\n\n本文")
   })
+})
+
+it("連続コピーの成功通知を新しいコピーから3秒間保持する", async () => {
+  vi.useFakeTimers()
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText: vi.fn().mockResolvedValue() },
+  })
+  const { unmount } = render(<ArticleActions article={{ id: "repeat" }} />)
+  const copy = async () => {
+    fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+    fireEvent.click(screen.getByRole("menuitem", { name: "記事URLをコピー" }))
+    await act(async () => Promise.resolve())
+  }
+  try {
+    await copy()
+    await act(async () => vi.advanceTimersByTimeAsync(2500))
+    await copy()
+    await act(async () => vi.advanceTimersByTimeAsync(1000))
+    expect(screen.getByRole("alert")).toHaveTextContent("コピーしました")
+    await act(async () => vi.advanceTimersByTimeAsync(2250))
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+  } finally {
+    unmount()
+    vi.useRealTimers()
+  }
 })

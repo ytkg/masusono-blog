@@ -44,4 +44,10 @@ RSpec.describe RssXmlBuilder do
       end
     end
   end
+  it "XML 1.0で禁止された制御文字だけを除き、RSS全体を読み取れる" do
+    xml = described_class.call(title: "本文\u0000\u000B\uFFFE😊\t\n末尾", link: "https://example.test", description: "Feed",
+      feed_url: "https://example.test/feed.xml", items: [])
+    document = Nokogiri::XML(xml) { |config| config.strict.nonet }
+    expect(document.at_xpath("/rss/channel/title").text).to eq("本文😊\t\n末尾")
+  end
 end

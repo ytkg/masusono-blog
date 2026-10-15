@@ -30,6 +30,7 @@ export default function AppLoadingScreen({
   title,
   buttonIcon,
   isContentVisible,
+  reduceMotion = false,
   completedTaskCount,
   loadingTaskCount,
 }) {
@@ -50,7 +51,7 @@ export default function AppLoadingScreen({
         gap: 3,
         color: "common.white",
         opacity: isContentVisible ? 0 : 1,
-        transition: "opacity 180ms ease",
+        transition: reduceMotion ? "none" : "opacity 180ms ease",
         pointerEvents: "none",
         zIndex: 1,
       }}

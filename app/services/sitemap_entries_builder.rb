@@ -36,13 +36,13 @@ class SitemapEntriesBuilder
   end
 
   def article_entries(articles)
-    articles.filter_map do |article|
+    articles.uniq { |article| article[:id] }.filter_map do |article|
       content_entry(article, section: "articles", changefreq: BLOG_ENTRY[:changefreq], priority: BLOG_ENTRY[:priority])
     end
   end
 
   def author_entries(authors)
-    authors.filter_map do |author|
+    authors.uniq { |author| author[:id] }.filter_map do |author|
       content_entry(author, section: "authors", changefreq: "monthly", priority: 0.5)
     end
   end
@@ -53,7 +53,7 @@ class SitemapEntriesBuilder
 
     {
       loc: "#{base_url}/#{section}/#{id}",
-      lastmod: content[:revisedAt] || content[:updatedAt] || content[:publishedAt],
+      lastmod: content.values_at(:revisedAt, :updatedAt, :publishedAt).find(&:present?),
       changefreq:,
       priority:
     }

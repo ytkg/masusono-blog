@@ -62,10 +62,7 @@ describe("SettingsContent", () => {
       expect(fetch).toHaveBeenLastCalledWith("/api/app/users.json", {
         cache: "no-store",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: expect.any(Headers),
         body: JSON.stringify({ name: "新しい名前", userId: "cookie-user" }),
       })
     })

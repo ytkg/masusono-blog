@@ -26,7 +26,9 @@ export default function LoadMoreArticles({ hasMore, loading, failed, loadMore, b
         {loading ? <Typography color="text.secondary">記事を読み込んでいます…</Typography> : null}
         {failed ? <Typography color="text.secondary">記事を読み込めませんでした。</Typography> : null}
       </Box>
-      {!loading ? <Button onClick={loadMore}>{failed ? "再試行" : "さらに読み込む"}</Button> : null}
+      <Button disabled={loading} onClick={loadMore}>
+        {failed ? "再試行" : "さらに読み込む"}
+      </Button>
     </Box>
   )
 }

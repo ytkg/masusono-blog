@@ -71,4 +71,9 @@ RSpec.describe SitemapXmlBuilder do
       end
     end
   end
+  it "禁止制御文字を含んでも有効なサイトマップを生成する" do
+    xml = described_class.call([ { loc: "https://example.test/a\u0001&b" } ])
+    document = Nokogiri::XML(xml) { |config| config.strict.nonet }
+    expect(document.at_xpath("//*[local-name()='loc']").text).to eq("https://example.test/a&b")
+  end
 end

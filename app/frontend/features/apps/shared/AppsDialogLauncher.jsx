@@ -112,7 +112,8 @@ export default function AppsDialogLauncher({
     setIsTransitionComplete(false)
     resetLoadingTasks()
     setIsTransitioning(true)
-    onOpen?.(registerLoadingTask)
+    const opening = onOpen?.(registerLoadingTask)
+    if (opening?.then) registerLoadingTask(opening)
     setOpen(true)
   }
 
@@ -167,6 +168,7 @@ export default function AppsDialogLauncher({
       >
         <AppLoadingScreen
           title={title}
+          reduceMotion={prefersReducedMotion}
           buttonIcon={buttonIcon}
           isContentVisible={isContentVisible}
           completedTaskCount={completedTaskCount}
@@ -179,7 +181,7 @@ export default function AppsDialogLauncher({
           sx={{
             ...dialogContentSx,
             opacity: isContentVisible ? 1 : 0,
-            transition: "opacity 180ms ease",
+            transition: prefersReducedMotion ? "none" : "opacity 180ms ease",
             pointerEvents: isContentVisible ? "auto" : "none",
           }}
         >

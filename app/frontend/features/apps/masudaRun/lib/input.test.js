@@ -87,10 +87,70 @@ describe("attachPointerHandler", () => {
     const doJump = vi.fn()
     const cleanup = attachPointerHandler(canvas, "playing", startOrRestart, doJump)
 
-    pointerdownHandler()
+    pointerdownHandler({ button: 0 })
     expect(doJump).toHaveBeenCalledTimes(1)
 
     cleanup()
     expect(canvas.removeEventListener).toHaveBeenCalledWith("pointerdown", pointerdownHandler)
   })
+})
+
+it.each(["input", "textarea", "select", "button", "a", "div"])("keeps native editing and controls on %s", (tag) => {
+  const target = document.createElement(tag)
+  if (tag === "div") target.contentEditable = "true"
+  if (tag === "div") target.setAttribute("contenteditable", "true")
+  document.body.append(target)
+  const start = vi.fn()
+  const jump = vi.fn()
+  const cleanup = attachKeyboardHandlers("ready", start, jump)
+  const event = new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true })
+  target.dispatchEvent(event)
+  expect(event.defaultPrevented).toBe(false)
+  expect(start).not.toHaveBeenCalled()
+  cleanup()
+  target.remove()
+})
+
+it.each([{ ctrlKey: true }, { metaKey: true }, { altKey: true }, { isComposing: true }])(
+  "ignores modified/composing keys: %j",
+  (options) => {
+    const start = vi.fn()
+    const cleanup = attachKeyboardHandlers("ready", start, vi.fn())
+    const event = new KeyboardEvent("keydown", { key: " ", cancelable: true, ...options })
+    window.dispatchEvent(event)
+    expect(start).not.toHaveBeenCalled()
+    expect(event.defaultPrevented).toBe(false)
+    cleanup()
+  },
+)
+
+it("ignores secondary pointers on the RUN canvas", () => {
+  const canvas = document.createElement("canvas")
+  const start = vi.fn()
+  const cleanup = attachPointerHandler(canvas, "ready", start, vi.fn())
+  for (const button of [1, 2]) canvas.dispatchEvent(new MouseEvent("pointerdown", { button }))
+  expect(start).not.toHaveBeenCalled()
+  canvas.dispatchEvent(new MouseEvent("pointerdown", { button: 0 }))
+  expect(start).toHaveBeenCalledOnce()
+  cleanup()
+})
+
+it("ランキングのスクロール領域では上矢印をゲーム操作として奪わない", () => {
+  const region = document.createElement("div")
+  region.setAttribute("role", "region")
+  region.tabIndex = 0
+  document.body.append(region)
+  const jump = vi.fn()
+  const cleanup = attachKeyboardHandlers("playing", vi.fn(), jump)
+  try {
+    for (const type of ["keydown", "keyup"]) {
+      const event = new KeyboardEvent(type, { key: "ArrowUp", bubbles: true, cancelable: true })
+      region.dispatchEvent(event)
+      expect(event.defaultPrevented).toBe(false)
+    }
+    expect(jump).not.toHaveBeenCalled()
+  } finally {
+    cleanup()
+    region.remove()
+  }
 })

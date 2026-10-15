@@ -18,7 +18,7 @@ function currentNavigationIndex(path) {
 }
 
 function navigationPathFromUrl(url) {
-  return String(url || "/").split("?")[0]
+  return String(url || "/").split(/[?#]/, 1)[0]
 }
 
 export default function FloatingBottomNavigation() {
@@ -37,6 +37,7 @@ export default function FloatingBottomNavigation() {
             {...navigationPrefetchProps({ href: tab.href, currentPath: path, isActive: tab.value === active })}
             label={tab.label}
             value={tab.value}
+            aria-current={tab.value === active ? "page" : undefined}
             icon={tab.icon}
             component={Link}
             href={tab.href}
