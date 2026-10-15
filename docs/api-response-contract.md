@@ -158,7 +158,7 @@ Request: `{ "failure": { ... } }`
 - `response_request_id`: 失敗した応答の `X-Request-Id`。100 bytes 以下の英数字・`_`・`-`。
 - `content_type`: MIME type のみ。100 bytes 以下。
 - `prefetch`, `prefetch_in_flight`, `online`, `service_worker`: Boolean。
-- `elapsed_ms`: ページ読み込みからの経過時間 (0〜86,400,000)。
+- `elapsed_ms`: 遷移開始を観測してから失敗までの経過時間 (0〜86,400,000)。前景は `before`、先読みは `start` を起点とし、開始を観測できない場合は省略する。従来のページ読み込み起点の記録とは意味が異なるため、過去ログと比較する際はリビジョンを区別する。
 
 不正な任意項目と未知のキーは記録から除外する。本文・Cookie・トークン・検索語・例外メッセージは送信しない。標準のパラメータログでは `failure` 全体をフィルタし、検証済み項目だけを `navigation_failed` イベントに出す。
 
