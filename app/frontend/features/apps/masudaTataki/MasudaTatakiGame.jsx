@@ -15,18 +15,20 @@ export default function MasudaTatakiGame({ active = true }) {
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    let disposed = false
-    const loading = loadImages().then(
-      () => {
-        if (!disposed) setAssets("ready")
-      },
-      () => {
-        if (!disposed) setAssets("error")
-      },
-    )
+    const controller = new AbortController()
+    const loading = loadImages({ signal: controller.signal })
+      .then(
+        () => {
+          if (!controller.signal.aborted) setAssets("ready")
+        },
+        () => {
+          if (!controller.signal.aborted) setAssets("error")
+        },
+      )
+      .finally(() => controller.abort())
     registerLoadingTask(loading)
     return () => {
-      disposed = true
+      controller.abort()
     }
   }, [registerLoadingTask, attempt])
 
