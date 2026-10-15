@@ -2,7 +2,7 @@ require "nokogiri"
 
 module Numbers
   class ArticleCharacterCounter
-    IGNORED_SELECTORS = "script, style, template, noscript".freeze
+    IGNORED_SELECTORS = "script, style, template, noscript, iframe, [hidden]".freeze
     WHITESPACE_PATTERN = /[[:space:]\u00a0\u200b\u200c\u200d\ufeff]/.freeze
 
     def self.call(html)

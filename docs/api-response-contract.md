@@ -15,6 +15,8 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 
 `articles` はトップページと同じ記事形式（本文・著者・文字数・読了時間を含む）。`nextOffset` は次回取得位置で、末尾では `null`。初回の `GET /` も同じデータをInertia propsとして返す。すべて `Cache-Control: no-store` を返し、upstreamエラーには共通のエラー形式を使う。
 
+`characterCount` と `readingTimeMinutes` は、空白・不可視文字のみの書記素、script/style/template/noscript/iframeの本文、`hidden` 属性のある部分木を除いて計算する。`aria-hidden` だけでは視覚的な本文を除外しない。CSSによる表示判定は行わず、`content` のHTML自体は維持する。
+
 検索、RSS、サイトマップは全記事、著者別ページはその著者の記事全件を対象とする（全件取得の上限は README の microCMS ページング保護を参照）。
 
 ## GET /api/app/calendar_articles

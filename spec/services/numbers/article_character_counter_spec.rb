@@ -26,6 +26,17 @@ RSpec.describe Numbers::ArticleCharacterCounter do
       end
     end
 
+    context "非表示の本文を含む場合" do
+      let(:html) do
+        '<p>本文<span hidden>非表示<strong>子孫</strong></span><span aria-hidden="true">視覚</span></p>' \
+          '<div hidden="false">非表示</div><div hidden="until-found">検索前は非表示</div><iframe>代替本文</iframe>'
+      end
+
+      it "hidden属性の部分木とiframeを除き、aria-hiddenだけの可視本文は残す" do
+        expect(result).to eq(4)
+      end
+    end
+
     context "空白と不可視文字だけの場合" do
       let(:html) { "<p> \t\n&nbsp;\u200b\u200c\u200d\ufeff</p>" }
 

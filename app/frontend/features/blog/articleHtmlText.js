@@ -39,7 +39,8 @@ export function extractTextFromHtml(html) {
 function readText(node) {
   if (node.nodeName === "#text") return node.value ?? node.nodeValue
   const tagName = node.tagName?.toLowerCase()
-  if (EXCLUDED_TAGS.has(tagName)) return ""
+  if (EXCLUDED_TAGS.has(tagName) || node.hasAttribute?.("hidden") || node.attrs?.some(({ name }) => name === "hidden"))
+    return ""
   if (tagName === "br") return "\n"
 
   const text = Array.from(node.childNodes ?? [], readText).join("")
