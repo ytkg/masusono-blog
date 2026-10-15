@@ -1,12 +1,5 @@
-require "uri"
-
 class ArticleContentImageUrlOptimizer
-  MICROCMS_IMAGE_HOST = "images.microcms-assets.io".freeze
-  OPTIMIZED_IMAGE_PARAMS = {
-    "fit" => "max",
-    "w" => "800",
-    "h" => "800"
-  }.freeze
+  DEFAULT_IMAGE_SIZE = 800
   RESPONSIVE_IMAGE_WIDTHS = [ 400, 800 ].freeze
   RESPONSIVE_IMAGE_SIZES = "(max-width: 800px) 100vw, 800px".freeze
 
@@ -40,42 +33,21 @@ class ArticleContentImageUrlOptimizer
 
   attr_reader :content
 
-  def microcms_image_url?(uri)
-    uri.is_a?(URI::HTTPS) && uri.host == MICROCMS_IMAGE_HOST
-  end
-
   def optimized_attributes(url)
-    uri = URI.parse(url)
-    return unless microcms_image_url?(uri)
+    image_url = MicrocmsImageUrl.parse(url)
+    return unless image_url
 
     {
-      "src" => optimized_url(uri),
-      "srcset" => responsive_srcset(uri),
+      "src" => image_url.resize(fit: "max", size: DEFAULT_IMAGE_SIZE),
+      "srcset" => responsive_srcset(image_url),
       "sizes" => RESPONSIVE_IMAGE_SIZES,
       "decoding" => "async"
     }
-  rescue URI::InvalidURIError
-    nil
   end
 
-  def responsive_srcset(uri)
+  def responsive_srcset(image_url)
     RESPONSIVE_IMAGE_WIDTHS.map do |width|
-      "#{optimized_url(uri, width:)} #{width}w"
+      "#{image_url.resize(fit: "max", size: width)} #{width}w"
     end.join(", ")
-  end
-
-  def optimized_url(uri, width: OPTIMIZED_IMAGE_PARAMS.fetch("w").to_i)
-    optimized_uri = uri.dup
-    optimized_uri.query = optimized_query(optimized_uri.query, width:)
-    optimized_uri.to_s
-  end
-
-  def optimized_query(query, width: OPTIMIZED_IMAGE_PARAMS.fetch("w").to_i)
-    params = URI.decode_www_form(query.to_s).reject do |key, _value|
-      OPTIMIZED_IMAGE_PARAMS.key?(key)
-    end
-
-    optimized_params = OPTIMIZED_IMAGE_PARAMS.merge("w" => width.to_s, "h" => width.to_s)
-    URI.encode_www_form(params + optimized_params.to_a)
   end
 end
