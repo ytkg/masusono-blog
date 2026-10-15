@@ -1,6 +1,6 @@
 import GameScoreboard from "./GameScoreboard"
 import GamePrimaryAction from "./GamePrimaryAction"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useId, useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import charImgSrc from "../assets/masuda_run.webp"
@@ -13,6 +13,7 @@ import { useMasudaRunRestartCooldown } from "../hooks/useMasudaRunRestartCooldow
 import MasudaRunRankings from "./MasudaRunRankings"
 import { CFG, createInitialWorld, getNow, getStoredHighScore } from "../lib"
 import { useAppLoading } from "../../shared/AppsLoadingContext"
+import { focusVisibleInsetSx } from "@/shared/styles/focusStyles"
 
 const containerSx = {
   display: "flex",
@@ -40,12 +41,14 @@ const canvasFrameSx = {
   borderColor: "divider",
   borderRadius: 1,
   overflow: "hidden",
+  "& canvas": focusVisibleInsetSx,
 }
 
-const canvasStyle = { width: "100%", height: "auto", display: "block", outline: "none" }
+const canvasStyle = { width: "100%", height: "auto", display: "block" }
 
 export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
   const registerLoadingTask = useAppLoading()
+  const instructionsId = useId()
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
   const scaleRef = useRef(1)
@@ -170,11 +173,20 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
       <GameScoreboard score={score} high={high} />
       <Box ref={canvasWrapRef} sx={canvasWrapSx}>
         <Box sx={canvasFrameSx}>
-          <canvas ref={canvasRef} width={CFG.BASE_W} height={CFG.BASE_H} tabIndex={0} style={canvasStyle} />
+          <canvas
+            ref={canvasRef}
+            width={CFG.BASE_W}
+            height={CFG.BASE_H}
+            role="img"
+            aria-label="増田RUNのゲーム画面"
+            aria-describedby={instructionsId}
+            tabIndex={0}
+            style={canvasStyle}
+          />
         </Box>
       </Box>
       <GamePrimaryAction state={state} restartCooling={restartCooling} onAction={handlePrimaryAction} />
-      <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
+      <Typography id={instructionsId} variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
         操作: スペース/↑でジャンプ（タップでジャンプ）。ゲームオーバー時はスペース/タップで再開。
       </Typography>
       <MasudaRunRankings

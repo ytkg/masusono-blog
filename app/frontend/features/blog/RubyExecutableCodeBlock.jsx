@@ -5,6 +5,7 @@ import LoadingStatus from "@/shared/components/LoadingStatus"
 import CodeBlock, { CodeBlockRunButton } from "./CodeBlock"
 import { buildCodeBlockDataFromHtml } from "./codeBlockData"
 import { runRubyCode } from "./runRubyCode"
+import { focusVisibleInsetSx } from "../../shared/styles/focusStyles"
 
 const RUNNING_WARNING_DELAY_MS = 3000
 const monoFont = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
@@ -30,6 +31,7 @@ const outputSx = {
   px: 1,
   py: 0.75,
   whiteSpace: "pre-wrap",
+  ...focusVisibleInsetSx,
 }
 
 function buildOutputText(result) {
@@ -108,7 +110,14 @@ export default function RubyExecutableCodeBlock({ code, html }) {
         <Box sx={{ display: "grid", gap: 0.75 }}>
           {result.error ? <StatusAlert>{result.error}</StatusAlert> : null}
           {!result.error ? (
-            <Box component="pre" data-testid="ruby-code-runner-output" sx={outputSx}>
+            <Box
+              component="pre"
+              role="region"
+              aria-label="Ruby実行結果"
+              tabIndex={0}
+              data-testid="ruby-code-runner-output"
+              sx={outputSx}
+            >
               {outputText}
             </Box>
           ) : null}

@@ -47,6 +47,8 @@ describe("RubyExecutableCodeBlock", () => {
     const style = window.getComputedStyle(output)
     expect(style.maxHeight).toBe(`${8.5 * Number.parseFloat(style.fontSize)}px`)
     expect(output).toHaveStyle({ overflow: "auto" })
+    expect(screen.getByRole("region", { name: "Ruby実行結果" })).toBe(output)
+    expect(output).toHaveAttribute("tabindex", "0")
   })
 
   it("実行エラーを表示する", async () => {

@@ -20,6 +20,7 @@ describe("CodeBlock", () => {
     expect(numbers).toHaveLength(2)
     numbers.forEach((number) => expect(number).toHaveAttribute("aria-hidden", "true"))
     expect(screen.getByRole("button", { name: "実行する" })).toBeInTheDocument()
+    expect(screen.getByRole("region", { name: "JavaScriptのコード" })).toHaveAttribute("tabindex", "0")
   })
 
   it("実行ボタンの状態を表示し、クリックを通知する", () => {
