@@ -1,40 +1,24 @@
 import { useEffect } from "react"
+import { loadImage } from "../../shared/loadImage"
 
 const noop = () => {}
 
-const initImageRef = (ref, src) => {
-  const img = new Image()
-  let settle
-  const loaded = new Promise((resolve) => {
-    settle = resolve
-    img.onload = () => {
-      ref.current = img
-      resolve()
-    }
-    img.onerror = resolve
-  })
-  img.src = src
-  const dispose = () => {
-    img.onload = null
-    img.onerror = null
-    settle()
-    ref.current = null
-  }
-  return { loaded, dispose }
-}
-
 export const useMasudaRunAssets = ({ imgRef, obsShortRef, obsTallRef, sources, registerLoadingTask = noop }) => {
   useEffect(() => {
-    const assets = [
-      initImageRef(imgRef, sources.player),
-      initImageRef(obsShortRef, sources.short),
-      initImageRef(obsTallRef, sources.tall),
-    ]
-    for (const asset of assets) registerLoadingTask(asset.loaded)
+    const controller = new AbortController()
+    for (const [ref, src] of [
+      [imgRef, sources.player],
+      [obsShortRef, sources.short],
+      [obsTallRef, sources.tall],
+    ]) {
+      const loaded = loadImage(src, { signal: controller.signal }).then((image) => {
+        if (!controller.signal.aborted) ref.current = image
+      }, noop)
+      registerLoadingTask(loaded)
+    }
     return () => {
-      for (const asset of assets) {
-        asset.dispose()
-      }
+      controller.abort()
+      for (const ref of [imgRef, obsShortRef, obsTallRef]) ref.current = null
     }
   }, [imgRef, obsShortRef, obsTallRef, registerLoadingTask, sources.player, sources.short, sources.tall])
 }

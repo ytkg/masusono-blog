@@ -32,6 +32,19 @@ RSpec.describe ArticleContentImageUrlOptimizer do
       end
     end
 
+    it "対象外の画像属性を保ち、他の画像だけを変換する" do
+      content = '<img src="http://images.microcms-assets.io/photo.jpg" srcset="original 2x" sizes="50vw">' \
+                '<img src="/local.jpg"><img src="https://invalid url">' \
+                '<img src="https://images.microcms-assets.io/photo.jpg?fit=crop&amp;w=20&amp;w=40#photo">'
+      images = Nokogiri::HTML5.fragment(described_class.call(content)).css("img")
+
+      expect(images[0]["srcset"]).to eq("original 2x")
+      expect(images[0]["sizes"]).to eq("50vw")
+      expect(images[1]["src"]).to eq("/local.jpg")
+      expect(images[2]["src"]).to eq("https://invalid url")
+      expect(images[3]["src"]).to eq("https://images.microcms-assets.io/photo.jpg?fit=max&w=800&h=800#photo")
+    end
+
     context "HTML文字列ではない場合" do
       let(:content) { { html: "本文" } }
 

@@ -1,5 +1,5 @@
-const REPORT_URL = "/api/app/navigation_failures"
-const MAX_REPORTS = 10
+import { createNavigationFailureReporter, localUrl } from "./navigationFailureReporter"
+
 let failure = null
 const listeners = new Set()
 
@@ -19,73 +19,18 @@ function showFailure(url, kind, requestId) {
   listeners.forEach((listener) => listener())
 }
 
-function localUrl(value) {
-  if (!value) return null
-  try {
-    const url = new URL(value, window.location.href)
-    return url.origin === window.location.origin ? url : null
-  } catch {
-    return null
-  }
-}
-
 // Inertia 3's HTTP exception event contains the response but not the visit.
 // Only foreground visits process non-Inertia responses; prefetches emit prefetched.
 export function installNavigationRecovery(router) {
   let foreground = null
-  let reportCount = 0
   const visits = new Map()
-  const pendingReports = []
-
-  async function sendReport(payload) {
-    try {
-      const response = await fetch(REPORT_URL, {
-        method: "POST",
-        credentials: "omit",
-        keepalive: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ failure: payload }),
-      })
-      if (!response.ok) return
-    } catch {
-      if (pendingReports.length < MAX_REPORTS) pendingReports.push(payload)
-    }
-  }
-
-  function report(visit, kind, response) {
-    if (reportCount >= MAX_REPORTS) return
-    const url = localUrl(visit?.url || window.location.href)
-    if (!url) return
-    reportCount += 1
-    const payload = {
-      kind,
-      path: url.pathname,
-      source_path: window.location.pathname,
-      status: response?.status ?? null,
-      response_request_id: response?.headers?.["x-request-id"] ?? null,
-      content_type: response?.headers?.["content-type"]?.split(";", 1)[0] ?? null,
-      prefetch: Boolean(visit?.prefetch),
-      prefetch_in_flight: Boolean(visit?.prefetchInFlight),
-      elapsed_ms: Math.round(performance.now()),
-      online: navigator.onLine,
-      service_worker: Boolean(navigator.serviceWorker?.controller),
-    }
-    if (navigator.onLine) void sendReport(payload)
-    else pendingReports.push(payload)
-  }
-
-  function flushReports() {
-    pendingReports.splice(0).forEach((payload) => void sendReport(payload))
-  }
-  window.addEventListener("online", flushReports)
+  const { report, dispose } = createNavigationFailureReporter()
 
   const removeListeners = [
     router.on("before", ({ detail: { visit } }) => {
       const url = localUrl(visit.url)
       if (!url) return
-      const entry = { ...visit, url: url.href }
+      const entry = { ...visit, url: url.href, startedAt: performance.now() }
       if (!visit.prefetch && !visit.async) {
         entry.prefetchInFlight = [...visits.values()].some((pending) => pending.prefetch && pending.url === url.href)
         foreground = entry
@@ -94,7 +39,10 @@ export function installNavigationRecovery(router) {
     }),
     router.on("start", ({ detail: { visit } }) => {
       const url = localUrl(visit.url)
-      if (url) visits.set(visit.id, { ...visit, url: url.href })
+      if (url) {
+        const startedAt = foreground?.id === visit.id ? foreground.startedAt : performance.now()
+        visits.set(visit.id, { ...visit, url: url.href, startedAt })
+      }
     }),
     router.on("finish", ({ detail: { visit } }) => {
       visits.delete(visit.id)
@@ -109,7 +57,7 @@ export function installNavigationRecovery(router) {
       // A 409 location response is a normal version refresh, including an empty body.
       if (response.status === 409 && response.headers["x-inertia-location"]) return
       if (!response.headers["x-inertia"] || response.status >= 500)
-        report({ ...visit, prefetch: true }, "http_exception", response)
+        report({ ...visits.get(visit.id), ...visit, prefetch: true }, "http_exception", response)
     }),
     router.on("httpException", (event) => {
       const { response } = event.detail
@@ -141,6 +89,8 @@ export function installNavigationRecovery(router) {
 
   return () => {
     removeListeners.forEach((remove) => remove())
-    window.removeEventListener("online", flushReports)
+    dispose()
+    visits.clear()
+    foreground = null
   }
 }

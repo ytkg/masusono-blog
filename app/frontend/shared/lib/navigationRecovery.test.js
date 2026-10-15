@@ -127,6 +127,33 @@ describe("navigation recovery", () => {
     expect(fetch).toHaveBeenCalledTimes(2)
   })
 
+  it("ページ起動からでなく、前景遷移を始めてからの経過時間を記録する", () => {
+    const now = vi.spyOn(performance, "now").mockReturnValue(90_000)
+    emit("before", { visit: visit() })
+    now.mockReturnValue(90_125)
+    emit("start", { visit: visit() })
+    now.mockReturnValue(90_250)
+    emit("networkError", { error: { url: visit().url.href } })
+    expect(reportBody()).toMatchObject({ elapsed_ms: 250, prefetch: false })
+  })
+
+  it("前景と異なる先読みの経過時間を混同しない", () => {
+    const now = vi.spyOn(performance, "now").mockReturnValue(10_000)
+    const prefetch = visit({ id: "prefetch-timed", prefetch: true, async: true })
+    emit("before", { visit: prefetch })
+    now.mockReturnValue(10_050)
+    emit("before", { visit: visit({ url: new URL("/numbers", window.location.href) }) })
+    now.mockReturnValue(10_300)
+    emit("prefetched", { visit: prefetch, response: { status: 502, headers: {} } })
+    expect(reportBody()).toMatchObject({ elapsed_ms: 300, prefetch: true })
+    expect(getNavigationFailure()).toBeNull()
+  })
+
+  it("開始時刻を観測していない失敗の経過時間を捏造しない", () => {
+    emit("httpException", { response: { status: 503, headers: {} } })
+    expect(reportBody()).not.toHaveProperty("elapsed_ms")
+  })
+
   it("連続失敗でも記録送信数を制限し、次の遷移で案内を閉じる", () => {
     emit("before", { visit: visit() })
     for (let i = 0; i < 15; i++) emit("httpException", { response: { status: 503, headers: {} } })
