@@ -42,14 +42,16 @@ module VisualTestFixtures
     ],
     trend: {
       title: "推移",
-      description: "当日を含む直近7日間の1日平均（投稿のない日は0）。",
+      description: "累積値の7日間移動平均（当日を含む・最初の6日間は存在する日数で平均）。",
       series: [
-        { key: :totalArticles, label: "記事数", unit: "本/日", finalValue: "0.29 本/日" },
-        { key: :totalChars, label: "文字数", unit: "字/日", finalValue: "13.71 字/日" }
+        { key: :totalArticles, label: "総記事数", unit: "本", finalValue: "1.25 本" },
+        { key: :totalChars, label: "総文字数", unit: "字", finalValue: "51 字" }
       ],
       points: [
-        { date: "2026-01-12", label: "2026/01/12", totalArticles: 1 / 7.0, totalChars: 36 / 7.0 },
-        { date: "2026-01-15", label: "2026/01/15", totalArticles: 2 / 7.0, totalChars: 96 / 7.0 }
+        { date: "2026-01-12", label: "2026/01/12", totalArticles: 1, totalChars: 36 },
+        { date: "2026-01-13", label: "2026/01/13", totalArticles: 1, totalChars: 36 },
+        { date: "2026-01-14", label: "2026/01/14", totalArticles: 1, totalChars: 36 },
+        { date: "2026-01-15", label: "2026/01/15", totalArticles: 1.25, totalChars: 51 }
       ]
     }
   }.freeze

@@ -18,10 +18,10 @@ RSpec.describe Numbers::MetricsTrendBuilder do
         ]
       end
 
-      it "公開日時をJSTの日付ごとに7日間の平均を計算する" do
+      it "公開日時をJSTの日付ごとに累積し移動平均を返す" do
         expect(result.fetch(:points)).to eq([
-          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1 / 7.0, totalChars: 1 / 7.0 },
-          { date: "2025-10-06", label: "2025/10/06", totalArticles: 3 / 7.0, totalChars: 6 / 7.0 }
+          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 1 },
+          { date: "2025-10-06", label: "2025/10/06", totalArticles: 2, totalChars: 3.5 }
         ])
       end
     end
@@ -44,8 +44,8 @@ RSpec.describe Numbers::MetricsTrendBuilder do
       it do
         expect(result).to include(
           series: [
-            { key: :totalArticles, label: "記事数", unit: "本/日", finalValue: "0 本/日" },
-            { key: :totalChars, label: "文字数", unit: "字/日", finalValue: "0 字/日" }
+            { key: :totalArticles, label: "総記事数", unit: "本", finalValue: "0 本" },
+            { key: :totalChars, label: "総文字数", unit: "字", finalValue: "0 字" }
           ],
           points: [
             { date: "2025-10-05", label: "2025/10/05", totalArticles: 0, totalChars: 0 },
@@ -61,7 +61,7 @@ RSpec.describe Numbers::MetricsTrendBuilder do
 
       it "空のポイントとゼロの最終値を返す" do
         expect(result.fetch(:points)).to eq([])
-        expect(result.fetch(:series).pluck(:finalValue)).to eq([ "0 本/日", "0 字/日" ])
+        expect(result.fetch(:series).pluck(:finalValue)).to eq([ "0 本", "0 字" ])
       end
     end
 
@@ -76,27 +76,34 @@ RSpec.describe Numbers::MetricsTrendBuilder do
 
       it do
         expect(result.fetch(:points)).to eq([
-          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1 / 7.0, totalChars: 3 / 7.0 },
-          { date: "2025-10-06", label: "2025/10/06", totalArticles: 1 / 7.0, totalChars: 3 / 7.0 },
-          { date: "2025-10-07", label: "2025/10/07", totalArticles: 1 / 7.0, totalChars: 3 / 7.0 },
-          { date: "2025-10-08", label: "2025/10/08", totalArticles: 2 / 7.0, totalChars: 5 / 7.0 }
+          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3 },
+          { date: "2025-10-06", label: "2025/10/06", totalArticles: 1, totalChars: 3 },
+          { date: "2025-10-07", label: "2025/10/07", totalArticles: 1, totalChars: 3 },
+          { date: "2025-10-08", label: "2025/10/08", totalArticles: 1.25, totalChars: 3.5 }
         ])
       end
     end
   end
-  it "表示開始日前の6日間も平均に含める" do
+  it "表示開始日前の記事も累積の初期値に含める" do
     result = described_class.call(
       articles: [ { publishedAt: "2025-10-04T00:00:00Z", content: "abc" }, { publishedAt: "2025-10-06T00:00:00Z", content: "de" } ],
       start_date: Date.new(2025, 10, 5), end_date: Date.new(2025, 10, 6))
-    expect(result.fetch(:points).pluck(:totalArticles)).to eq([ 1 / 7.0, 2 / 7.0 ])
-    expect(result.fetch(:points).pluck(:totalChars)).to eq([ 3 / 7.0, 5 / 7.0 ])
-    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "0.29 本/日", "0.71 字/日" ])
+    expect(result.fetch(:points).pluck(:totalArticles)).to eq([ 1, 1.5 ])
+    expect(result.fetch(:points).pluck(:totalChars)).to eq([ 3, 4 ])
+    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "1.5 本", "4 字" ])
   end
-  it "7日前の記事を除外し、投稿がない日も0として平均する" do
+  it "直近7日分の累積値を平均し、8日目には最初の日を除外する" do
     result = described_class.call(
-      articles: [ { publishedAt: "2025-10-05T00:00:00Z", content: "abcdefg" } ],
+      articles: [
+        { publishedAt: "2025-10-05T00:00:00Z", content: "abcdefg" },
+        { publishedAt: "2025-10-06T00:00:00Z", content: "abcdefg" }
+      ],
       start_date: Date.new(2025, 10, 5), end_date: Date.new(2025, 10, 13))
-    expect(result.fetch(:points).pluck(:totalArticles)).to eq([ *Array.new(7, 1 / 7.0), 0, 0 ])
-    expect(result.fetch(:points).pluck(:totalChars)).to eq([ *Array.new(7, 1.0), 0, 0 ])
+    points = result.fetch(:points)
+    expect(points.first.fetch(:totalArticles)).to eq(1)
+    expect(points[6].fetch(:totalArticles)).to eq(13 / 7.0)
+    expect(points[7].fetch(:totalArticles)).to eq(2)
+    expect(points[7].fetch(:totalChars)).to eq(14)
+    expect(points.last.fetch(:totalArticles)).to eq(2)
   end
 end

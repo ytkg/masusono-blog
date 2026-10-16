@@ -548,15 +548,15 @@ test("numbers trend", async ({ page }) => {
   await expect(chart.getByTestId("trend-line-totalChars")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.getByText("'26/01/12", { exact: true })).toHaveAttribute("font-size", "12")
   await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
-  await expect(chart.getByText("記事数", { exact: true })).toHaveCSS("color", "rgb(102, 102, 102)")
-  await expect(chart.getByText("記事数", { exact: true })).toHaveCSS("font-size", "14px")
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("color", "rgb(102, 102, 102)")
+  await expect(chart.getByText("総記事数", { exact: true })).toHaveCSS("font-size", "14px")
   await expect(chart).toHaveScreenshot("numbers-trend.png")
 })
 
 test("numbers trend selection", async ({ page }, testInfo) => {
   await openPage(page, "/numbers")
   const chart = page.getByTestId("numbers-trend")
-  const graph = chart.getByRole("img", { name: "記事数、文字数の7日間移動平均" })
+  const graph = chart.getByRole("img", { name: "総記事数、総文字数の7日間移動平均" })
   // Element screenshots expand a short viewport, which can clear mouse selection.
   if (testInfo.project.name === "desktop") {
     const viewport = page.viewportSize()
@@ -576,7 +576,7 @@ test("numbers trend selection", async ({ page }, testInfo) => {
     await page.mouse.move(first.x, first.y)
   }
   await expect(values).toContainText("2026/01/12")
-  await expect(values).toContainText("5.14 字/日")
+  await expect(values).toContainText("36 字")
 
   if (testInfo.project.name === "mobile") {
     const session = await page.context().newCDPSession(page)
@@ -588,8 +588,8 @@ test("numbers trend selection", async ({ page }, testInfo) => {
     await page.mouse.move(last.x, last.y)
   }
   await expect(values).toContainText("2026/01/15")
-  await expect(values).toContainText("0.29 本/日")
-  await expect(values).toContainText("13.71 字/日")
+  await expect(values).toContainText("1.25 本")
+  await expect(values).toContainText("51 字")
   await expect(chart.getByTestId("trend-selected-date")).toHaveCount(1)
   await expect(chart).toHaveScreenshot("numbers-trend-selected.png")
   await expectNoPageOverflow(page)
@@ -601,6 +601,8 @@ test("numbers trend selection", async ({ page }, testInfo) => {
     await graph.press("End")
     await expect(values).toContainText("2026/01/15")
     await graph.press("ArrowLeft")
+    await expect(values).toContainText("2026/01/14")
+    await graph.press("Home")
     await expect(values).toContainText("2026/01/12")
     await graph.press("Escape")
     await expect(values).toHaveCount(0)
