@@ -81,8 +81,8 @@ RSpec.describe Numbers::MetricsQuery do
       it do
         expect(trend[:title]).to eq("推移")
         expect(trend[:series]).to eq([
-          { key: :totalArticles, label: "総記事数", unit: "本", finalValue: "3 本" },
-          { key: :totalChars, label: "総文字数", unit: "字", finalValue: "8.83 字" }
+          { key: :totalArticles, label: "総記事数", unit: "本", finalValue: "4 本" },
+          { key: :totalChars, label: "総文字数", unit: "字", finalValue: "12 字" }
         ])
       end
 

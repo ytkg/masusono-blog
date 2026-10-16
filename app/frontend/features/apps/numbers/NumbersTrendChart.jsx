@@ -25,7 +25,7 @@ export default function NumbersTrendChart({ trend }) {
       </Box>
 
       <Typography variant="caption" sx={{ color: "text.secondary" }}>
-        {trend.description} 総文字数は1/300
+        総文字数は1/300
       </Typography>
     </Stack>
   )
