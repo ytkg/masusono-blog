@@ -531,6 +531,18 @@ test("numbers trend", async ({ page }) => {
   await openPage(page, "/numbers")
   const chart = page.getByTestId("numbers-trend")
   await expectSectionHeading(chart.getByRole("heading", { name: "推移", level: 2 }), "0px")
+  const gaps = await page.evaluate(() => {
+    const heading = (name) => [...document.querySelectorAll("h2")].find((element) => element.textContent === name)
+    return {
+      metrics:
+        document.querySelector("table").getBoundingClientRect().top - heading("集計").getBoundingClientRect().bottom,
+      trend:
+        document.querySelector('[data-testid="trend-date-grid-line"]').getBoundingClientRect().top -
+        heading("推移").getBoundingClientRect().bottom,
+    }
+  })
+  expect(gaps.metrics).toBeCloseTo(12, 0)
+  expect(gaps.trend).toBeCloseTo(gaps.metrics, 0)
   await chart.scrollIntoViewIfNeeded()
   await expect(chart.getByTestId("trend-line-totalArticles")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.getByTestId("trend-line-totalChars")).not.toHaveAttribute("stroke-dasharray")

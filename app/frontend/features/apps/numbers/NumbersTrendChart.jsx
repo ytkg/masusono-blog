@@ -17,7 +17,7 @@ export default function NumbersTrendChart({ trend }) {
 
       <Box
         sx={{
-          py: 0.5,
+          pb: 0.5,
         }}
       >
         <TrendChartSvg trend={trend} />
