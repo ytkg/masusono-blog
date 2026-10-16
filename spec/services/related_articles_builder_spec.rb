@@ -21,32 +21,28 @@ RSpec.describe RelatedArticlesBuilder do
     allow(Article).to receive(:all).and_return(candidates)
   end
 
-  it "共通タグ数を優先し、公開時刻順に最大3件のタイトルとIDを返す" do
-    expect(result).to eq([
-      { id: "both", title: "古い2タグ" },
-      { id: "single", title: "新しい1タグ" },
-      { id: "early", title: "同じ日の早い記事" }
-    ])
+  it "タグの設定順で分類し、タグ間の重複を許してIDとタイトルだけ返す" do
+    expect(result.pluck(:tag)).to eq(%w[ラーメン 味玉 価値観])
+    expect(result[0][:articles]).to match_array(candidates.first(2).map { |item| item.slice(:id, :title) })
+    expect(result[1][:articles]).to match_array(candidates.values_at(1, 2).map { |item| item.slice(:id, :title) })
+    expect(result[2][:articles]).to eq([ { id: "excluded" } ])
   end
 
-  context "同点・日付欠損・重複がある場合" do
+  context "候補が4件以上の場合" do
     let(:candidates) do
-      [
-        { id: "b", tags: "味玉", publishedAt: "2026-01-01T00:00:00Z" },
-        { id: "missing-b", tags: "味玉" },
-        { id: "a", tags: "味玉", publishedAt: "2026-01-01T09:00:00+09:00" },
-        { id: "a", tags: "味玉", publishedAt: "2026-01-01T09:00:00+09:00" },
-        { id: "missing-a", tags: "味玉", publishedAt: "invalid" }
-      ]
+      items = 8.times.map { |i| { id: i.to_s, title: i.to_s, tags: "味玉" } }
+      items + [ items.first, article, { id: nil, tags: "味玉" } ]
     end
 
-    it "同じ日時はID順にし、日付欠損を末尾に置き、IDを重複させない" do
-      expect(result.pluck(:id)).to eq(%w[a b missing-a])
+    it "重複せず最大3件をランダムに選ぶ" do
+      selections = 10.times.map { described_class.call(article:).first[:articles].pluck(:id) }
+      expect(selections).to all(satisfy { |ids| ids.size == 3 && ids.uniq == ids && (ids - (0...8).map(&:to_s)).empty? })
+      expect(selections.uniq.size).to be > 1
     end
   end
 
   context "対象タグがない場合" do
-    [ nil, " , , ", "価値観,感情,自己理解,思い出,お金,節約,おすすめ" ].each do |tags|
+    [ nil, " , , " ].each do |tags|
       context "タグが#{tags.inspect}の場合" do
         let(:article) { { id: "current", tags: } }
 
@@ -59,7 +55,7 @@ RSpec.describe RelatedArticlesBuilder do
   end
 
   context "一致する候補がない場合" do
-    let(:candidates) { [ article, { id: "other", tags: "ラーメン好き,価値観" } ] }
+    let(:candidates) { [ article, { id: "other", tags: "ラーメン好き" } ] }
 
     it "完全一致以外や閲覧中の記事で埋めない" do
       expect(result).to eq([])
@@ -76,7 +72,7 @@ RSpec.describe RelatedArticlesBuilder do
     let(:candidates) { [ { id: "only", title: "1件", tags: "味玉" } ] }
 
     it "1件だけ返す" do
-      expect(result).to eq([ { id: "only", title: "1件" } ])
+      expect(result).to eq([ { tag: "味玉", articles: [ { id: "only", title: "1件" } ] } ])
     end
   end
 

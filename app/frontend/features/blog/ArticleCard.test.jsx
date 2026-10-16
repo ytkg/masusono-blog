@@ -18,15 +18,36 @@ describe("ArticleCard", () => {
       <ArticleCard
         mode="detail"
         article={{ id: "current", title: "閲覧中", author, authorId: author, content: "<p>本文です</p>" }}
-        relatedArticles={[{ id: "related", title: "関連" }]}
+        relatedArticles={[{ tag: "散歩", articles: [{ id: "related", title: "関連" }] }]}
       />,
     )
     const link = screen.getByRole("link", { name: `${author}の他の記事を読む →` })
     expect(link).toHaveAttribute("href", screen.getByRole("link", { name: author, exact: true }).getAttribute("href"))
     expect(screen.getByText("本文です").compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(
-      link.compareDocumentPosition(screen.getByRole("region", { name: "関連記事" })) & Node.DOCUMENT_POSITION_FOLLOWING,
+      link.compareDocumentPosition(screen.getByRole("region", { name: "散歩の記事" })) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
+  })
+
+  it("タグごとの見出しを順番に表示し、同じ記事の重複も許す", () => {
+    const articles = [{ id: "shared", title: "共通の記事" }]
+    render(
+      <ArticleCard
+        mode="detail"
+        article={{ id: "current", title: "本文" }}
+        relatedArticles={[
+          { tag: "散歩", articles },
+          { tag: "日常", articles },
+        ]}
+      />,
+    )
+    expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual([
+      "散歩の記事",
+      "日常の記事",
+    ])
+    expect(screen.getAllByRole("link", { name: "共通の記事" })).toHaveLength(2)
+    expect(screen.queryByRole("link", { name: "散歩の記事" })).not.toBeInTheDocument()
   })
 
   it("関連記事がなくても読後リンクを表示する", () => {
@@ -45,7 +66,7 @@ describe("ArticleCard", () => {
     expect(screen.queryByRole("link", { name: /の他の記事を読む/ })).not.toBeInTheDocument()
   })
 
-  it.each([[[]], [[{ id: "related", title: "関連記事のタイトル" }]]])(
+  it.each([[[]], [[{ tag: "散歩", articles: [{ id: "related", title: "関連記事のタイトル" }] }]]])(
     "関連記事の有無にかかわらず詳細の本文後に応援リンクを1組表示する: %j",
     (relatedArticles) => {
       render(
@@ -71,7 +92,7 @@ describe("ArticleCard", () => {
       }
       if (relatedArticles.length) {
         expect(
-          screen.getByRole("region", { name: "関連記事" }).compareDocumentPosition(links[0]) &
+          screen.getByRole("region", { name: "散歩の記事" }).compareDocumentPosition(links[0]) &
             Node.DOCUMENT_POSITION_FOLLOWING,
         ).toBeTruthy()
       }
@@ -90,8 +111,13 @@ describe("ArticleCard", () => {
         mode="detail"
         article={{ id: "a", title: "A" }}
         relatedArticles={[
-          { id: "b", title: "B" },
-          { id: "c", title: "C" },
+          {
+            tag: "散歩",
+            articles: [
+              { id: "b", title: "B" },
+              { id: "c", title: "C" },
+            ],
+          },
         ]}
       />,
     )
@@ -110,11 +136,11 @@ describe("ArticleCard", () => {
       <ArticleCard
         mode="detail"
         article={{ id: "current", title: "閲覧中", content: "<p>本文です</p>" }}
-        relatedArticles={[{ id: "related", title: "関連記事のタイトル" }]}
+        relatedArticles={[{ tag: "散歩", articles: [{ id: "related", title: "関連記事のタイトル" }] }]}
       />,
     )
-    const section = screen.getByRole("region", { name: "関連記事" })
-    expect(section).toContainElement(screen.getByRole("heading", { level: 2, name: "関連記事" }))
+    const section = screen.getByRole("region", { name: "散歩の記事" })
+    expect(section).toContainElement(screen.getByRole("heading", { level: 2, name: "散歩の記事" }))
     expect(screen.getByRole("link", { name: "関連記事のタイトル" })).toHaveAttribute("href", "/articles/related")
     expect(
       screen.getByText("本文です").compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -123,17 +149,17 @@ describe("ArticleCard", () => {
 
   it.each(["list", "detail"])("%sモードでは候補が0件なら関連記事の枠を表示しない", (mode) => {
     render(<ArticleCard mode={mode} article={{ id: "current", title: "閲覧中", content: "<p>本文</p>" }} />)
-    expect(screen.queryByRole("region", { name: "関連記事" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("region", { name: "散歩の記事" })).not.toBeInTheDocument()
   })
 
   it("一覧には関連記事を表示しない", () => {
     render(
       <ArticleCard
         article={{ id: "current", title: "閲覧中", content: "<p>本文</p>" }}
-        relatedArticles={[{ id: "related", title: "関連記事のタイトル" }]}
+        relatedArticles={[{ tag: "散歩", articles: [{ id: "related", title: "関連記事のタイトル" }] }]}
       />,
     )
-    expect(screen.queryByRole("region", { name: "関連記事" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("region", { name: "散歩の記事" })).not.toBeInTheDocument()
   })
 
   it("1年前の記事は関連記事の下に全件表示し、重複も許容してクリックを計測する", () => {
@@ -143,7 +169,7 @@ describe("ArticleCard", () => {
       <ArticleCard
         mode="detail"
         article={{ id: "current", title: "本文" }}
-        relatedArticles={[articles[0]]}
+        relatedArticles={[{ tag: "散歩", articles: [articles[0]] }]}
         yearAgoArticles={articles}
       />,
     )
@@ -151,7 +177,7 @@ describe("ArticleCard", () => {
     expect(section.querySelectorAll("a")).toHaveLength(4)
     expect(screen.getAllByRole("link", { name: "a", exact: true })).toHaveLength(2)
     expect(
-      screen.getByRole("region", { name: "関連記事" }).compareDocumentPosition(section) &
+      screen.getByRole("region", { name: "散歩の記事" }).compareDocumentPosition(section) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
     expect(

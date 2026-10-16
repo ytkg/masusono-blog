@@ -59,7 +59,7 @@ test("article initial HTML contains content, links, styles and SEO metadata", as
     const { head, body } = await render("blog/show", url, {
       article,
       ogpImagePath: "/articles/ssr-article/ogp/test-version.png",
-      relatedArticles: [{ id: "related-1", title: "関連する記事" }],
+      relatedArticles: [{ tag: "散歩", articles: [{ id: "related-1", title: "関連する記事" }] }],
       yearAgoArticles: [{ id: "past-1", title: "1年前の同日の記事" }],
     })
     assert.ok(body.includes("本文"))

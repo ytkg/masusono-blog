@@ -106,13 +106,16 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
               </Link>
             </Box>
           )}
-          <ArticleLinkSection
-            title="関連記事"
-            articles={relatedArticles}
-            sourceId={article.id}
-            trackClick={trackRelatedArticleClick}
-            sx={authorHref ? { mt: 1, pt: 1 } : undefined}
-          />
+          {relatedArticles.map(({ tag, articles }, index) => (
+            <ArticleLinkSection
+              key={tag}
+              title={`${tag}の記事`}
+              articles={articles}
+              sourceId={article.id}
+              trackClick={trackRelatedArticleClick}
+              sx={index === 0 && authorHref ? { mt: 1, pt: 1 } : undefined}
+            />
+          ))}
           <ArticleLinkSection
             title="1年前の記事"
             articles={yearAgoArticles}

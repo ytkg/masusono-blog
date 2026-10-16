@@ -55,7 +55,7 @@ test("GA4 hydration, Inertia history and related links", async ({ page, baseURL 
   await expectView(6, "/")
   await page.goForward()
   await expectView(7, "/articles/visual-article-2")
-  await page.getByRole("region", { name: "関連記事" }).getByRole("link").click()
+  await page.getByRole("region", { name: "日常の記事" }).getByRole("link").click()
   await expect.poll(() => clicks().length).toBe(1)
   expect(clicks()[0][2]).toMatchObject({
     source_article_id: "visual-article-2", target_article_id: "visual-article-1", link_position: 1,
@@ -109,7 +109,7 @@ test("excluded browser never loads or initializes Google across reload and histo
   const beforeReload = policyChecks
   await page.reload()
   await expect.poll(() => policyChecks).toBeGreaterThan(beforeReload)
-  await page.getByRole("region", { name: "関連記事" }).getByRole("link").click()
+  await page.getByRole("region", { name: "日常の記事" }).getByRole("link").click()
   await expect(page).toHaveURL("https://masusono.com/articles/visual-article-1")
   await page.getByRole("link", { name: "ホーム", exact: true }).click()
   await expect(page).toHaveURL("https://masusono.com/")
