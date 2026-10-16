@@ -556,7 +556,7 @@ test("numbers trend", async ({ page }) => {
 test("numbers trend selection", async ({ page }, testInfo) => {
   await openPage(page, "/numbers")
   const chart = page.getByTestId("numbers-trend")
-  const graph = chart.getByRole("img", { name: "総記事数、総文字数の累積推移" })
+  const graph = chart.getByRole("img", { name: "総記事数、総文字数の7日間移動平均" })
   // Element screenshots expand a short viewport, which can clear mouse selection.
   if (testInfo.project.name === "desktop") {
     const viewport = page.viewportSize()
@@ -601,6 +601,8 @@ test("numbers trend selection", async ({ page }, testInfo) => {
     await graph.press("End")
     await expect(values).toContainText("2026/01/15")
     await graph.press("ArrowLeft")
+    await expect(values).toContainText("2026/01/14")
+    await graph.press("Home")
     await expect(values).toContainText("2026/01/12")
     await graph.press("Escape")
     await expect(values).toHaveCount(0)

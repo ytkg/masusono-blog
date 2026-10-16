@@ -8,7 +8,7 @@ const render = (ui) => testingLibraryRender(<ThemeProvider theme={theme}>{ui}</T
 
 const trend = {
   title: "推移",
-  description: "各指標の累積値を日ごとに表示しています。",
+  description: "累積値の7日間移動平均。",
   series: [
     { key: "totalArticles", label: "総記事数", unit: "本", finalValue: "4 本" },
     { key: "totalChars", label: "総文字数", unit: "字", finalValue: "12 字" },
@@ -26,14 +26,13 @@ describe("NumbersTrendChart", () => {
     render(<NumbersTrendChart trend={trend} />)
 
     expect(screen.getByRole("heading", { name: "推移" })).toBeInTheDocument()
-    expect(screen.getByRole("img", { name: "総記事数、総文字数の累積推移" })).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "総記事数、総文字数の7日間移動平均" })).toBeInTheDocument()
     expect(screen.getByText("総記事数")).toBeInTheDocument()
     expect(screen.getByText("4 本")).toBeInTheDocument()
     expect(screen.getByText("総文字数")).toBeInTheDocument()
     expect(screen.getByText("12 字")).toBeInTheDocument()
     expect(screen.queryByText("増田RUN総プレイ回数")).not.toBeInTheDocument()
-    expect(screen.getByText("総文字数は1/300")).toBeInTheDocument()
-    expect(screen.queryByText(trend.description)).not.toBeInTheDocument()
+    expect(screen.getByText(trend.description + " 総文字数は1/300")).toBeInTheDocument()
     expect(screen.getByText("'25/10/05")).toBeInTheDocument()
     expect(screen.getByText("'25/10/06")).toBeInTheDocument()
     expect(screen.getByText("'25/10/07")).toBeInTheDocument()
@@ -66,6 +65,31 @@ describe("NumbersTrendChart", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument()
   })
 
+  it("線と丸印は移動平均を保ち、カーソルとキーボードでは累積実数を表示する", () => {
+    render(
+      <NumbersTrendChart
+        trend={{
+          ...trend,
+          points: trend.points.map((point) => ({
+            ...point,
+            actualValues: { totalArticles: point.totalArticles * 7, totalChars: point.totalChars * 7 },
+          })),
+        }}
+      />,
+    )
+    const chart = screen.getByRole("img")
+    chart.getBoundingClientRect = () => ({ left: 0, width: 360 })
+    const line = screen.getByTestId("trend-line-totalArticles").getAttribute("d")
+    fireEvent(chart, new MouseEvent("pointermove", { bubbles: true, clientX: 360 }))
+    expect(screen.getByRole("status")).toHaveTextContent("総記事数28 本")
+    expect(screen.getByRole("status")).toHaveTextContent("総文字数84 字")
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", line)
+    expect(chart.querySelector("circle")).toHaveAttribute("cy", "18")
+    fireEvent.keyDown(chart, { key: "Home" })
+    expect(screen.getByRole("status")).toHaveTextContent("総記事数7 本")
+    expect(screen.getByRole("status")).toHaveTextContent("総文字数21 字")
+  })
+
   it("タッチで選択してなぞり、離した後も値を読める", () => {
     render(<NumbersTrendChart trend={trend} />)
     const chart = screen.getByRole("img")
@@ -88,13 +112,16 @@ describe("NumbersTrendChart", () => {
   it("キーボードで日付を選択でき、文字数は縮尺を戻した実数で表示する", () => {
     render(
       <NumbersTrendChart
-        trend={{ ...trend, points: [{ date: "2025-10-05", totalArticles: 1000, totalChars: 600000 }, trend.points[3]] }}
+        trend={{
+          ...trend,
+          points: [{ date: "2025-10-05", totalArticles: 1000 / 7, totalChars: 600000 / 7 }, trend.points[3]],
+        }}
       />,
     )
     const chart = screen.getByRole("img")
     fireEvent.keyDown(chart, { key: "Home" })
-    expect(within(screen.getByRole("status")).getByText("600,000 字")).toBeInTheDocument()
-    expect(within(screen.getByRole("status")).getByText("1,000 本")).toBeInTheDocument()
+    expect(within(screen.getByRole("status")).getByText("85,714.29 字")).toBeInTheDocument()
+    expect(within(screen.getByRole("status")).getByText("142.86 本")).toBeInTheDocument()
     fireEvent.keyDown(chart, { key: "ArrowRight" })
     expect(screen.getByRole("status")).toHaveTextContent("2025/10/08")
     fireEvent.keyDown(chart, { key: "ArrowLeft" })

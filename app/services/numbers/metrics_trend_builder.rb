@@ -24,7 +24,7 @@ module Numbers
     def call
       {
         title: "推移",
-        description: "各指標の累積値を日ごとに表示しています。",
+        description: "線・凡例は7日間移動平均、カーソルの数値はその日の累積実数。",
         series: build_series,
         points: build_points
       }
@@ -58,22 +58,30 @@ module Numbers
           totals[:total_chars] += counts.fetch(:total_chars)
         end
 
+        window = []
         date_range.map do |date|
           article_data = article_events.fetch(date) { initial_totals }
           totals[:total_articles] += article_data.fetch(:total_articles)
           totals[:total_chars] += article_data.fetch(:total_chars)
 
-          build_point(date, totals)
+          window << totals.dup
+          window.shift if window.length > 7
+          averages = totals.keys.to_h { |key| [ key, window.sum { |point| point.fetch(key) }.fdiv(window.length) ] }
+          build_point(date, averages, totals)
         end
       end
     end
 
-    def build_point(date, totals)
+    def build_point(date, averages, totals)
       {
         date: date.strftime(POINT_DATE_FORMAT),
         label: date.strftime(DATE_FORMAT),
-        totalArticles: totals.fetch(:total_articles),
-        totalChars: totals.fetch(:total_chars)
+        totalArticles: averages.fetch(:total_articles),
+        totalChars: averages.fetch(:total_chars),
+        actualValues: {
+          totalArticles: totals.fetch(:total_articles),
+          totalChars: totals.fetch(:total_chars)
+        }
       }
     end
 
@@ -120,7 +128,7 @@ module Numbers
     def format_value(value, unit)
       return nil if value.nil?
 
-      "#{number_to_delimited(value)} #{unit}"
+      "#{number_to_rounded(value, precision: 2, strip_insignificant_zeros: true, delimiter: ",")} #{unit}"
     end
   end
 end

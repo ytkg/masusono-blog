@@ -54,7 +54,7 @@ export default function TrendChartSvg({ trend }) {
         component="svg"
         viewBox={`0 ${bounds.top} ${CHART_WIDTH} ${CHART_HEIGHT - bounds.top}`}
         role="img"
-        aria-label="総記事数、総文字数の累積推移"
+        aria-label="総記事数、総文字数の7日間移動平均"
         aria-description="カーソルや指で日付を選択できます。キーボードでは左右の矢印キーで選択し、Escapeで閉じます。"
         tabIndex={0}
         onPointerDown={(event) => {

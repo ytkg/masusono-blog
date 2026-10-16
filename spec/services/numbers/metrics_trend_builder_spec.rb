@@ -18,10 +18,10 @@ RSpec.describe Numbers::MetricsTrendBuilder do
         ]
       end
 
-      it "公開日時をJSTの日付ごとに累積する" do
+      it "公開日時をJSTの日付ごとに累積し移動平均を返す" do
         expect(result.fetch(:points)).to eq([
-          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 1 },
-          { date: "2025-10-06", label: "2025/10/06", totalArticles: 3, totalChars: 6 }
+          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 1, actualValues: { totalArticles: 1, totalChars: 1 } },
+          { date: "2025-10-06", label: "2025/10/06", totalArticles: 2, totalChars: 3.5, actualValues: { totalArticles: 3, totalChars: 6 } }
         ])
       end
     end
@@ -48,8 +48,8 @@ RSpec.describe Numbers::MetricsTrendBuilder do
             { key: :totalChars, label: "総文字数", unit: "字", finalValue: "0 字" }
           ],
           points: [
-            { date: "2025-10-05", label: "2025/10/05", totalArticles: 0, totalChars: 0 },
-            { date: "2025-10-06", label: "2025/10/06", totalArticles: 0, totalChars: 0 }
+            { date: "2025-10-05", label: "2025/10/05", totalArticles: 0, totalChars: 0, actualValues: { totalArticles: 0, totalChars: 0 } },
+            { date: "2025-10-06", label: "2025/10/06", totalArticles: 0, totalChars: 0, actualValues: { totalArticles: 0, totalChars: 0 } }
           ]
         )
       end
@@ -76,10 +76,10 @@ RSpec.describe Numbers::MetricsTrendBuilder do
 
       it do
         expect(result.fetch(:points)).to eq([
-          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3 },
-          { date: "2025-10-06", label: "2025/10/06", totalArticles: 1, totalChars: 3 },
-          { date: "2025-10-07", label: "2025/10/07", totalArticles: 1, totalChars: 3 },
-          { date: "2025-10-08", label: "2025/10/08", totalArticles: 2, totalChars: 5 }
+          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3, actualValues: { totalArticles: 1, totalChars: 3 } },
+          { date: "2025-10-06", label: "2025/10/06", totalArticles: 1, totalChars: 3, actualValues: { totalArticles: 1, totalChars: 3 } },
+          { date: "2025-10-07", label: "2025/10/07", totalArticles: 1, totalChars: 3, actualValues: { totalArticles: 1, totalChars: 3 } },
+          { date: "2025-10-08", label: "2025/10/08", totalArticles: 1.25, totalChars: 3.5, actualValues: { totalArticles: 2, totalChars: 5 } }
         ])
       end
     end
@@ -88,8 +88,22 @@ RSpec.describe Numbers::MetricsTrendBuilder do
     result = described_class.call(
       articles: [ { publishedAt: "2025-10-04T00:00:00Z", content: "abc" }, { publishedAt: "2025-10-06T00:00:00Z", content: "de" } ],
       start_date: Date.new(2025, 10, 5), end_date: Date.new(2025, 10, 6))
-    expect(result.fetch(:points).pluck(:totalArticles)).to eq([ 1, 2 ])
-    expect(result.fetch(:points).pluck(:totalChars)).to eq([ 3, 5 ])
-    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "2 本", "5 字" ])
+    expect(result.fetch(:points).pluck(:totalArticles)).to eq([ 1, 1.5 ])
+    expect(result.fetch(:points).pluck(:totalChars)).to eq([ 3, 4 ])
+    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "1.5 本", "4 字" ])
+  end
+  it "直近7日分の累積値を平均し、8日目には最初の日を除外する" do
+    result = described_class.call(
+      articles: [
+        { publishedAt: "2025-10-05T00:00:00Z", content: "abcdefg" },
+        { publishedAt: "2025-10-06T00:00:00Z", content: "abcdefg" }
+      ],
+      start_date: Date.new(2025, 10, 5), end_date: Date.new(2025, 10, 13))
+    points = result.fetch(:points)
+    expect(points.first.fetch(:totalArticles)).to eq(1)
+    expect(points[6].fetch(:totalArticles)).to eq(13 / 7.0)
+    expect(points[7].fetch(:totalArticles)).to eq(2)
+    expect(points[7].fetch(:totalChars)).to eq(14)
+    expect(points.last.fetch(:totalArticles)).to eq(2)
   end
 end
