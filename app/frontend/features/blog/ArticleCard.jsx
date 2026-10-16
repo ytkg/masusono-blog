@@ -113,7 +113,7 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
               articles={articles}
               sourceId={article.id}
               trackClick={trackRelatedArticleClick}
-              sx={index === 0 && authorHref ? { mt: 1, pt: 1 } : undefined}
+              sx={index > 0 ? { pt: 0 } : authorHref ? { mt: 1, pt: 1 } : undefined}
             />
           ))}
           <ArticleLinkSection
