@@ -111,3 +111,31 @@ it("著者名中のORを演算子とせず、引用語と通常のORを組み合
   expect(articleMatchesQuery({ author, tags: "ruby" }, query)).toBe(true)
   expect(articleMatchesQuery({ author: "A", tags: "missing" }, query)).toBe(false)
 })
+
+it.each(["<Ruby>", "&copy;", "&#35;Ruby"])("検索入力の表示文字をHTMLとして解釈しない: %s", (literal) => {
+  const query = normalizeArticleSearchText(literal)
+  expect(query).toBe(literal.toLowerCase())
+  expect(articleMatchesQuery({ title: literal }, query)).toBe(true)
+  expect(articleMatchesQuery({ title: "無関係", content: "<p>本文</p>" }, query)).toBe(false)
+})
+
+it.each(["title", "author", "tags"])("プレーンテキストの%sとHTML本文の境界を保つ", (field) => {
+  const article = { [field]: "<Ruby> &copy;", content: "<p>Ru<strong>by</strong> &copy; &lt;Rails&gt;</p>" }
+  const matches = (query) => articleMatchesQuery(article, normalizeArticleSearchText(query))
+  expect(matches('"<Ruby> &copy;"')).toBe(true)
+  expect(matches("Ruby © <Rails>")).toBe(true)
+  expect(matches("strong")).toBe(false)
+  expect(articleMatchesQuery({ [field]: "<Ruby>" }, normalizeArticleSearchText("<Ruby>"))).toBe(true)
+  expect(articleMatchesQuery({ [field]: "&copy;" }, normalizeArticleSearchText("©"))).toBe(false)
+})
+
+it.each(["<Ruby>", "&copy;", 'A <B> or "C"\\D'])("タグ・著者の選択条件を表示文字のまま評価する: %s", (literal) => {
+  for (const [prefix, field] of [
+    ["#", "tags"],
+    ["@", "author"],
+  ]) {
+    const query = normalizeArticleSearchText(buildArticleSearchTerm(prefix, literal))
+    expect(articleMatchesQuery({ [field]: literal }, query)).toBe(true)
+    expect(articleMatchesQuery({ [field]: "other", content: literal }, query)).toBe(false)
+  }
+})
