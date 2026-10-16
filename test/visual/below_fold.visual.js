@@ -61,6 +61,6 @@ test("numbers bottom with navigation", async ({ page }) => {
   const chart = page.getByTestId("numbers-trend")
   await expect(chart.getByTestId("trend-line-totalArticles")).toBeVisible()
   await scrollToBottom(page)
-  await expectAboveNavigation(page, chart.getByText("96 字", { exact: true }))
+  await expectAboveNavigation(page, chart.getByText("総文字数は1/300", { exact: true }))
   await expect(page).toHaveScreenshot("numbers-bottom-navigation.png")
 })

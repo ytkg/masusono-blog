@@ -33,7 +33,7 @@ describe("NumbersTrendChart", () => {
     expect(screen.getByText("12 字")).toBeInTheDocument()
     expect(screen.queryByText("増田RUN総プレイ回数")).not.toBeInTheDocument()
     expect(screen.queryByText(trend.description)).not.toBeInTheDocument()
-    expect(screen.queryByText(/総文字数は1\/300/)).not.toBeInTheDocument()
+    expect(screen.getByText("総文字数は1/300")).toBeInTheDocument()
     expect(screen.getByText("'25/10/05")).toBeInTheDocument()
     expect(screen.getByText("'25/10/06")).toBeInTheDocument()
     expect(screen.getByText("'25/10/07")).toBeInTheDocument()
