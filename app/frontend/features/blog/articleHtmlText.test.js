@@ -64,3 +64,11 @@ it.each([false, true])("表や引用のテキストを結合しない SSR=%s", (
     ),
   ).toBe("左 右 引用 code 後")
 })
+
+it.each([false, true])("hidden属性の部分木を除き、aria-hiddenだけの可視本文は残す SSR=%s", (ssr) => {
+  vi.stubEnv("SSR", ssr)
+  const html =
+    '<p>本文<span hidden>非表示<strong>子孫</strong></span><span aria-hidden="true">視覚</span></p><div hidden="false">非表示</div><div hidden="until-found">検索前は非表示</div><p>末尾</p>'
+  expect(extractHtmlText(html)).toBe("本文視覚\n末尾\n")
+  expect(extractTextFromHtml(html)).toBe("本文視覚 末尾")
+})

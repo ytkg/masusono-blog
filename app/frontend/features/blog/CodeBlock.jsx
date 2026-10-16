@@ -1,4 +1,5 @@
 import { supportingActionSx } from "../../shared/styles/supportingActionStyles"
+import { focusVisibleInsetSx } from "../../shared/styles/focusStyles"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import HighlightedCode from "./HighlightedCode"
@@ -55,7 +56,12 @@ export default function CodeBlock({ block, action }) {
         </Box>
         {action}
       </Box>
-      <Box sx={{ ...bodySx, ...scrollerSx }}>
+      <Box
+        role="region"
+        aria-label={`${block.languageLabel}のコード`}
+        tabIndex={0}
+        sx={{ ...bodySx, ...scrollerSx, ...focusVisibleInsetSx }}
+      >
         <HighlightedCode block={block} />
       </Box>
     </Box>

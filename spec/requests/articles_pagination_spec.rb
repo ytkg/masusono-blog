@@ -39,6 +39,22 @@ RSpec.describe "Public articles pagination", type: :request do
     expect(response.parsed_body["pagination"]).to eq("nextOffset" => 10)
   end
 
+  context "本文に非表示要素がある場合" do
+    let(:content) { "<p>本文</p><div hidden=\"\">#{'あ' * 401}</div><iframe>代替本文</iframe>" }
+    let(:articles) { [ { id: "hidden-content", content: } ] }
+
+    it "本文のHTMLを維持し、可視本文だけで文字数と読了目安を返す" do
+      get "/api/app/articles"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.fetch("articles").first).to include(
+        "content" => content, "characterCount" => 2, "readingTimeMinutes" => 0.5
+      )
+      expect(response.headers["Cache-Control"]).to include("no-store")
+      expect(response.headers["X-Request-Id"]).to be_present
+    end
+  end
+
   it "空ページで追加読み込みを終了する" do
     stub_microcms_get(endpoint:, query: { limit: "10", offset: "20", orders: "-publishedAt" },
                       contents: [], total_count: 15, limit: 10, offset: 20)

@@ -57,6 +57,9 @@ describe("MasudaRunGame", () => {
     expect(screen.getByText("スコア 00000")).toBeInTheDocument()
     expect(screen.getByText("ハイスコア 00042")).toBeInTheDocument()
     expect(screen.getByText("rankings:1")).toBeInTheDocument()
+    const canvas = screen.getByRole("img", { name: "増田RUNのゲーム画面" })
+    expect(canvas).toHaveAttribute("tabindex", "0")
+    expect(canvas).toHaveAccessibleDescription(/スペース\/↑でジャンプ/)
 
     act(() => {
       fireEvent.click(screen.getByRole("button", { name: "スタート" }))
