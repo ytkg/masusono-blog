@@ -52,7 +52,7 @@ export default function TrendChartSvg({ trend }) {
     <Box sx={{ position: "relative" }}>
       <Box
         component="svg"
-        viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+        viewBox={`0 ${bounds.top} ${CHART_WIDTH} ${CHART_HEIGHT - bounds.top}`}
         role="img"
         aria-label="総記事数、総文字数の累積推移"
         aria-description="カーソルや指で日付を選択できます。キーボードでは左右の矢印キーで選択し、Escapeで閉じます。"
