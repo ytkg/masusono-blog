@@ -33,7 +33,7 @@ function readCopyNode(node, inPre = false) {
   if (node.nodeType === TEXT_NODE) return inPre ? node.textContent : node.textContent.replace(/\s+/g, " ")
   if (node.nodeType !== ELEMENT_NODE) return ""
   const tag = node.tagName
-  if (EXCLUDED_TAGS.has(tag)) return ""
+  if (EXCLUDED_TAGS.has(tag) || node.hasAttribute("hidden")) return ""
   if (tag === "BR") return "\n"
   const text = Array.from(node.childNodes, (child) => readCopyNode(child, inPre || tag === "PRE")).join("")
   if (["TD", "TH"].includes(tag)) return `${text}\t`

@@ -30,3 +30,15 @@ it("omits inert template and fallback content from copied text", () => {
     buildArticleCopyText({ content: "<p>本文</p><template>hidden</template><noscript>fallback</noscript><p>末尾</p>" }),
   ).toBe("本文\n\n末尾")
 })
+
+it.each(["hidden", 'hidden="false"', 'hidden="until-found"'])(
+  "コピーから%sの部分木を除き、aria-hiddenの可視本文とコードの字下げを保持する",
+  (attribute) => {
+    expect(
+      buildArticleCopyText({
+        title: "題名",
+        content: `<p>本文<span ${attribute}>非表示<strong>子孫</strong></span><span aria-hidden="true">視覚</span></p><pre><code>  puts 1<span ${attribute}>非表示コード</span></code></pre><div ${attribute}><p>非表示段落</p></div><p>末尾</p>`,
+      }),
+    ).toBe("題名\n\n本文視覚\n\n  puts 1\n\n末尾")
+  },
+)

@@ -1,4 +1,5 @@
 import { HEADER_HEIGHT } from "../../layouts/pageLayout"
+import { useRef } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import SearchIcon from "@mui/icons-material/Search"
 import Box from "@mui/material/Box"
@@ -7,6 +8,8 @@ import InputAdornment from "@mui/material/InputAdornment"
 import TextField from "@mui/material/TextField"
 
 export default function ArticleSearchBox({ autoFocus = false, onChange, onClear, query }) {
+  const inputRef = useRef(null)
+
   return (
     <Box
       sx={{
@@ -22,6 +25,7 @@ export default function ArticleSearchBox({ autoFocus = false, onChange, onClear,
     >
       <TextField
         autoFocus={autoFocus}
+        inputRef={inputRef}
         fullWidth
         value={query}
         onChange={(event) => onChange(event.target.value)}
@@ -40,7 +44,14 @@ export default function ArticleSearchBox({ autoFocus = false, onChange, onClear,
             ),
             endAdornment: query ? (
               <InputAdornment position="end">
-                <AuxiliaryIconButton aria-label="検索語をクリア" edge="end" onClick={onClear}>
+                <AuxiliaryIconButton
+                  aria-label="検索語をクリア"
+                  edge="end"
+                  onClick={() => {
+                    onClear()
+                    inputRef.current?.focus()
+                  }}
+                >
                   <CloseIcon fontSize="small" />
                 </AuxiliaryIconButton>
               </InputAdornment>

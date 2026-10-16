@@ -23,4 +23,19 @@ describe("ArticleSearchBox", () => {
 
     expect(onClear).toHaveBeenCalledOnce()
   })
+
+  it("クリアボタンが消えた後も入力欄にフォーカスを戻して次の検索を続けられる", () => {
+    const props = { onChange: vi.fn(), onClear: vi.fn() }
+    const { rerender } = render(<ArticleSearchBox query="Ruby" {...props} />)
+    const clear = screen.getByRole("button", { name: "検索語をクリア" })
+    clear.focus()
+    fireEvent.click(clear)
+    rerender(<ArticleSearchBox query="" {...props} />)
+
+    expect(screen.queryByRole("button", { name: "検索語をクリア" })).not.toBeInTheDocument()
+    const input = screen.getByRole("textbox", { name: "記事を検索" })
+    expect(input).toHaveFocus()
+    fireEvent.change(input, { target: { value: "Rails" } })
+    expect(props.onChange).toHaveBeenCalledWith("Rails")
+  })
 })
