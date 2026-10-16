@@ -24,7 +24,7 @@ module Numbers
     def call
       {
         title: "推移",
-        description: "線・凡例は7日間移動平均、カーソルの数値はその日の累積実数。",
+        description: "線は7日間移動平均、数値は累積実数（凡例は最新日・カーソルは選択日）。",
         series: build_series,
         points: build_points
       }
@@ -35,7 +35,7 @@ module Numbers
     attr_reader :articles, :start_date, :end_date, :character_counter
 
     def build_series
-      final_point = build_points.last || {}
+      final_point = build_points.last&.fetch(:actualValues) || {}
       SERIES.map do |definition|
         key = definition.fetch(:key)
         {

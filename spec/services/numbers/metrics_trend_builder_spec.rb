@@ -90,7 +90,7 @@ RSpec.describe Numbers::MetricsTrendBuilder do
       start_date: Date.new(2025, 10, 5), end_date: Date.new(2025, 10, 6))
     expect(result.fetch(:points).pluck(:totalArticles)).to eq([ 1, 1.5 ])
     expect(result.fetch(:points).pluck(:totalChars)).to eq([ 3, 4 ])
-    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "1.5 本", "4 字" ])
+    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "2 本", "5 字" ])
   end
   it "直近7日分の累積値を平均し、8日目には最初の日を除外する" do
     result = described_class.call(
