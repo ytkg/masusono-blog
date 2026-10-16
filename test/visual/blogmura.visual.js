@@ -5,7 +5,9 @@ for (const hasRelated of [true, false]) {
   test(`article support banner with related articles ${hasRelated}`, async ({ page }) => {
     await mockPageProps(page, "/articles/visual-article-1", (props) => {
       props.article.content = "<p>応援リンクの前の本文です。</p>"
-      props.relatedArticles = hasRelated ? [{ id: "related", title: "関連記事のタイトル" }] : []
+      props.relatedArticles = hasRelated
+        ? [{ tag: "散歩", articles: [{ id: "related", title: "関連記事のタイトル" }] }]
+        : []
     })
     await openPage(page, "/articles/visual-article-1")
     const imageLink = page.getByRole("link", { name: "にほんブログ村 その他日記ブログへ" })
@@ -16,7 +18,7 @@ for (const hasRelated of [true, false]) {
     await image.evaluate((element) => element.decode())
     await expect(image).toHaveCSS("width", "88px")
     await expect(image).toHaveCSS("height", "31px")
-    await expect(page.getByRole("region", { name: "関連記事" })).toHaveCount(hasRelated ? 1 : 0)
+    await expect(page.getByRole("region", { name: "散歩の記事" })).toHaveCount(hasRelated ? 1 : 0)
     for (const link of [imageLink]) {
       await expect(link).toHaveAttribute("href", "https://diary.blogmura.com/ranking/in?p_cid=11218704")
       await expect(link).toHaveAttribute("target", "_blank")

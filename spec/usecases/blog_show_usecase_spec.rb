@@ -98,7 +98,7 @@ RSpec.describe BlogShowUsecase do
       end
 
       it "本文を変更せず関連記事を別のpropsで返す" do
-        expect(result[:props][:relatedArticles]).to eq([ { id: "related", title: "散歩の記事" } ])
+        expect(result[:props][:relatedArticles]).to eq([ { tag: "散歩", articles: [ { id: "related", title: "散歩の記事" } ] } ])
         expect(result[:props][:article][:content]).to eq(article[:content])
       end
 
