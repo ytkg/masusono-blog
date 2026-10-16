@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 
-const VALUE_FORMATTER = new Intl.NumberFormat("ja-JP")
+const VALUE_FORMATTER = new Intl.NumberFormat("ja-JP", { maximumFractionDigits: 2 })
 
 export default function TrendChartTooltip({ point, series, colors }) {
   return (

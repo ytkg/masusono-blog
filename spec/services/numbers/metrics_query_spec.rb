@@ -81,19 +81,19 @@ RSpec.describe Numbers::MetricsQuery do
       it do
         expect(trend[:title]).to eq("推移")
         expect(trend[:series]).to eq([
-          { key: :totalArticles, label: "総記事数", unit: "本", finalValue: "4 本" },
-          { key: :totalChars, label: "総文字数", unit: "字", finalValue: "12 字" }
+          { key: :totalArticles, label: "記事数", unit: "本/日", finalValue: "0.57 本/日" },
+          { key: :totalChars, label: "文字数", unit: "字/日", finalValue: "1.71 字/日" }
         ])
       end
 
       it do
         expect(trend[:points]).to eq([
-          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3 },
-          { date: "2025-10-06", label: "2025/10/06", totalArticles: 2, totalChars: 5 },
-          { date: "2025-10-07", label: "2025/10/07", totalArticles: 3, totalChars: 9 },
-          { date: "2025-10-08", label: "2025/10/08", totalArticles: 4, totalChars: 12 },
-          { date: "2025-10-09", label: "2025/10/09", totalArticles: 4, totalChars: 12 },
-          { date: "2025-10-10", label: "2025/10/10", totalArticles: 4, totalChars: 12 }
+          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1 / 7.0, totalChars: 3 / 7.0 },
+          { date: "2025-10-06", label: "2025/10/06", totalArticles: 2 / 7.0, totalChars: 5 / 7.0 },
+          { date: "2025-10-07", label: "2025/10/07", totalArticles: 3 / 7.0, totalChars: 9 / 7.0 },
+          { date: "2025-10-08", label: "2025/10/08", totalArticles: 4 / 7.0, totalChars: 12 / 7.0 },
+          { date: "2025-10-09", label: "2025/10/09", totalArticles: 4 / 7.0, totalChars: 12 / 7.0 },
+          { date: "2025-10-10", label: "2025/10/10", totalArticles: 4 / 7.0, totalChars: 12 / 7.0 }
         ])
       end
     end

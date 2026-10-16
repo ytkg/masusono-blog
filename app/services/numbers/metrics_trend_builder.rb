@@ -6,8 +6,8 @@ module Numbers
     POINT_DATE_FORMAT = "%Y-%m-%d"
 
     SERIES = [
-      { key: :totalArticles, label: "総記事数", unit: "本" },
-      { key: :totalChars, label: "総文字数", unit: "字" }
+      { key: :totalArticles, label: "記事数", unit: "本/日" },
+      { key: :totalChars, label: "文字数", unit: "字/日" }
     ].freeze
 
     def self.call(articles:, start_date:, end_date: Date.current, character_counter: ArticleMetric.method(:character_count))
@@ -24,7 +24,7 @@ module Numbers
     def call
       {
         title: "推移",
-        description: "各指標の累積値を日ごとに表示しています。",
+        description: "当日を含む直近7日間の1日平均（投稿のない日は0）。",
         series: build_series,
         points: build_points
       }
@@ -50,19 +50,12 @@ module Numbers
     def build_points
       @build_points ||= begin
         article_events = grouped_article_events
-        totals = initial_totals
-        article_events.each do |date, counts|
-          next unless date < start_date
-
-          totals[:total_articles] += counts.fetch(:total_articles)
-          totals[:total_chars] += counts.fetch(:total_chars)
-        end
-
-        date_range.map do |date|
-          article_data = article_events.fetch(date) { initial_totals }
-          totals[:total_articles] += article_data.fetch(:total_articles)
-          totals[:total_chars] += article_data.fetch(:total_chars)
-
+        (start_date..effective_end_date).map do |date|
+          totals = initial_totals
+          (date - 6..date).each do |day|
+            counts = article_events.fetch(day) { initial_totals }
+            totals.each_key { |key| totals[key] += counts.fetch(key) }
+          end
           build_point(date, totals)
         end
       end
@@ -72,8 +65,8 @@ module Numbers
       {
         date: date.strftime(POINT_DATE_FORMAT),
         label: date.strftime(DATE_FORMAT),
-        totalArticles: totals.fetch(:total_articles),
-        totalChars: totals.fetch(:total_chars)
+        totalArticles: totals.fetch(:total_articles) / 7.0,
+        totalChars: totals.fetch(:total_chars) / 7.0
       }
     end
 
@@ -86,10 +79,6 @@ module Numbers
         grouped[date][:total_articles] += 1
         grouped[date][:total_chars] += character_counter.call(article)
       end
-    end
-
-    def date_range
-      @date_range ||= (start_date..effective_end_date)
     end
 
     def effective_end_date
@@ -120,7 +109,7 @@ module Numbers
     def format_value(value, unit)
       return nil if value.nil?
 
-      "#{number_to_delimited(value)} #{unit}"
+      "#{number_to_rounded(value, precision: 2, strip_insignificant_zeros: true, delimiter: ",")} #{unit}"
     end
   end
 end

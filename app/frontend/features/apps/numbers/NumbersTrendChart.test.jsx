@@ -8,10 +8,10 @@ const render = (ui) => testingLibraryRender(<ThemeProvider theme={theme}>{ui}</T
 
 const trend = {
   title: "推移",
-  description: "各指標の累積値を日ごとに表示しています。",
+  description: "当日を含む直近7日間の1日平均（投稿のない日は0）。",
   series: [
-    { key: "totalArticles", label: "総記事数", unit: "本", finalValue: "4 本" },
-    { key: "totalChars", label: "総文字数", unit: "字", finalValue: "12 字" },
+    { key: "totalArticles", label: "記事数", unit: "本/日", finalValue: "4 本/日" },
+    { key: "totalChars", label: "文字数", unit: "字/日", finalValue: "12 字/日" },
   ],
   points: [
     { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3 },
@@ -26,14 +26,14 @@ describe("NumbersTrendChart", () => {
     render(<NumbersTrendChart trend={trend} />)
 
     expect(screen.getByRole("heading", { name: "推移" })).toBeInTheDocument()
-    expect(screen.getByRole("img", { name: "総記事数、総文字数の累積推移" })).toBeInTheDocument()
-    expect(screen.getByText("総記事数")).toBeInTheDocument()
-    expect(screen.getByText("4 本")).toBeInTheDocument()
-    expect(screen.getByText("総文字数")).toBeInTheDocument()
-    expect(screen.getByText("12 字")).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "記事数、文字数の7日間移動平均" })).toBeInTheDocument()
+    expect(screen.getByText("記事数")).toBeInTheDocument()
+    expect(screen.getByText("4 本/日")).toBeInTheDocument()
+    expect(screen.getByText("文字数")).toBeInTheDocument()
+    expect(screen.getByText("12 字/日")).toBeInTheDocument()
     expect(screen.queryByText("増田RUN総プレイ回数")).not.toBeInTheDocument()
-    expect(screen.getByText("総文字数は1/300")).toBeInTheDocument()
-    expect(screen.queryByText(trend.description)).not.toBeInTheDocument()
+    expect(screen.getByText(/文字数は1\/300/)).toBeInTheDocument()
+    expect(screen.getByText(trend.description + " 文字数は1/300")).toBeInTheDocument()
     expect(screen.getByText("'25/10/05")).toBeInTheDocument()
     expect(screen.getByText("'25/10/06")).toBeInTheDocument()
     expect(screen.getByText("'25/10/07")).toBeInTheDocument()
@@ -43,7 +43,7 @@ describe("NumbersTrendChart", () => {
     expect(screen.getAllByTestId("trend-date-grid-line")).toHaveLength(4)
   })
 
-  it("総記事数と総文字数を描画する", () => {
+  it("記事数と文字数を描画する", () => {
     render(<NumbersTrendChart trend={trend} />)
 
     expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", expect.stringMatching(/^M 2 /))
@@ -58,8 +58,8 @@ describe("NumbersTrendChart", () => {
 
     fireEvent(chart, new MouseEvent("pointermove", { bubbles: true, clientX: 580 }))
     expect(screen.getByRole("status")).toHaveTextContent("2025/10/07")
-    expect(screen.getByRole("status")).toHaveTextContent("総記事数3 本")
-    expect(screen.getByRole("status")).toHaveTextContent("総文字数8 字")
+    expect(screen.getByRole("status")).toHaveTextContent("記事数3 本/日")
+    expect(screen.getByRole("status")).toHaveTextContent("文字数8 字/日")
     expect(screen.getByTestId("trend-selected-date")).toBeInTheDocument()
 
     fireEvent(chart, Object.assign(new MouseEvent("pointerout", { bubbles: true }), { pointerType: "mouse" }))
@@ -88,13 +88,16 @@ describe("NumbersTrendChart", () => {
   it("キーボードで日付を選択でき、文字数は縮尺を戻した実数で表示する", () => {
     render(
       <NumbersTrendChart
-        trend={{ ...trend, points: [{ date: "2025-10-05", totalArticles: 1000, totalChars: 600000 }, trend.points[3]] }}
+        trend={{
+          ...trend,
+          points: [{ date: "2025-10-05", totalArticles: 1000 / 7, totalChars: 600000 / 7 }, trend.points[3]],
+        }}
       />,
     )
     const chart = screen.getByRole("img")
     fireEvent.keyDown(chart, { key: "Home" })
-    expect(within(screen.getByRole("status")).getByText("600,000 字")).toBeInTheDocument()
-    expect(within(screen.getByRole("status")).getByText("1,000 本")).toBeInTheDocument()
+    expect(within(screen.getByRole("status")).getByText("85,714.29 字/日")).toBeInTheDocument()
+    expect(within(screen.getByRole("status")).getByText("142.86 本/日")).toBeInTheDocument()
     fireEvent.keyDown(chart, { key: "ArrowRight" })
     expect(screen.getByRole("status")).toHaveTextContent("2025/10/08")
     fireEvent.keyDown(chart, { key: "ArrowLeft" })
@@ -116,8 +119,8 @@ describe("NumbersTrendChart", () => {
     expect(screen.getAllByTestId("trend-date-grid-line")).toHaveLength(1)
     expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", "M 2 18")
     fireEvent.keyDown(screen.getByRole("img"), { key: "Home" })
-    expect(screen.getByRole("status")).toHaveTextContent("1 本")
-    expect(screen.getByRole("status")).toHaveTextContent("3 字")
+    expect(screen.getByRole("status")).toHaveTextContent("1 本/日")
+    expect(screen.getByRole("status")).toHaveTextContent("3 字/日")
   })
 
   it("無効値とゼロだけの系列に壊れたSVGパスを生成しない", () => {
@@ -134,7 +137,7 @@ describe("NumbersTrendChart", () => {
     )
     expect(screen.queryByTestId("trend-line-totalArticles")).not.toBeInTheDocument()
     expect(screen.queryByTestId("trend-line-totalChars")).not.toBeInTheDocument()
-    expect(screen.getByText("総記事数")).toBeInTheDocument()
+    expect(screen.getByText("記事数")).toBeInTheDocument()
   })
 })
 
