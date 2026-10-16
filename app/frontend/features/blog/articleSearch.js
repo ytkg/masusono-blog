@@ -1,5 +1,6 @@
 import { normalizeArticleSearchText } from "./articleSearchText"
 import { articleMatchesToken } from "./articleSearchToken"
+import { extractHtmlText } from "./articleHtmlText"
 
 export { normalizeArticleSearchText } from "./articleSearchText"
 
@@ -26,7 +27,7 @@ export function prepareArticleQuery(normalizedQuery) {
     // Parse the body only for plain-text tokens, at most once per article/query.
     let searchTarget
     const getSearchTarget = () => {
-      searchTarget ??= [article?.title, article?.content, article?.author, article?.tags]
+      searchTarget ??= [article?.title, extractHtmlText(article?.content), article?.author, article?.tags]
         .map(normalizeArticleSearchText)
         .join(" ")
       return searchTarget

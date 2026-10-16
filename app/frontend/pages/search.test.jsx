@@ -55,6 +55,44 @@ describe("Search page", () => {
     expect(screen.queryByTestId("articles-list")).not.toBeInTheDocument()
   })
 
+  it("HTMLに見えるURL入力を空検索にせず、本文に表示される文字と照合する", () => {
+    window.history.replaceState(null, "", "/search?q=%3CRuby%3E")
+    render(
+      <Search
+        articles={[
+          { id: "visible", title: "サンプル", content: "<p>&lt;Ruby&gt;</p>" },
+          { id: "markup", title: "無関係", content: "<ruby>本文</ruby>" },
+        ]}
+      />,
+    )
+
+    expect(screen.getByRole("textbox", { name: "記事を検索" })).toHaveValue("<Ruby>")
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
+    expect(screen.queryByText("タグから探す")).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ["#<Ruby>", "tags"],
+    ["@A <B>", "author"],
+  ])("HTMLに見える候補を選択しても対象を絞り込み、クリアで候補を復元する: %s", (label, field) => {
+    window.history.replaceState(null, "", "/search")
+    render(
+      <Search
+        articles={[
+          { id: "literal", title: "対象", [field]: label.slice(1) },
+          { id: "other", title: "無関係", [field]: "other" },
+        ]}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole("button", { name: label }))
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
+    fireEvent.click(screen.getByRole("button", { name: "検索語をクリア" }))
+    expect(screen.getByRole("button", { name: label })).toBeInTheDocument()
+    fireEvent.change(screen.getByRole("textbox", { name: "記事を検索" }), { target: { value: "<missing>" } })
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:0")
+  })
+
   it("検索語が空なら著者候補をタグ候補より上に表示し、クリックで著者検索する", () => {
     window.history.replaceState(null, "", "/search")
 

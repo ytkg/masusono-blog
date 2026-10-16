@@ -28,3 +28,10 @@
 - Keep tests next to the file they cover.
 
 When a file could fit in both `components/` and `shared/`, prefer `shared/` unless it is part of the global app shell.
+
+## Article Search Text
+
+Search queries, titles, author names, and tags are plain text. `normalizeArticleSearchText`
+only collapses whitespace and lowercases them; strings such as `<Ruby>` and `&copy;`
+keep their literal meaning. Only article bodies pass through `extractHtmlText` before
+normalization, so searches match visible body text rather than HTML markup.
