@@ -24,7 +24,7 @@ module Numbers
     def call
       {
         title: "推移",
-        description: "累積値の7日間移動平均（当日を含む・最初の6日間は存在する日数で平均）。",
+        description: "線・凡例は7日間移動平均、カーソルの数値はその日の累積実数。",
         series: build_series,
         points: build_points
       }
@@ -67,17 +67,21 @@ module Numbers
           window << totals.dup
           window.shift if window.length > 7
           averages = totals.keys.to_h { |key| [ key, window.sum { |point| point.fetch(key) }.fdiv(window.length) ] }
-          build_point(date, averages)
+          build_point(date, averages, totals)
         end
       end
     end
 
-    def build_point(date, totals)
+    def build_point(date, averages, totals)
       {
         date: date.strftime(POINT_DATE_FORMAT),
         label: date.strftime(DATE_FORMAT),
-        totalArticles: totals.fetch(:total_articles),
-        totalChars: totals.fetch(:total_chars)
+        totalArticles: averages.fetch(:total_articles),
+        totalChars: averages.fetch(:total_chars),
+        actualValues: {
+          totalArticles: totals.fetch(:total_articles),
+          totalChars: totals.fetch(:total_chars)
+        }
       }
     end
 

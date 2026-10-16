@@ -65,6 +65,31 @@ describe("NumbersTrendChart", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument()
   })
 
+  it("線と丸印は移動平均を保ち、カーソルとキーボードでは累積実数を表示する", () => {
+    render(
+      <NumbersTrendChart
+        trend={{
+          ...trend,
+          points: trend.points.map((point) => ({
+            ...point,
+            actualValues: { totalArticles: point.totalArticles * 7, totalChars: point.totalChars * 7 },
+          })),
+        }}
+      />,
+    )
+    const chart = screen.getByRole("img")
+    chart.getBoundingClientRect = () => ({ left: 0, width: 360 })
+    const line = screen.getByTestId("trend-line-totalArticles").getAttribute("d")
+    fireEvent(chart, new MouseEvent("pointermove", { bubbles: true, clientX: 360 }))
+    expect(screen.getByRole("status")).toHaveTextContent("総記事数28 本")
+    expect(screen.getByRole("status")).toHaveTextContent("総文字数84 字")
+    expect(screen.getByTestId("trend-line-totalArticles")).toHaveAttribute("d", line)
+    expect(chart.querySelector("circle")).toHaveAttribute("cy", "18")
+    fireEvent.keyDown(chart, { key: "Home" })
+    expect(screen.getByRole("status")).toHaveTextContent("総記事数7 本")
+    expect(screen.getByRole("status")).toHaveTextContent("総文字数21 字")
+  })
+
   it("タッチで選択してなぞり、離した後も値を読める", () => {
     render(<NumbersTrendChart trend={trend} />)
     const chart = screen.getByRole("img")

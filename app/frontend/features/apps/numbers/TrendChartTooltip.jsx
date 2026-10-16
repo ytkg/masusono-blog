@@ -4,6 +4,8 @@ import Typography from "@mui/material/Typography"
 const VALUE_FORMATTER = new Intl.NumberFormat("ja-JP", { maximumFractionDigits: 2 })
 
 export default function TrendChartTooltip({ point, series, colors }) {
+  const values = point.actualValues ?? point
+
   return (
     <Box
       role="status"
@@ -29,7 +31,7 @@ export default function TrendChartTooltip({ point, series, colors }) {
         <Box key={item.key} sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
           <Typography sx={{ fontSize: 14, color: colors[index % colors.length] }}>{item.label}</Typography>
           <Typography sx={{ fontSize: 14, fontWeight: 700 }}>
-            {Number.isFinite(point[item.key]) ? VALUE_FORMATTER.format(point[item.key]) : "—"} {item.unit}
+            {Number.isFinite(values[item.key]) ? VALUE_FORMATTER.format(values[item.key]) : "—"} {item.unit}
           </Typography>
         </Box>
       ))}

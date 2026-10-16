@@ -588,8 +588,8 @@ test("numbers trend selection", async ({ page }, testInfo) => {
     await page.mouse.move(last.x, last.y)
   }
   await expect(values).toContainText("2026/01/15")
-  await expect(values).toContainText("1.25 本")
-  await expect(values).toContainText("51 字")
+  await expect(values).toContainText("2 本")
+  await expect(values).toContainText("96 字")
   await expect(chart.getByTestId("trend-selected-date")).toHaveCount(1)
   await expect(chart).toHaveScreenshot("numbers-trend-selected.png")
   await expectNoPageOverflow(page)

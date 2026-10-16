@@ -20,8 +20,8 @@ RSpec.describe Numbers::MetricsTrendBuilder do
 
       it "公開日時をJSTの日付ごとに累積し移動平均を返す" do
         expect(result.fetch(:points)).to eq([
-          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 1 },
-          { date: "2025-10-06", label: "2025/10/06", totalArticles: 2, totalChars: 3.5 }
+          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 1, actualValues: { totalArticles: 1, totalChars: 1 } },
+          { date: "2025-10-06", label: "2025/10/06", totalArticles: 2, totalChars: 3.5, actualValues: { totalArticles: 3, totalChars: 6 } }
         ])
       end
     end
@@ -48,8 +48,8 @@ RSpec.describe Numbers::MetricsTrendBuilder do
             { key: :totalChars, label: "総文字数", unit: "字", finalValue: "0 字" }
           ],
           points: [
-            { date: "2025-10-05", label: "2025/10/05", totalArticles: 0, totalChars: 0 },
-            { date: "2025-10-06", label: "2025/10/06", totalArticles: 0, totalChars: 0 }
+            { date: "2025-10-05", label: "2025/10/05", totalArticles: 0, totalChars: 0, actualValues: { totalArticles: 0, totalChars: 0 } },
+            { date: "2025-10-06", label: "2025/10/06", totalArticles: 0, totalChars: 0, actualValues: { totalArticles: 0, totalChars: 0 } }
           ]
         )
       end
@@ -76,10 +76,10 @@ RSpec.describe Numbers::MetricsTrendBuilder do
 
       it do
         expect(result.fetch(:points)).to eq([
-          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3 },
-          { date: "2025-10-06", label: "2025/10/06", totalArticles: 1, totalChars: 3 },
-          { date: "2025-10-07", label: "2025/10/07", totalArticles: 1, totalChars: 3 },
-          { date: "2025-10-08", label: "2025/10/08", totalArticles: 1.25, totalChars: 3.5 }
+          { date: "2025-10-05", label: "2025/10/05", totalArticles: 1, totalChars: 3, actualValues: { totalArticles: 1, totalChars: 3 } },
+          { date: "2025-10-06", label: "2025/10/06", totalArticles: 1, totalChars: 3, actualValues: { totalArticles: 1, totalChars: 3 } },
+          { date: "2025-10-07", label: "2025/10/07", totalArticles: 1, totalChars: 3, actualValues: { totalArticles: 1, totalChars: 3 } },
+          { date: "2025-10-08", label: "2025/10/08", totalArticles: 1.25, totalChars: 3.5, actualValues: { totalArticles: 2, totalChars: 5 } }
         ])
       end
     end
