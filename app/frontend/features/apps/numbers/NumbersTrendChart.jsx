@@ -12,7 +12,7 @@ export default function NumbersTrendChart({ trend }) {
   return (
     <Stack spacing={1.5} sx={{ "& > :last-child": { mt: 0.5 } }} data-testid="numbers-trend">
       <Box>
-        <SectionHeading>{trend.title ?? "推移"}</SectionHeading>
+        <SectionHeading gutterBottom={false}>{trend.title ?? "推移"}</SectionHeading>
       </Box>
 
       <Box
