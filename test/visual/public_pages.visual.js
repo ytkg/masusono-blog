@@ -40,11 +40,11 @@ async function checkAuxiliaryButton(page, button) {
   await expect(button).toHaveCSS("background-color", "rgb(245, 245, 245)")
 }
 
-async function expectSectionHeading(heading) {
+async function expectSectionHeading(heading, marginBottom = "16px") {
   await expect(heading).toHaveCSS("font-size", "20px")
   await expect(heading).toHaveCSS("font-weight", "700")
   await expect(heading).toHaveCSS("line-height", "25px")
-  await expect(heading).toHaveCSS("margin-bottom", "16px")
+  await expect(heading).toHaveCSS("margin-bottom", marginBottom)
 }
 
 async function expectPageHeading(page, name) {
@@ -530,7 +530,7 @@ for (const state of ["input", "save", "notification"]) {
 test("numbers trend", async ({ page }) => {
   await openPage(page, "/numbers")
   const chart = page.getByTestId("numbers-trend")
-  await expectSectionHeading(chart.getByRole("heading", { name: "推移", level: 2 }))
+  await expectSectionHeading(chart.getByRole("heading", { name: "推移", level: 2 }), "0px")
   await chart.scrollIntoViewIfNeeded()
   await expect(chart.getByTestId("trend-line-totalArticles")).not.toHaveAttribute("stroke-dasharray")
   await expect(chart.getByTestId("trend-line-totalChars")).not.toHaveAttribute("stroke-dasharray")
