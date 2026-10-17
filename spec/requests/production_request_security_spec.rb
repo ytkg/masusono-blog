@@ -32,7 +32,8 @@ RSpec.describe "Production request security", type: :request do
   end
 
   it "allows the Cloud Run production and staging hostnames" do
-    [ "masusono-332902117625.asia-northeast1.run.app",
+    [ "dashboard.masusono.com",
+      "masusono-332902117625.asia-northeast1.run.app",
       "masusono-feature-login-332902117625.asia-northeast1.run.app" ].each do |host|
       response = Rack::MockRequest.new(host_authorized_app).get("/up", "HTTP_HOST" => host)
 

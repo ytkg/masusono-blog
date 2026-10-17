@@ -33,7 +33,7 @@ export default defineConfig(async ({ command }) => {
       "import.meta.env.VITE_BUILD_VERSION": JSON.stringify(buildVersion),
     },
     plugins: [RubyPlugin(), react(), inertia({ ssr: { entry: "ssr/ssr.jsx", host: "127.0.0.1" } })],
-    server: { allowedHosts: ["vite"] },
+    server: { allowedHosts: ["vite", "lvh.me", "dashboard.lvh.me"] },
     ssr: {
       noExternal: command === "build" ? true : [],
     },
