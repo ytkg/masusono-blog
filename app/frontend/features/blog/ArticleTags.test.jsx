@@ -33,6 +33,19 @@ describe("ArticleTags", () => {
 
     expect(screen.queryByTestId("article-tags")).not.toBeInTheDocument()
   })
+
+  it("同じタグは初出順に一度だけ表示し、表記と検索リンクを保つ", () => {
+    render(<ArticleTags tags=" Ruby, Rails, Ruby , , ruby, Rails, Ruby on Rails, Ruby on Rails " />)
+
+    const links = screen.getAllByRole("link")
+    expect(links.map((link) => link.textContent)).toEqual(["#Ruby", "#Rails", "#ruby", "#Ruby on Rails"])
+    expect(links.map((link) => new URL(link.href).searchParams.get("q"))).toEqual([
+      "#Ruby",
+      "#Rails",
+      "#ruby",
+      '#"Ruby on Rails"',
+    ])
+  })
 })
 
 it("空白を含むタグのリンクを引用付き条件にする", () => {
