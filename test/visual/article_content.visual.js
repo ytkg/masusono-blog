@@ -34,3 +34,20 @@ test("rich article content", async ({ page }) => {
   await expect.soft(page.getByTestId("ruby-code-runner")).toHaveScreenshot("rich-article-ruby.png")
   await expectNoPageOverflow(page)
 })
+
+test("structured code retains nested article markup", async ({ page }) => {
+  await mockPageProps(page, "/articles/visual-article-1", (props) => {
+    props.article.content = '<blockquote cite="/about"><ol start="3"><li id="nested-code">前文<pre><code class="language-js">const n = 1</code></pre><p>後文</p></li></ol></blockquote>'
+  })
+  await openPage(page, "/articles/visual-article-1")
+  await expect(page.locator("[data-code-block-shell]")).toHaveCount(1)
+  const item = page.locator("blockquote[cite='/about'] ol[start='3'] #nested-code")
+  const code = item.locator("[data-code-block-shell]")
+  await expect(code).toBeVisible()
+  await expect(item.locator("p")).toHaveText("後文")
+  const quoteBounds = await page.locator("blockquote").boundingBox()
+  const codeBounds = await code.boundingBox()
+  expect(codeBounds.x).toBeGreaterThanOrEqual(quoteBounds.x)
+  expect(codeBounds.x + codeBounds.width).toBeLessThanOrEqual(quoteBounds.x + quoteBounds.width + 1)
+  await expectNoPageOverflow(page)
+})

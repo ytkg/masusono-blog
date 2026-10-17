@@ -55,6 +55,7 @@ function NameSection({
               <TextField
                 label=""
                 error={Boolean(inputError)}
+                disabled={isSaving}
                 placeholder="表示名"
                 value={draftName}
                 size="small"

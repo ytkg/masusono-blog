@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { getUserIdFromCookie } from "@/shared/lib/userId"
-import { fetchJson, postJson } from "@/shared/lib/fetchJson"
+import { requestJson, postJson } from "@/shared/lib/fetchJson"
 
 const DEFAULT_NAME = "NO NAME"
 
@@ -11,31 +11,33 @@ export default function useDisplayName({ loadOnMount, registerLoadingTask }) {
   const [isSaving, setIsSaving] = useState(false)
   const [inputError, setInputError] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
-  const loadCurrentUser = useCallback(async () => {
-    if (isEditing) return
-
-    const userId = getUserIdFromCookie()
-    if (!userId) return
-
-    try {
-      const current = await fetchJson(`/api/app/users/${encodeURIComponent(userId)}.json`)
-      const fetchedName = current?.name?.toString()?.trim() || DEFAULT_NAME
-      setName(fetchedName)
-      setDraftName(fetchedName)
-      setErrorMessage("")
-    } catch (_error) {
-      // 取得失敗時は既存表示を維持する
-    }
-  }, [isEditing])
+  const loadRef = useRef(null)
 
   useEffect(() => {
     if (!loadOnMount) return
 
-    const task = loadCurrentUser()
+    const userId = getUserIdFromCookie()
+    if (!userId) return
+
+    const controller = new AbortController()
+    loadRef.current = controller
+    const task = requestJson(`/api/app/users/${encodeURIComponent(userId)}.json`, { signal: controller.signal })
+      .then((current) => {
+        if (controller.signal.aborted) return
+        const fetchedName = current?.name?.toString()?.trim() || DEFAULT_NAME
+        setName(fetchedName)
+        setDraftName(fetchedName)
+        setErrorMessage("")
+      })
+      .catch(() => {
+        // 取得失敗時は既存表示を維持する
+      })
     registerLoadingTask(task)
-  }, [loadCurrentUser, loadOnMount, registerLoadingTask])
+    return () => controller.abort()
+  }, [loadOnMount, registerLoadingTask])
 
   const startEditing = () => {
+    loadRef.current?.abort()
     setDraftName(name)
     setErrorMessage("")
     setInputError("")
