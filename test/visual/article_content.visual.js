@@ -51,3 +51,16 @@ test("structured code retains nested article markup", async ({ page }) => {
   expect(codeBounds.x + codeBounds.width).toBeLessThanOrEqual(quoteBounds.x + quoteBounds.width + 1)
   await expectNoPageOverflow(page)
 })
+
+test("article tags keep one search link per label in first-seen order", async ({ page }) => {
+  await mockPageProps(page, "/articles/visual-article-1", (props) => {
+    props.article.tags = " Ruby, Rails, Ruby , , ruby, Rails, Ruby on Rails, Ruby on Rails "
+  })
+  await openPage(page, "/articles/visual-article-1")
+  const links = page.getByTestId("article-tags").getByRole("link")
+  await expect(links).toHaveText(["#Ruby", "#Rails", "#ruby", "#Ruby on Rails"])
+  await expect(links.last()).toHaveAttribute("href", "/search?q=%23%22Ruby%20on%20Rails%22")
+  await links.last().click()
+  await expect(page.getByRole("textbox", { name: "記事を検索" })).toHaveValue('#"Ruby on Rails"')
+  await expectNoPageOverflow(page)
+})
