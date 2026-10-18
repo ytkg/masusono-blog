@@ -181,3 +181,13 @@ it("ゲームは読込と遷移の完了後だけ有効になり、閉じ始め�
     vi.useRealTimers()
   }
 })
+
+it("Paperのカスタムスタイルを実際のdialogへ適用する", () => {
+  render(
+    <AppsDialogLauncher title="Styled" buttonAriaLabel="スタイル確認" paperSx={{ paddingTop: "7px" }}>
+      <div>内容</div>
+    </AppsDialogLauncher>,
+  )
+  fireEvent.click(screen.getByRole("button", { name: "スタイル確認" }))
+  expect(screen.getByRole("dialog")).toHaveStyle({ paddingTop: "7px", overflow: "hidden" })
+})

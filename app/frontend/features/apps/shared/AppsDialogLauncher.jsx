@@ -160,13 +160,13 @@ export default function AppsDialogLauncher({
         transitionDuration={prefersReducedMotion ? 150 : animationDuration}
         slots={{ transition: prefersReducedMotion ? Fade : LauncherZoomTransition }}
         slotProps={{
+          paper: { sx: dialogPaperSx },
           transition: {
             ...(prefersReducedMotion ? {} : { origin: transitionOrigin }),
             onEntered: handleEntered,
             onExited: handleExited,
           },
         }}
-        PaperProps={{ sx: dialogPaperSx }}
       >
         <AppLoadingScreen
           title={title}
