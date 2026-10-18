@@ -35,4 +35,23 @@ describe("useMasudaRunInput", () => {
     expect(attachKeyboardHandlers).toHaveBeenCalledWith("playing", startOrRestart, doJump)
     expect(attachPointerHandler).toHaveBeenCalledWith(canvas, "playing", startOrRestart, doJump)
   })
+
+  it("操作不可の間は入力を登録せず、有効化後の入力も無効化時に解除する", () => {
+    const keyboardCleanup = vi.fn()
+    const pointerCleanup = vi.fn()
+    attachKeyboardHandlers.mockReturnValue(keyboardCleanup)
+    attachPointerHandler.mockReturnValue(pointerCleanup)
+    const options = { state: "playing", canvasRef: { current: {} }, startOrRestart: vi.fn(), doJump: vi.fn() }
+    const { rerender } = renderHook(({ active }) => useMasudaRunInput({ ...options, active }), {
+      initialProps: { active: false },
+    })
+    expect(attachKeyboardHandlers).not.toHaveBeenCalled()
+    expect(attachPointerHandler).not.toHaveBeenCalled()
+    rerender({ active: true })
+    expect(attachKeyboardHandlers).toHaveBeenCalledOnce()
+    expect(attachPointerHandler).toHaveBeenCalledOnce()
+    rerender({ active: false })
+    expect(keyboardCleanup).toHaveBeenCalledOnce()
+    expect(pointerCleanup).toHaveBeenCalledOnce()
+  })
 })

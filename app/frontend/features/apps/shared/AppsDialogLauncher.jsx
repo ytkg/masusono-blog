@@ -12,6 +12,7 @@ import IconButton from "@mui/material/IconButton"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { AppsLoadingProvider } from "./AppsLoadingContext"
+import { AppActivityProvider } from "./AppActivityContext"
 
 const launcherContainerSx = {
   display: "flex",
@@ -93,6 +94,7 @@ export default function AppsDialogLauncher({
   const dialogPaperSx = paperSx ? [dialogPaperBaseSx, paperSx] : dialogPaperBaseSx
   const interactionSx = { pointerEvents: isTransitioning ? "none" : "auto" }
   const dialogBodySx = contentSx ? [dialogBodyBaseSx, contentSx, interactionSx] : [dialogBodyBaseSx, interactionSx]
+  const isActive = open && isContentVisible && !isTransitioning
 
   const updateTransitionOrigin = () => {
     const rect = launcherButtonRef.current?.getBoundingClientRect()
@@ -177,7 +179,7 @@ export default function AppsDialogLauncher({
         <Box
           data-testid="app-content"
           aria-hidden={!isContentVisible}
-          inert={isContentVisible ? undefined : ""}
+          inert={!isActive}
           sx={{
             ...dialogContentSx,
             opacity: isContentVisible ? 1 : 0,
@@ -187,7 +189,9 @@ export default function AppsDialogLauncher({
         >
           <AppDialogHeader title={title} titleId={titleId} accessory={titleAccessory} onClose={handleClose} />
           <AppsLoadingProvider value={registerLoadingTask}>
-            <Box sx={dialogBodySx}>{children}</Box>
+            <AppActivityProvider value={isActive}>
+              <Box sx={dialogBodySx}>{children}</Box>
+            </AppActivityProvider>
           </AppsLoadingProvider>
         </Box>
       </Dialog>

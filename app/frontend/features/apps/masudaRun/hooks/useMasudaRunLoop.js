@@ -23,7 +23,16 @@ import {
 
 const FRAME_MS = 1000 / 60
 
-export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, setRestartReadyAt, refs }) => {
+export const useMasudaRunLoop = ({
+  active = true,
+  state,
+  high,
+  setHigh,
+  setScore,
+  setState,
+  setRestartReadyAt,
+  refs,
+}) => {
   const {
     scoreRef,
     scoreDisplayRef,
@@ -111,6 +120,7 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
   }, [canvasRef, canvasWrapRef, scaleRef])
 
   useEffect(() => {
+    if (!active) return
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext("2d")
@@ -140,5 +150,5 @@ export const useMasudaRunLoop = ({ state, high, setHigh, setScore, setState, set
       if (reqRef.current) cancelAnimationFrame(reqRef.current)
       reqRef.current = null
     }
-  }, [canvasRef, draw, update, scaleRef, worldRef, reqRef])
+  }, [active, canvasRef, draw, update, scaleRef, worldRef, reqRef])
 }

@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import MasudaTatakiGame from "./MasudaTatakiGame"
 import { loadImages } from "./assets"
+import { AppActivityProvider } from "../shared/AppActivityContext"
 vi.mock("./assets", () => ({ IMAGES: ["/masuda.webp", "/other1.webp", "/other2.webp"], loadImages: vi.fn() }))
 describe("増田たたきの進行", () => {
   beforeEach(() => {
@@ -75,5 +76,37 @@ describe("増田たたきの進行", () => {
     expect(screen.getByRole("status")).toHaveTextContent("1")
     advance(1)
     expect(screen.queryByRole("status")).not.toBeInTheDocument()
+  })
+
+  it("ダイアログが操作不可の間は開始できず、進行中のカウントダウンも止める", async () => {
+    const game = (active) => (
+      <AppActivityProvider value={active}>
+        <MasudaTatakiGame />
+      </AppActivityProvider>
+    )
+    const { rerender } = render(game(false))
+    await ready()
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    expect(screen.getByRole("button", { name: "スタート" })).toBeInTheDocument()
+    rerender(game(true))
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    advance(1500)
+    expect(screen.getByRole("status")).toHaveTextContent("2")
+    rerender(game(false))
+    advance(10000)
+    expect(screen.getByRole("status")).toHaveTextContent("2")
+    rerender(game(true))
+    advance(1500)
+    expect(screen.queryByRole("status")).not.toBeInTheDocument()
+    advance(30)
+    rerender(game(false))
+    const target = screen.getByRole("button", { name: "穴1 増田" })
+    fireEvent.pointerDown(target)
+    advance(30000)
+    expect(screen.getByText("0点")).toBeInTheDocument()
+    expect(screen.getByText("残り 30秒")).toBeInTheDocument()
+    rerender(game(true))
+    fireEvent.pointerDown(target)
+    expect(screen.getByText("100点")).toBeInTheDocument()
   })
 })

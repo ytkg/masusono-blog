@@ -13,6 +13,7 @@ import { useMasudaRunRestartCooldown } from "../hooks/useMasudaRunRestartCooldow
 import MasudaRunRankings from "./MasudaRunRankings"
 import { CFG, createInitialWorld, getNow, getStoredHighScore } from "../lib"
 import { useAppLoading } from "../../shared/AppsLoadingContext"
+import { useAppActive } from "../../shared/AppActivityContext"
 import { focusVisibleInsetSx } from "@/shared/styles/focusStyles"
 
 const containerSx = {
@@ -48,6 +49,7 @@ const canvasStyle = { width: "100%", height: "auto", display: "block" }
 
 export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
   const registerLoadingTask = useAppLoading()
+  const active = useAppActive()
   const instructionsId = useId()
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
@@ -95,6 +97,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
   }, [rankingsLoading, registerLoadingTask])
 
   const startOrRestart = useCallback(() => {
+    if (!active) return
     const now = getNow()
     if (state === "gameover" && now < restartReadyAtRef.current) return
     world.current = createInitialWorld()
@@ -105,10 +108,10 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
     setRestartReadyAt(0)
     roundIdRef.current += 1
     setState("playing")
-  }, [state])
+  }, [state, active])
 
   const doJump = useCallback(() => {
-    if (state !== "playing") return
+    if (!active || state !== "playing") return
     const p = world.current.player
     if (p.jumps < CFG.MAX_JUMPS) {
       p.vy = CFG.JUMP_VY
@@ -116,7 +119,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
       p.jumps += 1
       if (p.jumps === 2) p.spin = CFG.SPIN_MS
     }
-  }, [state])
+  }, [state, active])
 
   useEffect(() => {
     if (state !== "gameover") return
@@ -134,7 +137,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
 
   useMasudaRunRestartCooldown(state, restartReadyAt, restartReadyAtRef, setRestartReadyAt)
 
-  useMasudaRunInput({ state, canvasRef, startOrRestart, doJump })
+  useMasudaRunInput({ active, state, canvasRef, startOrRestart, doJump })
   const loopRefs = {
     scoreRef,
     scoreDisplayRef,
@@ -150,6 +153,7 @@ export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError
   }
 
   useMasudaRunLoop({
+    active,
     state,
     high,
     setHigh,
