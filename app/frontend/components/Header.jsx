@@ -12,6 +12,7 @@ import { navigationPrefetchKey, navigationPrefetchProps } from "@/shared/lib/nav
 import logo from "../assets/logo.webp"
 import seasonalLogo from "../assets/logo-autumn-health-v8.png"
 import { useSeasonalLogo } from "@/shared/lib/seasonalLogo"
+import useVisibleHealthPhrase from "@/shared/lib/useVisibleHealthPhrase"
 
 function goBack() {
   if (window.history.length > 1) {
@@ -25,6 +26,7 @@ function goBack() {
 export default function Header() {
   const { url, props } = usePage()
   const seasonalLogoEnabled = useSeasonalLogo(props?.app?.seasonalLogoEnabled ?? false)
+  const healthPhraseVisible = useVisibleHealthPhrase()
   const [currentUrl, setCurrentUrl] = useState(() => String(url || "/"))
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function Header() {
   }, [])
 
   const [path, search = ""] = currentUrl.split("#", 1)[0].split("?")
-  const showsSeasonalLogo = seasonalLogoEnabled || path === "/articles/1cxjrah487"
+  const showsSeasonalLogo = seasonalLogoEnabled || path === "/articles/1cxjrah487" || healthPhraseVisible
   const hasSearchQuery = path === "/search" && Boolean(new URLSearchParams(search).get("q")?.trim())
   const showsBackButton = path.startsWith("/articles/") || path.startsWith("/authors/") || hasSearchQuery
 
