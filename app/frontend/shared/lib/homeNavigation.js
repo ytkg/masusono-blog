@@ -2,7 +2,12 @@ const HOME_FEED_INTENT_KEY = "home-feed-intent"
 
 // This is deliberately a one-time intent: normal browser back/forward must
 // continue to restore the exact history entry the user left.
-export function requestHomeFeed() {
+export function requestHomeFeed(event) {
+  if (
+    event &&
+    (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+  )
+    return
   try {
     window.sessionStorage.setItem(HOME_FEED_INTENT_KEY, "1")
   } catch {
