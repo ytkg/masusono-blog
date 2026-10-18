@@ -20,6 +20,7 @@ export default function ArticleMetaText({ articleStats, author, authorHref, date
           color: "text.primary",
           fontWeight: 700,
           lineHeight: 1.35,
+          overflowWrap: "anywhere",
           textDecoration: "none",
           "&:hover": authorHref ? { textDecoration: "underline" } : undefined,
         }}
