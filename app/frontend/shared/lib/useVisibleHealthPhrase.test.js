@@ -22,3 +22,7 @@ it("段落をまたいで結合したり、ヘッダーやスクリプトを本�
     ),
   ).toEqual([])
 })
+
+it("別の意味ブロックを跨いで対象文言を組み立てない", () => {
+  expect(matches("<div><section>増田とその他</section><section>と、私の体調</section></div>")).toEqual([])
+})

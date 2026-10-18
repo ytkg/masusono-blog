@@ -1,24 +1,9 @@
+import { HTML_BLOCK_TAGS } from "@/shared/lib/htmlBlockTags"
 import { parseFragment } from "parse5"
 
 const HTML_MARKUP_PATTERN = /[<&]/
 const WHITESPACE_PATTERN = /\s+/g
 const EXCLUDED_TAGS = new Set(["script", "style", "template", "noscript", "iframe"])
-const LINE_BOUNDARY_TAGS = new Set([
-  "p",
-  "div",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "li",
-  "pre",
-  "blockquote",
-  "tr",
-  "td",
-  "th",
-])
 
 // Both parsers use inert HTML fragments and preserve the same text boundaries.
 export function extractHtmlText(html = "") {
@@ -43,6 +28,18 @@ function readText(node) {
     return ""
   if (tagName === "br") return "\n"
 
-  const text = Array.from(node.childNodes ?? [], readText).join("")
-  return LINE_BOUNDARY_TAGS.has(tagName) ? `${text}\n` : text
+  let text = ""
+  for (const child of node.childNodes ?? []) {
+    const childText = readText(child)
+    if (
+      childText &&
+      HTML_BLOCK_TAGS.has(child.tagName?.toLowerCase()) &&
+      text &&
+      !text.endsWith("\n") &&
+      !childText.startsWith("\n")
+    )
+      text += "\n"
+    text += childText
+  }
+  return HTML_BLOCK_TAGS.has(tagName) ? `${text}\n` : text
 }

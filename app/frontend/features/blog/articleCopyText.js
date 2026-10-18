@@ -1,26 +1,8 @@
-const EXCLUDED_TAGS = new Set(["SCRIPT", "STYLE", "IFRAME", "TEMPLATE", "NOSCRIPT"])
+import { HTML_BLOCK_TAGS } from "@/shared/lib/htmlBlockTags"
+
+const EXCLUDED_TAGS = new Set(["script", "style", "iframe", "template", "noscript"])
 const TEXT_NODE = 3
 const ELEMENT_NODE = 1
-
-const BLOCK_TAGS = new Set([
-  "P",
-  "DIV",
-  "SECTION",
-  "ARTICLE",
-  "H1",
-  "H2",
-  "H3",
-  "H4",
-  "H5",
-  "H6",
-  "UL",
-  "OL",
-  "LI",
-  "BLOCKQUOTE",
-  "PRE",
-  "TR",
-  "FIGCAPTION",
-])
 
 export function buildArticleCopyText(article) {
   const document = new DOMParser().parseFromString(article.content ?? "", "text/html")
@@ -32,12 +14,12 @@ export function buildArticleCopyText(article) {
 function readCopyNode(node, inPre = false) {
   if (node.nodeType === TEXT_NODE) return inPre ? node.textContent : node.textContent.replace(/\s+/g, " ")
   if (node.nodeType !== ELEMENT_NODE) return ""
-  const tag = node.tagName
+  const tag = node.tagName.toLowerCase()
   if (EXCLUDED_TAGS.has(tag) || node.hasAttribute("hidden")) return ""
-  if (tag === "BR") return "\n"
-  const text = Array.from(node.childNodes, (child) => readCopyNode(child, inPre || tag === "PRE")).join("")
-  if (["TD", "TH"].includes(tag)) return `${text}\t`
-  if (!BLOCK_TAGS.has(tag)) return text
-  const blockText = tag === "PRE" ? text : text.replace(/^\n+|\n+$/g, "")
+  if (tag === "br") return "\n"
+  const text = Array.from(node.childNodes, (child) => readCopyNode(child, inPre || tag === "pre")).join("")
+  if (["td", "th"].includes(tag)) return `${text}\t`
+  if (!HTML_BLOCK_TAGS.has(tag)) return text
+  const blockText = tag === "pre" ? text : text.replace(/^\n+|\n+$/g, "")
   return `\n${blockText}\n`
 }
