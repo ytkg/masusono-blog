@@ -42,7 +42,7 @@ export function findHealthPhraseRanges(root) {
   return matches
 }
 
-function isVisible({ range, parents }) {
+function isVisible({ range, parents }, viewportBottom) {
   for (const parent of parents) {
     for (let element = parent; element; element = element.parentElement) {
       const style = getComputedStyle(element)
@@ -62,7 +62,7 @@ function isVisible({ range, parents }) {
     const left = Math.max(0, rect.left)
     const right = Math.min(window.innerWidth, rect.right)
     const top = Math.max(0, rect.top)
-    const bottom = Math.min(window.innerHeight, rect.bottom)
+    const bottom = Math.min(viewportBottom, rect.bottom)
     if (right <= left || bottom <= top) return false
     // Test the visible text itself so fixed headers, navigation and overlays do not count as visibility.
     return [left + 0.5, (left + right) / 2, right - 0.5].some((x) =>
@@ -86,7 +86,10 @@ export default function useVisibleHealthPhrase() {
         ranges = findHealthPhraseRanges(document.body)
         dirty = false
       }
-      setVisible(ranges.some(isVisible))
+      // Ignore the entire footer band, including gaps around the floating navigation.
+      const navigation = document.querySelector('nav[aria-label="メインナビゲーション"]')
+      const viewportBottom = Math.min(window.innerHeight, navigation?.getBoundingClientRect().top ?? window.innerHeight)
+      setVisible(ranges.some((match) => isVisible(match, viewportBottom)))
     }
     function schedule() {
       if (frame === undefined) frame = requestAnimationFrame(update)
