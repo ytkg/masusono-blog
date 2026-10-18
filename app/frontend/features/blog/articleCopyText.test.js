@@ -50,3 +50,12 @@ it("意味のあるブロックとhrを改行で区切り、インラインは�
   expect(buildArticleCopyText({ content: "前<hr>後" })).toBe("前\n\n後")
   expect(buildArticleCopyText({ content: "前<strong>中</strong>後" })).toBe("前中後")
 })
+
+it.each([
+  ["<pre><code>  first\n\tlast  </code></pre>", "  first\n\tlast  "],
+  [" \n<blockquote><pre><code>  first\n\n</code></pre></blockquote> \n", "  first\n\n"],
+  ["<p>  前文  </p><pre>  code  </pre>", "前文 \n\n  code  "],
+  ["<pre>  code  </pre><p>  後文  </p>", "  code  \n\n 後文"],
+])("preの外側だけをtrimし、整形済み空白を保つ: %s", (content, expected) => {
+  expect(buildArticleCopyText({ title: "題名", content })).toBe(`題名\n\n${expected}`)
+})
