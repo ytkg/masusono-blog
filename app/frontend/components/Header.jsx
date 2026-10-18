@@ -9,7 +9,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { currentLocationPath, LOCATION_CHANGE_EVENT } from "@/shared/lib/locationEvents"
 import { requestHomeFeed } from "@/shared/lib/homeNavigation"
 import { navigationPrefetchKey, navigationPrefetchProps } from "@/shared/lib/navigationPrefetch"
-import logo from "../assets/logo-autumn-health-v8.png"
+import logo from "../assets/logo.webp"
+import seasonalLogo from "../assets/logo-autumn-health-v8.png"
+import { useSeasonalLogo } from "@/shared/lib/seasonalLogo"
 
 function goBack() {
   if (window.history.length > 1) {
@@ -21,7 +23,8 @@ function goBack() {
 }
 
 export default function Header() {
-  const { url } = usePage()
+  const { url, props } = usePage()
+  const seasonalLogoEnabled = useSeasonalLogo(props?.app?.seasonalLogoEnabled ?? false)
   const [currentUrl, setCurrentUrl] = useState(() => String(url || "/"))
 
   useEffect(() => {
@@ -57,7 +60,12 @@ export default function Header() {
           onClick={requestHomeFeed}
           sx={headerLogoLinkSx}
         >
-          <Box component="img" src={logo} alt="増田とその他！と、私の体調" sx={headerLogoImageSx} />
+          <Box
+            component="img"
+            src={seasonalLogoEnabled ? seasonalLogo : logo}
+            alt={seasonalLogoEnabled ? "増田とその他！と、私の体調" : "増田とその他！"}
+            sx={headerLogoImageSx}
+          />
         </Box>
         {showsBackButton ? (
           <IconButton aria-label="前のページに戻る" onClick={goBack} size="small" sx={headerBackButtonSx}>

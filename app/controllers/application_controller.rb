@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
   end
 
   def inertia_shared_app
-    { name: "増田とその他！" }
+    { name: "増田とその他！", seasonalLogoEnabled: cookies[:seasonal_logo_20261018_autumn_health] == "on" }
   end
 
   def inertia_shared_flash

@@ -19,7 +19,29 @@ describe("SettingsContent", () => {
 
   afterEach(() => {
     document.cookie = "user_id=; Max-Age=0; Path=/"
+    document.cookie = "seasonal_logo_20261018_autumn_health=; Max-Age=0; Path=/"
     vi.unstubAllGlobals()
+  })
+
+  it("期間限定ロゴは初期オフで、Cookieでオン・オフにする", () => {
+    render(<SettingsContent />)
+    const toggle = screen.getByRole("switch", { name: "期間限定ロゴ" })
+    expect(toggle).not.toBeChecked()
+    fireEvent.click(toggle)
+    expect(toggle).toBeChecked()
+    expect(document.cookie).toContain("seasonal_logo_20261018_autumn_health=on")
+    fireEvent.click(toggle)
+    expect(toggle).not.toBeChecked()
+    expect(document.cookie).toContain("seasonal_logo_20261018_autumn_health=off")
+  })
+
+  it("ロゴ設定を保存できない場合はスイッチを維持してエラーを表示する", () => {
+    render(<SettingsContent />)
+    const write = vi.spyOn(document, "cookie", "set").mockImplementation(() => {})
+    fireEvent.click(screen.getByRole("switch", { name: "期間限定ロゴ" }))
+    expect(screen.getByRole("switch", { name: "期間限定ロゴ" })).not.toBeChecked()
+    expect(screen.getByText("設定を保存できません。ブラウザのCookie設定を確認してください。")).toBeInTheDocument()
+    write.mockRestore()
   })
 
   it("mount 時に現在のユーザー名を取得する", async () => {

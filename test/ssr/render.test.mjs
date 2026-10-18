@@ -89,3 +89,15 @@ test("article initial HTML contains content, links, styles and SEO metadata", as
     assert.ok(body.includes("puts 1"))
   }
 })
+
+
+test("logo preference is rendered per request without leaking between SSR pages", async () => {
+  for (const enabled of [false, true, false]) {
+    const { body } = await render("blog/show", "/articles/ssr-article", {
+      article,
+      app: { seasonalLogoEnabled: enabled },
+    })
+    assert.ok(body.includes(`alt="${enabled ? "増田とその他！と、私の体調" : "増田とその他！"}"`))
+    assert.match(body, enabled ? /logo-autumn-health-v8/ : /logo-[^/]+\.webp/)
+  }
+})
