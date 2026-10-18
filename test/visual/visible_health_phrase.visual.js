@@ -66,3 +66,30 @@ test("multiple visible phrases and navigation restore the appropriate logo", asy
   await openPage(page, "/articles/1cxjrah487")
   await expect(logo).toHaveAttribute("alt", limitedAlt)
 })
+
+test("footer gaps do not trigger the logo while scrolling", async ({ page }) => {
+  await disablePreference(page)
+  await mockPageProps(page, "/articles/visual-article-2", (props) => {
+    props.article.content = `<div style="height:1100px"></div><p id="logo-trigger">${phrase}</p><div style="height:1100px"></div>`
+    props.relatedArticles = []
+    props.yearAgoArticles = []
+  })
+  await openPage(page, "/articles/visual-article-2")
+  const logo = page.locator("header img")
+  const trigger = page.locator("#logo-trigger")
+  // Move the text through the lower gap, rounded corner and side gap of the real navigation.
+  for (const position of ["below", "corner", "side", "above", "side", "below"]) {
+    await trigger.evaluate((element, position) => {
+      const navigation = document.querySelector('nav[aria-label="メインナビゲーション"]').getBoundingClientRect()
+      element.style.margin = "0"
+      element.style.width = "1em"
+      element.style.whiteSpace = "nowrap"
+      element.style.transform = ""
+      element.style.transform = `translateX(${1 - element.getBoundingClientRect().left}px)`
+      const line = element.getBoundingClientRect()
+      const target = position === "below" ? navigation.bottom + 1 : position === "corner" ? navigation.top + 2 : position === "side" ? navigation.top + navigation.height / 2 : navigation.top - line.height - 2
+      window.scrollBy(0, line.top - target)
+    }, position)
+    await expect(logo).toHaveAttribute("alt", position === "above" ? limitedAlt : normalAlt)
+  }
+})
