@@ -102,6 +102,7 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 - Content-Type: `application/xml; charset=utf-8`
 - Response: XML sitemap。記事・著者の各IDは最初の項目を採用し、同じURLを重複出力しない。
 - `lastmod` は空でない改訂日時・更新日時・公開日時の順に選び、有効な日時だけを出力する。
+- RSSの `pubDate` とサイトマップの `lastmod` は、存在しない閏日や月末を翌月へ丸めず省略する。記事項目自体と `Cache-Control: no-store` は維持する。
 
 ## GET /feed.xml
 

@@ -52,3 +52,11 @@ describe("adminListReducer", () => {
     expect(state).toMatchObject({ items: [{ id: "first" }], loadingMore: true, error: null })
   })
 })
+
+it("追加ページが重なっても初出順と既存データ、カーソルを維持する", () => {
+  const first = { ...initialAdminListState, items: [{ id: "a", title: "original" }], totalCount: 3 }
+  const state = loaded(first, [{ id: "a", title: "duplicate" }, { id: "b" }, { id: "b" }], 2, true)
+  expect(state.items).toEqual([{ id: "a", title: "original" }, { id: "b" }])
+  expect(state).toMatchObject({ page: 2, hasMore: false, nextToken: null, totalCount: 3 })
+  expect(first.items).toEqual([{ id: "a", title: "original" }])
+})

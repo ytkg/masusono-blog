@@ -19,3 +19,7 @@ it.each(["👨‍👩‍👧‍👦", "🇯🇵", "á"])("does not split a join
   expect(buildArticleExcerpt(text, true).excerpt).toBe(prefix + "…")
   expect(firstSentenceFromHtml(text)).toBe(prefix)
 })
+
+it("別sectionの書き出しを1文として連結しない", () => {
+  expect(firstSentenceFromHtml("<section>最初</section><section>次</section>")).toBe("最初")
+})

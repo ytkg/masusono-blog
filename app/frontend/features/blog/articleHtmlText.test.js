@@ -72,3 +72,25 @@ it.each([false, true])("hidden属性の部分木を除き、aria-hiddenだけの
   expect(extractHtmlText(html)).toBe("本文視覚\n末尾\n")
   expect(extractTextFromHtml(html)).toBe("本文視覚 末尾")
 })
+
+it.each([false, true])("意味のあるブロックとhrの前後に境界を保つ SSR=%s", (ssr) => {
+  vi.stubEnv("SSR", ssr)
+  for (const tag of [
+    "section",
+    "article",
+    "main",
+    "aside",
+    "figure",
+    "figcaption",
+    "address",
+    "header",
+    "footer",
+    "nav",
+    "dt",
+    "dd",
+  ]) {
+    expect(extractTextFromHtml(`前<${tag}>中</${tag}>後`)).toBe("前 中 後")
+  }
+  expect(extractTextFromHtml("前<hr>後")).toBe("前 後")
+  expect(extractTextFromHtml("前<strong>中</strong>後")).toBe("前中後")
+})

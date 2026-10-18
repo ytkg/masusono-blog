@@ -76,4 +76,14 @@ RSpec.describe YearAgoArticlesBuilder do
       it { is_expected.to eq([]) }
     end
   end
+  it "存在しない公開日で前年検索を開始せず、不正な候補日も丸めない" do
+    allow(Article).to receive(:fetch_by_filter).and_return([
+      { id: "invalid-leap", title: "無効", publishedAt: "2025-02-29T00:00:00Z" },
+      { id: "valid", title: "有効", publishedAt: "2025-03-01T00:00:00Z" }
+    ])
+    expect(described_class.call(article: { id: "current", publishedAt: "2026-03-01T00:00:00Z" })).to eq([
+      { id: "valid", title: "有効" }
+    ])
+    expect(described_class.call(article: { publishedAt: "2026-02-29T00:00:00Z" })).to eq([])
+  end
 end

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest"
-import { LANGUAGE_CODE_PATTERN } from "./codeBlockLanguage"
 import { buildCodeBlockDataFromHtml } from "./codeBlockData"
 
 describe("buildCodeBlockDataFromHtml", () => {
@@ -52,6 +51,5 @@ it.each(["constructor", "toString", "__proto__"])("does not infer language from 
 
 it.each(["ruby", "RUBY", "lang-Ruby", "LANGUAGE-Ruby"])("認識した言語を本文でも装飾できる: %s", (language) => {
   const html = `<pre><code class = "${language}">puts 1</code></pre>`
-  expect(LANGUAGE_CODE_PATTERN.test(html)).toBe(true)
   expect(buildCodeBlockDataFromHtml(html)).toMatchObject({ languageKey: "ruby", languageLabel: "Ruby" })
 })

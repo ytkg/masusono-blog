@@ -120,6 +120,7 @@ module Numbers
       return value if value.is_a?(Date)
       return nil if value.blank?
 
+      CalendarDateValidator.validate!(value.to_s)
       Time.zone.parse(value.to_s)&.to_date
     rescue ArgumentError
       nil

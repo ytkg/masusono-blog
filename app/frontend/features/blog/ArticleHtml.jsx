@@ -1,4 +1,4 @@
-import { LANGUAGE_CODE_PATTERN } from "./codeBlockLanguage"
+import { codeLanguage } from "./codeBlockLanguage"
 import { lazy, Suspense, useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import { articleBodyHtmlSx } from "./articleBodyHtmlSx"
@@ -10,14 +10,18 @@ function ArticleRawHtml({ html }) {
 }
 
 export default function ArticleHtml({ enableRubyRunner, html }) {
-  const hasCode = LANGUAGE_CODE_PATTERN.test(html)
-  const [mounted, setMounted] = useState(false)
+  const [hasCode, setHasCode] = useState(false)
   useEffect(() => {
-    if (hasCode) setMounted(true)
-  }, [hasCode])
+    if (!/<pre\b/i.test(html)) {
+      setHasCode(false)
+      return
+    }
+    const document = new DOMParser().parseFromString(html, "text/html")
+    setHasCode(Array.from(document.body.querySelectorAll("pre > code")).some(codeLanguage))
+  }, [html])
 
   // Code controls need browser APIs; keep their initial HTML identical during hydration.
-  if (mounted && hasCode) {
+  if (hasCode) {
     return (
       <Suspense fallback={<ArticleRawHtml html={html} />}>
         <ArticleStructuredHtml enableRubyRunner={enableRubyRunner} html={html} />

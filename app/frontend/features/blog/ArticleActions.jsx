@@ -1,5 +1,5 @@
 import { navigationNoticeBottomSx } from "../../layouts/pageLayout"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import AuxiliaryIconButton from "../../shared/components/AuxiliaryIconButton"
 import Button from "@mui/material/Button"
 import StatusAlert from "@/shared/components/StatusAlert"
@@ -20,6 +20,7 @@ function buildArticleUrl(articleId) {
 export default function ArticleActions({ article }) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [feedback, setFeedback] = useState(null)
+  const copyAttemptRef = useRef(0)
   const isOpen = Boolean(anchorEl)
 
   const handleOpen = (event) => {
@@ -32,12 +33,13 @@ export default function ArticleActions({ article }) {
 
   const handleCopy = async (kind = "url") => {
     handleClose()
+    const attempt = ++copyAttemptRef.current
 
     try {
       await navigator.clipboard.writeText(kind === "full" ? buildArticleCopyText(article) : buildArticleUrl(article.id))
-      setFeedback((previous) => ({ ...copyFeedback(kind, "success"), sequence: (previous?.sequence ?? 0) + 1 }))
+      if (attempt === copyAttemptRef.current) setFeedback({ ...copyFeedback(kind, "success"), sequence: attempt })
     } catch {
-      setFeedback((previous) => ({ ...copyFeedback(kind, "error"), sequence: (previous?.sequence ?? 0) + 1 }))
+      if (attempt === copyAttemptRef.current) setFeedback({ ...copyFeedback(kind, "error"), sequence: attempt })
     }
   }
 

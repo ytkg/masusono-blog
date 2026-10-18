@@ -15,11 +15,6 @@ const LANGUAGE_CONFIGS = Object.freeze({
   typescript: { label: "TypeScript", prismLanguage: "typescript" },
 })
 
-export const LANGUAGE_CODE_PATTERN = new RegExp(
-  `<pre\\b[^>]*>\\s*<code\\b[^>]*\\bclass\\s*=\\s*["'][^"']*\\b(?:(?:language|lang)-|${Object.keys(LANGUAGE_CONFIGS).join("|")}(?=[\\s"']))`,
-  "i",
-)
-
 function rawCodeLanguage(codeElement) {
   const classNames = Array.from(codeElement.classList)
   const languageClass = classNames.find((className) => LANGUAGE_PREFIX_PATTERN.test(className))

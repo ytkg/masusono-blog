@@ -1,7 +1,8 @@
+import { HTML_BLOCK_TAGS } from "./htmlBlockTags"
 import { useEffect, useState } from "react"
 
 const PHRASE = "増田とその他と、私の体調"
-const BLOCKS = "p,div,li,h1,h2,h3,h4,h5,h6,blockquote,pre,td,th,button,label"
+const BLOCKS = [...HTML_BLOCK_TAGS, "button", "label"].join(",")
 
 export function findHealthPhraseRanges(root) {
   const matches = []
@@ -32,7 +33,7 @@ export function findHealthPhraseRanges(root) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const parent = node.parentElement
-    if (!parent || parent.closest("header,script,style,noscript,template")) continue
+    if (!parent || parent.closest("header,script,style,noscript,template,[hidden]")) continue
     const nextBlock = parent.closest(BLOCKS) || parent
     if (nextBlock !== block) collect()
     block = nextBlock

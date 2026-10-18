@@ -154,3 +154,17 @@ it("ランキングのスクロール領域では上矢印をゲーム操作と�
     region.remove()
   }
 })
+
+it.each([" ", "ArrowUp"])("%sの長押しでもスクロールを抑止し、操作回数は増やさない", (key) => {
+  const start = vi.fn()
+  const cleanup = attachKeyboardHandlers("ready", start, vi.fn())
+  try {
+    window.dispatchEvent(new KeyboardEvent("keydown", { key, cancelable: true }))
+    const repeat = new KeyboardEvent("keydown", { key, repeat: true, cancelable: true })
+    window.dispatchEvent(repeat)
+    expect(repeat.defaultPrevented).toBe(true)
+    expect(start).toHaveBeenCalledOnce()
+  } finally {
+    cleanup()
+  }
+})

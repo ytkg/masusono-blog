@@ -1,6 +1,6 @@
 export const attachKeyboardHandlers = (state, startOrRestart, doJump) => {
   const onKey = (e) => {
-    if (e.repeat || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return
+    if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return
     if (
       e.target instanceof Element &&
       e.target.closest(
@@ -9,7 +9,7 @@ export const attachKeyboardHandlers = (state, startOrRestart, doJump) => {
     )
       return
     const isJumpKey = e.key === " " || e.key === "ArrowUp"
-    if (e.type === "keyup") {
+    if (e.type === "keyup" || e.repeat) {
       if (isJumpKey) e.preventDefault()
       return
     }

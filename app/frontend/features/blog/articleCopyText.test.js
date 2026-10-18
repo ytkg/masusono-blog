@@ -42,3 +42,20 @@ it.each(["hidden", 'hidden="false"', 'hidden="until-found"'])(
     ).toBe("題名\n\n本文視覚\n\n  puts 1\n\n末尾")
   },
 )
+
+it("意味のあるブロックとhrを改行で区切り、インラインは連結する", () => {
+  for (const tag of ["main", "aside", "figure", "figcaption", "address", "header", "footer", "nav", "dt", "dd"]) {
+    expect(buildArticleCopyText({ content: `前<${tag}>中</${tag}>後` })).toBe("前\n中\n後")
+  }
+  expect(buildArticleCopyText({ content: "前<hr>後" })).toBe("前\n\n後")
+  expect(buildArticleCopyText({ content: "前<strong>中</strong>後" })).toBe("前中後")
+})
+
+it.each([
+  ["<pre><code>  first\n\tlast  </code></pre>", "  first\n\tlast  "],
+  [" \n<blockquote><pre><code>  first\n\n</code></pre></blockquote> \n", "  first\n\n"],
+  ["<p>  前文  </p><pre>  code  </pre>", "前文 \n\n  code  "],
+  ["<pre>  code  </pre><p>  後文  </p>", "  code  \n\n 後文"],
+])("preの外側だけをtrimし、整形済み空白を保つ: %s", (content, expected) => {
+  expect(buildArticleCopyText({ title: "題名", content })).toBe(`題名\n\n${expected}`)
+})

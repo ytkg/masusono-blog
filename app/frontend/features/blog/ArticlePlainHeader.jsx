@@ -28,7 +28,14 @@ export default function ArticlePlainHeader({ action, articleStats, author, autho
       ) : (
         <Box
           data-testid="article-list-meta"
-          sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, width: "100%" }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+            minWidth: 0,
+            flex: "1 1 auto",
+          }}
         >
           {metaText}
           <Box sx={{ flex: "0 0 auto", ml: 1 }}>{action}</Box>

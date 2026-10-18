@@ -1,3 +1,4 @@
+import { appendUniqueById } from "@/shared/lib/appendUniqueById"
 import { requestJson } from "@/shared/lib/fetchJson"
 
 export async function fetchArticlePage(offset, { signal }) {
@@ -13,12 +14,6 @@ export async function fetchArticlePage(offset, { signal }) {
 }
 
 export function appendArticlePage(state, page) {
-  const existingIds = new Set(state.articles.map((article) => article.id))
-  const newArticles = page.articles.filter((article) => {
-    if (existingIds.has(article.id)) return false
-    existingIds.add(article.id)
-    return true
-  })
   // A newly appended list should not restore an earlier navigation's scroll position.
-  return { articles: [...state.articles, ...newArticles], nextOffset: page.nextOffset }
+  return { articles: appendUniqueById(state.articles, page.articles), nextOffset: page.nextOffset }
 }

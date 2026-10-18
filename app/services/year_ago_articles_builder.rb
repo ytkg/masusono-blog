@@ -40,7 +40,10 @@ class YearAgoArticlesBuilder
   private_class_method :date_filters
 
   def self.published_time(value)
-    Time.iso8601(value).getlocal(JST_OFFSET) if value.present?
+    return if value.blank?
+
+    CalendarDateValidator.validate!(value)
+    Time.iso8601(value).getlocal(JST_OFFSET)
   rescue ArgumentError, TypeError
     nil
   end
