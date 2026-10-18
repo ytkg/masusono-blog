@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useEffect } from "react"
 import { describe, expect, it, vi } from "vitest"
 import MasudaRunGame from "./MasudaRunGame"
+import { AppActivityProvider } from "../../shared/AppActivityContext"
 
 vi.mock("../assets/masuda_run.webp", () => ({ default: "/player.png" }))
 vi.mock("../assets/other1.webp", () => ({ default: "/short.png" }))
@@ -48,6 +49,28 @@ vi.mock("../lib", async () => {
 })
 
 describe("MasudaRunGame", () => {
+  it("操作不可の間はボタンでも開始・ジャンプせず、再開時は同じラウンドを維持する", () => {
+    useMasudaRunLoopMock.mockReset()
+    const game = (active) => (
+      <AppActivityProvider value={active}>
+        <MasudaRunGame rankings={[]} rankingsLoading={false} rankingsError={false} />
+      </AppActivityProvider>
+    )
+    const { rerender } = render(game(false))
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    expect(screen.getByRole("button", { name: "スタート" })).toBeInTheDocument()
+    rerender(game(true))
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    const player = useMasudaRunLoopMock.mock.calls.at(-1)[0].refs.worldRef.current.player
+    rerender(game(false))
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(player.jumps).toBe(0)
+    rerender(game(true))
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(player.jumps).toBe(1)
+    expect(useMasudaRunLoopMock.mock.calls.at(-1)[0].refs.worldRef.current.player).toBe(player)
+  })
+
   it("初期表示でスコアとランキングを描画し、スタートできる", async () => {
     useMasudaRunLoopMock.mockReset()
     render(

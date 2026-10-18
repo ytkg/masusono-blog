@@ -47,6 +47,7 @@ export function useMasudaTatakiGame(active) {
   }, [active, phase])
 
   const start = () => {
+    if (!active) return
     const next = initialGame()
     gameRef.current = next
     setGame(next)

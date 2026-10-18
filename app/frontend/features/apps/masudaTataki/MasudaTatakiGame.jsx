@@ -3,6 +3,7 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import { useAppLoading } from "../shared/AppsLoadingContext"
+import { useAppActive } from "../shared/AppActivityContext"
 import { IMAGES, loadImages } from "./assets"
 import { DURATION, multiplier, rank } from "./game"
 import { useMasudaTatakiGame } from "./useMasudaTatakiGame"
@@ -11,6 +12,7 @@ import MasudaTatakiHole from "./MasudaTatakiHole"
 
 export default function MasudaTatakiGame({ active = true }) {
   const registerLoadingTask = useAppLoading()
+  const appActive = useAppActive()
   const [assets, setAssets] = useState("loading")
   const [attempt, setAttempt] = useState(0)
 
@@ -32,7 +34,7 @@ export default function MasudaTatakiGame({ active = true }) {
     }
   }, [registerLoadingTask, attempt])
 
-  const { phase, countdown, game, start, tap } = useMasudaTatakiGame(active)
+  const { phase, countdown, game, start, tap } = useMasudaTatakiGame(active && appActive)
 
   return (
     <Box

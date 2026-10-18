@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import AppsDialogLauncher from "./AppsDialogLauncher"
+import { useAppActive } from "./AppActivityContext"
 
 describe("AppsDialogLauncher", () => {
   it("起動ボタンでモーダルを開き、閉じると子要素を隠す", async () => {
@@ -122,14 +123,15 @@ it.each([false, true])("onOpenのPromiseを待ち、失敗でも表示を続け�
 })
 
 it("動きを減らす設定では内部の内容・読み込み画面もフェードさせない", () => {
-  const matchMedia = vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
+  const originalMatchMedia = window.matchMedia
+  window.matchMedia = (query) => ({
     matches: query.includes("prefers-reduced-motion"),
     media: query,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     addListener: vi.fn(),
     removeListener: vi.fn(),
-  }))
+  })
   const { unmount } = render(
     <AppsDialogLauncher title="Reduced" buttonAriaLabel="低モーション">
       <div>内容</div>
@@ -141,6 +143,41 @@ it("動きを減らす設定では内部の内容・読み込み画面もフェ�
     expect(screen.getByRole("status", { name: "Reducedを読み込み中" })).toHaveStyle({ transition: "none" })
   } finally {
     unmount()
-    matchMedia.mockRestore()
+    window.matchMedia = originalMatchMedia
+  }
+})
+
+it("ゲームは読込と遷移の完了後だけ有効になり、閉じ始めた時点で停止する", async () => {
+  function Activity() {
+    return <div data-testid="activity">{String(useAppActive())}</div>
+  }
+  vi.useFakeTimers()
+  let finish
+  const loading = new Promise((resolve) => {
+    finish = resolve
+  })
+  const { unmount } = render(
+    <AppsDialogLauncher title="Game" buttonAriaLabel="ゲームを開く" onOpen={() => loading}>
+      <Activity />
+    </AppsDialogLauncher>,
+  )
+  try {
+    fireEvent.click(screen.getByRole("button", { name: "ゲームを開く" }))
+    expect(screen.getByTestId("activity")).toHaveTextContent("false")
+    expect(screen.getByTestId("app-content")).toHaveAttribute("inert")
+    await act(async () => vi.advanceTimersByTimeAsync(2000))
+    expect(screen.getByTestId("activity")).toHaveTextContent("false")
+    await act(async () => finish())
+    await act(async () => vi.advanceTimersByTimeAsync(499))
+    expect(screen.getByTestId("activity")).toHaveTextContent("false")
+    await act(async () => vi.advanceTimersByTimeAsync(1))
+    expect(screen.getByTestId("activity")).toHaveTextContent("true")
+    expect(screen.getByTestId("app-content")).not.toHaveAttribute("inert")
+    fireEvent.click(screen.getByRole("button", { name: "閉じる" }))
+    expect(screen.getByTestId("activity")).toHaveTextContent("false")
+    expect(screen.getByTestId("app-content")).toHaveAttribute("inert")
+  } finally {
+    unmount()
+    vi.useRealTimers()
   }
 })

@@ -1,14 +1,16 @@
 import { useEffect } from "react"
 import { attachKeyboardHandlers, attachPointerHandler } from "../lib"
 
-export const useMasudaRunInput = ({ state, canvasRef, startOrRestart, doJump }) => {
+export const useMasudaRunInput = ({ active = true, state, canvasRef, startOrRestart, doJump }) => {
   useEffect(() => {
+    if (!active) return
     return attachKeyboardHandlers(state, startOrRestart, doJump)
-  }, [state, startOrRestart, doJump])
+  }, [active, state, startOrRestart, doJump])
 
   useEffect(() => {
+    if (!active) return
     const canvas = canvasRef.current
     if (!canvas) return
     return attachPointerHandler(canvas, state, startOrRestart, doJump)
-  }, [state, startOrRestart, doJump, canvasRef])
+  }, [active, state, startOrRestart, doJump, canvasRef])
 }
