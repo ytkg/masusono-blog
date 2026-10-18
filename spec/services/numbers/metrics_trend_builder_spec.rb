@@ -106,4 +106,14 @@ RSpec.describe Numbers::MetricsTrendBuilder do
     expect(points[7].fetch(:totalChars)).to eq(14)
     expect(points.last.fetch(:totalArticles)).to eq(2)
   end
+  it "存在しない暦日の記事を翌月へ丸めて集計しない" do
+    result = described_class.call(
+      articles: [
+        { publishedAt: "2026-02-29T00:00:00Z", content: "invalid" },
+        { publishedDate: "2026/02/30", content: "invalid" },
+        { publishedAt: "2024-02-29T00:00:00Z", content: "ok" },
+        { publishedDate: Date.new(2026, 3, 1), content: "valid" }
+      ], start_date: Date.new(2026, 3, 1), end_date: Date.new(2026, 3, 1))
+    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "2 本", "7 字" ])
+  end
 end

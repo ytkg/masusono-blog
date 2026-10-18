@@ -25,8 +25,7 @@ module DateDisplayFormatter
   end
 
   def format_timestamp(value)
-    date_parts = Date._parse(value).values_at(:year, :mon, :mday)
-    raise ArgumentError if date_parts.all? && !Date.valid_date?(*date_parts)
+    CalendarDateValidator.validate!(value)
 
     time = parse_time(value)
     jst_time = time.getlocal(JST_OFFSET)

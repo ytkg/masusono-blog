@@ -52,4 +52,13 @@ RSpec.describe "Feeds", type: :request do
       end
     end
   end
+  it "無効な暦日をXMLの日付へ正規化せず、記事とno-storeを維持する" do
+    allow(Article).to receive(:all).and_return([ { id: "invalid-date", title: "記事", publishedAt: "2026-02-29T00:00:00Z" } ])
+    get "/feed.xml"
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Cache-Control"]).to eq("no-store")
+    document = Nokogiri::XML(response.body) { |config| config.strict.nonet }
+    expect(response.body).to include("/articles/invalid-date")
+    expect(document.xpath("//*[local-name()='pubDate']")).to be_empty
+  end
 end
