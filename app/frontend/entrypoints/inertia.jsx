@@ -35,6 +35,9 @@ function registerServiceWorker() {
 installNavigationRecovery(router)
 installAnalyticsNavigation(router)
 
+// A late prefetch for the restored URL can overwrite its remembered list and scroll position.
+window.addEventListener("popstate", () => router.cancelAll({ sync: false }))
+
 createInertiaApp({
   resolve: resolvePage,
   setup({ el, App, props }) {
