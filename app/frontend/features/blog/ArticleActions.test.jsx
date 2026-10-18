@@ -111,3 +111,22 @@ it("連続コピーの成功通知を新しいコピーから3秒間保持する
     vi.useRealTimers()
   }
 })
+
+it.each([false, true])("古いコピーの完了は新しい全文コピー通知を上書きしない reject=%s", async (reject) => {
+  let finishOld
+  const pending = new Promise((resolve, fail) => {
+    finishOld = () => (reject ? fail(new Error("old failure")) : resolve())
+  })
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText: vi.fn().mockReturnValueOnce(pending).mockResolvedValue(undefined) },
+  })
+  render(<ArticleActions article={{ id: "a", title: "題名", content: "<p>本文</p>" }} />)
+  fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+  fireEvent.click(screen.getByRole("menuitem", { name: "記事URLをコピー" }))
+  fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+  fireEvent.click(screen.getByRole("menuitem", { name: "記事全文をコピー" }))
+  expect(await screen.findByText("記事全文をコピーしました")).toBeInTheDocument()
+  await act(async () => finishOld())
+  expect(screen.getByRole("alert")).toHaveTextContent("記事全文をコピーしました")
+})
