@@ -91,7 +91,13 @@ module VisualTestFixtures
       { contents: VisualTestFixtures::ARTICLES.slice(offset, limit) || [], total_count: VisualTestFixtures::ARTICLES.size }
     end
 
-    def find(id) = VisualTestFixtures::ARTICLES.find { |article| article[:id] == id }
+    def find(id)
+      if id == "1cxjrah487"
+        return VisualTestFixtures::ARTICLES[1].merge(id: id, title: "私に秋服を着させてくれ", tags: "秋服")
+      end
+
+      VisualTestFixtures::ARTICLES.find { |article| article[:id] == id }
+    end
 
     def for_author(author_id) = VisualTestFixtures::ARTICLES.select { |article| article[:author][:id] == author_id }
   end

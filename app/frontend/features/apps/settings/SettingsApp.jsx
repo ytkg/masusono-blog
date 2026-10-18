@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { ensureUserIdCookie } from "@/shared/lib/userId"
 import SettingsSection from "./SettingsSection"
+import { useSeasonalLogo, setSeasonalLogoEnabled } from "@/shared/lib/seasonalLogo"
 import useDisplayName from "./useDisplayName"
 import useWebPushSettings from "./useWebPushSettings"
 import { supportingTextSx } from "@/shared/styles/typographyStyles"
@@ -128,6 +129,32 @@ function NotificationsSection({ state, isSaving, errorMessage, onSubscribe, onUn
   )
 }
 
+function SeasonalLogoSection() {
+  const enabled = useSeasonalLogo()
+  const [errorMessage, setErrorMessage] = useState("")
+
+  function toggleLogo(event) {
+    try {
+      setSeasonalLogoEnabled(event.target.checked)
+      setErrorMessage("")
+    } catch {
+      setErrorMessage("設定を保存できません。ブラウザのCookie設定を確認してください。")
+    }
+  }
+
+  return (
+    <SettingsSection label="期間限定ロゴ">
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Typography variant="body2" sx={{ ...supportingTextSx, flex: 1 }}>
+          期間限定ロゴに切り替えます。
+        </Typography>
+        <Switch checked={enabled} slotProps={{ input: { "aria-label": "期間限定ロゴ" } }} onChange={toggleLogo} />
+      </Box>
+      <SettingsSectionError message={errorMessage} />
+    </SettingsSection>
+  )
+}
+
 function BrowserIdDisplay() {
   const [browserId, setBrowserId] = useState("")
   useEffect(() => {
@@ -167,6 +194,7 @@ export function SettingsContent({ loadOnMount = false }) {
         onSubscribe={notifications.subscribe}
         onUnsubscribe={notifications.unsubscribe}
       />
+      <SeasonalLogoSection />
       <BrowserIdDisplay />
     </Box>
   )

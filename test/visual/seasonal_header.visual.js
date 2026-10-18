@@ -5,6 +5,7 @@ for (const width of [320, 390, 1280]) {
   test(`seasonal header ${width}px`, async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop")
     await page.setViewportSize({ width, height: 844 })
+    await page.context().addCookies([{ name: "seasonal_logo_20261018_autumn_health", value: "on", url: "http://localhost:3000" }])
     for (const path of ["/", "/articles/visual-article-1", "/search?q=散歩"]) {
       await openPage(page, path)
       const header = page.locator("header")
