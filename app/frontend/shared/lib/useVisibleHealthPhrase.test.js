@@ -26,3 +26,13 @@ it("段落をまたいで結合したり、ヘッダーやスクリプトを本�
 it("別の意味ブロックを跨いで対象文言を組み立てない", () => {
   expect(matches("<div><section>増田とその他</section><section>と、私の体調</section></div>")).toEqual([])
 })
+it.each(["hidden", 'hidden="false"', 'hidden="until-found"'])(
+  "%sのインライン文字は可視文言の一致を妨げない",
+  (attribute) => {
+    const root = document.createElement("main")
+    root.innerHTML = `<p>増田と<span ${attribute}>非表示</span>その他と、私の体調</p>`
+    expect(findHealthPhraseRanges(root)).toHaveLength(1)
+    root.querySelector("span").removeAttribute("hidden")
+    expect(findHealthPhraseRanges(root)).toHaveLength(0)
+  },
+)
