@@ -1,3 +1,5 @@
+import { appendUniqueById } from "@/shared/lib/appendUniqueById"
+
 export const initialAdminListState = {
   items: [],
   page: 1,
@@ -25,7 +27,7 @@ export function adminListReducer(state, action) {
     case "loaded":
       return {
         ...state,
-        items: action.append ? [...state.items, ...action.items] : action.items,
+        items: action.append ? appendUniqueById(state.items, action.items) : action.items,
         page: action.result.page,
         hasMore: action.result.has_more,
         nextToken: action.result.next_token ?? null,
