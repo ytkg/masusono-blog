@@ -6,6 +6,8 @@ export function buildHtmlParts(html) {
 
   document.body.querySelectorAll("pre > code").forEach((codeElement) => {
     const preElement = codeElement.parentElement
+    // Preserve native hidden boundaries instead of flattening them into visible code.
+    if (preElement.closest("[hidden]") || preElement.querySelector("[hidden]")) return
     const block = buildCodeBlockDataFromElement(codeElement)
     if (!block) return
 

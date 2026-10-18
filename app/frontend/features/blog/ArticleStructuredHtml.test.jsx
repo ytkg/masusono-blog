@@ -12,6 +12,37 @@ vi.mock("./RubyExecutableCodeBlock", () => ({
 }))
 
 describe("ArticleStructuredHtml", () => {
+  it.each(["hidden", 'hidden="false"', 'hidden="until-found"'])(
+    "%sのあるコードは元HTMLの非表示境界を維持する",
+    (attribute) => {
+      const html = [
+        `<pre ${attribute}><code class="language-ruby">puts :hidden_pre</code></pre>`,
+        `<pre><code class="language-ruby" ${attribute}>puts :hidden_code</code></pre>`,
+        `<pre><code class="language-ruby">puts :visible<span ${attribute}>puts :hidden_child</span></code></pre>`,
+        `<section ${attribute}><pre><code class="language-ruby">puts :hidden_ancestor</code></pre></section>`,
+      ].join("")
+      render(<ArticleStructuredHtml html={html} enableRubyRunner />)
+      const body = screen.getByTestId("article-body-html")
+      const original = new DOMParser().parseFromString(html, "text/html").body
+      expect(body.innerHTML).toBe(original.innerHTML)
+      expect(screen.queryByTestId("ruby-runner")).not.toBeInTheDocument()
+    },
+  )
+
+  it("hiddenを含む本文でも隣の可視コードとaria-hiddenのコードは装飾する", () => {
+    render(
+      <ArticleStructuredHtml
+        enableRubyRunner
+        html={
+          '<pre hidden><code class="language-ruby">puts :hidden</code></pre><pre><code class="language-ruby">puts :visible</code></pre><pre aria-hidden="true"><code class="language-js">const n = 1</code></pre>'
+        }
+      />,
+    )
+    expect(screen.getByTestId("ruby-runner")).toHaveTextContent("puts :visible")
+    expect(screen.getByTestId("article-body-html").querySelectorAll("[data-code-block-shell]")).toHaveLength(1)
+    expect(screen.getByTestId("article-body-html").querySelector("pre[hidden]")).toHaveTextContent("puts :hidden")
+  })
+
   it("通常のHTMLを本文として表示する", () => {
     render(<ArticleStructuredHtml html="<p>通常の本文</p><blockquote>引用</blockquote>" />)
 
