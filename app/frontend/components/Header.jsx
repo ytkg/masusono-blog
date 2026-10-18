@@ -46,6 +46,7 @@ export default function Header() {
   }, [])
 
   const [path, search = ""] = currentUrl.split("#", 1)[0].split("?")
+  const showsSeasonalLogo = seasonalLogoEnabled || path === "/articles/1cxjrah487"
   const hasSearchQuery = path === "/search" && Boolean(new URLSearchParams(search).get("q")?.trim())
   const showsBackButton = path.startsWith("/articles/") || path.startsWith("/authors/") || hasSearchQuery
 
@@ -62,8 +63,8 @@ export default function Header() {
         >
           <Box
             component="img"
-            src={seasonalLogoEnabled ? seasonalLogo : logo}
-            alt={seasonalLogoEnabled ? "増田とその他！と、私の体調" : "増田とその他！"}
+            src={showsSeasonalLogo ? seasonalLogo : logo}
+            alt={showsSeasonalLogo ? "増田とその他！と、私の体調" : "増田とその他！"}
             sx={headerLogoImageSx}
           />
         </Box>

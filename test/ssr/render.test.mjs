@@ -101,3 +101,19 @@ test("logo preference is rendered per request without leaking between SSR pages"
     assert.match(body, enabled ? /logo-autumn-health-v8/ : /logo-[^/]+\.webp/)
   }
 })
+
+
+test("the designated article keeps its logo with the preference off", async () => {
+  for (const [url, limited] of [
+    ["/articles/1cxjrah487", true],
+    ["/articles/ssr-article", false],
+    ["/articles/1cxjrah487?from=home#body", true],
+  ]) {
+    const { body } = await render("blog/show", url, {
+      article: { ...article, id: url.includes("1cxjrah487") ? "1cxjrah487" : article.id },
+      app: { seasonalLogoEnabled: false },
+    })
+    assert.ok(body.includes(`alt="${limited ? "増田とその他！と、私の体調" : "増田とその他！"}"`))
+    assert.match(body, limited ? /logo-autumn-health-v8/ : /logo-[^/]+\.webp/)
+  }
+})

@@ -33,6 +33,40 @@ describe("Header", () => {
     document.cookie = "seasonal_logo_20261018_autumn_health=; Max-Age=0; Path=/"
   })
 
+  it.each(["/articles/1cxjrah487", "/articles/1cxjrah487?from=home", "/articles/1cxjrah487?from=home#body"])(
+    "設定オフでも対象記事 %s は限定ロゴにする",
+    (url) => {
+      document.cookie = "seasonal_logo_20261018_autumn_health=off; Path=/"
+      vi.mocked(usePage).mockReturnValueOnce({ url })
+      render(<Header />)
+      expect(screen.getByRole("img", { name: "増田とその他！と、私の体調", exact: true })).toHaveAttribute(
+        "src",
+        expect.stringContaining("logo-autumn-health-v8"),
+      )
+    },
+  )
+
+  it.each([
+    "/articles/1cxjrah487-other",
+    "/articles/other-1cxjrah487",
+    "/articles/1cxjrah487/other",
+    "/authors/1cxjrah487",
+  ])("設定オフで対象外 %s は通常ロゴにする", (url) => {
+    vi.mocked(usePage).mockReturnValueOnce({ url })
+    render(<Header />)
+    expect(screen.getByRole("img", { name: "増田とその他！", exact: true })).toHaveAttribute("src", "/mock-logo.png")
+  })
+
+  it("履歴によるURL変更で対象記事と通常ページのロゴを切り替える", async () => {
+    render(<Header />)
+    window.history.pushState(null, "", "/articles/1cxjrah487#body")
+    fireEvent(window, new Event("popstate"))
+    expect(await screen.findByRole("img", { name: "増田とその他！と、私の体調", exact: true })).toBeInTheDocument()
+    window.history.pushState(null, "", "/search")
+    fireEvent(window, new Event("popstate"))
+    expect(await screen.findByRole("img", { name: "増田とその他！", exact: true })).toBeInTheDocument()
+  })
+
   it("Cookieがオンなら限定ロゴとその代替テキストを表示する", () => {
     document.cookie = "seasonal_logo_20261018_autumn_health=on; Path=/"
     render(<Header />)
