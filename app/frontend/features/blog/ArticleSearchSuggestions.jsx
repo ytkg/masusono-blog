@@ -1,5 +1,6 @@
 import { buildArticleSearchTerm } from "./articleSearchTerm"
 import { parseArticleTags } from "./parseArticleTags"
+import { normalizeArticleSearchText } from "./articleSearchText"
 import Box from "@mui/material/Box"
 import Chip from "@mui/material/Chip"
 import SectionHeading from "@/shared/components/SectionHeading"
@@ -15,12 +16,22 @@ const READING_TIME_SUGGESTIONS = Object.freeze(
 )
 
 function extractArticleTags(articles) {
-  return [...new Set(articles.flatMap((article) => parseArticleTags(article.tags || "")))]
+  return uniqueSuggestions(articles.flatMap((article) => parseArticleTags(article.tags || "")))
 }
 
 function extractArticleAuthors(articles) {
   const authors = articles.map((article) => String(article.author || "").trim()).filter(Boolean)
-  return [...new Set(authors)]
+  return uniqueSuggestions(authors)
+}
+
+function uniqueSuggestions(items) {
+  const seen = new Set()
+  return items.filter((item) => {
+    const query = normalizeArticleSearchText(item)
+    if (seen.has(query)) return false
+    seen.add(query)
+    return true
+  })
 }
 
 function SearchSuggestionSection({ items, label, prefix, onSelect }) {

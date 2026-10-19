@@ -54,3 +54,28 @@ it("表示はそのままに、空白を含む候補を引用付き条件で選�
   fireEvent.click(screen.getByRole("button", { name: "@A or B" }))
   expect(onSelect).toHaveBeenLastCalledWith('@"A or B"')
 })
+
+it("検索条件が同じ著者とタグは最初の表記・順序で1候補にまとめる", () => {
+  const onSelect = vi.fn()
+  render(
+    <ArticleSearchSuggestions
+      articles={[
+        { author: "A  or B", tags: "Ruby  on Rails, JavaScript" },
+        { author: "a or b", tags: "ruby on rails, javascript" },
+        { author: "A or B", tags: "Ruby on Rails, Rust" },
+      ]}
+      onSelect={onSelect}
+    />,
+  )
+  const candidates = screen.getAllByRole("button").filter((button) => /^[#@]/.test(button.textContent))
+  expect(candidates.map((button) => button.textContent)).toEqual([
+    "@A  or B",
+    "#Ruby  on Rails",
+    "#JavaScript",
+    "#Rust",
+  ])
+  fireEvent.click(candidates[0])
+  expect(onSelect).toHaveBeenLastCalledWith('@"A or B"')
+  fireEvent.click(candidates[1])
+  expect(onSelect).toHaveBeenLastCalledWith('#"Ruby on Rails"')
+})
