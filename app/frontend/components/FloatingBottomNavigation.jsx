@@ -26,11 +26,10 @@ export default function FloatingBottomNavigation() {
   const path = navigationPathFromUrl(url)
   const activeIndex = currentNavigationIndex(path)
   const active = activeIndex >= 0 ? MAIN_NAVIGATION_LINKS[activeIndex].value : null
-  const hasActiveItem = activeIndex >= 0
 
   return (
     <Paper component="nav" elevation={0} aria-label="メインナビゲーション" sx={navigationPaperSx}>
-      <BottomNavigation showLabels value={active} sx={buildBottomNavigationSx(activeIndex, hasActiveItem)}>
+      <BottomNavigation showLabels value={active} sx={buildBottomNavigationSx()}>
         {MAIN_NAVIGATION_LINKS.map((tab) => (
           <BottomNavigationAction
             key={navigationPrefetchKey({ href: tab.href, currentPath: path })}

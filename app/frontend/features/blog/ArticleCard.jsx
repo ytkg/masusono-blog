@@ -83,7 +83,7 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
       titleSx={{
         fontSize: isDetail ? "24px" : "20px",
         fontWeight: 700,
-        lineHeight: 1.25,
+        lineHeight: 1.5,
         letterSpacing: 0,
         overflowWrap: "anywhere",
         mb: hasTags ? 0 : isDetail ? 2 : 0.5,
@@ -148,7 +148,21 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
   )
 
   return (
-    <Box sx={[{ display: "grid", gap: isDetail ? 2 : 1.5 }, sx]}>
+    <Box
+      sx={[
+        {
+          display: "grid",
+          gap: 2,
+          bgcolor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 3,
+          p: { xs: 2, sm: 3 },
+          minWidth: 0,
+        },
+        sx,
+      ]}
+    >
       {plainHeader}
       {content}
     </Box>

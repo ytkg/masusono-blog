@@ -11,7 +11,7 @@ import { HOME_TABS } from "../features/blog/HomeTabs"
 import PageContainer from "../shared/components/PageContainer"
 import SeoHead from "../shared/components/SeoHead"
 
-const HOME_TAB_HEIGHT = 38
+const HOME_TAB_HEIGHT = 44
 const compactTabSx = {
   minHeight: HOME_TAB_HEIGHT,
   py: 0.75,
@@ -46,8 +46,16 @@ export default function Home({ articles = [], pagination }) {
               top: HEADER_HEIGHT,
               zIndex: (theme) => theme.zIndex.appBar - 1,
               bgcolor: "background.default",
-              borderBottom: "1px solid",
-              borderColor: "divider",
+              py: 1,
+              "& .MuiTabs-root": { bgcolor: "#e8e8ed", borderRadius: 3, p: 0.5 },
+              "& .MuiTabs-indicator": { display: "none" },
+              "& .MuiTab-root": { borderRadius: 2.5, color: "text.secondary" },
+              "& .MuiTab-root.Mui-selected": {
+                bgcolor: "background.paper",
+                color: "primary.main",
+                boxShadow: "0 1px 4px rgba(29, 29, 31, 0.1)",
+                fontWeight: 700,
+              },
             }}
           >
             <Tabs

@@ -34,7 +34,7 @@ export default function ArticleBody({ enableRubyRunner = false, html, hasBody, s
             onClick={() => setIsExpanded((current) => !current)}
             sx={{
               ...supportingActionSx,
-              minHeight: 0,
+              minHeight: 44,
               minWidth: 0,
               p: 0,
               border: 0,
