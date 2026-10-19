@@ -13,6 +13,7 @@ import { useMasudaRunRestartCooldown } from "../hooks/useMasudaRunRestartCooldow
 import MasudaRunRankings from "./MasudaRunRankings"
 import { CFG, createInitialWorld, getNow, getStoredHighScore } from "../lib"
 import { useAppLoading } from "../../shared/AppsLoadingContext"
+import usePageVisible from "@/shared/hooks/usePageVisible"
 import { useAppActive } from "../../shared/AppActivityContext"
 import { focusVisibleInsetSx } from "@/shared/styles/focusStyles"
 
@@ -49,7 +50,9 @@ const canvasStyle = { width: "100%", height: "auto", display: "block" }
 
 export default function MasudaRunGame({ rankings, rankingsLoading, rankingsError, rankingsFetchError, onScoreSubmit }) {
   const registerLoadingTask = useAppLoading()
-  const active = useAppActive()
+  const appActive = useAppActive()
+  const pageVisible = usePageVisible()
+  const active = appActive && pageVisible
   const instructionsId = useId()
   const canvasRef = useRef(null)
   const canvasWrapRef = useRef(null)
