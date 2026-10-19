@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Article page SSR", type: :request do
+RSpec.describe "Public page SSR", type: :request do
   let(:ssr_url) { "http://127.0.0.1:13714/render" }
   let(:html_headers) { { "ACCEPT" => "text/html" } }
   let(:ssr_response) do
@@ -41,7 +41,7 @@ RSpec.describe "Article page SSR", type: :request do
     expect(InertiaRails.configuration.ssr_enabled).to be(true)
   end
 
-  [ "/articles/article-1" ].each do |path|
+  [ "/", "/articles/article-1" ].each do |path|
     it "#{path}の初回レスポンスにSSRの本文とメタ情報を含める" do
       get path, headers: html_headers
 
@@ -54,7 +54,7 @@ RSpec.describe "Article page SSR", type: :request do
     end
   end
 
-  [ "/", "/about", "/authors", "/authors/author-1", "/search", "/others", "/numbers" ].each do |path|
+  [ "/about", "/authors", "/authors/author-1", "/search", "/others", "/numbers" ].each do |path|
     it "#{path}をSSRしない" do
       get path, headers: html_headers
 
