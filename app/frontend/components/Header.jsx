@@ -67,7 +67,7 @@ export default function Header() {
             component="img"
             src={showsSeasonalLogo ? seasonalLogo : logo}
             alt={showsSeasonalLogo ? "増田とその他！と、私の体調" : "増田とその他！"}
-            sx={headerLogoImageSx}
+            sx={{ ...headerLogoImageSx, transform: showsSeasonalLogo ? "rotate(360deg)" : "rotate(0deg)" }}
           />
         </Box>
         {showsBackButton ? (

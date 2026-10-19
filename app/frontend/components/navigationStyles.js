@@ -123,6 +123,10 @@ export const headerLogoImageSx = {
   height: { xs: 40, sm: 48 },
   maxWidth: "100%",
   objectFit: "contain",
+  transition: "transform 600ms ease-in-out",
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
+  },
 }
 
 export const headerBackButtonSx = {
