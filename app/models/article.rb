@@ -1,6 +1,6 @@
 class Article
   def self.all
-    fetch_all
+    normalize(Microcms::FetchArticlesService.execute)
   end
 
   def self.page(limit:, offset:)
@@ -20,10 +20,6 @@ class Article
     fetch_by_filter("author[equals]#{author_id}")
   end
 
-  def self.fetch_all
-    normalize(Microcms::FetchArticlesService.execute)
-  end
-
   def self.fetch_by_filter(filters)
     return [] if filters.nil? || filters.empty?
 
@@ -35,4 +31,5 @@ class Article
       article.merge(content: ArticleContentImageUrlOptimizer.call(article[:content]))
     end
   end
+  private_class_method :normalize
 end
