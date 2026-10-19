@@ -52,6 +52,21 @@ async function render(component, url, props) {
   return result
 }
 
+test("home initial HTML contains the article list and SEO metadata", async () => {
+  const { head, body } = await render("home", "/", {
+    articles: [article],
+    pagination: { nextOffset: null },
+  })
+  assert.match(body, /data-server-rendered/)
+  assert.match(body, /SSR記事/)
+  assert.match(body, /本文/)
+  assert.match(body, /href="\/articles\/ssr-article"/)
+  const meta = head.join("")
+  assert.match(meta, /<title[^>]*>ホーム \| 増田とその他！<\/title>/)
+  assert.match(meta, /name="description" content="「増田とその他！」のブログ記事一覧。/)
+  assert.match(meta, /rel="canonical" href="https:\/\/masusono.com\/"/)
+})
+
 test("article initial HTML contains content, links, styles and SEO metadata", async () => {
   const url = "/articles/ssr-article"
   // Repeat a page to catch shared server state leaking between requests.
