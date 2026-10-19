@@ -5,13 +5,18 @@ for (const width of [320, 390, 1280]) {
   test(`seasonal header ${width}px`, async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop")
     await page.setViewportSize({ width, height: 844 })
-    await page.context().addCookies([{ name: "seasonal_logo_20261018_autumn_health", value: "on", url: "http://localhost:3000" }])
+    await page
+      .context()
+      .addCookies([{ name: "seasonal_logo_20261018_autumn_health", value: "on", url: "http://localhost:3000" }])
     for (const path of ["/", "/articles/visual-article-1", "/search?q=散歩"]) {
       await openPage(page, path)
       const header = page.locator("header")
       const logo = header.getByRole("img", { name: "増田とその他！と、私の体調", exact: true })
       await expect(logo).toBeVisible()
-      await expect(logo.locator("..")).toHaveAttribute("href", "/")
+      await expect(header.getByRole("link", { name: "増田とその他！と、私の体調", exact: true })).toHaveAttribute(
+        "href",
+        "/",
+      )
       await logo.evaluate((image) => image.decode())
       const image = await logo.boundingBox()
       const bar = await header.boundingBox()
@@ -27,7 +32,10 @@ for (const width of [320, 390, 1280]) {
         expect(button.x + button.width).toBeLessThanOrEqual(image.x)
       }
       await expectNoPageOverflow(page)
-      if (width === 320) await expect(header).toHaveScreenshot(`seasonal-header-${path === "/" ? "home" : path.startsWith("/articles") ? "article" : "search"}-320.png`)
+      if (width === 320)
+        await expect(header).toHaveScreenshot(
+          `seasonal-header-${path === "/" ? "home" : path.startsWith("/articles") ? "article" : "search"}-320.png`,
+        )
     }
   })
 }

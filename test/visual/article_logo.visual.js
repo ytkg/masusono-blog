@@ -9,10 +9,12 @@ for (const width of [320, 390, 1280]) {
   test(`designated article logo with setting off at ${width}px`, async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop")
     await page.setViewportSize({ width, height: 844 })
-    await page.context().addCookies([{ name: "seasonal_logo_20261018_autumn_health", value: "off", url: "http://localhost:3000" }])
+    await page
+      .context()
+      .addCookies([{ name: "seasonal_logo_20261018_autumn_health", value: "off", url: "http://localhost:3000" }])
     await openPage(page, `${articlePath}?from=home#body`)
     const header = page.locator("header")
-    const image = header.locator("img")
+    const image = header.locator('img[aria-hidden="false"]')
     await expect(image).toHaveAttribute("alt", limitedAlt)
     await image.evaluate((element) => element.decode())
     const logo = await image.boundingBox()
@@ -48,7 +50,7 @@ test("article logo follows Inertia navigation and browser back/forward", async (
     props.articles[1].title = "私に秋服を着させてくれ"
   })
   await openPage(page, "/")
-  const logo = page.locator("header img")
+  const logo = page.locator('header img[aria-hidden="false"]')
   await expect(logo).toHaveAttribute("alt", normalAlt)
   await page.getByRole("link", { name: "私に秋服を着させてくれ", exact: true }).click()
   await expect(page).toHaveURL(articlePath)

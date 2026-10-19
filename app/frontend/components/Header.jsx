@@ -55,20 +55,50 @@ export default function Header() {
   return (
     <AppBar position="sticky" color="transparent" enableColorOnDark sx={headerSx}>
       <Toolbar disableGutters sx={headerToolbarSx}>
-        <Box
-          component={Link}
-          key={navigationPrefetchKey({ href: "/", currentPath: path })}
-          {...navigationPrefetchProps({ href: "/", currentPath: path })}
-          href="/"
-          onClick={requestHomeFeed}
-          sx={headerLogoLinkSx}
-        >
+        <Box sx={headerLogoLinkSx}>
           <Box
-            component="img"
-            src={showsSeasonalLogo ? seasonalLogo : logo}
-            alt={showsSeasonalLogo ? "増田とその他！と、私の体調" : "増田とその他！"}
-            sx={headerLogoImageSx}
-          />
+            component="span"
+            sx={{
+              display: "inline-flex",
+              maxWidth: "100%",
+              position: "relative",
+              transformStyle: "preserve-3d",
+              transform: showsSeasonalLogo ? "rotateY(180deg)" : "rotateY(0deg)",
+              transition: "transform 600ms ease-in-out",
+              "@media (prefers-reduced-motion: reduce)": { transition: "none" },
+            }}
+          >
+            <Box
+              component={Link}
+              key={navigationPrefetchKey({ href: "/", currentPath: path })}
+              {...navigationPrefetchProps({ href: "/", currentPath: path })}
+              href="/"
+              onClick={requestHomeFeed}
+              sx={{ display: "inline-flex", maxWidth: "100%", transformStyle: "preserve-3d" }}
+            >
+              {[false, true].map((seasonal) => (
+                <Box
+                  key={String(seasonal)}
+                  component="img"
+                  src={seasonal ? seasonalLogo : logo}
+                  alt={seasonal !== showsSeasonalLogo ? "" : seasonal ? "増田とその他！と、私の体調" : "増田とその他！"}
+                  aria-hidden={seasonal !== showsSeasonalLogo}
+                  sx={{
+                    ...headerLogoImageSx,
+                    backfaceVisibility: "hidden",
+                    transform: seasonal ? "rotateY(180deg)" : "rotateY(0deg)",
+                    ...(seasonal !== showsSeasonalLogo && {
+                      position: "absolute",
+                      top: 0,
+                      left: "50%",
+                      maxWidth: "none",
+                      transform: `translateX(-50%) rotateY(${seasonal ? 180 : 0}deg)`,
+                    }),
+                  }}
+                />
+              ))}
+            </Box>
+          </Box>
         </Box>
         {showsBackButton ? (
           <IconButton aria-label="前のページに戻る" onClick={goBack} size="small" sx={headerBackButtonSx}>

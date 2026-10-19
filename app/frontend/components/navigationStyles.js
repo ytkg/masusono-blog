@@ -117,6 +117,7 @@ export const headerLogoLinkSx = {
   alignItems: "flex-end",
   gridColumn: 2,
   textDecoration: "none",
+  perspective: "800px",
 }
 
 export const headerLogoImageSx = {
