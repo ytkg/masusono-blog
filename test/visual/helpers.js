@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
 
+export async function waitForClientReady(page) {
+  await expect(page.locator("#app")).toHaveAttribute("data-client-ready", "true")
+}
+
 // Keep the real Rails response and Inertia boot process; replace only this test's props.
 export async function mockPageProps(page, path, transform) {
   await page.route(
@@ -43,6 +47,7 @@ export async function openPage(page, path) {
   await mockBlogmuraBanner(page)
   const response = await page.goto(path)
   expect(response?.status()).toBe(200)
+  await waitForClientReady(page)
   await page.locator("main").waitFor()
   await page.evaluate(() => document.fonts.ready)
 }

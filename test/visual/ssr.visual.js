@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { waitForClientReady } from "./helpers"
 
 const pages = [
   ["/articles/visual-article-1", "駅を出て、いつもと違う道を歩きました。"],
@@ -80,6 +81,7 @@ test("SSRのhydrationとInertia遷移後も操作できる", async ({ page }) =>
       errors.push(message.text())
   })
   await page.goto("/")
+  await waitForClientReady(page)
   await expect(page.locator("#app[data-server-rendered]")).toBeVisible()
   await page.getByRole("tab", { name: "書き出し", exact: true }).click()
   await expect(page.getByRole("tab", { name: "書き出し", exact: true })).toHaveAttribute("aria-selected", "true")
@@ -87,6 +89,7 @@ test("SSRのhydrationとInertia遷移後も操作できる", async ({ page }) =>
   await page.getByRole("link", { name: "週末の散歩で見つけたもの", exact: true }).click()
   await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
   await page.reload()
+  await waitForClientReady(page)
   await expect(page.locator("#app[data-server-rendered]")).toBeVisible()
   await page.getByRole("button", { name: "記事メニューを開く" }).click()
   await expect(page.getByRole("menu")).toBeVisible()
@@ -105,4 +108,26 @@ test("SSRのhydrationとInertia遷移後も操作できる", async ({ page }) =>
   )
   await expect(page.getByRole("heading", { name: "週末の散歩で見つけたもの" })).toBeVisible()
   expect(errors).toEqual([])
+})
+
+test("SSR stays unready until delayed layout JavaScript hydrates", async ({ page }) => {
+  let release
+  const layoutReady = new Promise((resolve) => {
+    release = resolve
+  })
+  await page.route("**/vite/assets/AppLayout-*.js", async (route) => {
+    await layoutReady
+    await route.continue()
+  })
+  try {
+    await page.goto("/")
+    await expect(page.locator("#app[data-server-rendered]")).toBeVisible()
+    await expect(page.locator("#app")).not.toHaveAttribute("data-client-ready", "true")
+    release()
+    await waitForClientReady(page)
+    await page.getByRole("tab", { name: "書き出し", exact: true }).click()
+    await expect(page.getByRole("tab", { name: "書き出し", exact: true })).toHaveAttribute("aria-selected", "true")
+  } finally {
+    release()
+  }
 })
