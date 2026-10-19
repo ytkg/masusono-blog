@@ -102,7 +102,9 @@ Issue #239 の状態表示も対象に含めます。コピー成功・失敗、
 `waitForClientReady(page)` は React の初回描画後に付く `#app[data-client-ready="true"]` を待ちます。
 SSRのHTMLやページのload完了だけでは操作イベントの準備完了を保証しないため、
 初回表示・再読み込み後に操作するテストで使います。`openPage` もこの待機を含みます。
-`ssr.visual.js` はレイアウトJavaScriptを保留して、この待機が初期化前には完了しないことを確認します。
+関連記事リンクは通常のページ読み込みで新しいdocumentを作るため、移動先のURL確認後にもこの待機が必要です。
+`ssr.visual.js` はレイアウトJavaScriptを保留して、初期化前に待機が完了しないことと、
+移動先の記事の履歴が保存されてからホームへ進み、戻る操作で記事を復元できることを確認します。
 
 `analytics.visual.js` が失敗すると、レポートに `navigation-history` JSON を添付します。
 最大200件の `pushState` / `replaceState` の呼び出し元スタック、変更前後のURL、

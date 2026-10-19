@@ -131,3 +131,32 @@ test("SSR stays unready until delayed layout JavaScript hydrates", async ({ page
     release()
   }
 })
+
+test("native article links initialize history before returning home", async ({ page }) => {
+  await page.goto("/articles/visual-article-2")
+  await waitForClientReady(page)
+  let release
+  const layoutReady = new Promise((resolve) => {
+    release = resolve
+  })
+  await page.route("**/vite/assets/AppLayout-*.js", async (route) => {
+    await layoutReady
+    await route.continue()
+  })
+  try {
+    await page.getByRole("region", { name: "日常の記事" }).getByRole("link").click()
+    await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
+    await expect(page.locator("#app")).not.toHaveAttribute("data-client-ready", "true")
+    expect(await page.evaluate(() => history.state?.page?.url)).toBeUndefined()
+    release()
+    await waitForClientReady(page)
+    await expect.poll(() => page.evaluate(() => history.state?.page?.url)).toBe("/articles/visual-article-1")
+    await page.getByRole("link", { name: "ホーム", exact: true }).click()
+    await expect(page).toHaveURL(/\/$/)
+    await page.goBack()
+    await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
+    await expect(page.getByRole("heading", { name: "週末の散歩で見つけたもの" })).toBeVisible()
+  } finally {
+    release()
+  }
+})

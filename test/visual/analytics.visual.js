@@ -165,6 +165,8 @@ test("excluded browser never loads or initializes Google across reload and histo
   await expect.poll(() => policyChecks).toBeGreaterThan(beforeReload)
   await page.getByRole("region", { name: "日常の記事" }).getByRole("link").click()
   await expect(page).toHaveURL("https://masusono.com/articles/visual-article-1")
+  // Related article links load a new document, so the URL alone does not imply hydration.
+  await waitForClientReady(page)
   await page.getByRole("link", { name: "ホーム", exact: true }).click()
   await expect(page).toHaveURL("https://masusono.com/")
   await page.goBack()
