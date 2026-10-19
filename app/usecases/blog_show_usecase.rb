@@ -1,14 +1,6 @@
 class BlogShowUsecase
   def self.call(article_id:)
-    new(article_id:).call
-  end
-
-  def initialize(article_id:)
-    @article_id = article_id
-  end
-
-  def call
-    article = Article.find(@article_id)
+    article = Article.find(article_id)
     unless article
       return {
         props: { article: nil, relatedArticles: [], yearAgoArticles: [], ogpImagePath: nil }
