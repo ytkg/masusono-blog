@@ -36,3 +36,16 @@ it.each(["hidden", 'hidden="false"', 'hidden="until-found"'])(
     expect(findHealthPhraseRanges(root)).toHaveLength(0)
   },
 )
+
+it.each(["<br>", "<hr>", "<span><br></span>", "<div></div>", "<section></section>"])(
+  "%sの明示境界を越えて文言を連結しない",
+  (boundary) => {
+    expect(matches(`<div>増田とその他${boundary}と、私の体調</div>`)).toEqual([])
+  },
+)
+it.each(["<br hidden>", "<div hidden></div>", "<span hidden><br></span>"])(
+  "非表示の境界%sは可視の文言を分割しない",
+  (boundary) => {
+    expect(matches(`<div>増田とその他${boundary}と、私の体調</div>`)).toEqual(["増田とその他と、私の体調"])
+  },
+)

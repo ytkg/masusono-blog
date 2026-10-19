@@ -30,10 +30,14 @@ export function findHealthPhraseRanges(root) {
     nodes = []
   }
 
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT)
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    const parent = node.parentElement
+    const parent = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement
     if (!parent || parent.closest("header,script,style,noscript,template,[hidden]")) continue
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.matches(`${BLOCKS},br`)) collect()
+      continue
+    }
     const nextBlock = parent.closest(BLOCKS) || parent
     if (nextBlock !== block) collect()
     block = nextBlock
