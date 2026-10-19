@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useEffect } from "react"
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import MasudaRunGame from "./MasudaRunGame"
 import { AppActivityProvider } from "../../shared/AppActivityContext"
 
@@ -49,6 +49,49 @@ vi.mock("../lib", async () => {
 })
 
 describe("MasudaRunGame", () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it("非表示タブでは開始・入力・RAFを停止し、復帰時は同じラウンドを再開する", async () => {
+    useMasudaRunLoopMock.mockReset()
+    const { useMasudaRunInput } = await import("../hooks/useMasudaRunInput")
+    const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden")
+    const game = (active) => (
+      <AppActivityProvider value={active}>
+        <MasudaRunGame rankings={[]} rankingsLoading={false} rankingsError={false} />
+      </AppActivityProvider>
+    )
+    const { rerender } = render(game(true))
+    const lastLoop = () => useMasudaRunLoopMock.mock.calls.at(-1)[0]
+    expect(lastLoop().active).toBe(false)
+    expect(useMasudaRunInput.mock.calls.at(-1)[0].active).toBe(false)
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    expect(screen.getByRole("button", { name: "スタート" })).toBeInTheDocument()
+
+    const changeVisibility = (state) => {
+      visibility.mockReturnValue(state)
+      act(() => document.dispatchEvent(new Event("visibilitychange")))
+    }
+    changeVisibility("visible")
+    expect(lastLoop().active).toBe(true)
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    const world = lastLoop().refs.worldRef.current
+    changeVisibility("hidden")
+    expect(lastLoop().active).toBe(false)
+    expect(useMasudaRunInput.mock.calls.at(-1)[0].active).toBe(false)
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(world.player.jumps).toBe(0)
+    changeVisibility("visible")
+    expect(lastLoop().active).toBe(true)
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(world.player.jumps).toBe(1)
+    expect(lastLoop().refs.worldRef.current).toBe(world)
+
+    rerender(game(false))
+    changeVisibility("hidden")
+    changeVisibility("visible")
+    expect(lastLoop().active).toBe(false)
+  })
+
   it("操作不可の間はボタンでも開始・ジャンプせず、再開時は同じラウンドを維持する", () => {
     useMasudaRunLoopMock.mockReset()
     const game = (active) => (
