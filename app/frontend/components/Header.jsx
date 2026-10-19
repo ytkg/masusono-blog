@@ -87,7 +87,13 @@ export default function Header() {
                     ...headerLogoImageSx,
                     backfaceVisibility: "hidden",
                     transform: seasonal ? "rotateY(180deg)" : "rotateY(0deg)",
-                    ...(seasonal !== showsSeasonalLogo && { position: "absolute", inset: 0, width: "100%" }),
+                    ...(seasonal !== showsSeasonalLogo && {
+                      position: "absolute",
+                      top: 0,
+                      left: "50%",
+                      maxWidth: "none",
+                      transform: `translateX(-50%) rotateY(${seasonal ? 180 : 0}deg)`,
+                    }),
                   }}
                 />
               ))}

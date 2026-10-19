@@ -26,9 +26,13 @@ test("logo setting persists through reload, navigation and SSR", async ({ page }
   await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
   const toggle = page.getByRole("switch", { name: "期間限定ロゴ", exact: true })
   await expect(toggle).not.toBeChecked()
+  const normalSize = await logo.evaluate((image) => [image.offsetWidth, image.offsetHeight])
   await toggle.click()
   await expect(toggle).toBeChecked()
   await expect(logo).toHaveAttribute("alt", "増田とその他！と、私の体調")
+  expect(
+    await page.locator('header img[aria-hidden="true"]').evaluate((image) => [image.offsetWidth, image.offsetHeight]),
+  ).toEqual(normalSize)
   const cookie = (await page.context().cookies()).find(({ name }) => name === "seasonal_logo_20261018_autumn_health")
   expect(cookie).toMatchObject({ value: "on", path: "/", sameSite: "Lax" })
   await expect(page).toHaveScreenshot("settings-seasonal-logo-on.png")
@@ -44,9 +48,13 @@ test("logo setting persists through reload, navigation and SSR", async ({ page }
   await openPage(page, "/others")
   await page.getByRole("button", { name: "設定を開く" }).click()
   await expect(toggle).toBeChecked()
+  const seasonalSize = await logo.evaluate((image) => [image.offsetWidth, image.offsetHeight])
   await toggle.click()
   await expect(toggle).not.toBeChecked()
   await expect(logo).toHaveAttribute("alt", "増田とその他！")
+  expect(
+    await page.locator('header img[aria-hidden="true"]').evaluate((image) => [image.offsetWidth, image.offsetHeight]),
+  ).toEqual(seasonalSize)
   await expect(page).toHaveScreenshot("settings-seasonal-logo-off.png")
   await page.reload()
   await openPage(page, "/articles/visual-article-1")
