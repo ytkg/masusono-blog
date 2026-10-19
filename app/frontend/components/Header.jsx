@@ -55,14 +55,7 @@ export default function Header() {
   return (
     <AppBar position="sticky" color="transparent" enableColorOnDark sx={headerSx}>
       <Toolbar disableGutters sx={headerToolbarSx}>
-        <Box
-          component={Link}
-          key={navigationPrefetchKey({ href: "/", currentPath: path })}
-          {...navigationPrefetchProps({ href: "/", currentPath: path })}
-          href="/"
-          onClick={requestHomeFeed}
-          sx={headerLogoLinkSx}
-        >
+        <Box sx={headerLogoLinkSx}>
           <Box
             component="span"
             sx={{
@@ -75,21 +68,30 @@ export default function Header() {
               "@media (prefers-reduced-motion: reduce)": { transition: "none" },
             }}
           >
-            {[false, true].map((seasonal) => (
-              <Box
-                key={String(seasonal)}
-                component="img"
-                src={seasonal ? seasonalLogo : logo}
-                alt={seasonal ? "増田とその他！と、私の体調" : "増田とその他！"}
-                aria-hidden={seasonal !== showsSeasonalLogo}
-                sx={{
-                  ...headerLogoImageSx,
-                  backfaceVisibility: "hidden",
-                  transform: seasonal ? "rotateY(180deg)" : "rotateY(0deg)",
-                  ...(seasonal !== showsSeasonalLogo && { position: "absolute", inset: 0, width: "100%" }),
-                }}
-              />
-            ))}
+            <Box
+              component={Link}
+              key={navigationPrefetchKey({ href: "/", currentPath: path })}
+              {...navigationPrefetchProps({ href: "/", currentPath: path })}
+              href="/"
+              onClick={requestHomeFeed}
+              sx={{ display: "inline-flex", maxWidth: "100%", transformStyle: "preserve-3d" }}
+            >
+              {[false, true].map((seasonal) => (
+                <Box
+                  key={String(seasonal)}
+                  component="img"
+                  src={seasonal ? seasonalLogo : logo}
+                  alt={seasonal !== showsSeasonalLogo ? "" : seasonal ? "増田とその他！と、私の体調" : "増田とその他！"}
+                  aria-hidden={seasonal !== showsSeasonalLogo}
+                  sx={{
+                    ...headerLogoImageSx,
+                    backfaceVisibility: "hidden",
+                    transform: seasonal ? "rotateY(180deg)" : "rotateY(0deg)",
+                    ...(seasonal !== showsSeasonalLogo && { position: "absolute", inset: 0, width: "100%" }),
+                  }}
+                />
+              ))}
+            </Box>
           </Box>
         </Box>
         {showsBackButton ? (
