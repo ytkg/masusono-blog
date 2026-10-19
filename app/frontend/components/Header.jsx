@@ -64,11 +64,33 @@ export default function Header() {
           sx={headerLogoLinkSx}
         >
           <Box
-            component="img"
-            src={showsSeasonalLogo ? seasonalLogo : logo}
-            alt={showsSeasonalLogo ? "増田とその他！と、私の体調" : "増田とその他！"}
-            sx={{ ...headerLogoImageSx, transform: showsSeasonalLogo ? "rotate(360deg)" : "rotate(0deg)" }}
-          />
+            component="span"
+            sx={{
+              display: "inline-flex",
+              maxWidth: "100%",
+              position: "relative",
+              transformStyle: "preserve-3d",
+              transform: showsSeasonalLogo ? "rotateY(180deg)" : "rotateY(0deg)",
+              transition: "transform 600ms ease-in-out",
+              "@media (prefers-reduced-motion: reduce)": { transition: "none" },
+            }}
+          >
+            {[false, true].map((seasonal) => (
+              <Box
+                key={String(seasonal)}
+                component="img"
+                src={seasonal ? seasonalLogo : logo}
+                alt={seasonal ? "増田とその他！と、私の体調" : "増田とその他！"}
+                aria-hidden={seasonal !== showsSeasonalLogo}
+                sx={{
+                  ...headerLogoImageSx,
+                  backfaceVisibility: "hidden",
+                  transform: seasonal ? "rotateY(180deg)" : "rotateY(0deg)",
+                  ...(seasonal !== showsSeasonalLogo && { position: "absolute", inset: 0, width: "100%" }),
+                }}
+              />
+            ))}
+          </Box>
         </Box>
         {showsBackButton ? (
           <IconButton aria-label="前のページに戻る" onClick={goBack} size="small" sx={headerBackButtonSx}>

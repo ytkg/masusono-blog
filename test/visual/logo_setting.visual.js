@@ -16,9 +16,11 @@ test("logo setting persists through reload, navigation and SSR", async ({ page }
       },
     })
   })
-  await page.context().addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
+  await page
+    .context()
+    .addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
   await openPage(page, "/others")
-  const logo = page.locator("header img")
+  const logo = page.locator('header img[aria-hidden="false"]')
   await expect(logo).toHaveAttribute("alt", "増田とその他！")
   await page.getByRole("button", { name: "設定を開く" }).click()
   await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
