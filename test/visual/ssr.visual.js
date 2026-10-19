@@ -43,7 +43,10 @@ test("トップページの初回HTMLに説明文と記事一覧を含める", a
     await expect(page.locator("#app[data-server-rendered]")).toBeVisible()
     await expect(page.locator("head title")).toHaveCount(1)
     await expect(page.locator('meta[name="description"]')).toHaveCount(1)
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /ブログ記事一覧/)
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      "増田とその仲間たちが、日々の出来事や思ったことを気ままに綴る「増田とその他！」。日常のブログから、気軽に遊べるミニゲームまで。",
+    )
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://masusono.com/")
     await expect(page.getByRole("link", { name: "週末の散歩で見つけたもの", exact: true })).toBeVisible()
     await expect(page.locator("main")).toContainText("駅を出て、いつもと違う道を歩きました。")
