@@ -35,7 +35,7 @@ export default function Home({ articles = [], pagination }) {
     <>
       <SeoHead
         title="ホーム"
-        description="「増田とその他！」のブログ記事一覧。最近の出来事やお知らせ、コラムをまとめて読むことができます。"
+        description="増田とその仲間たちが、日々の出来事や思ったことを気ままに綴る「増田とその他！」。日常のブログから、気軽に遊べるミニゲームまで。"
         canonicalPath="/"
       />
       <PageContainer id="home" sx={{ pt: 0 }}>

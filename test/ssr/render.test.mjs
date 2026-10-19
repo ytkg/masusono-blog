@@ -63,7 +63,10 @@ test("home initial HTML contains the article list and SEO metadata", async () =>
   assert.match(body, /href="\/articles\/ssr-article"/)
   const meta = head.join("")
   assert.match(meta, /<title[^>]*>ホーム \| 増田とその他！<\/title>/)
-  assert.match(meta, /name="description" content="「増田とその他！」のブログ記事一覧。/)
+  assert.match(
+    meta,
+    /name="description" content="増田とその仲間たちが、日々の出来事や思ったことを気ままに綴る「増田とその他！」。日常のブログから、気軽に遊べるミニゲームまで。"/,
+  )
   assert.match(meta, /rel="canonical" href="https:\/\/masusono.com\/"/)
 })
 
