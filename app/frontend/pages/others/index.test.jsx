@@ -14,6 +14,8 @@ vi.mock("../../features/apps/masudaTataki/MasudaTatakiApp", () => ({
   default: () => <div>MasudaTatakiApp</div>,
 }))
 
+vi.mock("../../features/apps/greed/GreedApp", () => ({ default: () => <div>GreedApp</div> }))
+
 vi.mock("../../features/apps/settings/SettingsApp", () => ({
   default: () => <div>SettingsApp</div>,
 }))
@@ -26,6 +28,7 @@ describe("Others page", () => {
     expect(screen.getByRole("heading", { name: "増田とその他のその他！" })).toBeInTheDocument()
     expect(await screen.findByText("MasudaRunApp")).toBeInTheDocument()
     expect(await screen.findByText("MasudaTatakiApp")).toBeInTheDocument()
+    expect(await screen.findByText("GreedApp")).toBeInTheDocument()
     expect(await screen.findByText("SettingsApp")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "管理を開く" })).toBeInTheDocument()
   })
