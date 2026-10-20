@@ -11,7 +11,7 @@ import { HOME_TABS } from "../features/blog/HomeTabs"
 import PageContainer from "../shared/components/PageContainer"
 import SeoHead from "../shared/components/SeoHead"
 
-const HOME_TAB_HEIGHT = 38
+const HOME_TAB_HEIGHT = 44
 const compactTabSx = {
   minHeight: HOME_TAB_HEIGHT,
   py: 0.75,
@@ -39,15 +39,16 @@ export default function Home({ articles = [], pagination }) {
         canonicalPath="/"
       />
       <PageContainer id="home" sx={{ pt: 0 }}>
-        <Box sx={{ display: "grid", gap: 1.5 }}>
+        <Box sx={{ display: "grid", gap: 1 }}>
           <Box
             sx={{
               position: "sticky",
               top: HEADER_HEIGHT,
               zIndex: (theme) => theme.zIndex.appBar - 1,
               bgcolor: "background.default",
-              borderBottom: "1px solid",
-              borderColor: "divider",
+              py: 0.5,
+              "& .MuiTabs-root": { borderBottom: "1px solid", borderColor: "divider" },
+              "& .MuiTab-root.Mui-selected": { fontWeight: 700 },
             }}
           >
             <Tabs
@@ -69,12 +70,7 @@ export default function Home({ articles = [], pagination }) {
               ))}
             </Tabs>
           </Box>
-          <Box
-            role="tabpanel"
-            id={`${tabsId}-panel`}
-            aria-labelledby={`${tabsId}-${mode}`}
-            sx={{ pt: mode === "calendar" ? 0.5 : 1 }}
-          >
+          <Box role="tabpanel" id={`${tabsId}-panel`} aria-labelledby={`${tabsId}-${mode}`} sx={{ pt: 0 }}>
             {activeTab?.renderContent({
               articles: feed.articles,
               hasMore: feed.hasMore,

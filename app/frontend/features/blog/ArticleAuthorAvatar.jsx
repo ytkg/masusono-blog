@@ -9,9 +9,10 @@ export default function ArticleAuthorAvatar({ author, authorHref, avatarSrc, siz
       href={authorHref}
       aria-label={authorHref ? `${author}の著者ページへ` : undefined}
       sx={{
-        display: "block",
-        width: size,
-        height: size,
+        display: "grid",
+        placeItems: "center",
+        width: Math.max(size, 44),
+        height: Math.max(size, 44),
         borderRadius: "50%",
         textDecoration: "none",
         "&:focus-visible": {

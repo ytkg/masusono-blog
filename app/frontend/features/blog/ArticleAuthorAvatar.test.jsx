@@ -19,6 +19,13 @@ describe("ArticleAuthorAvatar", () => {
     expect(screen.getByRole("img", { name: "増田" })).toHaveAttribute("src", "https://example.test/masuda.webp")
   })
 
+  it.each([36, 40])("画像が%dpxでも44pxのリンク領域を保つ", (size) => {
+    render(<ArticleAuthorAvatar author="増田" authorHref="/authors/masuda" size={size} />)
+
+    expect(screen.getByRole("link", { name: "増田の著者ページへ" })).toHaveStyle({ width: "44px", height: "44px" })
+    expect(screen.getByText("増")).toHaveStyle({ width: `${size}px`, height: `${size}px` })
+  })
+
   it("著者ページがない場合はリンクにしない", () => {
     render(<ArticleAuthorAvatar author="増田" />)
 

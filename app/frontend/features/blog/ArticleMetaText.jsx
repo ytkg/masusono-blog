@@ -1,5 +1,6 @@
 import { focusVisibleSx } from "../../shared/styles/focusStyles"
 import { Link } from "@inertiajs/react"
+import { Fragment } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 
@@ -29,7 +30,14 @@ export default function ArticleMetaText({ articleStats, author, authorHref, date
       </Box>
       {secondaryParts.length ? (
         <Typography variant="body2" color="text.secondary" sx={{ m: 0, lineHeight: 1.45 }}>
-          {secondaryParts.join(" ・ ")}
+          {secondaryParts.map((part, index) => (
+            <Fragment key={part}>
+              {index > 0 ? " ・ " : null}
+              <Box component="span" sx={{ display: "inline-block", maxWidth: "100%" }}>
+                {part}
+              </Box>
+            </Fragment>
+          ))}
         </Typography>
       ) : null}
     </Box>

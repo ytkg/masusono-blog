@@ -12,6 +12,7 @@ test("author without articles", async ({ page }) => {
   await expect(page.getByText("0件", { exact: true })).toBeVisible()
   await expect(page.getByText("この著者の記事はまだありません。")).toBeVisible()
   await expect(page.getByTestId("article-body-html")).toHaveCount(0)
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)")
   await expect(page).toHaveScreenshot("author-without-articles.png")
 })
 

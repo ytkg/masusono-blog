@@ -81,9 +81,7 @@ test("home calendar", async ({ page }) => {
       buttonHeight: heading.querySelector("button").getBoundingClientRect().height,
     }
   })
-  // The sticky tabs can move by their 1px border relative to the grid layout.
-  expect(spacing.topGap).toBeGreaterThanOrEqual(16)
-  expect(spacing.topGap).toBeLessThanOrEqual(17)
+  expect(spacing.topGap).toBe(13)
   expect(spacing.buttonHeight).toBeGreaterThanOrEqual(44)
   await screenshot(page, "home-calendar-collapsed")
   await month.focus()
@@ -266,13 +264,13 @@ test.describe("article titles", () => {
     await openPage(page, "/")
     const listTitle = page.getByRole("heading", { name: title, level: 3 })
     await expect(listTitle).toHaveCSS("font-size", "20px")
-    await expect(listTitle).toHaveCSS("line-height", "25px")
+    await expect(listTitle).toHaveCSS("line-height", "30px")
     await screenshot(page, "article-title-long-list")
     await page.getByRole("link", { name: title, exact: true }).click()
     await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
     const detailTitle = page.getByRole("heading", { name: title, level: 1 })
     await expect(detailTitle).toHaveCSS("font-size", "24px")
-    await expect(detailTitle).toHaveCSS("line-height", "30px")
+    await expect(detailTitle).toHaveCSS("line-height", "36px")
     await expect(detailTitle).toHaveCSS("margin-bottom", "0px")
     await expect(page.getByTestId("article-tags")).toHaveCSS("margin-top", "12px")
     await expect(page.getByTestId("article-tags")).toHaveCSS("margin-bottom", "12px")
@@ -452,7 +450,7 @@ test("article body spacing and expansion", async ({ page }) => {
   const expand = page.getByRole("button", { name: "続きを読む", exact: true }).first()
   await expect(expand).toBeVisible()
   await expect(expand).toHaveCSS("font-size", "12px")
-  await expect(expand).toHaveCSS("height", "18px")
+  await expect(expand).toHaveCSS("height", "44px")
   await expect(expand).toHaveCSS("padding", "0px")
   await expect(expand).toHaveCSS("border-width", "0px")
   await expect(page.getByText(/駅を出て.*…$/)).toHaveCSS("line-height", "28.8px")
@@ -745,15 +743,16 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
         scrollWidth: document.documentElement.scrollWidth,
       }
     })
-    const outerWidth = Math.min(width, 1200)
+    const outerWidth = Math.min(width, 840)
     const padding = width < 600 ? 16 : 24
     const left = (width - outerWidth) / 2 + padding
     expect(bounds.main.width).toBe(outerWidth)
     expect(bounds.toolbar).toEqual(bounds.main)
     expect(bounds.contentLeft).toBe(left)
     expect(bounds.backButton.x).toBeCloseTo(left, 0)
-    expect(bounds.nav.x).toBe(left)
-    expect(bounds.nav.width).toBe(outerWidth - padding * 2)
+    const navigationWidth = Math.min(width - padding * 2, 560)
+    expect(bounds.nav.x).toBe((width - navigationWidth) / 2)
+    expect(bounds.nav.width).toBe(navigationWidth)
     expect(bounds.scrollWidth).toBe(width)
     const links = page.getByRole("navigation", { name: "メインナビゲーション" }).getByRole("link")
     await expect(links).toHaveCount(5)

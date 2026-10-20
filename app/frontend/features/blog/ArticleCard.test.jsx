@@ -606,7 +606,7 @@ describe("ArticleCard", () => {
     )
 
     expect(screen.getByRole("img", { name: "増田" })).toHaveAttribute("src", "/author.webp")
-    expect(screen.getByRole("link", { name: "増田の著者ページへ" })).toHaveStyle({ width: "48px", height: "48px" })
+    expect(screen.getByRole("link", { name: "増田の著者ページへ" })).toHaveStyle({ width: "44px", height: "44px" })
   })
 
   it("plain presentation の一覧では抜粋を表示し、その場で全文を展開できる", () => {
@@ -655,7 +655,7 @@ describe("ArticleCard", () => {
     expect(screen.getByRole("img", { name: "本文画像" })).toHaveAttribute("src", "/photo.jpg")
   })
 
-  it("詳細の plain presentation では著者情報を記事部分の上に表示する", () => {
+  it("詳細ではタイトルの後、本文の前に著者情報を表示する", () => {
     render(
       <ArticleCard
         mode="detail"
@@ -677,7 +677,8 @@ describe("ArticleCard", () => {
     expect(author).toHaveAttribute("href", "/authors/9wgrey2lh3")
     expect(screen.getByText("2026/03/09")).toBeInTheDocument()
     expect(meta).toHaveStyle({ display: "grid" })
-    expect(author.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(title.compareDocumentPosition(author) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(author.compareDocumentPosition(screen.getByText("本文です")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it("詳細の plain presentation では著者情報付近に文字数と読了目安を表示する", () => {

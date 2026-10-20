@@ -1,6 +1,7 @@
-export const PAGE_MAX_WIDTH = 1200
+export const PAGE_MAX_WIDTH = 840
 export const PAGE_HORIZONTAL_PADDING = { xs: 2, sm: 3 }
 export const PAGE_INNER_MAX_WIDTH = PAGE_MAX_WIDTH - 24 * 2
+export const NAVIGATION_MAX_WIDTH = 560
 
 export const NAVIGATION_CONTENT_HEIGHT = 56
 export const NAVIGATION_VERTICAL_PADDING = 4

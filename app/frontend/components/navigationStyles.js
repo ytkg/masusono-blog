@@ -7,12 +7,9 @@ import {
   NAVIGATION_VERTICAL_PADDING,
   NAVIGATION_BORDER_WIDTH,
   navigationBottomSx,
-  PAGE_INNER_MAX_WIDTH,
+  NAVIGATION_MAX_WIDTH,
 } from "../layouts/pageLayout"
-import { MAIN_NAVIGATION_LINKS } from "./mainNavigationLinks"
 
-const INDICATOR_HALF_WIDTH = 16
-const INDICATOR_TRANSITION_DURATION = 280
 const NAVIGATION_LABEL_FONT_SIZE = "0.72rem"
 
 export const navigationPaperSx = {
@@ -21,7 +18,7 @@ export const navigationPaperSx = {
   bottom: navigationBottomSx,
   transform: "translateX(-50%)",
   width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
-  maxWidth: PAGE_INNER_MAX_WIDTH,
+  maxWidth: NAVIGATION_MAX_WIDTH,
   zIndex: (t) => t.zIndex.appBar,
   overflow: "hidden",
   bgcolor: "common.white",
@@ -29,15 +26,13 @@ export const navigationPaperSx = {
   border: `${NAVIGATION_BORDER_WIDTH}px solid`,
   borderColor: "divider",
   borderRadius: 999,
-  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)",
+  boxShadow: "0 8px 24px rgba(29, 29, 31, 0.08)",
   px: { xs: 1, sm: 1.25 },
   py: `${NAVIGATION_VERTICAL_PADDING}px`,
 }
 
-export function buildBottomNavigationSx(activeIndex, hasActiveItem) {
+export function buildBottomNavigationSx() {
   return {
-    "--navigation-item-count": MAIN_NAVIGATION_LINKS.length,
-    "--navigation-active-index": activeIndex,
     width: "100%",
     maxWidth: "100%",
     height: NAVIGATION_CONTENT_HEIGHT,
@@ -45,21 +40,6 @@ export function buildBottomNavigationSx(activeIndex, hasActiveItem) {
     bgcolor: "transparent",
     overflowX: "auto",
     scrollbarWidth: "none",
-    "&::after": {
-      content: hasActiveItem ? '""' : "none",
-      position: "absolute",
-      left: "calc((100% / var(--navigation-item-count)) * var(--navigation-active-index))",
-      bottom: 4,
-      width: "calc(100% / var(--navigation-item-count))",
-      height: 2,
-      pointerEvents: "none",
-      background: `linear-gradient(to right, transparent calc(50% - ${INDICATOR_HALF_WIDTH}px), currentColor calc(50% - ${INDICATOR_HALF_WIDTH}px), currentColor calc(50% + ${INDICATOR_HALF_WIDTH}px), transparent calc(50% + ${INDICATOR_HALF_WIDTH}px))`,
-      transition: (t) =>
-        t.transitions.create("left", {
-          duration: INDICATOR_TRANSITION_DURATION,
-          easing: t.transitions.easing.easeOut,
-        }),
-    },
     "&::-webkit-scrollbar": {
       display: "none",
     },
@@ -72,7 +52,8 @@ export function buildBottomNavigationSx(activeIndex, hasActiveItem) {
       borderRadius: 999,
       color: "text.secondary",
       "&.Mui-selected": {
-        color: "text.primary",
+        color: "primary.main",
+        bgcolor: "action.selected",
       },
     },
     ".MuiSvgIcon-root": {
@@ -92,7 +73,7 @@ export function buildBottomNavigationSx(activeIndex, hasActiveItem) {
 export const headerSx = {
   minHeight: HEADER_HEIGHT,
   py: 0,
-  bgcolor: "background.default",
+  bgcolor: "background.paper",
   color: "text.primary",
   boxShadow: "none",
   borderBottom: "1px solid",

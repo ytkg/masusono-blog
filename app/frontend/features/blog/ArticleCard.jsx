@@ -83,14 +83,16 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
       titleSx={{
         fontSize: isDetail ? "24px" : "20px",
         fontWeight: 700,
-        lineHeight: 1.25,
+        lineHeight: 1.5,
+        textWrap: "pretty",
         letterSpacing: 0,
         overflowWrap: "anywhere",
-        mb: hasTags ? 0 : isDetail ? 2 : 0.5,
+        mb: isDetail || hasTags ? 0 : 0.5,
       }}
       titleTo={isList ? `/articles/${article.id}` : undefined}
       sx={{ minWidth: 0 }}
     >
+      {isDetail ? <Box sx={{ my: 2 }}>{plainHeader}</Box> : null}
       <ArticleTags tags={article.tags} />
       <ArticleBody enableRubyRunner={isDetail || isList} html={html} hasBody={hasBody} shouldCollapse={isList} />
       {isDetail && (
@@ -148,8 +150,20 @@ export default function ArticleCard({ article, mode = "list", sx, relatedArticle
   )
 
   return (
-    <Box sx={[{ display: "grid", gap: isDetail ? 2 : 1.5 }, sx]}>
-      {plainHeader}
+    <Box
+      sx={[
+        {
+          display: "grid",
+          gap: 2,
+          width: "100%",
+          maxWidth: isDetail ? 728 : undefined,
+          mx: "auto",
+          minWidth: 0,
+        },
+        sx,
+      ]}
+    >
+      {!isDetail ? plainHeader : null}
       {content}
     </Box>
   )

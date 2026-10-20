@@ -9,7 +9,13 @@ export default function ArticlePlainHeader({ action, articleStats, author, autho
 
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-      <ArticleAuthorAvatar author={author} authorHref={authorHref} avatarSrc={avatarSrc} sx={{ flex: "0 0 auto" }} />
+      <ArticleAuthorAvatar
+        author={author}
+        authorHref={authorHref}
+        avatarSrc={avatarSrc}
+        size={mode === "detail" ? 36 : 40}
+        sx={{ flex: "0 0 auto" }}
+      />
       {mode === "detail" ? (
         <Box
           data-testid="article-detail-header"
