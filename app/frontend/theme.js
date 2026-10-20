@@ -12,7 +12,7 @@ const theme = createTheme({
     primary: { main: "#7045a0", dark: "#59367f" },
     action: { selected: "#f2edf8" },
     secondary: { main: "#666666" },
-    background: { default: "#f5f5f7", paper: "#ffffff" },
+    background: { default: "#ffffff", paper: "#ffffff" },
     text: { primary: "#1d1d1f", secondary: "#666666", disabled: "#767680" },
     divider: "#dedee3",
     dataVisualization: { totalArticles: "#9966cc", totalChars: "#3399cc" },

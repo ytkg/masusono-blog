@@ -47,15 +47,8 @@ export default function Home({ articles = [], pagination }) {
               zIndex: (theme) => theme.zIndex.appBar - 1,
               bgcolor: "background.default",
               py: 1,
-              "& .MuiTabs-root": { bgcolor: "#e8e8ed", borderRadius: 2, p: 0.5 },
-              "& .MuiTabs-indicator": { display: "none" },
-              "& .MuiTab-root": { borderRadius: 1.5, color: "text.secondary" },
-              "& .MuiTab-root.Mui-selected": {
-                bgcolor: "background.paper",
-                color: "primary.main",
-                boxShadow: "0 1px 4px rgba(29, 29, 31, 0.1)",
-                fontWeight: 700,
-              },
+              "& .MuiTabs-root": { borderBottom: "1px solid", borderColor: "divider" },
+              "& .MuiTab-root.Mui-selected": { fontWeight: 700 },
             }}
           >
             <Tabs

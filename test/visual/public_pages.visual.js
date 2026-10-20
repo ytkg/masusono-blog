@@ -81,7 +81,7 @@ test("home calendar", async ({ page }) => {
       buttonHeight: heading.querySelector("button").getBoundingClientRect().height,
     }
   })
-  expect(spacing.topGap).toBe(28)
+  expect(spacing.topGap).toBe(25)
   expect(spacing.buttonHeight).toBeGreaterThanOrEqual(44)
   await screenshot(page, "home-calendar-collapsed")
   await month.focus()

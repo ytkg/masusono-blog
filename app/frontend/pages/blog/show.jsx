@@ -24,7 +24,7 @@ export default function BlogDetail({ article = null, relatedArticles = [], yearA
         imageAlt={`増田とその他！：${article?.title ?? "ブログ記事"}`}
       />
 
-      <PageContainer component="article">
+      <PageContainer component="article" sx={{ py: { xs: 3, sm: 4 } }}>
         <ArticleCard
           article={article ?? undefined}
           mode="detail"
