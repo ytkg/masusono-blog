@@ -49,39 +49,48 @@ describe("greed rules", () => {
     expect(pickPayer([2000, 2000, 2000], () => 0.5)).toBe(1)
     expect(pickPayer([2000, 2000, 2000], () => 0.99)).toBe(2)
   })
-  it("preserves final distributions for each human hand, including ties and duels", () => {
+  it.each([
+    { amounts: [2000, 2000, 6000] },
+    { amounts: [6000, 2000, 6000] },
+    { amounts: [10000, 2000, 6000] },
+    { amounts: [2000, 2000, 2000] },
+  ])("preserves final distributions and legal hands for $amounts", ({ amounts }) => {
     const random = seeded()
     const seen = new Set()
-    for (const amounts of [
-      [2000, 2000, 6000],
-      [6000, 2000, 6000],
-      [10000, 2000, 6000],
-      [2000, 2000, 2000],
-    ]) {
-      for (let hand = 0; hand < 3; hand++) {
-        const counts = [0, 0, 0]
-        for (let i = 0; i < 6000; i++) {
-          const payer = pickPayer(amounts, random)
-          let players = [0, 1, 2],
-            ties = 0,
-            steps = 0
-          while (players.length > 1) {
-            const result = match(players, payer, hand, ties, random)
-            expect(result.players).toEqual(winners(result.hands, players))
-            if (players.includes(0)) expect(result.hands[0]).toBe(hand)
-            if (result.tie) seen.add(`${players.length}-tie-${new Set(players.map((p) => result.hands[p])).size}`)
-            else seen.add(`${players.length}-${result.players.length}`)
-            ties = result.tie ? ties + 1 : 0
-            expect(ties).toBeLessThanOrEqual(2)
-            players = result.players
-            expect(++steps).toBeLessThanOrEqual(6)
-          }
-          expect(players).toEqual([payer])
-          counts[players[0]]++
+    // Check every draw, aggregating failures to avoid matcher overhead in the simulation loop.
+    let invalidHands = 0,
+      changedHumanHands = 0,
+      excessiveTies = 0,
+      wrongPayers = 0
+    for (let hand = 0; hand < 3; hand++) {
+      const counts = [0, 0, 0]
+      for (let i = 0; i < 6000; i++) {
+        const payer = pickPayer(amounts, random)
+        let players = [0, 1, 2],
+          ties = 0,
+          steps = 0
+        while (players.length > 1) {
+          const result = match(players, payer, hand, ties, random)
+          if (result.players.join() !== winners(result.hands, players).join()) invalidHands++
+          if (players.includes(0) && result.hands[0] !== hand) changedHumanHands++
+          if (result.tie) seen.add(`${players.length}-tie-${new Set(players.map((p) => result.hands[p])).size}`)
+          else seen.add(`${players.length}-${result.players.length}`)
+          ties = result.tie ? ties + 1 : 0
+          if (ties > 2) excessiveTies++
+          players = result.players
+          if (++steps > 6) throw new Error("Round failed to finish within the legal maximum")
         }
-        probabilities(amounts).forEach((p, i) => expect(Math.abs(counts[i] / 6000 - p)).toBeLessThan(0.02))
+        if (players[0] !== payer) wrongPayers++
+        counts[players[0]]++
       }
+      probabilities(amounts).forEach((p, i) => expect(Math.abs(counts[i] / 6000 - p)).toBeLessThan(0.02))
     }
+    expect({ invalidHands, changedHumanHands, excessiveTies, wrongPayers }).toEqual({
+      invalidHands: 0,
+      changedHumanHands: 0,
+      excessiveTies: 0,
+      wrongPayers: 0,
+    })
     expect([...seen]).toEqual(expect.arrayContaining(["3-tie-1", "3-tie-3", "2-tie-1", "3-1", "3-2", "2-1"]))
   })
   it("locks the basket and payer, prevents empty/overlimit baskets and duplicate actions", () => {
