@@ -8,13 +8,13 @@ export default function ArticlesList({ articles, emptyMessage = "記事があり
   }
 
   return (
-    <Box sx={{ display: "grid", gap: { xs: 3, sm: 4 } }}>
+    <Box sx={{ display: "grid", gap: { xs: 1.5, sm: 2 } }}>
       {articles.map((article) => (
         <ArticleCard
           key={article.id}
           article={article}
           sx={{
-            "& + &": { borderTop: "1px solid", borderColor: "divider", pt: { xs: 3, sm: 4 } },
+            "& + &": { borderTop: "1px solid", borderColor: "divider", pt: 2 },
           }}
         />
       ))}

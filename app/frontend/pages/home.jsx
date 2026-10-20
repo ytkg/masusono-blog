@@ -39,14 +39,14 @@ export default function Home({ articles = [], pagination }) {
         canonicalPath="/"
       />
       <PageContainer id="home" sx={{ pt: 0 }}>
-        <Box sx={{ display: "grid", gap: 1.5 }}>
+        <Box sx={{ display: "grid", gap: 1 }}>
           <Box
             sx={{
               position: "sticky",
               top: HEADER_HEIGHT,
               zIndex: (theme) => theme.zIndex.appBar - 1,
               bgcolor: "background.default",
-              py: 1,
+              py: 0.5,
               "& .MuiTabs-root": { borderBottom: "1px solid", borderColor: "divider" },
               "& .MuiTab-root.Mui-selected": { fontWeight: 700 },
             }}
@@ -70,12 +70,7 @@ export default function Home({ articles = [], pagination }) {
               ))}
             </Tabs>
           </Box>
-          <Box
-            role="tabpanel"
-            id={`${tabsId}-panel`}
-            aria-labelledby={`${tabsId}-${mode}`}
-            sx={{ pt: mode === "calendar" ? 0.5 : 1 }}
-          >
+          <Box role="tabpanel" id={`${tabsId}-panel`} aria-labelledby={`${tabsId}-${mode}`} sx={{ pt: 0 }}>
             {activeTab?.renderContent({
               articles: feed.articles,
               hasMore: feed.hasMore,
