@@ -7,7 +7,7 @@ import {
   NAVIGATION_VERTICAL_PADDING,
   NAVIGATION_BORDER_WIDTH,
   navigationBottomSx,
-  PAGE_INNER_MAX_WIDTH,
+  NAVIGATION_MAX_WIDTH,
 } from "../layouts/pageLayout"
 
 const NAVIGATION_LABEL_FONT_SIZE = "0.72rem"
@@ -18,7 +18,7 @@ export const navigationPaperSx = {
   bottom: navigationBottomSx,
   transform: "translateX(-50%)",
   width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
-  maxWidth: PAGE_INNER_MAX_WIDTH,
+  maxWidth: NAVIGATION_MAX_WIDTH,
   zIndex: (t) => t.zIndex.appBar,
   overflow: "hidden",
   bgcolor: "common.white",
@@ -26,7 +26,7 @@ export const navigationPaperSx = {
   border: `${NAVIGATION_BORDER_WIDTH}px solid`,
   borderColor: "divider",
   borderRadius: 999,
-  boxShadow: "0 8px 32px rgba(29, 29, 31, 0.12)",
+  boxShadow: "0 8px 24px rgba(29, 29, 31, 0.08)",
   px: { xs: 1, sm: 1.25 },
   py: `${NAVIGATION_VERTICAL_PADDING}px`,
 }
@@ -53,7 +53,7 @@ export function buildBottomNavigationSx() {
       color: "text.secondary",
       "&.Mui-selected": {
         color: "primary.main",
-        bgcolor: "#edf4ff",
+        bgcolor: "action.selected",
       },
     },
     ".MuiSvgIcon-root": {

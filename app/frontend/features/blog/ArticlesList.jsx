@@ -8,7 +8,7 @@ export default function ArticlesList({ articles, emptyMessage = "記事があり
   }
 
   return (
-    <Box sx={{ display: "grid", gap: 2 }}>
+    <Box sx={{ display: "grid", gap: { xs: 2, sm: 3 } }}>
       {articles.map((article) => (
         <ArticleCard key={article.id} article={article} />
       ))}

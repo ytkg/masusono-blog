@@ -743,15 +743,16 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
         scrollWidth: document.documentElement.scrollWidth,
       }
     })
-    const outerWidth = Math.min(width, 1200)
+    const outerWidth = Math.min(width, 840)
     const padding = width < 600 ? 16 : 24
     const left = (width - outerWidth) / 2 + padding
     expect(bounds.main.width).toBe(outerWidth)
     expect(bounds.toolbar).toEqual(bounds.main)
     expect(bounds.contentLeft).toBe(left)
     expect(bounds.backButton.x).toBeCloseTo(left, 0)
-    expect(bounds.nav.x).toBe(left)
-    expect(bounds.nav.width).toBe(outerWidth - padding * 2)
+    const navigationWidth = Math.min(width - padding * 2, 560)
+    expect(bounds.nav.x).toBe((width - navigationWidth) / 2)
+    expect(bounds.nav.width).toBe(navigationWidth)
     expect(bounds.scrollWidth).toBe(width)
     const links = page.getByRole("navigation", { name: "メインナビゲーション" }).getByRole("link")
     await expect(links).toHaveCount(5)

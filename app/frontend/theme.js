@@ -1,7 +1,7 @@
 import { createTheme } from "@mui/material/styles"
 
 const theme = createTheme({
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 8 },
   typography: {
     button: { textTransform: "none", fontWeight: 700 },
     fontFamily:
@@ -9,7 +9,8 @@ const theme = createTheme({
   },
   palette: {
     mode: "light",
-    primary: { main: "#005ac1" },
+    primary: { main: "#7045a0", dark: "#59367f" },
+    action: { selected: "#f2edf8" },
     secondary: { main: "#666666" },
     background: { default: "#f5f5f7", paper: "#ffffff" },
     text: { primary: "#1d1d1f", secondary: "#666666", disabled: "#767680" },
@@ -47,17 +48,9 @@ const theme = createTheme({
       },
     },
     MuiButton: {
+      defaultProps: { disableElevation: true },
       styleOverrides: {
         root: { minHeight: 44, paddingInline: 16 },
-        contained: {
-          backgroundColor: "#005ac1",
-          color: "#fff",
-          "&:hover": { backgroundColor: "#004a9f" },
-        },
-        outlined: {
-          borderColor: "#005ac1",
-          "&:hover": { borderColor: "#004a9f", backgroundColor: "#edf4ff" },
-        },
       },
     },
   },

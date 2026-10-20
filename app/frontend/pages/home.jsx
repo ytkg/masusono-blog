@@ -47,9 +47,9 @@ export default function Home({ articles = [], pagination }) {
               zIndex: (theme) => theme.zIndex.appBar - 1,
               bgcolor: "background.default",
               py: 1,
-              "& .MuiTabs-root": { bgcolor: "#e8e8ed", borderRadius: 3, p: 0.5 },
+              "& .MuiTabs-root": { bgcolor: "#e8e8ed", borderRadius: 2, p: 0.5 },
               "& .MuiTabs-indicator": { display: "none" },
-              "& .MuiTab-root": { borderRadius: 2.5, color: "text.secondary" },
+              "& .MuiTab-root": { borderRadius: 1.5, color: "text.secondary" },
               "& .MuiTab-root.Mui-selected": {
                 bgcolor: "background.paper",
                 color: "primary.main",
