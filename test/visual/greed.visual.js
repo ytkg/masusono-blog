@@ -36,15 +36,20 @@ test("greed shopping, complete game, best and reset", async ({ page }) => {
     await confirm.click()
     await expect.poll(() => screen.evaluate((element) => element.scrollTop)).toBe(0)
     let attempts = 0
-    while (!(await page.getByText("MIDNIGHT MART レシート", { exact: true }).isVisible())) {
+    while (!(await page.getByText("領収証", { exact: true }).isVisible())) {
       if (++attempts > 12) throw new Error("round failed to finish")
       const hand = page.getByRole("button", { name: "✊ グー", exact: true })
       const next = page.getByRole("button", { name: "次のじゃんけんへ" })
       if (await hand.isVisible()) await hand.click()
       else if (await next.isVisible()) await next.click()
-      else await expect(page.getByText("MIDNIGHT MART レシート", { exact: true })).toBeVisible()
+      else await expect(page.getByText("領収証", { exact: true })).toBeVisible()
     }
     await expect(page.getByText(`現在の合計スコア：${round * 100}円`)).toBeVisible()
+    const receipt = page.getByRole("region", { name: "会計レシート" })
+    await expect(receipt).not.toContainText(/あなた|CPU/)
+    const chocolate = receipt.getByRole("row", { name: /板チョコ/ })
+    await expect(chocolate.getByRole("cell").nth(1)).toHaveText("44")
+    await expect(chocolate.getByRole("cell").nth(2)).toHaveText("6,600円")
     if (round === 1) await expect(page).toHaveScreenshot("greed-receipt.png")
     await page.getByRole("button", { name: round === 3 ? "最終結果を見る" : "次のラウンドへ" }).click()
   }
@@ -70,16 +75,17 @@ test("greed payer receipt and negative first best", async ({ page }) => {
     await expect(page.getByRole("button", { name: "塩むすびを追加", exact: true })).toBeDisabled()
     await page.getByRole("button", { name: "カゴを確定して勝負" }).click()
     for (let i = 0; i < 6; i++) {
-      if (await page.getByText("MIDNIGHT MART レシート", { exact: true }).isVisible()) break
+      if (await page.getByText("領収証", { exact: true }).isVisible()) break
       const hand = page.getByRole("button", { name: "✊ グー", exact: true })
       if (await hand.isVisible()) await hand.click()
       else await page.getByRole("button", { name: "次のじゃんけんへ" }).click()
     }
     await expect(page.getByText("あなたが勝ち残り、全員に奢る！")).toBeVisible()
     await expect(page.getByText("お支払い合計：17,900円")).toBeVisible()
+    await expect(page.getByRole("region", { name: "会計レシート" })).not.toContainText(/あなた|CPU/)
     await expect(page.getByText("ラウンド収支：-17,900円")).toBeVisible()
     if (round === 1) {
-      await page.getByText("MIDNIGHT MART レシート", { exact: true }).scrollIntoViewIfNeeded()
+      await page.getByText("領収証", { exact: true }).scrollIntoViewIfNeeded()
       await expect(page.getByRole("button", { name: "閉じる", exact: true })).toBeInViewport({ ratio: 1 })
       await expect(page).toHaveScreenshot("greed-payer-receipt.png")
     }

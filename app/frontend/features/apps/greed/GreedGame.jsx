@@ -1,4 +1,5 @@
 import Storefront from "./Storefront"
+import Receipt from "./Receipt"
 import { useEffect, useReducer, useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -78,10 +79,6 @@ export default function GreedGame() {
           <Box sx={{ ...panel, textAlign: "left", my: 3 }}>
             <Typography>全3ラウンド。CPUのカゴを見て、100〜10,000円のお買い物。</Typography>
             <Typography>奢ってもらえば自分の商品代を加算。奢ると全員分を減算します。</Typography>
-            <Typography>最終支払者は金額の2乗に比例した確率で抽選します。手の種類に有利・不利はありません。</Typography>
-            <Typography>あいこは連続2回まで。2人勝ちなら決戦。負けた人は抜けます。</Typography>
-            <Typography>金額はゲーム内のものです。実際の決済・購入はありません。</Typography>
-            <Typography>閉じると途中進行はリセットされ、自己ベストだけがこのブラウザに残ります。</Typography>
           </Box>
         </Box>
       ) : game.phase === "final" ? (
@@ -230,42 +227,7 @@ export default function GreedGame() {
                         <Typography variant="h5" component="h4" sx={{ my: 2 }}>
                           {NAMES[game.payer]}が勝ち残り、全員に奢る！
                         </Typography>
-                        <Box
-                          sx={{
-                            bgcolor: "#fff",
-                            color: "#30273f",
-                            mx: "auto",
-                            maxWidth: 380,
-                            p: 3,
-                            my: 2,
-                            borderBottom: "6px dashed #dfad75",
-                          }}
-                        >
-                          <Typography fontWeight={800}>MIDNIGHT MART レシート</Typography>
-                          {game.amounts.map((value, i) => (
-                            <Typography key={i}>
-                              {NAMES[i]}：{yen(value)}
-                            </Typography>
-                          ))}
-                          <Typography fontWeight={800}>
-                            お支払い合計：{yen(game.amounts.reduce((s, x) => s + x, 0))}
-                          </Typography>
-                          {game.payer === 0 &&
-                            game.carts.map((cart, person) => (
-                              <Box key={person} sx={{ textAlign: "left", my: 2 }}>
-                                <Typography fontWeight={700}>{NAMES[person]}の商品</Typography>
-                                {cart.flatMap((quantity, i) =>
-                                  quantity
-                                    ? [
-                                        <Typography variant="body2" key={i}>
-                                          {PRODUCTS[i].name} ×{quantity} · {yen(PRODUCTS[i].price * quantity)}
-                                        </Typography>,
-                                      ]
-                                    : [],
-                                )}
-                              </Box>
-                            ))}
-                        </Box>
+                        <Receipt carts={game.carts} round={game.round} />
                         <Typography>
                           ラウンド収支：{game.delta > 0 ? "+" : ""}
                           {yen(game.delta)}

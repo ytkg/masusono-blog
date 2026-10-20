@@ -33,7 +33,7 @@ it("saves only a completed three-round score, before dismissing the last receipt
   for (let round = 1; round <= 3; round++) {
     click("塩むすびを追加")
     click("カゴを確定して勝負")
-    for (let n = 0; n < 6 && !screen.queryByText("MIDNIGHT MART レシート"); n++) {
+    for (let n = 0; n < 6 && !screen.queryByText("領収証"); n++) {
       if (screen.queryByRole("button", { name: "✊ グー", exact: true })) click("✊ グー")
       else click("次のじゃんけんへ")
     }
@@ -64,15 +64,15 @@ it("pauses CPU decisions and blocks input while inactive", () => {
   const before = screen.getByText(/ラウンド 1/).textContent
   act(() => vi.advanceTimersByTime(60000))
   expect(screen.getByText(/ラウンド 1/).textContent).toBe(before)
-  expect(screen.queryByText("MIDNIGHT MART レシート")).not.toBeInTheDocument()
+  expect(screen.queryByText("領収証")).not.toBeInTheDocument()
   const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden")
   act(() => document.dispatchEvent(new Event("visibilitychange")))
   rerender(tree(true))
   act(() => vi.advanceTimersByTime(60000))
-  expect(screen.queryByText("MIDNIGHT MART レシート")).not.toBeInTheDocument()
+  expect(screen.queryByText("領収証")).not.toBeInTheDocument()
   visibility.mockReturnValue("visible")
   act(() => document.dispatchEvent(new Event("visibilitychange")))
   act(() => vi.advanceTimersByTime(1200))
   act(() => vi.advanceTimersByTime(1200))
-  expect(screen.getByText("MIDNIGHT MART レシート")).toBeInTheDocument()
+  expect(screen.getByText("領収証")).toBeInTheDocument()
 })
