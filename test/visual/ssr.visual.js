@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { waitForClientReady } from "./helpers"
 
-// Delayed module requests must reach page.route instead of the service worker.
+// Service Worker fetches bypass page.route and would defeat the delayed layout checks.
 test.use({ serviceWorkers: "block" })
 
 const pages = [
@@ -126,8 +126,8 @@ test("SSR stays unready until delayed layout JavaScript hydrates", async ({ page
   })
   try {
     await page.goto("/")
-    await expect.poll(() => layoutRequested).toBe(true)
     await expect(page.locator("#app[data-server-rendered]")).toBeVisible()
+    await expect.poll(() => layoutRequested).toBe(true)
     await expect(page.locator("#app")).not.toHaveAttribute("data-client-ready", "true")
     release()
     await waitForClientReady(page)
