@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test"
 import { waitForClientReady } from "./helpers"
 
+// Service workers bypass page.route, which must delay layout JavaScript in these tests.
+test.use({ serviceWorkers: "block" })
+
 const pages = [
   ["/articles/visual-article-1", "駅を出て、いつもと違う道を歩きました。"],
   ["/articles/visual-article-2", "久しぶりに友人と集まりました。"],
