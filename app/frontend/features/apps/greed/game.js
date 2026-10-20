@@ -99,8 +99,8 @@ export function saveBest(score, best) {
   }
   return next
 }
-export function newRound(round = 1, score = 0) {
-  return { phase: "shopping", round, score, carts: [emptyCart(), cpuCart(1000, 3000), cpuCart(4000, 8000)] }
+export function newRound(round = 1, score = 0, history = []) {
+  return { phase: "shopping", round, score, history, carts: [emptyCart(), cpuCart(1000, 3000), cpuCart(4000, 8000)] }
 }
 export function advance(state, hand, random = Math.random) {
   const result = { ...match(state.players, state.payer, hand, state.ties, random), contestants: state.players }
@@ -114,6 +114,19 @@ export function advance(state, hand, random = Math.random) {
     ties: result.tie ? state.ties + 1 : 0,
     delta,
     score: state.score + delta,
+    history: finished
+      ? [
+          ...state.history,
+          {
+            round: state.round,
+            payer: state.payer,
+            carts: state.carts.map((cart) =>
+              cart.flatMap((quantity, i) => (quantity ? [{ ...PRODUCTS[i], quantity }] : [])),
+            ),
+            amounts: [...state.amounts],
+          },
+        ]
+      : state.history,
   }
 }
 export function reducer(state, action) {
@@ -132,6 +145,6 @@ export function reducer(state, action) {
   if (action.type === "cpu" && state.phase === "hand" && !state.players.includes(0)) return advance(state)
   if (action.type === "continue" && state.phase === "reveal") return { ...state, phase: "hand" }
   if (action.type === "next" && state.phase === "result")
-    return state.round === 3 ? { ...state, phase: "final" } : newRound(state.round + 1, state.score)
+    return state.round === 3 ? { ...state, phase: "final" } : newRound(state.round + 1, state.score, state.history)
   return state
 }

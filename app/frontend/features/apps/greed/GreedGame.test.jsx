@@ -4,6 +4,11 @@ import GreedGame from "./GreedGame"
 import { AppActivityProvider } from "../shared/AppActivityContext"
 import { BEST_KEY } from "./game"
 
+vi.mock("@inertiajs/react", async () => {
+  const { MockInertiaLinkWithoutPrefetch } = await import("@/test/inertiaLinkMocks")
+  return { Link: MockInertiaLinkWithoutPrefetch }
+})
+
 beforeEach(() => {
   localStorage.clear()
   vi.spyOn(Math, "random").mockReturnValue(0.5)
@@ -15,7 +20,12 @@ afterEach(() => {
 const click = (name) => fireEvent.click(screen.getByRole("button", { name, exact: true }))
 it("updates quantity, caps purchases and freezes CPU baskets", () => {
   render(<GreedGame />)
+  expect(screen.getByRole("link", { name: "強欲は身を滅ぼす？を読む →" })).toHaveAttribute(
+    "href",
+    "/articles/uqu8cokro",
+  )
   click("買い物を始める")
+  expect(screen.queryByRole("link")).not.toBeInTheDocument()
   const cpu = screen.getByRole("heading", { name: /CPU1/ }).textContent
   expect(screen.getByRole("button", { name: "カゴを確定して勝負" })).toBeDisabled()
   for (let i = 0; i < 5; i++) click("ごほうび重を追加")
@@ -42,6 +52,7 @@ it("saves only a completed three-round score, before dismissing the last receipt
     click(round === 3 ? "最終結果を見る" : "次のラウンドへ")
   }
   expect(screen.getByText("自己ベスト：300円")).toBeInTheDocument()
+  expect(screen.getByRole("link", { name: "元になった記事を読む →" })).toHaveAttribute("href", "/articles/uqu8cokro")
   click("再挑戦")
   expect(screen.getByText("あなたのカゴ：0円 / 10,000円")).toBeInTheDocument()
 })

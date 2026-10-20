@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test"
 import { openPage } from "./helpers"
 
+// Article fixture requests must reach page.route instead of the service worker.
+test.use({ serviceWorkers: "block" })
+
 test("greed shopping, complete game, best and reset", async ({ page }) => {
   await page.addInitScript(() => {
     // Reproducible baskets, payer and legal decisive hands.
@@ -54,7 +57,12 @@ test("greed shopping, complete game, best and reset", async ({ page }) => {
     await page.getByRole("button", { name: round === 3 ? "最終結果を見る" : "次のラウンドへ" }).click()
   }
   await expect(page.getByText("自己ベスト：300円")).toBeVisible()
+  await expect(page.getByRole("region", { name: "奢ってもらった商品" })).toContainText("塩むすび ×3")
+  await expect(page.getByText("全部ごちそうになりました", { exact: false })).toBeVisible()
   await expect(page).toHaveScreenshot("greed-final.png")
+  await page.getByRole("button", { name: "再挑戦", exact: true }).click()
+  await expect(page.getByText("あなたのカゴ：0円 / 10,000円")).toBeVisible()
+  await expect(page.getByRole("region", { name: "奢ってもらった商品" })).toHaveCount(0)
   await page.getByRole("button", { name: "閉じる", exact: true }).click()
   await page.getByRole("button", { name: "強欲を開く" }).click()
   await expect(page.getByText("自己ベスト：300円")).toBeVisible()
@@ -65,6 +73,15 @@ test("greed shopping, complete game, best and reset", async ({ page }) => {
 })
 
 test("greed payer receipt and negative first best", async ({ page }) => {
+  // Keep the real article page, using fixture content for the source article.
+  await page.route("**/articles/uqu8cokro", async (route) => {
+    const response = await route.fetch({ url: new URL("/articles/visual-article-1", route.request().url()).href })
+    const payload = await response.json()
+    payload.url = "/articles/uqu8cokro"
+    payload.props.article.id = "uqu8cokro"
+    payload.props.article.title = "強欲は身を滅ぼす？"
+    await route.fulfill({ response, json: payload })
+  })
   await page.addInitScript(() => { Math.random = () => 0.5 })
   await openPage(page, "/others")
   await page.getByRole("button", { name: "強欲を開く" }).click()
@@ -92,7 +109,27 @@ test("greed payer receipt and negative first best", async ({ page }) => {
     await page.getByRole("button", { name: round === 3 ? "最終結果を見る" : "次のラウンドへ" }).click()
   }
   await expect(page.getByText("自己ベスト：-53,700円")).toBeVisible()
-  await page.getByRole("button", { name: "閉じる", exact: true }).click()
+  await expect(page.getByRole("heading", { name: "自分のお支払い合計 53,700円" })).toBeVisible()
+  await expect(page.getByText("今回は奢ってもらえませんでした")).toBeVisible()
+  await expect(page).toHaveScreenshot("greed-final-payer.png")
+  const details = page.getByText("購入者ごとの商品明細", { exact: true })
+  await details.nth(0).click()
+  await expect(page.getByText("ごほうび重 ×5 · 10,000円", { exact: true }).first()).toBeVisible()
+  await expect(page).toHaveScreenshot("greed-final-details.png")
+  await page.getByRole("button", { name: "再挑戦", exact: true }).scrollIntoViewIfNeeded()
+  await expect(page.getByRole("button", { name: "再挑戦", exact: true })).toBeInViewport({ ratio: 1 })
+  await expect(page.getByRole("button", { name: "閉じる", exact: true })).toBeInViewport({ ratio: 1 })
+  const sourceLink = page.getByRole("link", { name: "元になった記事を読む →" })
+  await expect(sourceLink).toHaveAttribute("href", "/articles/uqu8cokro")
+  await sourceLink.click()
+  await expect(page).toHaveURL(/\/articles\/uqu8cokro$/)
+  await expect(page.getByRole("dialog")).toHaveCount(0)
+  await expect(page.getByRole("heading", { name: "強欲は身を滅ぼす？", exact: true })).toBeVisible()
+  await openPage(page, "/others")
   await page.getByRole("button", { name: "強欲を開く" }).click()
   await expect(page.getByText("自己ベスト：-53,700円")).toBeVisible()
+  await page.getByRole("link", { name: "強欲は身を滅ぼす？を読む →" }).click()
+  await expect(page).toHaveURL(/\/articles\/uqu8cokro$/)
+  await expect(page.getByRole("dialog")).toHaveCount(0)
+  await expect(page.getByRole("heading", { name: "強欲は身を滅ぼす？", exact: true })).toBeVisible()
 })

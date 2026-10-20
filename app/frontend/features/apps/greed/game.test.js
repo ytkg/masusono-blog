@@ -105,7 +105,16 @@ describe("greed rules", () => {
     expect(reducer(game, { type: "hand", hand: 1 })).toBe(game)
   })
   it("adds only own basket or subtracts all baskets, permits negative scores, resets rounds", () => {
-    const base = { phase: "hand", players: [0, 1], amounts: [2000, 3000, 6000], ties: 2, score: 0, round: 1 }
+    const base = {
+      history: [],
+      carts: [[], [], []],
+      phase: "hand",
+      players: [0, 1],
+      amounts: [2000, 3000, 6000],
+      ties: 2,
+      score: 0,
+      round: 1,
+    }
     const paid = advance({ ...base, payer: 0 }, 0, () => 0)
     expect(paid.delta).toBe(-11000)
     expect(paid.score).toBe(-11000)
@@ -127,4 +136,42 @@ describe("greed rules", () => {
     localStorage.setItem(BEST_KEY, "broken")
     expect(readBest()).toBeNull()
   })
+})
+
+it.each([
+  [1, 1, 1],
+  [0, 0, 0],
+  [1, 0, 2],
+])("keeps immutable round snapshots, reconciles score and resets history (%j)", (...payers) => {
+  let game = reducer({ phase: "title" }, { type: "start" })
+  for (let round = 1; round <= 3; round++) {
+    const carts = PRODUCTS.map(() => 0)
+    carts[0] = round
+    game = {
+      ...game,
+      phase: "hand",
+      carts: [carts, [...carts], [...carts]],
+      amounts: [round * 100, round * 100, round * 100],
+      players: [0, 1, 2],
+      payer: payers[round - 1],
+      ties: 2,
+    }
+    while (game.phase !== "result") game = advance(game, 0, () => 0)
+    expect(game.history).toHaveLength(round)
+    expect(reducer(game, { type: "hand", hand: 0 })).toBe(game)
+    const snapshot = game.history[round - 1]
+    expect(snapshot.carts[0][0]).toMatchObject({ name: "塩むすび", price: 100, quantity: round })
+    carts[0] = 99
+    expect(snapshot.carts[0][0].quantity).toBe(round)
+    game = reducer(game, { type: "next" })
+    expect(game.history).toHaveLength(round)
+  }
+  expect(game.phase).toBe("final")
+  const gifts = game.history.filter((r) => r.payer !== 0).reduce((sum, r) => sum + r.amounts[0], 0)
+  const paid = game.history
+    .filter((r) => r.payer === 0)
+    .reduce((sum, r) => sum + r.amounts.reduce((a, b) => a + b, 0), 0)
+  expect(gifts - paid).toBe(game.score)
+  expect(reducer(game, { type: "start" }).history).toEqual([])
+  expect(reducer({ phase: "title" }, { type: "start" }).history).toEqual([])
 })

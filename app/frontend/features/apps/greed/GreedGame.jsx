@@ -1,9 +1,12 @@
 import Storefront from "./Storefront"
 import Receipt from "./Receipt"
+import FinalRecap from "./FinalRecap"
 import { useEffect, useReducer, useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
+import MuiLink from "@mui/material/Link"
+import { Link } from "@inertiajs/react"
 import usePageVisible from "../../../shared/hooks/usePageVisible"
 import { useAppActive } from "../shared/AppActivityContext"
 import { PRODUCTS, HANDS, NAMES, yen, total, probabilities, readBest, saveBest, reducer } from "./game"
@@ -80,6 +83,17 @@ export default function GreedGame() {
             <Typography>全3ラウンド。CPUのカゴを見て、100〜10,000円のお買い物。</Typography>
             <Typography>奢ってもらえば自分の商品代を加算。奢ると全員分を減算します。</Typography>
           </Box>
+          <Typography variant="body2" sx={{ mt: 2, color: "#e3d9bd" }}>
+            このゲームのきっかけ
+          </Typography>
+          <MuiLink
+            component={Link}
+            href="/articles/uqu8cokro"
+            color="inherit"
+            sx={{ display: "inline-block", py: 1.5 }}
+          >
+            強欲は身を滅ぼす？を読む →
+          </MuiLink>
         </Box>
       ) : game.phase === "final" ? (
         <Box sx={{ textAlign: "center", py: 5 }}>
@@ -90,9 +104,20 @@ export default function GreedGame() {
             合計 {yen(game.score)}
           </Typography>
           <Typography sx={{ mb: 3 }}>自己ベスト：{best === null ? "記録なし" : yen(best)}</Typography>
+          <FinalRecap history={game.history} />
           <Button variant="contained" disabled={!active} onClick={() => send("start")}>
             再挑戦
           </Button>
+          <Box sx={{ mt: 2 }}>
+            <MuiLink
+              component={Link}
+              href="/articles/uqu8cokro"
+              color="inherit"
+              sx={{ display: "inline-block", py: 1.5 }}
+            >
+              元になった記事を読む →
+            </MuiLink>
+          </Box>
         </Box>
       ) : (
         <>
