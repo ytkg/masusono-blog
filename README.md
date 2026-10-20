@@ -448,3 +448,16 @@ SSRに失敗したリクエストは初期propsを返してブラウザで描画
 Rails アプリケーションはリポジトリ直下に配置しています。`app/frontend/` を含め、コマンドはリポジトリルートで実行します。
 
 既存 checkout の `backend/` にある Git 管理外のファイルは、Git の更新では移動されません。旧 `backend/` は Git・Docker・Cloud Run の除外対象として残し、秘密情報や古い DB の誤取り込みを防ぎます。必要な `config/master.key`・環境ファイル・`storage/` のローカル DB は、起動前に新しい配置先に同名ファイルがないことを確認して個別に移してください。不要なログやビルド出力は再生成できます。管理対象 worktree の再生成可能なデータは、通常の片付け手順に従います。
+
+## 公開ダッシュボード
+
+同じ Rails アプリと Cloud Run サービスで、`dashboard` サブドメインの `/` に
+認証なしの公開記事ダッシュボードを表示する。ブログ用ルートとは分離している。
+
+- 本番: `https://dashboard.masusono.com/`
+- ローカル: `http://dashboard.lvh.me:<Rails のポート>/`（worktree のポートは `.env.worktree` を参照）
+- PR ステージング: 従来のブログのみ。dashboard 用のドメインや別パスは用意しない。
+
+本番公開には `dashboard.masusono.com` の DNS・HTTPS と既存 Cloud Run サービスへの
+ドメイン接続設定が別途必要。アプリの変更だけではドメインは接続されない。
+集計は既存の数字ページと同じ公開記事データを使用し、最大1時間キャッシュする。

@@ -5,11 +5,11 @@ export async function waitForClientReady(page) {
 }
 
 // Keep the real Rails response and Inertia boot process; replace only this test's props.
-export async function mockPageProps(page, path, transform) {
+export async function mockPageProps(page, path, transform, fetchOptions = {}) {
   await page.route(
     (url) => url.pathname === path,
     async (route) => {
-      const response = await route.fetch()
+      const response = await route.fetch(fetchOptions)
       if (response.headers()["content-type"]?.includes("application/json")) {
         const payload = await response.json()
         transform(payload.props)
