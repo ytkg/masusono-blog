@@ -7,6 +7,8 @@ export default function GreedApp() {
   const [session, setSession] = useState(0)
   return (
     <AppsDialogLauncher
+      edgeToEdge
+      contentSx={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}
       onClose={() => setSession((value) => value + 1)}
       title="強欲は身を滅ぼす？"
       launcherLabel="強欲"

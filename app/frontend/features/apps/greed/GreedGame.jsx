@@ -1,5 +1,5 @@
 import Storefront from "./Storefront"
-import { useEffect, useReducer, useState } from "react"
+import { useEffect, useReducer, useRef, useState } from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
@@ -24,6 +24,10 @@ function Cart({ cart, name }) {
 export default function GreedGame() {
   const [game, dispatch] = useReducer(reducer, { phase: "title" })
   const [best, setBest] = useState(readBest)
+  const screenRef = useRef(null)
+  useEffect(() => {
+    if (screenRef.current) screenRef.current.scrollTop = 0
+  }, [game.phase, game.round])
   const appActive = useAppActive()
   const pageVisible = usePageVisible()
   const active = appActive && pageVisible
@@ -42,26 +46,35 @@ export default function GreedGame() {
   const amount = game.carts ? total(game.carts[0]) : 0
   return (
     <Box
+      ref={screenRef}
+      component="section"
+      aria-label="強欲のゲーム画面"
       sx={{
-        maxWidth: 960,
-        mx: "auto",
-        p: { xs: 1, sm: 3 },
-        borderRadius: 3,
+        width: "100%",
+        height: "100%",
+        overflowY: "auto",
+        pt: { xs: 2, sm: 3 },
+        pl: "max(16px, env(safe-area-inset-left))",
+        pr: "max(16px, env(safe-area-inset-right))",
+        pb: "max(24px, env(safe-area-inset-bottom))",
         bgcolor: "#29283e",
         color: "#fff8e4",
-        minHeight: "100%",
       }}
     >
       <Typography sx={{ textAlign: "center", letterSpacing: 3, color: "#ffe787" }}>
         🌙 MIDNIGHT MART · 24時間営業
       </Typography>
       {game.phase === "title" ? (
-        <Box sx={{ textAlign: "center", py: 4 }}>
+        <Box sx={{ maxWidth: 760, mx: "auto", textAlign: "center", py: { xs: 2, sm: 4 } }}>
           <Storefront />
           <Typography variant="h4" component="h3" fontWeight={800}>
             強欲は身を滅ぼす？
           </Typography>
           <Typography sx={{ my: 2 }}>好きな商品をカゴへ。じゃんけんで勝ち残った1人が全員に奢る！</Typography>
+          <Typography sx={{ mb: 2 }}>自己ベスト：{best === null ? "記録なし" : yen(best)}</Typography>
+          <Button variant="contained" disabled={!active} onClick={() => send("start")}>
+            買い物を始める
+          </Button>
           <Box sx={{ ...panel, textAlign: "left", my: 3 }}>
             <Typography>全3ラウンド。CPUのカゴを見て、100〜10,000円のお買い物。</Typography>
             <Typography>奢ってもらえば自分の商品代を加算。奢ると全員分を減算します。</Typography>
@@ -70,10 +83,6 @@ export default function GreedGame() {
             <Typography>金額はゲーム内のものです。実際の決済・購入はありません。</Typography>
             <Typography>閉じると途中進行はリセットされ、自己ベストだけがこのブラウザに残ります。</Typography>
           </Box>
-          <Typography sx={{ mb: 2 }}>自己ベスト：{best === null ? "記録なし" : yen(best)}</Typography>
-          <Button variant="contained" disabled={!active} onClick={() => send("start")}>
-            買い物を始める
-          </Button>
         </Box>
       ) : game.phase === "final" ? (
         <Box sx={{ textAlign: "center", py: 5 }}>
@@ -90,9 +99,21 @@ export default function GreedGame() {
         </Box>
       ) : (
         <>
-          <Typography component="h3" variant="h5" sx={{ my: 2 }}>
-            ラウンド {game.round} / 3 · 合計スコア {yen(game.score)}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "baseline",
+              justifyContent: "space-between",
+              gap: 1,
+              my: 2,
+            }}
+          >
+            <Typography component="h3" variant="h5">
+              ラウンド {game.round} / 3
+            </Typography>
+            <Typography sx={{ fontWeight: 700, whiteSpace: "nowrap" }}>合計スコア {yen(game.score)}</Typography>
+          </Box>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1, mb: 2 }}>
             <Cart cart={game.carts[1]} name="CPU1" />
             <Cart cart={game.carts[2]} name="CPU2" />
@@ -120,7 +141,7 @@ export default function GreedGame() {
               <Box
                 sx={{
                   display: "grid",
-                  gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)", md: "repeat(5, 1fr)" },
+                  gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(auto-fit, minmax(160px, 1fr))" },
                   gap: 1.5,
                 }}
               >
@@ -221,6 +242,14 @@ export default function GreedGame() {
                           }}
                         >
                           <Typography fontWeight={800}>MIDNIGHT MART レシート</Typography>
+                          {game.amounts.map((value, i) => (
+                            <Typography key={i}>
+                              {NAMES[i]}：{yen(value)}
+                            </Typography>
+                          ))}
+                          <Typography fontWeight={800}>
+                            お支払い合計：{yen(game.amounts.reduce((s, x) => s + x, 0))}
+                          </Typography>
                           {game.payer === 0 &&
                             game.carts.map((cart, person) => (
                               <Box key={person} sx={{ textAlign: "left", my: 2 }}>
@@ -236,14 +265,6 @@ export default function GreedGame() {
                                 )}
                               </Box>
                             ))}
-                          {game.amounts.map((value, i) => (
-                            <Typography key={i}>
-                              {NAMES[i]}：{yen(value)}
-                            </Typography>
-                          ))}
-                          <Typography fontWeight={800}>
-                            お支払い合計：{yen(game.amounts.reduce((s, x) => s + x, 0))}
-                          </Typography>
                         </Box>
                         <Typography>
                           ラウンド収支：{game.delta > 0 ? "+" : ""}

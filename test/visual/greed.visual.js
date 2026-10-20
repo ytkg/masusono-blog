@@ -10,6 +10,16 @@ test("greed shopping, complete game, best and reset", async ({ page }) => {
   await page.getByRole("button", { name: "強欲を開く" }).click()
   await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
   await expect(page.getByText("自己ベスト：記録なし")).toBeVisible()
+  const screen = page.getByRole("region", { name: "強欲のゲーム画面" })
+  const header = page.getByRole("dialog").getByRole("heading", { name: "強欲は身を滅ぼす？", exact: true, level: 2 })
+  const bounds = await screen.boundingBox()
+  const headerBounds = await header.boundingBox()
+  expect(bounds.x).toBe(0)
+  expect(bounds.width).toBe(page.viewportSize().width)
+  expect(bounds.y).toBeGreaterThan(headerBounds.y + headerBounds.height)
+  expect(bounds.y + bounds.height).toBe(page.viewportSize().height)
+  await expect(page.getByRole("button", { name: "買い物を始める" })).toBeInViewport()
+
   await expect(page).toHaveScreenshot("greed-title.png")
   await page.getByRole("button", { name: "買い物を始める" }).click()
   const confirm = page.getByRole("button", { name: "カゴを確定して勝負" })
@@ -17,9 +27,14 @@ test("greed shopping, complete game, best and reset", async ({ page }) => {
   await page.getByRole("button", { name: "塩むすびを追加", exact: true }).click()
   await expect(page.getByText("あなたのカゴ：100円 / 10,000円")).toBeVisible()
   await expect(page).toHaveScreenshot("greed-shopping.png")
+  await page.getByRole("button", { name: "おつまみセットを追加", exact: true }).scrollIntoViewIfNeeded()
+  await expect.poll(() => screen.evaluate((element) => element.scrollTop)).toBeGreaterThan(0)
+  await expect(page.getByRole("button", { name: "閉じる", exact: true })).toBeInViewport({ ratio: 1 })
+  await expect(confirm).toBeInViewport({ ratio: 1 })
   for (let round = 1; round <= 3; round++) {
     if (round > 1) await page.getByRole("button", { name: "塩むすびを追加", exact: true }).click()
     await confirm.click()
+    await expect.poll(() => screen.evaluate((element) => element.scrollTop)).toBe(0)
     let attempts = 0
     while (!(await page.getByText("MIDNIGHT MART レシート", { exact: true }).isVisible())) {
       if (++attempts > 12) throw new Error("round failed to finish")
@@ -65,6 +80,7 @@ test("greed payer receipt and negative first best", async ({ page }) => {
     await expect(page.getByText("ラウンド収支：-17,900円")).toBeVisible()
     if (round === 1) {
       await page.getByText("MIDNIGHT MART レシート", { exact: true }).scrollIntoViewIfNeeded()
+      await expect(page.getByRole("button", { name: "閉じる", exact: true })).toBeInViewport({ ratio: 1 })
       await expect(page).toHaveScreenshot("greed-payer-receipt.png")
     }
     await page.getByRole("button", { name: round === 3 ? "最終結果を見る" : "次のラウンドへ" }).click()
