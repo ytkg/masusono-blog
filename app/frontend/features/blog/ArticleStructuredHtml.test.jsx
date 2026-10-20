@@ -156,3 +156,18 @@ it.each([
   expect(screen.getByTestId("article-body-html").innerHTML).toBe(html)
   expect(screen.queryByTestId("ruby-runner")).not.toBeInTheDocument()
 })
+
+it("passes br line breaks to the Ruby runner and syntax highlighted code", () => {
+  render(
+    <ArticleStructuredHtml
+      enableRubyRunner
+      html={
+        '<pre><code class="language-ruby"># comment<br>  puts 1</code></pre><pre><code class="language-js">// comment<br>const n = 1</code></pre>'
+      }
+    />,
+  )
+  expect(screen.getByTestId("ruby-runner").textContent).toBe("# comment\n  puts 1")
+  const lines = screen.getByTestId("article-body-html").querySelectorAll("pre > code > [data-code-line]")
+  expect(lines).toHaveLength(2)
+  expect(lines[1]).toHaveTextContent("const n = 1")
+})

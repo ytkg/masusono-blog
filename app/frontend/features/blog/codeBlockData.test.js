@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { buildCodeBlockDataFromHtml } from "./codeBlockData"
+import { buildCodeBlockDataFromElement, buildCodeBlockDataFromHtml } from "./codeBlockData"
 
 describe("buildCodeBlockDataFromHtml", () => {
   it("language- 接頭辞から Prism 用の言語設定を返す", () => {
@@ -52,4 +52,21 @@ it.each(["constructor", "toString", "__proto__"])("does not infer language from 
 it.each(["ruby", "RUBY", "lang-Ruby", "LANGUAGE-Ruby"])("認識した言語を本文でも装飾できる: %s", (language) => {
   const html = `<pre><code class = "${language}">puts 1</code></pre>`
   expect(buildCodeBlockDataFromHtml(html)).toMatchObject({ languageKey: "ruby", languageLabel: "Ruby" })
+})
+
+it.each([
+  ["# explanation<br>  puts &quot;ok&quot;", '# explanation\n  puts "ok"'],
+  ["<span>first<br><br>\tsecond</span><br>", "first\n\n\tsecond\n"],
+  ["first\n  second", "first\n  second"],
+])("preserves explicit code line breaks and indentation: %s", (content, code) => {
+  const html = `<pre><code class="language-ruby">${content}</code></pre>`
+  expect(buildCodeBlockDataFromHtml(html)?.code).toBe(code)
+})
+
+it("reads br without changing the original element", () => {
+  const element = document.createElement("code")
+  element.className = "language-js"
+  element.innerHTML = "first<br><span>second</span>"
+  expect(buildCodeBlockDataFromElement(element)?.code).toBe("first\nsecond")
+  expect(element.innerHTML).toBe("first<br><span>second</span>")
 })
