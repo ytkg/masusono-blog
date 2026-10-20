@@ -91,7 +91,10 @@ it("uses full payments as losses for the score and best, keeps full receipts, an
   render(<GreedGame />)
   click("買い物を始める")
   for (let round = 1; round <= 3; round++) {
-    for (let i = 0; i < 5; i++) click("ごほうび重を追加")
+    const add = screen.getByRole("button", { name: "ごほうび重を追加", exact: true })
+    act(() => {
+      for (let i = 0; i < 5; i++) fireEvent.click(add)
+    })
     click("カゴを確定して勝負")
     for (let n = 0; n < 6 && !screen.queryByText("領収証"); n++) {
       if (screen.queryByRole("button", { name: "✊ グー", exact: true })) click("✊ グー")
