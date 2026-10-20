@@ -1,9 +1,53 @@
 import { test, expect } from "@playwright/test"
+import { waitForClientReady } from "./helpers"
 
-test.afterEach(async ({ page }) => {
-  // Drain background requests before removing the production-origin proxy.
-  await page.waitForLoadState("networkidle")
-  await page.unrouteAll({ behavior: "wait" })
+const historyLogs = new WeakMap()
+
+test.beforeEach(async ({ page }) => {
+  const events = []
+  historyLogs.set(page, events)
+  await page.exposeFunction("recordNavigationHistory", (event) => {
+    events.push(event)
+    if (events.length > 200) events.shift()
+  })
+  await page.addInitScript(() => {
+    const record = (type, details = {}) => {
+      void window.recordNavigationHistory({
+        type,
+        time: Date.now(),
+        url: location.href,
+        pageUrl: history.state?.page?.url,
+        ...details,
+      })
+    }
+    for (const method of ["pushState", "replaceState"]) {
+      const original = history[method].bind(history)
+      history[method] = (...args) => {
+        const before = location.href
+        const stack = new Error().stack
+        const result = original(...args)
+        record(method, { before, stack })
+        return result
+      }
+    }
+    window.addEventListener("popstate", () => record("popstate"))
+    document.addEventListener("inertia:navigate", () => record("inertia:navigate"))
+  })
+})
+
+test.afterEach(async ({ page }, testInfo) => {
+  try {
+    // Drain background requests before removing the production-origin proxy.
+    await page.waitForLoadState("networkidle")
+  } finally {
+    if (testInfo.status !== testInfo.expectedStatus) {
+      await testInfo.attach("navigation-history", {
+        body: JSON.stringify(historyLogs.get(page), null, 2),
+        contentType: "application/json",
+      })
+    }
+    await page.unrouteAll({ behavior: "wait" })
+  }
 })
 
 // Serve real Rails/Vite output under the production origin without sending data to Google.
@@ -19,7 +63,9 @@ test("GA4 hydration, Inertia history and related links", async ({ page, baseURL 
     window.dataLayer = dataLayer
     navigator.serviceWorker.register = async () => ({})
   })
-  await page.route("https://www.googletagmanager.com/**", (route) => route.fulfill({ body: "", contentType: "text/javascript" }))
+  await page.route("https://www.googletagmanager.com/**", (route) =>
+    route.fulfill({ body: "", contentType: "text/javascript" }),
+  )
   await page.route("https://masusono.com/**", async (route) => {
     const url = new URL(route.request().url())
     const response = await route.fetch({ url: `${baseURL}${url.pathname}${url.search}` })
@@ -39,6 +85,7 @@ test("GA4 hydration, Inertia history and related links", async ({ page, baseURL 
   }
   const article = "/articles/visual-article-1?utm_source=x&utm_medium=social"
   await page.goto(`https://masusono.com${article}`)
+  await waitForClientReady(page)
   await expectView(1, article)
   const browserId = (await page.context().cookies()).find(({ name }) => name === "user_id").value
   expect(queued.find(([command]) => command === "config")[2].client_id).toBe(browserId)
@@ -58,7 +105,9 @@ test("GA4 hydration, Inertia history and related links", async ({ page, baseURL 
   await page.getByRole("region", { name: "日常の記事" }).getByRole("link").click()
   await expect.poll(() => clicks().length).toBe(1)
   expect(clicks()[0][2]).toMatchObject({
-    source_article_id: "visual-article-2", target_article_id: "visual-article-1", link_position: 1,
+    source_article_id: "visual-article-2",
+    target_article_id: "visual-article-1",
+    link_position: 1,
   })
   await expectView(8, "/articles/visual-article-1")
   await page.getByRole("link", { name: "その他！", exact: true }).click()
@@ -71,6 +120,7 @@ test("GA4 hydration, Inertia history and related links", async ({ page, baseURL 
 
   // A fresh document starting in management does not initialize Google at all.
   await page.goto("https://masusono.com/others")
+  await waitForClientReady(page)
   await page.locator("main").waitFor()
   expect(await page.evaluate(() => window.gtag)).toBeUndefined()
   expect(views()).toHaveLength(9)
@@ -82,7 +132,9 @@ test("GA4 hydration, Inertia history and related links", async ({ page, baseURL 
 // The server's private policy response is the only exclusion information exposed to the browser.
 test("excluded browser never loads or initializes Google across reload and history", async ({ page, baseURL }) => {
   let policyChecks = 0
-  await page.addInitScript(() => { navigator.serviceWorker.register = async () => ({}) })
+  await page.addInitScript(() => {
+    navigator.serviceWorker.register = async () => ({})
+  })
   const googleRequests = []
   await page.route(/https:\/\/[^/]*(?:googletagmanager|google-analytics)\.com\//, (route) =>
     route.fulfill({ body: "", contentType: "text/javascript" }),
@@ -105,12 +157,16 @@ test("excluded browser never loads or initializes Google across reload and histo
     await route.fulfill({ response, body })
   })
   await page.goto("https://masusono.com/articles/visual-article-2")
+  await waitForClientReady(page)
   await expect.poll(() => policyChecks).toBeGreaterThan(0)
   const beforeReload = policyChecks
   await page.reload()
+  await waitForClientReady(page)
   await expect.poll(() => policyChecks).toBeGreaterThan(beforeReload)
   await page.getByRole("region", { name: "日常の記事" }).getByRole("link").click()
   await expect(page).toHaveURL("https://masusono.com/articles/visual-article-1")
+  // Related article links load a new document, so the URL alone does not imply hydration.
+  await waitForClientReady(page)
   await page.getByRole("link", { name: "ホーム", exact: true }).click()
   await expect(page).toHaveURL("https://masusono.com/")
   await page.goBack()
