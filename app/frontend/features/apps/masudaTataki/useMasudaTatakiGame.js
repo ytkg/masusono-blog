@@ -58,9 +58,10 @@ export function useMasudaTatakiGame(active) {
   const tap = (index) => {
     if (!active || phase !== "playing") return
     // 描画を待たずに更新し、同じフレーム内の連打も一度だけ採点する。
-    const now = advance(gameRef.current, getTime() - startedAt.current)
-    const next = hit(now, index)
-    if (next === now) return
+    const current = gameRef.current
+    const now = advance(current, getTime() - startedAt.current)
+    // An expired character may have been replaced before the next paint.
+    const next = now.holes[index] === current.holes[index] ? hit(now, index) : now
     gameRef.current = next
     setGame(next)
   }

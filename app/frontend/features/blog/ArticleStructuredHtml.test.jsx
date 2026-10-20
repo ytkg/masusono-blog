@@ -49,9 +49,11 @@ describe("ArticleStructuredHtml", () => {
     expect(screen.getByTestId("article-body-html")).toHaveTextContent("通常の本文引用")
   })
 
-  it("言語指定付きコードブロックを構造化して表示する", () => {
+  it.each(["", "<!-- sample -->"])("言語指定付きコードをHTMLコメントの有無によらず装飾する: %s", (comment) => {
     render(
-      <ArticleStructuredHtml html={'<p>前文</p><pre><code class="language-javascript">const value = 1</code></pre>'} />,
+      <ArticleStructuredHtml
+        html={`<p>前文</p><pre>${comment}<code class="language-javascript">const value = 1</code></pre>`}
+      />,
     )
 
     const shell = screen.getByTestId("article-body-html").querySelector("[data-code-block-shell]")
@@ -141,4 +143,16 @@ describe("ArticleStructuredHtml", () => {
     expect(screen.getByTestId("article-body-html")).toHaveTextContent("コードなし")
     view.unmount()
   })
+})
+
+it.each([
+  '<pre>前文<code class="language-ruby">puts :ok</code>後文</pre>',
+  '<pre><code class="language-ruby">puts :first</code><code class="language-js">const second = 2</code></pre>',
+  '<pre id="anchor"><code class="language-ruby">puts :ok</code></pre>',
+  '<pre><code class="language-ruby" id="anchor">puts :ok</code></pre>',
+  '<pre><code class="language-ruby"><span id="anchor">puts :ok</span></code></pre>',
+])("コード以外の本文とアンカーを持つpreを元のDOMで保持する: %s", (html) => {
+  render(<ArticleStructuredHtml html={html} enableRubyRunner />)
+  expect(screen.getByTestId("article-body-html").innerHTML).toBe(html)
+  expect(screen.queryByTestId("ruby-runner")).not.toBeInTheDocument()
 })

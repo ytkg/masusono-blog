@@ -95,3 +95,18 @@ Issue #239 の状態表示も対象に含めます。コピー成功・失敗、
 `admin_states.visual.js` は記事一覧、記事検索0件、メディア0件、資格情報不一致によるHTTP 401のログイン失敗をPC・スマホで8枚比較します。認証は撮影用サーバーの既存の固定認証を使います。
 
 既存の `admin feedback articles`・`admin feedback media`・`admin feedback session`・`admin feedback login` は取得失敗・認証確認失敗・ログイン通信失敗の比較として再利用します。再試行のある状態では、ボタンが表示されていることも確認します。通常の記事一覧、検索・フィルター、記事0件も既存テストを維持し、機能の振る舞いはVitest・RSpecと分担します。
+
+
+## SSR操作の待機と履歴の診断
+
+`waitForClientReady(page)` は React の初回描画後に付く `#app[data-client-ready="true"]` を待ちます。
+SSRのHTMLやページのload完了だけでは操作イベントの準備完了を保証しないため、
+初回表示・再読み込み後に操作するテストで使います。`openPage` もこの待機を含みます。
+関連記事リンクは通常のページ読み込みで新しいdocumentを作るため、移動先のURL確認後にもこの待機が必要です。
+`ssr.visual.js` はレイアウトJavaScriptを保留して、初期化前に待機が完了しないことと、
+移動先の記事の履歴が保存されてからホームへ進み、戻る操作で記事を復元できることを確認します。
+
+`analytics.visual.js` が失敗すると、レポートに `navigation-history` JSON を添付します。
+最大200件の `pushState` / `replaceState` の呼び出し元スタック、変更前後のURL、
+履歴内のページURL、`popstate` / `inertia:navigate` を記録します。
+Cookie・認証情報・ページpropsは記録しません。履歴操作の失敗は再試行で隠さず、このログとトレースを照合します。

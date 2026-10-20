@@ -53,6 +53,34 @@ describe("増田たたきの進行", () => {
     expect(screen.getByText("増田ヒット数：1")).toBeInTheDocument()
   })
 
+  it("最初の描画前の空穴タップでは採点せず、表示後に同じ穴を叩くと採点する", async () => {
+    render(<MasudaTatakiGame />)
+    await ready()
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    advance(3000)
+    expect(screen.getByRole("button", { name: "穴1", exact: true })).toBeInTheDocument()
+    fireEvent.pointerDown(screen.getByRole("button", { name: "穴1", exact: true }))
+    expect(screen.getByText("0点")).toBeInTheDocument()
+    fireEvent.pointerDown(screen.getByRole("button", { name: "穴1 増田", exact: true }))
+    expect(screen.getByText("100点")).toBeInTheDocument()
+    fireEvent.pointerDown(screen.getByRole("button", { name: "穴1", exact: true }))
+    expect(screen.getByText("100点")).toBeInTheDocument()
+  })
+
+  it("タップ時に期限切れから入れ替わったキャラクターは次の操作から採点する", async () => {
+    render(<MasudaTatakiGame />)
+    await ready()
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    advance(3000)
+    advance(30)
+    const target = screen.getByRole("button", { name: "穴1 増田", exact: true })
+    vi.spyOn(performance, "now").mockReturnValue(performance.now() + 2000)
+    fireEvent.pointerDown(target)
+    expect(screen.getByText("0点")).toBeInTheDocument()
+    fireEvent.pointerDown(screen.getByRole("button", { name: "穴1 増田", exact: true }))
+    expect(screen.getByText("100点")).toBeInTheDocument()
+  })
+
   it("画像読み込み後に開始、カウントダウン、連打防止、結果、再プレイ", async () => {
     render(<MasudaTatakiGame />)
     await ready()
