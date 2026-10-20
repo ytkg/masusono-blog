@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test"
 import { waitForClientReady } from "./helpers"
 
+// Service Worker fetches bypass page.route and would defeat the delayed layout checks.
+test.use({ serviceWorkers: "block" })
+
 const pages = [
   ["/articles/visual-article-1", "駅を出て、いつもと違う道を歩きました。"],
   ["/articles/visual-article-2", "久しぶりに友人と集まりました。"],
@@ -112,16 +115,19 @@ test("SSRのhydrationとInertia遷移後も操作できる", async ({ page }) =>
 
 test("SSR stays unready until delayed layout JavaScript hydrates", async ({ page }) => {
   let release
+  let layoutRequested = false
   const layoutReady = new Promise((resolve) => {
     release = resolve
   })
   await page.route("**/vite/assets/AppLayout-*.js", async (route) => {
+    layoutRequested = true
     await layoutReady
     await route.continue()
   })
   try {
     await page.goto("/")
     await expect(page.locator("#app[data-server-rendered]")).toBeVisible()
+    await expect.poll(() => layoutRequested).toBe(true)
     await expect(page.locator("#app")).not.toHaveAttribute("data-client-ready", "true")
     release()
     await waitForClientReady(page)
@@ -136,16 +142,19 @@ test("native article links initialize history before returning home", async ({ p
   await page.goto("/articles/visual-article-2")
   await waitForClientReady(page)
   let release
+  let layoutRequested = false
   const layoutReady = new Promise((resolve) => {
     release = resolve
   })
   await page.route("**/vite/assets/AppLayout-*.js", async (route) => {
+    layoutRequested = true
     await layoutReady
     await route.continue()
   })
   try {
     await page.getByRole("region", { name: "日常の記事" }).getByRole("link").click()
     await expect(page).toHaveURL(/\/articles\/visual-article-1$/)
+    await expect.poll(() => layoutRequested).toBe(true)
     await expect(page.locator("#app")).not.toHaveAttribute("data-client-ready", "true")
     expect(await page.evaluate(() => history.state?.page?.url)).toBeUndefined()
     release()

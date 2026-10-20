@@ -6,8 +6,11 @@ export function buildCodeBlockDataFromElement(codeElement) {
   const language = codeLanguage(codeElement)
   if (!language) return undefined
 
+  const source = codeElement.cloneNode(true)
+  source.querySelectorAll("br").forEach((lineBreak) => lineBreak.replaceWith("\n"))
+
   return {
-    code: codeElement.textContent ?? "",
+    code: source.textContent ?? "",
     languageKey: language.key,
     languageLabel: language.label,
     prismLanguage: language.prismLanguage,
