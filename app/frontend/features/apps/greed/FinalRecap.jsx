@@ -3,16 +3,16 @@ import Typography from "@mui/material/Typography"
 import { NAMES, yen } from "./game"
 
 export default function FinalRecap({ history }) {
-  const gifts = new Map()
+  const items = new Map()
   const payments = history.filter((round) => round.payer === 0)
-  for (const round of history.filter((round) => round.payer !== 0)) {
+  for (const round of history) {
     for (const item of round.carts[0]) {
       const key = `${item.name}:${item.price}`
-      const previous = gifts.get(key)
-      gifts.set(key, { ...item, quantity: item.quantity + (previous?.quantity || 0) })
+      const previous = items.get(key)
+      items.set(key, { ...item, quantity: item.quantity + (previous?.quantity || 0) })
     }
   }
-  const giftTotal = [...gifts.values()].reduce((sum, item) => sum + item.quantity * item.price, 0)
+  const itemTotal = [...items.values()].reduce((sum, item) => sum + item.quantity * item.price, 0)
   const paidTotal = payments.reduce((sum, round) => sum + round.amounts.reduce((a, b) => a + b, 0), 0)
   const card = { p: { xs: 2, sm: 3 }, borderRadius: 2, bgcolor: "#fffdf2", color: "#30273f", minWidth: 0 }
   return (
@@ -28,31 +28,27 @@ export default function FinalRecap({ history }) {
         textAlign: "left",
       }}
     >
-      <Box component="section" aria-label="奢ってもらった商品" sx={card}>
+      <Box component="section" aria-label="手に入った商品" sx={card}>
         <Typography component="h4" variant="h5" fontWeight={800}>
-          奢ってもらった商品
+          手に入った商品
         </Typography>
-        <Typography sx={{ my: 2, fontWeight: 800 }}>合計 {yen(giftTotal)}分</Typography>
-        {gifts.size ? (
-          <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
-            {[...gifts.values()].map((item) => (
-              <Box
-                component="li"
-                key={`${item.name}:${item.price}`}
-                sx={{ display: "flex", alignItems: "center", gap: 2, py: 1, borderBottom: "1px dashed #d6c6ad" }}
-              >
-                <Box aria-hidden="true" sx={{ fontSize: 36 }}>
-                  {item.icon}
-                </Box>
-                <Typography>
-                  {item.name} ×{item.quantity}
-                </Typography>
+        <Typography sx={{ my: 2, fontWeight: 800 }}>合計 {yen(itemTotal)}分</Typography>
+        <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
+          {[...items.values()].map((item) => (
+            <Box
+              component="li"
+              key={`${item.name}:${item.price}`}
+              sx={{ display: "flex", alignItems: "center", gap: 2, py: 1, borderBottom: "1px dashed #d6c6ad" }}
+            >
+              <Box aria-hidden="true" sx={{ fontSize: 36 }}>
+                {item.icon}
               </Box>
-            ))}
-          </Box>
-        ) : (
-          <Typography>今回は奢ってもらえませんでした</Typography>
-        )}
+              <Typography>
+                {item.name} ×{item.quantity}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
       </Box>
       <Box component="section" aria-label="自分のお支払い" sx={card}>
         <Typography component="h4" variant="h5" fontWeight={800}>

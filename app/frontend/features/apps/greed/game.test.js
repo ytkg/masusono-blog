@@ -110,19 +110,19 @@ describe("greed rules", () => {
       carts: [[], [], []],
       phase: "hand",
       players: [0, 1],
-      amounts: [2000, 3000, 6000],
+      amounts: [2000, 3000, 5000],
       ties: 2,
       score: 0,
       round: 1,
     }
     const paid = advance({ ...base, payer: 0 }, 0, () => 0)
-    expect(paid.delta).toBe(-11000)
-    expect(paid.score).toBe(-11000)
+    expect(paid.delta).toBe(-10000)
+    expect(paid.score).toBe(-10000)
     const free = advance({ ...base, payer: 1 }, 0, () => 0)
     expect(free.delta).toBe(2000)
     const next = reducer(paid, { type: "next" })
     expect(total(next.carts[0])).toBe(0)
-    expect(next.score).toBe(-11000)
+    expect(next.score).toBe(-10000)
     expect(next.round).toBe(2)
     expect(reducer({ ...paid, round: 3 }, { type: "next" }).phase).toBe("final")
     expect(reducer(paid, { type: "hand", hand: 0 })).toBe(paid)
@@ -146,12 +146,12 @@ it.each([
   let game = reducer({ phase: "title" }, { type: "start" })
   for (let round = 1; round <= 3; round++) {
     const carts = PRODUCTS.map(() => 0)
-    carts[0] = round
+    carts[0] = 20
     game = {
       ...game,
       phase: "hand",
-      carts: [carts, [...carts], [...carts]],
-      amounts: [round * 100, round * 100, round * 100],
+      carts: [carts, carts.map((q) => (q ? 30 : 0)), carts.map((q) => (q ? 50 : 0))],
+      amounts: [2000, 3000, 5000],
       players: [0, 1, 2],
       payer: payers[round - 1],
       ties: 2,
@@ -160,18 +160,20 @@ it.each([
     expect(game.history).toHaveLength(round)
     expect(reducer(game, { type: "hand", hand: 0 })).toBe(game)
     const snapshot = game.history[round - 1]
-    expect(snapshot.carts[0][0]).toMatchObject({ name: "塩むすび", price: 100, quantity: round })
+    expect(snapshot.carts[0][0]).toMatchObject({ name: "塩むすび", price: 100, quantity: 20 })
     carts[0] = 99
-    expect(snapshot.carts[0][0].quantity).toBe(round)
+    expect(snapshot.carts[0][0].quantity).toBe(20)
     game = reducer(game, { type: "next" })
     expect(game.history).toHaveLength(round)
   }
   expect(game.phase).toBe("final")
-  const gifts = game.history.filter((r) => r.payer !== 0).reduce((sum, r) => sum + r.amounts[0], 0)
+  const gifted = game.history.filter((r) => r.payer !== 0).reduce((sum, r) => sum + r.amounts[0], 0)
   const paid = game.history
     .filter((r) => r.payer === 0)
     .reduce((sum, r) => sum + r.amounts.reduce((a, b) => a + b, 0), 0)
-  expect(gifts - paid).toBe(game.score)
+  expect(gifted - paid).toBe(game.score)
+  expect(game.history.reduce((sum, r) => sum + r.amounts[0], 0)).toBe(6000)
+  if (payers.join() === "1,0,2") expect(game.score).toBe(-6000)
   expect(reducer(game, { type: "start" }).history).toEqual([])
   expect(reducer({ phase: "title" }, { type: "start" }).history).toEqual([])
 })

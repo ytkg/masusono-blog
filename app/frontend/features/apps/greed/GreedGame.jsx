@@ -81,7 +81,7 @@ export default function GreedGame() {
           </Button>
           <Box sx={{ ...panel, textAlign: "left", my: 3 }}>
             <Typography>全3ラウンド。CPUのカゴを見て、100〜10,000円のお買い物。</Typography>
-            <Typography>奢ってもらえば自分の商品代を加算。奢ると全員分を減算します。</Typography>
+            <Typography>奢ってもらえば自分の商品代がプラス。奢ると全員分がマイナス。</Typography>
           </Box>
           <Typography variant="body2" sx={{ mt: 2, color: "#e3d9bd" }}>
             このゲームのきっかけ
@@ -101,10 +101,14 @@ export default function GreedGame() {
             3ラウンド完走！
           </Typography>
           <Typography variant="h3" sx={{ my: 3 }}>
-            合計 {yen(game.score)}
+            <Box component="span" sx={{ display: "block", fontSize: 20, mb: 1 }}>
+              合計スコア
+            </Box>
+            {yen(game.score)}
           </Typography>
           <Typography sx={{ mb: 3 }}>自己ベスト：{best === null ? "記録なし" : yen(best)}</Typography>
           <FinalRecap history={game.history} />
+          {game.score <= -10000 && <Typography sx={{ mb: 3 }}>今日は納豆ご飯だ。</Typography>}
           <Button variant="contained" disabled={!active} onClick={() => send("start")}>
             再挑戦
           </Button>
@@ -254,7 +258,7 @@ export default function GreedGame() {
                         </Typography>
                         <Receipt carts={game.carts} round={game.round} />
                         <Typography>
-                          ラウンド収支：{game.delta > 0 ? "+" : ""}
+                          今回のスコア：{game.delta > 0 ? "+" : ""}
                           {yen(game.delta)}
                         </Typography>
                         <Typography sx={{ mb: 2 }}>現在の合計スコア：{yen(game.score)}</Typography>

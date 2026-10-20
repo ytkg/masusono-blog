@@ -87,3 +87,25 @@ it("pauses CPU decisions and blocks input while inactive", () => {
   act(() => vi.advanceTimersByTime(1200))
   expect(screen.getByText("領収証")).toBeInTheDocument()
 })
+it("uses full payments as losses for the score and best, keeps full receipts, and clears the closing sentence on retry", () => {
+  render(<GreedGame />)
+  click("買い物を始める")
+  for (let round = 1; round <= 3; round++) {
+    for (let i = 0; i < 5; i++) click("ごほうび重を追加")
+    click("カゴを確定して勝負")
+    for (let n = 0; n < 6 && !screen.queryByText("領収証"); n++) {
+      if (screen.queryByRole("button", { name: "✊ グー", exact: true })) click("✊ グー")
+      else click("次のじゃんけんへ")
+    }
+    expect(screen.getByText("お支払い合計：17,900円")).toBeInTheDocument()
+    expect(screen.getByText("今回のスコア：-17,900円")).toBeInTheDocument()
+    expect(screen.queryByText("今日は納豆ご飯だ。")).not.toBeInTheDocument()
+    click(round === 3 ? "最終結果を見る" : "次のラウンドへ")
+  }
+  expect(screen.getByText("自己ベスト：-53,700円")).toBeInTheDocument()
+  expect(localStorage.getItem(BEST_KEY)).toBe("-53700")
+  expect(screen.getByText("今日は納豆ご飯だ。")).toBeInTheDocument()
+  click("再挑戦")
+  expect(screen.queryByText("今日は納豆ご飯だ。")).not.toBeInTheDocument()
+  expect(screen.getByText("あなたのカゴ：0円 / 10,000円")).toBeInTheDocument()
+})
