@@ -98,7 +98,8 @@ export default function BookshelfApp() {
     <AppsDialogLauncher
       edgeToEdge
       contentSx={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}
-      title="本棚"
+      title="増田とその他！の本棚"
+      launcherLabel="本棚"
       buttonAriaLabel="本棚を開く"
       buttonIcon={<MenuBookIcon />}
       onOpen={open}
