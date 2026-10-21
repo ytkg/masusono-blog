@@ -20,6 +20,14 @@ vi.mock("../../features/apps/settings/SettingsApp", () => ({
   default: () => <div>SettingsApp</div>,
 }))
 
+vi.mock("../../features/apps/bookshelf/BookshelfApp", () => ({
+  default: () => <button>本棚を開く</button>,
+}))
+
+vi.mock("../../features/apps/admin/AdminApp", () => ({
+  default: () => <button>管理を開く</button>,
+}))
+
 describe("Others page", () => {
   it("その他ページにミニアプリを表示する", async () => {
     render(<OthersIndex />)
@@ -30,6 +38,7 @@ describe("Others page", () => {
     expect(await screen.findByText("MasudaTatakiApp")).toBeInTheDocument()
     expect(await screen.findByText("GreedApp")).toBeInTheDocument()
     expect(await screen.findByText("SettingsApp")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "本棚を開く" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "管理を開く" })).toBeInTheDocument()
   })
 })

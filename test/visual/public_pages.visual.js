@@ -110,7 +110,7 @@ test("home beginnings", async ({ page }) => {
 test("others launcher columns adapt to narrow screens", async ({ page }) => {
   await openPage(page, "/others")
   const buttons = page.locator("#others button")
-  await expect(buttons).toHaveCount(5)
+  await expect(buttons).toHaveCount(6)
   for (const [width, columns] of [
     [390, 5],
     [320, 4],
@@ -932,6 +932,7 @@ test("masuda tataki play and replay", async ({ page }) => {
   await expect(page.getByRole("button", { name: "スタート", exact: true })).toBeEnabled()
   await page.evaluate(() => { Math.random = () => 0 })
   await page.clock.install()
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000))
   await page.getByRole("button", { name: "スタート", exact: true }).click()
   await page.clock.runFor(1000)
   await expect(page.getByRole("status")).toHaveText("2")
