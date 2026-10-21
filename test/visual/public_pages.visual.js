@@ -107,6 +107,27 @@ test("home beginnings", async ({ page }) => {
   await screenshot(page, "home-beginnings")
 })
 
+test("others launcher columns adapt to narrow screens", async ({ page }) => {
+  await openPage(page, "/others")
+  const buttons = page.locator("#others button")
+  await expect(buttons).toHaveCount(5)
+  for (const [width, columns] of [
+    [390, 5],
+    [320, 4],
+  ]) {
+    await page.setViewportSize({ width, height: 844 })
+    const boxes = await Promise.all((await buttons.all()).map((button) => button.boundingBox()))
+    for (let index = 1; index < columns; index += 1) {
+      expect(Math.abs(boxes[index].y - boxes[0].y)).toBeLessThan(1)
+      if (index > 1) {
+        expect(Math.abs(boxes[index].x - boxes[index - 1].x - (boxes[1].x - boxes[0].x))).toBeLessThan(1)
+      }
+    }
+    if (columns === 4) expect(boxes[4].y).toBeGreaterThan(boxes[0].y)
+    await expectNoPageOverflow(page)
+  }
+})
+
 for (const [name, path, heading] of [
   ["about", "/about", "「増田とその他！」について"],
   ["others", "/others", "増田とその他のその他！"],

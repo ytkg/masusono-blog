@@ -39,7 +39,14 @@ export default function OthersIndex() {
 
       <PageContainer id="others">
         <PageHeading>増田とその他のその他！</PageHeading>
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(64px, 1fr))",
+            columnGap: 1,
+            rowGap: 3,
+          }}
+        >
           <Suspense fallback={<OthersAppFallback />}>
             <MasudaRunApp />
             <MasudaTatakiApp />
