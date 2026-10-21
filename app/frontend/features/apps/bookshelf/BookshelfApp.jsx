@@ -137,7 +137,18 @@ export default function BookshelfApp() {
             gridTemplateColumns: "repeat(auto-fill, 64px)",
             gap: "24px 8px",
             justifyContent: "center",
-            p: 1,
+            p: "8px 12px 20px",
+            minHeight: 300,
+            border: "12px solid #8a6140",
+            borderTopWidth: 16,
+            borderBottomWidth: 18,
+            borderRadius: "4px",
+            boxShadow: "0 4px 8px #493b2b33, inset 0 3px 8px #493b2b30",
+            bgcolor: "#eddfc8",
+            backgroundImage:
+              "repeating-linear-gradient(to bottom, transparent 0 252px, #6b482e 252px 255px, #b68c5c 255px 264px, #8a6140 264px 268px, transparent 268px 276px)",
+            backgroundOrigin: "content-box",
+            backgroundClip: "padding-box",
           }}
         >
           {state.books.map((book) => (
