@@ -932,6 +932,7 @@ test("masuda tataki play and replay", async ({ page }) => {
   await expect(page.getByRole("button", { name: "スタート", exact: true })).toBeEnabled()
   await page.evaluate(() => { Math.random = () => 0 })
   await page.clock.install()
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000))
   await page.getByRole("button", { name: "スタート", exact: true }).click()
   await page.clock.runFor(1000)
   await expect(page.getByRole("status")).toHaveText("2")
