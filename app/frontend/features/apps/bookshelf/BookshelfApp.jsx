@@ -38,7 +38,19 @@ export default function BookshelfApp() {
     setState({ books: [], loading: true, error: false })
     try {
       const data = await getJson("/api/app/bookshelf", controller.signal)
-      if (!controller.signal.aborted) setState({ ...data, loading: false, error: false })
+      if (!controller.signal.aborted)
+        setState({
+          ...data,
+          books: data.books.map((book) => ({
+            ...book,
+            author: book.author
+              .replace(/[,，]\s*\d{4}\s*[-–－](?:\s*\d{4})?(?=\s*(?:$|[/／・,，]))/g, "")
+              .replace(/([\p{L}\p{M}])\s*[,，/／]\s*(?=[\p{L}\p{M}])/gu, "$1 ")
+              .trim(),
+          })),
+          loading: false,
+          error: false,
+        })
     } catch {
       if (!controller.signal.aborted) setState({ books: [], loading: false, error: true })
     }
@@ -115,8 +127,8 @@ export default function BookshelfApp() {
           height: "100%",
           overflowY: "auto",
           pt: 2,
-          pl: "max(16px, env(safe-area-inset-left))",
-          pr: "max(16px, env(safe-area-inset-right))",
+          pl: "max(8px, env(safe-area-inset-left))",
+          pr: "max(8px, env(safe-area-inset-right))",
           pb: "max(24px, env(safe-area-inset-bottom))",
           bgcolor: "#f6f0e6",
         }}
@@ -137,10 +149,10 @@ export default function BookshelfApp() {
           aria-label="記事に登場する本"
           sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, 64px)",
-            gap: "24px 8px",
-            justifyContent: "center",
-            p: "8px 12px 20px",
+            gridTemplateColumns: "repeat(auto-fill, 44px)",
+            gap: "24px 6px",
+            justifyContent: "space-evenly",
+            p: "8px 4px 20px",
             minHeight: 300,
             border: "12px solid #8a6140",
             borderTopWidth: 16,
@@ -160,10 +172,10 @@ export default function BookshelfApp() {
               onClick={() => select(book)}
               aria-label={`${book.title} / ${book.author}`}
               sx={{
-                width: 64,
-                minWidth: 64,
+                width: 44,
+                minWidth: 44,
                 height: 252,
-                p: "12px 8px",
+                p: "12px 6px",
                 borderRadius: "3px 6px 3px 3px",
                 color: "#fff",
                 bgcolor: colors[Number(book.isbn) % colors.length],
@@ -191,21 +203,6 @@ export default function BookshelfApp() {
                 }}
               >
                 {book.title}
-              </Box>
-              <Box
-                component="span"
-                sx={{
-                  writingMode: "vertical-rl",
-                  textOrientation: "mixed",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
-                  height: "100%",
-                  fontSize: 12,
-                  lineHeight: "16px",
-                }}
-              >
-                {book.author}
               </Box>
             </Button>
           ))}
