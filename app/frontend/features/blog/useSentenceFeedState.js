@@ -2,8 +2,8 @@ import { useLayoutEffect, useMemo, useRef } from "react"
 import useImmediateRemember from "@/shared/hooks/useImmediateRemember"
 import { prepareSentenceArticles, createInitialSentenceState, mergeSentenceArticleSources } from "./sentenceFeedData"
 
-// Discard histories containing repeated cards from partially loaded article pages.
-const SENTENCE_STATE_KEY = "home-beginnings-v2"
+// Discard histories whose initial candidates were limited to recent article pages.
+const SENTENCE_STATE_KEY = "home-beginnings-v3"
 
 export default function useSentenceFeedState(articles, hasMore) {
   const sourceRef = useRef([])

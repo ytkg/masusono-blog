@@ -1,6 +1,6 @@
 import ArticlesList from "./ArticlesList"
 import CalendarFeed from "./CalendarFeed"
-import SentenceFeed from "./SentenceFeed"
+import AllSentenceFeed from "./AllSentenceFeed"
 
 // Home-only features are registered here. Removing a tab is intentionally a
 // one-entry change; Home itself only handles generic tab selection and history.
@@ -14,8 +14,7 @@ export const HOME_TABS = Object.freeze([
   {
     id: "beginnings",
     label: "書き出し",
-    articleLoadBuffer: 3000,
-    renderContent: ({ articles, hasMore }) => <SentenceFeed articles={articles} hasMore={hasMore} />,
+    renderContent: () => <AllSentenceFeed />,
   },
   {
     id: "calendar",
