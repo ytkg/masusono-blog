@@ -15,7 +15,7 @@ vi.mock("../shared/AppsDialogLauncher", () => ({
 const book = {
   isbn: "9784101010014",
   title: "長い本の書名 ABC 123",
-  author: "著者, 1900-2000 / 共同著者",
+  author: "著者 共同著者",
   amazonUrl: "https://www.amazon.co.jp/dp/4101010013",
   articles: [{ id: "article", title: "登場記事のタイトル" }],
 }
@@ -50,6 +50,24 @@ describe("Bookshelf", () => {
     fireEvent.click(screen.getByText("起動"))
     fireEvent.click(await screen.findByRole("button", { name: `${book.title} / ${book.author}` }))
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(4))
+  })
+
+  it.each([
+    ["鈴木,俊貴,1983-", "鈴木 俊貴"],
+    ["Camus,Albert,1913-1960 / 著者, 1900-", "Camus Albert 著者"],
+    ["著者名 / 共同著者", "著者名 共同著者"],
+    ["水野／太貴", "水野 太貴"],
+    ["我孫子,武丸,1962-", "我孫子 武丸"],
+    ["著者,1983年版", "著者,1983年版"],
+  ])("formats author names and recognizable life dates in %s", async (author, expected) => {
+    fetch.mockImplementation((url) => json(url.endsWith("/cover") ? { cover: null } : { books: [{ ...book, author }] }))
+    render(<BookshelfApp />)
+    fireEvent.click(screen.getByText("起動"))
+    const spine = await screen.findByRole("button", { name: `${book.title} / ${expected}` })
+    expect(spine).toHaveTextContent(book.title)
+    expect(spine).not.toHaveTextContent(expected)
+    fireEvent.click(spine)
+    expect(await screen.findByText(expected)).toBeVisible()
   })
 
   it("distinguishes empty and failed results and retries on request", async () => {

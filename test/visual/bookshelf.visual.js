@@ -23,17 +23,21 @@ async function launch(page, data) {
 
 test("bookshelf spines and detail keyboard navigation", async ({ page }) => {
   await launch(page, { books, partial: false })
-  const first = page.getByRole("button", { name: `${books[0].title} / ${books[0].author}`, exact: true })
+  const first = page.getByRole("button", { name: `${books[0].title} / 著者 Author Name・共同著者`, exact: true })
   await expect(first).toBeVisible()
   const screen = await page.getByRole("region", { name: "本棚の画面" }).boundingBox()
   expect(screen.x).toBe(0)
   expect(screen.width).toBe(page.viewportSize().width)
   expect(screen.y + screen.height).toBe(page.viewportSize().height)
   const dimensions = await first.boundingBox()
-  expect(dimensions.width).toBe(64)
+  expect(dimensions.width).toBe(44)
+  if (page.viewportSize().width === 390) {
+    const sixth = await page.getByRole("button", { name: `${books[5].title} / 著者 Author Name・共同著者`, exact: true }).boundingBox()
+    expect(sixth.y).toBe(dimensions.y)
+  }
   await expectNoPageOverflow(page)
   await expect(page).toHaveScreenshot("bookshelf.png")
-  const last = page.getByRole("button", { name: `${books[23].title} / ${books[23].author}`, exact: true })
+  const last = page.getByRole("button", { name: `${books[23].title} / 著者 Author Name・共同著者`, exact: true })
   await last.scrollIntoViewIfNeeded()
   await last.focus()
   await page.keyboard.press("Enter")
@@ -93,7 +97,7 @@ for (const imageState of ["loaded", "failed"]) {
     await page.route("https://books.google.com/googlebooks/images/poweredby.png", (route) =>
       route.fulfill({ path: "public/favicon-32.png", contentType: "image/png" }),
     )
-    await page.getByRole("button", { name: `${books[0].title} / ${books[0].author}`, exact: true }).click()
+    await page.getByRole("button", { name: `${books[0].title} / 著者 Author Name・共同著者`, exact: true }).click()
     await expect(page.getByRole("heading", { name: books[0].title, exact: true })).toBeVisible()
     if (imageState === "loaded") {
       const image = page.getByRole("img", { name: `${books[0].title}の表紙` })
