@@ -156,13 +156,24 @@ git grep -nE '(^|`)/app/(users|masuda_run/rankings)\.json' -- README.md docs/api
 
 Request: `{ "failure": { ... } }`
 
-- `kind`: 必須。`http_exception` または `network_error`。
+- `kind`: 必須。`http_exception`、`network_error`、`navigation_stalled`、`navigation_slow`、`navigation_interrupted`、`module_load_error`。
 - `path`, `source_path`: 公開ページのパスだけ。クエリ・フラグメント・外部 URL・非公開 API パスは記録しない。
 - `status`: HTTP ステータス (100〜599)、通信失敗では省略。
 - `response_request_id`: 失敗した応答の `X-Request-Id`。100 bytes 以下の英数字・`_`・`-`。
 - `content_type`: MIME type のみ。100 bytes 以下。
 - `prefetch`, `prefetch_in_flight`, `online`, `service_worker`: Boolean。
 - `elapsed_ms`: 遷移開始を観測してから失敗までの経過時間 (0〜86,400,000)。前景は `before`、先読みは `start` を起点とし、開始を観測できない場合は省略する。従来のページ読み込み起点の記録とは意味が異なるため、過去ログと比較する際はリビジョンを区別する。
+
+フッター遷移の診断では次の任意項目も受理する。従来のクライアントには必須項目を追加しない。
+
+- `stage`: 最後に到達した段階。`tap`、`request`、`response`、`data_ready`、`module_start`、`module_end`、`commit`、`frame`。
+- `tap_ms`, `request_ms`, `response_ms`, `data_ready_ms`, `module_start_ms`, `module_end_ms`, `commit_ms`, `frame_ms`: タップを起点とする各段階の経過時間（整数、0〜86,400,000）。未到達・観測不能な段階は省略。背景にいた時間は除外し、この診断の `elapsed_ms` も同じ時計を使う。
+- `data_source`: `cached`、`in_flight`、`network`。先読み済み・先読み中・通常通信を区別する。
+- `standalone`, `backgrounded`, `recovered`: Boolean。PWA表示、遷移途中の背景化、保存記録の次回起動での再送を表す。
+- `build_version`: ビルド日時（JST）の12桁数字。
+- `controller_state`: Service Worker controller の `none`、`installing`、`installed`、`activating`、`activated`、`redundant`。
+- `visibility`: `visible` または `hidden`。
+- `since_resume_ms`: 直前の可視状態への復帰からタップまでの時間（整数、0〜86,400,000）。復帰を観測していなければ省略。
 
 不正な任意項目と未知のキーは記録から除外する。本文・Cookie・トークン・検索語・例外メッセージは送信しない。標準のパラメータログでは `failure` 全体をフィルタし、検証済み項目だけを `navigation_failed` イベントに出す。
 

@@ -26,6 +26,21 @@ RSpec.describe "Navigation failure reports", type: :request do
     })
   end
 
+  it "PWA遷移の段階・復旧情報を既存の共通ヘッダーで受理する" do
+    trace = {
+      kind: "navigation_stalled", path: "/numbers", stage: "module_start", standalone: true,
+      build_version: "202610211600", controller_state: "activated", data_source: "cached", visibility: "visible",
+      tap_ms: 0, request_ms: 1, response_ms: 1, data_ready_ms: 2, module_start_ms: 3,
+      since_resume_ms: 100, elapsed_ms: 5000, backgrounded: true, recovered: true
+    }
+    post "/api/app/navigation_failures", params: { failure: trace.merge(module_end_ms: "secret", body: "private") }, as: :json
+
+    expect(response).to have_http_status(:no_content)
+    expect(response.headers["Cache-Control"]).to include("no-store")
+    expect(response.headers["X-Request-Id"]).to be_present
+    expect(StructuredLogging::EventLogger).to have_received(:navigation_failure).with(payload: trace)
+  end
+
   it "開始時刻が不明な記録は経過時間なしでも受理する" do
     post "/api/app/navigation_failures", params: { failure: failure.except(:elapsed_ms) }, as: :json
 

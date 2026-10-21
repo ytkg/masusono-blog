@@ -1,3 +1,6 @@
+import { useLayoutEffect } from "react"
+import { usePage } from "@inertiajs/react"
+import { recordNavigationCommit } from "../shared/lib/navigationDiagnostics"
 import Box from "@mui/material/Box"
 import Container from "@mui/material/Container"
 import FloatingBottomNavigation from "../components/FloatingBottomNavigation"
@@ -5,6 +8,10 @@ import Header from "../components/Header"
 import { PAGE_MAX_WIDTH } from "./pageLayout"
 
 export default function AppLayout({ children }) {
+  const { url } = usePage()
+  useLayoutEffect(() => {
+    recordNavigationCommit(url)
+  })
   return (
     <Box sx={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
       <Header />

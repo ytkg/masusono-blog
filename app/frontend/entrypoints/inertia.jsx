@@ -3,6 +3,7 @@ import { createInertiaApp, router } from "@inertiajs/react"
 import InertiaApp from "../application/InertiaApp"
 import { resolvePage } from "../application/pageResolver"
 import { installAnalyticsNavigation } from "../shared/lib/analytics"
+import { installNavigationDiagnostics } from "../shared/lib/navigationDiagnostics"
 import { installNavigationRecovery } from "../shared/lib/navigationRecovery"
 
 void import("../styles/fonts.css")
@@ -33,6 +34,7 @@ function registerServiceWorker() {
 }
 
 installNavigationRecovery(router)
+installNavigationDiagnostics(router)
 installAnalyticsNavigation(router)
 
 // A late prefetch for the restored URL can overwrite its remembered list and scroll position.

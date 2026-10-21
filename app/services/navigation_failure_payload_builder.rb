@@ -1,8 +1,11 @@
 require "uri"
 
 class NavigationFailurePayloadBuilder
-  KINDS = %w[http_exception network_error].freeze
-  BOOLEAN_KEYS = %w[prefetch prefetch_in_flight online service_worker].freeze
+  KINDS = %w[http_exception network_error navigation_stalled navigation_slow navigation_interrupted module_load_error].freeze
+  BOOLEAN_KEYS = %w[prefetch prefetch_in_flight online service_worker standalone backgrounded recovered].freeze
+  TIMING_KEYS = %w[tap_ms request_ms response_ms data_ready_ms module_start_ms module_end_ms commit_ms frame_ms since_resume_ms].freeze
+  STAGES = %w[tap request response data_ready module_start module_end commit frame].freeze
+  CONTROLLER_STATES = %w[none installing installed activating activated redundant].freeze
   BOOLEAN_VALUES = [ true, false ].freeze
 
   def self.call(params)
@@ -21,6 +24,14 @@ class NavigationFailurePayloadBuilder
     BOOLEAN_KEYS.each do |key|
       payload[key.to_sym] = params[key] if BOOLEAN_VALUES.include?(params[key])
     end
+    TIMING_KEYS.each do |key|
+      payload[key.to_sym] = integer_in_range(params[key], 0..86_400_000)
+    end
+    payload[:build_version] = token(params["build_version"], 12, /\A[0-9]{12}\z/)
+    payload[:stage] = params["stage"] if STAGES.include?(params["stage"])
+    payload[:controller_state] = params["controller_state"] if CONTROLLER_STATES.include?(params["controller_state"])
+    payload[:data_source] = params["data_source"] if %w[cached in_flight network].include?(params["data_source"])
+    payload[:visibility] = params["visibility"] if %w[visible hidden].include?(params["visibility"])
     payload.compact
   end
 

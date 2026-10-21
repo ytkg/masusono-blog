@@ -1,3 +1,5 @@
+import { tracePageResolution } from "../shared/lib/navigationDiagnostics"
+
 const pages = import.meta.glob(["../pages/**/*.jsx", "!../pages/**/*.test.jsx", "!../pages/**/*.spec.jsx"])
 
 export async function resolvePage(name) {
@@ -12,10 +14,12 @@ export async function resolvePage(name) {
   const path = candidates.find((candidate) => pages[candidate])
   if (!path) throw new Error(`Inertia page not found: ${name}`)
 
-  const page = await pages[path]()
-  if (!page.default.layout) {
-    const { default: AppLayout } = await import("../layouts/AppLayout")
-    page.default.layout = (pageNode) => <AppLayout>{pageNode}</AppLayout>
-  }
-  return page
+  return tracePageResolution(async () => {
+    const page = await pages[path]()
+    if (!page.default.layout) {
+      const { default: AppLayout } = await import("../layouts/AppLayout")
+      page.default.layout = (pageNode) => <AppLayout>{pageNode}</AppLayout>
+    }
+    return page
+  })
 }
