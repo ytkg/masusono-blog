@@ -1,14 +1,16 @@
 import { render, screen, within } from "@testing-library/react"
 import { expect, it } from "vitest"
 import Receipt from "./Receipt"
-import { emptyCart } from "./game"
 
 it("combines everybody's products without identifying shoppers and matches the payment total", () => {
-  const carts = [emptyCart(), emptyCart(), emptyCart()]
-  carts[0][0] = 2
-  carts[0][7] = 1
-  carts[1][0] = 3
-  carts[2][7] = 2
+  const carts = [
+    [
+      { name: "塩むすび", price: 100, quantity: 2 },
+      { name: "ごほうび重", price: 2000, quantity: 1 },
+    ],
+    [{ name: "塩むすび", price: 100, quantity: 3 }],
+    [{ name: "ごほうび重", price: 2000, quantity: 2 }],
+  ]
   render(<Receipt carts={carts} round={2} />)
   const receipt = screen.getByRole("region", { name: "会計レシート" })
   expect(within(receipt).queryByText(/あなた|CPU|の商品/)).not.toBeInTheDocument()
@@ -28,4 +30,17 @@ it("combines everybody's products without identifying shoppers and matches the p
   expect(within(receipt).getByText("お支払い合計：6,500円")).toBeInTheDocument()
   expect(within(receipt).getByText("お買い上げ数量 8個", { exact: false })).toBeInTheDocument()
   expect(within(receipt).getByText("レジ01 取引 0002", { exact: false })).toBeInTheDocument()
+})
+
+it("uses recorded prices and keeps different unit prices on separate lines", () => {
+  render(
+    <Receipt
+      carts={[[{ name: "塩むすび", price: 80, quantity: 2 }], [{ name: "塩むすび", price: 120, quantity: 3 }]]}
+      round={3}
+    />,
+  )
+  expect(screen.getByText("単価 80円")).toBeInTheDocument()
+  expect(screen.getByText("単価 120円")).toBeInTheDocument()
+  expect(screen.getByText("お支払い合計：520円")).toBeInTheDocument()
+  expect(screen.getByText("お買い上げ数量 5個", { exact: false })).toBeInTheDocument()
 })

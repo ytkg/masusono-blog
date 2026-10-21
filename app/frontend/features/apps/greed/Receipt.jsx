@@ -1,9 +1,17 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import { PRODUCTS, total, yen } from "./game"
+import { yen } from "./game"
 
 export default function Receipt({ carts, round }) {
-  const quantities = PRODUCTS.map((_, index) => carts.reduce((sum, cart) => sum + cart[index], 0))
+  const combined = new Map()
+  for (const cart of carts) {
+    for (const item of cart) {
+      const key = `${item.name}:${item.price}`
+      const previous = combined.get(key)
+      combined.set(key, { ...item, quantity: item.quantity + (previous?.quantity || 0) })
+    }
+  }
+  const items = [...combined.values()]
   const number = String(round).padStart(4, "0")
   return (
     <Box
@@ -65,23 +73,21 @@ export default function Receipt({ carts, round }) {
           </tr>
         </thead>
         <tbody>
-          {PRODUCTS.map((product, index) =>
-            quantities[index] > 0 ? (
-              <tr key={product.name}>
-                <td>
-                  {product.name}
-                  <Box sx={{ fontSize: 12 }}>単価 {yen(product.price)}</Box>
-                </td>
-                <td>{quantities[index]}</td>
-                <td>{yen(product.price * quantities[index])}</td>
-              </tr>
-            ) : null,
-          )}
+          {items.map((item) => (
+            <tr key={`${item.name}:${item.price}`}>
+              <td>
+                {item.name}
+                <Box sx={{ fontSize: 12 }}>単価 {yen(item.price)}</Box>
+              </td>
+              <td>{item.quantity}</td>
+              <td>{yen(item.price * item.quantity)}</td>
+            </tr>
+          ))}
         </tbody>
       </Box>
-      <Typography>お買い上げ数量 {quantities.reduce((sum, quantity) => sum + quantity, 0)}個</Typography>
+      <Typography>お買い上げ数量 {items.reduce((sum, item) => sum + item.quantity, 0)}個</Typography>
       <Typography sx={{ fontWeight: 900, py: 1, borderBottom: "2px solid" }}>
-        お支払い合計：{yen(total(quantities))}
+        お支払い合計：{yen(items.reduce((sum, item) => sum + item.price * item.quantity, 0))}
       </Typography>
       <Box sx={{ textAlign: "center", mt: 2 }}>
         <Typography>ありがとうございました</Typography>

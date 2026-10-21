@@ -31,7 +31,16 @@ it("does not show the sentence on the title or an unfinished round even below th
   const { rerender } = render(<GreedGame />)
   expect(screen.queryByText("今日は納豆ご飯だ。")).not.toBeInTheDocument()
   vi.mocked(useReducer).mockReturnValue([
-    { phase: "result", round: 2, score: -10001, carts, payer: 0, delta: -10001, result: {} },
+    {
+      phase: "result",
+      round: 2,
+      score: -10001,
+      carts,
+      history: [{ carts: [[], [], []] }],
+      payer: 0,
+      delta: -10001,
+      result: {},
+    },
     vi.fn(),
   ])
   rerender(<GreedGame />)

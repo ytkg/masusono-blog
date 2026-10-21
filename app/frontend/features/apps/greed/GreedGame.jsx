@@ -1,5 +1,6 @@
 import Storefront from "./Storefront"
 import Receipt from "./Receipt"
+import ReceiptDialog from "./ReceiptDialog"
 import FinalRecap from "./FinalRecap"
 import { useEffect, useReducer, useRef, useState } from "react"
 import Box from "@mui/material/Box"
@@ -256,7 +257,9 @@ export default function GreedGame() {
                         <Typography variant="h5" component="h4" sx={{ my: 2 }}>
                           {NAMES[game.payer]}が勝ち残り、全員に奢る！
                         </Typography>
-                        <Receipt carts={game.carts} round={game.round} />
+                        <ReceiptDialog round={game.round}>
+                          <Receipt carts={game.history.at(-1).carts} round={game.round} />
+                        </ReceiptDialog>
                         <Typography>
                           今回のスコア：{game.delta > 0 ? "+" : ""}
                           {yen(game.delta)}

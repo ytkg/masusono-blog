@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import GreedGame from "./GreedGame"
 import { AppActivityProvider } from "../shared/AppActivityContext"
@@ -43,7 +43,7 @@ it("saves only a completed three-round score, before dismissing the last receipt
   for (let round = 1; round <= 3; round++) {
     click("塩むすびを追加")
     click("カゴを確定して勝負")
-    for (let n = 0; n < 6 && !screen.queryByText("領収証"); n++) {
+    for (let n = 0; n < 6 && !screen.queryByRole("button", { name: "レシートを見る" }); n++) {
       if (screen.queryByRole("button", { name: "✊ グー", exact: true })) click("✊ グー")
       else click("次のじゃんけんへ")
     }
@@ -75,19 +75,19 @@ it("pauses CPU decisions and blocks input while inactive", () => {
   const before = screen.getByText(/ラウンド 1/).textContent
   act(() => vi.advanceTimersByTime(60000))
   expect(screen.getByText(/ラウンド 1/).textContent).toBe(before)
-  expect(screen.queryByText("領収証")).not.toBeInTheDocument()
+  expect(screen.queryByRole("button", { name: "レシートを見る" })).not.toBeInTheDocument()
   const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden")
   act(() => document.dispatchEvent(new Event("visibilitychange")))
   rerender(tree(true))
   act(() => vi.advanceTimersByTime(60000))
-  expect(screen.queryByText("領収証")).not.toBeInTheDocument()
+  expect(screen.queryByRole("button", { name: "レシートを見る" })).not.toBeInTheDocument()
   visibility.mockReturnValue("visible")
   act(() => document.dispatchEvent(new Event("visibilitychange")))
   act(() => vi.advanceTimersByTime(1200))
   act(() => vi.advanceTimersByTime(1200))
-  expect(screen.getByText("領収証")).toBeInTheDocument()
+  expect(screen.getByRole("button", { name: "レシートを見る" })).toBeInTheDocument()
 })
-it("uses full payments as losses for the score and best, keeps full receipts, and clears the closing sentence on retry", () => {
+it("uses full payments as losses for the score and best, keeps full receipts, and clears the closing sentence on retry", async () => {
   render(<GreedGame />)
   click("買い物を始める")
   for (let round = 1; round <= 3; round++) {
@@ -96,11 +96,18 @@ it("uses full payments as losses for the score and best, keeps full receipts, an
       for (let i = 0; i < 5; i++) fireEvent.click(add)
     })
     click("カゴを確定して勝負")
-    for (let n = 0; n < 6 && !screen.queryByText("領収証"); n++) {
+    for (let n = 0; n < 6 && !screen.queryByRole("button", { name: "レシートを見る" }); n++) {
       if (screen.queryByRole("button", { name: "✊ グー", exact: true })) click("✊ グー")
       else click("次のじゃんけんへ")
     }
-    expect(screen.getByText("お支払い合計：17,900円")).toBeInTheDocument()
+    expect(screen.queryByText("領収証")).not.toBeInTheDocument()
+    if (round === 1) {
+      click("レシートを見る")
+      expect(screen.getByRole("dialog", { name: "ラウンド1のレシート", exact: true })).toBeInTheDocument()
+      expect(screen.getByText("お支払い合計：17,900円")).toBeInTheDocument()
+      click("レシートを閉じる")
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+    }
     expect(screen.getByText("今回のスコア：-17,900円")).toBeInTheDocument()
     expect(screen.queryByText("今日は納豆ご飯だ。")).not.toBeInTheDocument()
     click(round === 3 ? "最終結果を見る" : "次のラウンドへ")

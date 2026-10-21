@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react"
+import { fireEvent, render, screen, within } from "@testing-library/react"
 import { expect, it } from "vitest"
 import FinalRecap from "./FinalRecap"
 
@@ -19,9 +19,16 @@ it("consolidates all acquired products and shows paid round totals and buyer det
   const payments = screen.getByRole("region", { name: "自分のお支払い" })
   expect(payments).toHaveTextContent("自分のお支払い合計15,000円")
   expect(payments).toHaveTextContent("ラウンド2：15,000円")
-  expect(payments.querySelectorAll("details")).toHaveLength(1)
-  expect(payments).toHaveTextContent("ごほうび重 ×5 · 10,000円")
-  expect(payments).toHaveTextContent("塩むすび ×40 · 4,000円")
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+  fireEvent.click(within(payments).getByRole("button", { name: "レシートを見る" }))
+  const receipt = screen.getByRole("dialog", { name: "ラウンド2のレシート", exact: true })
+  const paper = within(receipt).getByRole("region", { name: "会計レシート" })
+  expect(paper).toHaveTextContent("MIDNIGHT MART")
+  expect(paper).toHaveTextContent("お支払い合計：15,000円")
+  expect(paper).not.toHaveTextContent(/あなた|CPU/)
+  expect(receipt.querySelectorAll("details")).toHaveLength(1)
+  expect(receipt).toHaveTextContent("ごほうび重 ×5 · 10,000円")
+  expect(receipt).toHaveTextContent("塩むすび ×40 · 4,000円")
 })
 it("includes self-paid products even when paying every round", () => {
   const { rerender } = render(<FinalRecap history={[free(1), free(2), free(3)]} />)
@@ -33,5 +40,5 @@ it("includes self-paid products even when paying every round", () => {
   expect(screen.getByText("合計 30,000円分")).toBeInTheDocument()
   expect(screen.queryByText("今回は奢ってもらえませんでした")).not.toBeInTheDocument()
   expect(screen.getByRole("region", { name: "自分のお支払い" })).toHaveTextContent("自分のお支払い合計45,000円")
-  expect(document.querySelectorAll("details")).toHaveLength(3)
+  expect(screen.getAllByRole("button", { name: "レシートを見る" })).toHaveLength(3)
 })

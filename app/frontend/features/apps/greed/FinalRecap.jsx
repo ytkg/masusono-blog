@@ -1,5 +1,7 @@
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
+import Receipt from "./Receipt"
+import ReceiptDialog from "./ReceiptDialog"
 import { NAMES, yen } from "./game"
 
 export default function FinalRecap({ history }) {
@@ -73,30 +75,33 @@ export default function FinalRecap({ history }) {
               <Typography component="h5" fontWeight={700}>
                 ラウンド{round.round}：{yen(round.amounts.reduce((a, b) => a + b, 0))}
               </Typography>
-              {round.amounts.map((amount, i) => (
-                <Typography key={NAMES[i]} sx={{ display: "flex", justifyContent: "space-between", gap: 1, mt: 1 }}>
-                  <span>{NAMES[i]}</span>
-                  <span>{yen(amount)}</span>
-                </Typography>
-              ))}
-              <Box component="details" sx={{ mt: 2, "& summary": { cursor: "pointer", py: 1, minHeight: 44 } }}>
-                <summary>購入者ごとの商品明細</summary>
-                {round.carts.map((cart, i) => (
-                  <Box key={NAMES[i]} sx={{ mt: 2 }}>
-                    <Typography component="h6" fontWeight={700}>
-                      {NAMES[i]}
-                    </Typography>
-                    <Box component="ul" sx={{ pl: 2, my: 1 }}>
-                      {cart.map((item) => (
-                        <li key={item.name}>
-                          {item.name} ×{item.quantity} · {yen(item.price * item.quantity)}
-                        </li>
-                      ))}
-                    </Box>
-                    <Typography variant="body2">小計 {yen(round.amounts[i])}</Typography>
-                  </Box>
+              <ReceiptDialog round={round.round}>
+                <Receipt carts={round.carts} round={round.round} />
+                {round.amounts.map((amount, i) => (
+                  <Typography key={NAMES[i]} sx={{ display: "flex", justifyContent: "space-between", gap: 1, mt: 1 }}>
+                    <span>{NAMES[i]}</span>
+                    <span>{yen(amount)}</span>
+                  </Typography>
                 ))}
-              </Box>
+                <Box component="details" sx={{ mt: 2, "& summary": { cursor: "pointer", py: 1, minHeight: 44 } }}>
+                  <summary>購入者ごとの商品明細</summary>
+                  {round.carts.map((cart, i) => (
+                    <Box key={NAMES[i]} sx={{ mt: 2 }}>
+                      <Typography component="h6" fontWeight={700}>
+                        {NAMES[i]}
+                      </Typography>
+                      <Box component="ul" sx={{ pl: 2, my: 1 }}>
+                        {cart.map((item) => (
+                          <li key={item.name}>
+                            {item.name} ×{item.quantity} · {yen(item.price * item.quantity)}
+                          </li>
+                        ))}
+                      </Box>
+                      <Typography variant="body2">小計 {yen(round.amounts[i])}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </ReceiptDialog>
             </Box>
           ))
         ) : (
