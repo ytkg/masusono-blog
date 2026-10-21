@@ -134,4 +134,44 @@ describe("Bookshelf", () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3))
     expect(screen.getByRole("heading", { name: second.title })).toBeVisible()
   })
+
+  it("aborts a pending catalog request when leaving the page", async () => {
+    let finishCatalog
+    fetch.mockImplementation(() => new Promise((resolve) => (finishCatalog = resolve)))
+    const { unmount } = render(<BookshelfApp />)
+    fireEvent.click(screen.getByText("起動"))
+    const signal = fetch.mock.calls[0][1].signal
+    expect(signal.aborted).toBe(false)
+
+    unmount()
+    await act(async () => finishCatalog(await json({ books: [book] })))
+
+    expect(signal.aborted).toBe(true)
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("aborts the active cover request and never starts queued covers after leaving the page", async () => {
+    const second = { ...book, isbn: "9780804429573", title: "別の本" }
+    let finishCover
+    fetch.mockImplementation((url) =>
+      url.endsWith("/cover") ? new Promise((resolve) => (finishCover = resolve)) : json({ books: [book, second] }),
+    )
+    const { unmount } = render(<BookshelfApp />)
+    fireEvent.click(screen.getByText("起動"))
+    fireEvent.click(await screen.findByRole("button", { name: `${book.title} / ${book.author}` }))
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2))
+    const signal = fetch.mock.calls[1][1].signal
+    expect(signal.aborted).toBe(false)
+    fireEvent.click(screen.getByText("棚に戻る"))
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+    fireEvent.click(screen.getByRole("button", { name: `${second.title} / ${second.author}` }))
+    expect(await screen.findByRole("heading", { name: second.title })).toBeVisible()
+    expect(fetch).toHaveBeenCalledTimes(2)
+
+    unmount()
+    await act(async () => finishCover(await json({ cover: null })))
+
+    expect.soft(signal.aborted).toBe(true)
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
 })

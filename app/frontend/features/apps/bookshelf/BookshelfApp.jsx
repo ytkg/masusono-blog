@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
@@ -31,6 +31,8 @@ export default function BookshelfApp() {
   const coverQueue = useRef(Promise.resolve())
   const session = useRef(null)
   const selectedIsbn = useRef(null)
+
+  useEffect(() => () => session.current?.abort(), [])
 
   const load = async (controller) => {
     setState({ books: [], loading: true, error: false })
