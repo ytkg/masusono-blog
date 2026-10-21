@@ -83,6 +83,18 @@ afterEach(() => {
 })
 
 describe("footer navigation diagnostics", () => {
+  it("Inertiaが受け付けなかったタップは再起動時の未完了記録にしない", () => {
+    document.body.innerHTML = '<nav aria-label="メインナビゲーション"><a href="/authors">著者</a></nav>'
+    document.querySelector("a").addEventListener("click", (event) => event.preventDefault())
+    document.querySelector("a").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+    window.dispatchEvent(new Event("pagehide"))
+    advance(10000)
+    expect(saved()).toBeNull()
+    remove()
+    remove = installNavigationDiagnostics(router)
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
   it("通常遷移は段階ごとの時刻を保存し、描画後に消して送信しない", async () => {
     click()
     advance(100)

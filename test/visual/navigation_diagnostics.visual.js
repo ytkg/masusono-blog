@@ -64,3 +64,22 @@ test("PWA startup reports the last unfinished stage and removes acknowledged sto
   expect(JSON.stringify(reports)).not.toContain("private-data")
   await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY)).toBeNull()
 })
+
+
+test("native footer navigation does not leave a false unfinished PWA trace", async ({ page }) => {
+  const reports = await observeReports(page)
+  await page.goto("/")
+  await page.getByRole("tab", { name: "書き出し", exact: true }).click()
+  await expect(page.getByRole("tab", { name: "書き出し", exact: true })).toHaveAttribute("aria-selected", "true")
+  const link = footer(page).getByRole("link", { name: "著者", exact: true })
+  await link.evaluate((element) => element.addEventListener("click", (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    window.location.assign(element.href)
+  }))
+  await link.click()
+  await expect(page).toHaveURL(/\/authors$/)
+  await expect(page.getByRole("heading", { name: "著者", exact: true })).toBeVisible()
+  await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY)).toBeNull()
+  expect(reports).toEqual([])
+})

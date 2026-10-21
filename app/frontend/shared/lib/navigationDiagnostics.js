@@ -103,6 +103,7 @@ export function installNavigationDiagnostics(router) {
     }
   }
   function persist(entry, kind = "navigation_interrupted") {
+    if (!entry.confirmed) return
     const saved = { id: entry.id, saved_at: entry.savedAt, payload: snapshot(entry, kind) }
     try {
       storage?.setItem(STORAGE_KEY, JSON.stringify(saved))
@@ -112,6 +113,7 @@ export function installNavigationDiagnostics(router) {
     return saved
   }
   function report(entry, kind) {
+    if (!entry.confirmed) return
     const saved = persist(entry, kind)
     reportPayload(saved.payload, () => clearStored(saved.id))
   }
@@ -161,7 +163,7 @@ export function installNavigationDiagnostics(router) {
     trace = null
   }
   function mark(entry, stage) {
-    if (!entry || trace !== entry || entry.payload[`${stage}_ms`] !== undefined) return
+    if (!entry?.confirmed || trace !== entry || entry.payload[`${stage}_ms`] !== undefined) return
     entry.payload[`${stage}_ms`] = elapsed(entry)
     // ResourceTiming callbacks can arrive after a later milestone.
     if (STAGES.indexOf(stage) > STAGES.indexOf(entry.payload.stage)) entry.payload.stage = stage
@@ -169,7 +171,7 @@ export function installNavigationDiagnostics(router) {
   }
   function armTimer() {
     clearTimeout(timer)
-    if (!trace || trace.stalled || document.visibilityState !== "visible") return
+    if (!trace?.confirmed || trace.stalled || document.visibilityState !== "visible") return
     timer = setTimeout(
       () => {
         if (!trace) return
@@ -214,8 +216,8 @@ export function installNavigationDiagnostics(router) {
           : { since_resume_ms: Math.min(MAX_AGE_MS, Math.round(performance.now() - lastResume)) }),
       },
     }
-    persist(trace)
-    armTimer()
+    // The click may still become a native navigation before React is hydrated.
+    // Persist only once Inertia confirms this visit in its before event.
   }
   function visibility() {
     if (document.visibilityState === "hidden") {
@@ -253,7 +255,7 @@ export function installNavigationDiagnostics(router) {
     })
   }
   function fail(entry) {
-    if (!entry || trace !== entry) return
+    if (!entry?.confirmed || trace !== entry) return
     report(entry, "module_load_error")
     stop()
     trace = null
@@ -264,11 +266,13 @@ export function installNavigationDiagnostics(router) {
     router.on("before", ({ detail: { visit } }) => {
       if (!trace || visit.prefetch || visit.async) return
       if (publicPath(visit.url) !== trace.payload.path) return abandon()
+      trace.confirmed = true
       trace.visitId = visit.id
       const cached = router.getCached(visit.url)
       trace.payload.data_source = cached ? "cached" : router.getPrefetching(visit.url) ? "in_flight" : "network"
       mark(trace, "request")
       if (cached) mark(trace, "response")
+      armTimer()
     }),
     router.on("beforeUpdate", ({ detail: { page } }) => {
       if (trace && publicPath(page.url) === trace.payload.path) mark(trace, "data_ready")
