@@ -111,3 +111,36 @@ for (const imageState of ["loaded", "failed"]) {
     await expect(page).toHaveScreenshot(`bookshelf-cover-${imageState}.png`)
   })
 }
+
+for (const count of [1, 19]) {
+  test(`bookshelf glyphs and bottom contact with ${count} books`, async ({ page }) => {
+    const titles = ["普通の底", "硝子の塔の殺人", "まだ、同じ夢を見ていた", "心心・東京の星 上海の月"]
+    const catalog = books.slice(0, count).map((book, i) => ({ ...book, title: titles[i % titles.length] }))
+    await launch(page, { books: catalog, partial: false })
+    const shelf = page.getByLabel("記事に登場する本", { exact: true })
+    await expect(shelf.getByRole("button")).toHaveCount(count)
+    await page.evaluate(() => document.fonts.ready)
+    const glyphsFit = await shelf.locator("button > span").evaluateAll((elements) =>
+      elements.every((element) => {
+        const box = element.getBoundingClientRect()
+        return Array.from(element.firstChild.textContent).every((_, i) => {
+          const range = document.createRange()
+          range.setStart(element.firstChild, i)
+          range.setEnd(element.firstChild, i + 1)
+          const glyph = range.getBoundingClientRect()
+          return glyph.left >= box.left && glyph.right <= box.right
+        })
+      }),
+    )
+    expect(glyphsFit).toBe(true)
+    const last = shelf.getByRole("button").last()
+    await last.scrollIntoViewIfNeeded()
+    const bottomGap = await shelf.evaluate((element) => {
+      const bottom = element.getBoundingClientRect().bottom
+      const bookBottom = element.lastElementChild.getBoundingClientRect().bottom
+      return bottom - parseFloat(getComputedStyle(element).borderBottomWidth) - bookBottom
+    })
+    expect(bottomGap).toBe(0)
+    await expect(page).toHaveScreenshot(`bookshelf-bottom-${count}.png`)
+  })
+}
