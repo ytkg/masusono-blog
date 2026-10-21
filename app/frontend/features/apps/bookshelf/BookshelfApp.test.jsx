@@ -58,6 +58,12 @@ describe("Bookshelf", () => {
     ["著者名 / 共同著者", "著者名 共同著者"],
     ["水野／太貴", "水野 太貴"],
     ["我孫子,武丸,1962-", "我孫子 武丸"],
+    ["Camus,Albert,1913-1960 窪田,啓作", "Camus Albert 窪田 啓作"],
+    [
+      "劉,慈欣,1963- 大森,望,1961- 光吉,さくら ワン,チャイ 立原,とうや",
+      "劉 慈欣 大森 望 光吉 さくら ワン チャイ 立原 とうや",
+    ],
+    ["著者,1900-20000", "著者,1900-20000"],
     ["著者,1983年版", "著者,1983年版"],
   ])("formats author names and recognizable life dates in %s", async (author, expected) => {
     fetch.mockImplementation((url) => json(url.endsWith("/cover") ? { cover: null } : { books: [{ ...book, author }] }))

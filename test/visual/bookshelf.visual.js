@@ -8,7 +8,7 @@ const books = Array.from({ length: 24 }, (_, i) => ({
   isbn: String(9784101010014 + i),
   title:
     i === 0 ? "長い書名 ABC 123 / 記号とローマ字がある本についてのとても長いタイトル" : `記事に登場した本 ${i + 1}`,
-  author: "著者, 1900-2000 / Author Name・共同著者",
+  author: "著者, 1900-2000 Author Name・共同著者,1961-",
   amazonUrl: "https://www.amazon.co.jp/dp/4101010013",
   articles: [{ id: "visual-article-1", title: "週末の散歩で見つけたもの" }],
 }))
@@ -123,12 +123,16 @@ for (const count of [1, 19]) {
     const glyphsFit = await shelf.locator("button > span").evaluateAll((elements) =>
       elements.every((element) => {
         const box = element.getBoundingClientRect()
+        const spine = element.parentElement.getBoundingClientRect()
         return Array.from(element.firstChild.textContent).every((_, i) => {
           const range = document.createRange()
           range.setStart(element.firstChild, i)
           range.setEnd(element.firstChild, i + 1)
           const glyph = range.getBoundingClientRect()
-          return glyph.left >= box.left && glyph.right <= box.right
+          return (
+            glyph.left >= box.left && glyph.right <= box.right &&
+            Math.abs((glyph.left + glyph.right) / 2 - (spine.left + spine.right) / 2) <= 1
+          )
         })
       }),
     )
