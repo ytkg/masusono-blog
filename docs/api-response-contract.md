@@ -19,6 +19,10 @@ Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer |
 
 検索、RSS、サイトマップは全記事、著者別ページはその著者の記事全件を対象とする（全件取得の上限は README の microCMS ページング保護を参照）。
 
+## GET /api/app/sentence_articles
+
+「書き出し」タブを開いたときに全期間の記事を取得する。認証不要。Response: `{ "articles": Array<{ "id": String, "content": String }> }`。記事0件は空配列。全件取得の上限は既存の microCMS ページング保護と同じ。ブラウザは全記事から書き出しを抽出してシャッフルし、初期表示から全期間を候補にする。`Cache-Control: no-store` と upstream の共通エラー形式を維持する。
+
 ## GET /api/app/calendar_articles
 
 「こよみ」タブ用。認証不要。全期間の記事を取得し、日本時間の公開日の月日でまとめる。全件取得の上限は既存の microCMS ページング保護と同じ。通常のホーム表示では呼び出さず、タブを開いたときに取得する。

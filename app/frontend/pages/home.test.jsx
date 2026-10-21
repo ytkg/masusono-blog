@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { requestHomeFeed } from "@/shared/lib/homeNavigation"
 import Home from "./home"
 import { requestJson } from "@/shared/lib/fetchJson"
@@ -64,6 +64,10 @@ vi.mock("@/shared/lib/userId", () => ({
 }))
 
 describe("Home page", () => {
+  beforeEach(() => {
+    requestJson.mockResolvedValue({ articles: [] })
+  })
+
   it("こよみを開いたときだけ全期間を取得し、切り替え後も取得済み一覧を維持する", async () => {
     requestJson.mockResolvedValue({
       groups: [
@@ -313,7 +317,7 @@ describe("Home page", () => {
     ])
   })
 
-  it("読み込み済みの記事と次の位置を履歴から復元し、タブ間で共有する", async () => {
+  it("フィードの読み込み済み記事と次の位置を履歴から復元する", async () => {
     requestJson.mockResolvedValue({ articles: [{ id: "two" }], pagination: { nextOffset: 20 } })
     const home = render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
     fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
@@ -321,8 +325,6 @@ describe("Home page", () => {
     home.unmount()
     render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
     expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:2")
-    fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
-    expect(screen.getByTestId("sentence-feed")).toHaveTextContent("articles:2")
     expect(requestJson).toHaveBeenCalledTimes(1)
     fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
     await waitFor(() => expect(requestJson.mock.calls[1][0]).toBe("/api/app/articles?offset=20"))
@@ -342,14 +344,30 @@ describe("Home page", () => {
     expect(requestJson).toHaveBeenCalledTimes(1)
   })
 
-  it("書き出しへ未取得ページの有無を渡し、最終ページの取得後に更新する", async () => {
-    requestJson.mockResolvedValue({ articles: [{ id: "two" }], pagination: { nextOffset: null } })
-    render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
+  it("書き出しを開いたときだけ全期間を取得し、フィードのページと独立して保持する", async () => {
+    const all = Array.from({ length: 120 }, (_, index) => ({ id: `article-${index}`, content: "本文。" }))
+    requestJson.mockResolvedValue({ articles: all })
+    render(<Home articles={[all[0]]} pagination={{ nextOffset: 10 }} />)
+    expect(requestJson).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
-    expect(screen.getByTestId("sentence-feed")).toHaveAttribute("data-has-more", "true")
-    fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
-    await waitFor(() => expect(screen.getByTestId("sentence-feed")).toHaveAttribute("data-has-more", "false"))
-    expect(screen.getByTestId("sentence-feed")).toHaveTextContent("articles:2")
+    expect(screen.queryByTestId("sentence-feed")).not.toBeInTheDocument()
+    expect(await screen.findByTestId("sentence-feed")).toHaveTextContent("articles:120")
+    expect(screen.getByTestId("sentence-feed")).toHaveAttribute("data-has-more", "false")
+    expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
+    expect(requestJson.mock.calls[0][0]).toBe("/api/app/sentence_articles")
+    fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
+    expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:1")
+    fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
+    expect(screen.getByTestId("sentence-feed")).toHaveTextContent("articles:120")
+    expect(requestJson).toHaveBeenCalledOnce()
+  })
+
+  it("書き出しの取得失敗時は最近の記事を表示せず再試行できる", async () => {
+    requestJson.mockRejectedValueOnce(new Error("unavailable")).mockResolvedValueOnce({ articles: [] })
+    render(<Home articles={[{ id: "recent" }]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
+    fireEvent.click(await screen.findByRole("button", { name: "再試行" }))
+    expect(await screen.findByTestId("sentence-feed")).toHaveTextContent("articles:0")
   })
 
   it.each([[{}], [null], [{ monthDay: 12, articles: [] }], [{ monthDay: "01/01", articles: null }]])(
