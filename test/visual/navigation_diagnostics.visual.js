@@ -83,3 +83,25 @@ test("native footer navigation does not leave a false unfinished PWA trace", asy
   await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY)).toBeNull()
   expect(reports).toEqual([])
 })
+
+
+test("a footer click blocked before Inertia reports the missing acceptance", async ({ page }) => {
+  const reports = await observeReports(page)
+  await page.goto("/")
+  await page.getByRole("tab", { name: "書き出し", exact: true }).click()
+  await expect(page.getByRole("tab", { name: "書き出し", exact: true })).toHaveAttribute("aria-selected", "true")
+  const link = footer(page).getByRole("link", { name: "著者", exact: true })
+  await link.evaluate((element) => element.addEventListener("click", (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }))
+  await link.click()
+  await expect.poll(() => reports.find((report) => report.kind === "navigation_stalled"), { timeout: 10000 }).toMatchObject({
+    stage: "tap", path: "/authors", standalone: true,
+  })
+  const report = reports.find((entry) => entry.kind === "navigation_stalled")
+  expect(report.release_ms).toBe(0)
+  expect(report.tap_ms).toBeGreaterThanOrEqual(0)
+  expect(report.request_ms).toBeUndefined()
+  await expect(page).toHaveURL(/\/$/)
+})

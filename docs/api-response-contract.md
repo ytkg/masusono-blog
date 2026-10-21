@@ -170,8 +170,8 @@ Request: `{ "failure": { ... } }`
 
 フッター遷移の診断では次の任意項目も受理する。従来のクライアントには必須項目を追加しない。
 
-- `stage`: 最後に到達した段階。`tap`、`request`、`response`、`data_ready`、`module_start`、`module_end`、`commit`、`frame`。
-- `tap_ms`, `request_ms`, `response_ms`, `data_ready_ms`, `module_start_ms`, `module_end_ms`, `commit_ms`, `frame_ms`: タップを起点とする各段階の経過時間（整数、0〜86,400,000）。未到達・観測不能な段階は省略。背景にいた時間は除外し、この診断の `elapsed_ms` も同じ時計を使う。
+- `stage`: 最後に到達した段階。`release`、`tap`、`request`、`response`、`data_ready`、`module_start`、`module_end`、`commit`、`frame`。
+- `release_ms`, `tap_ms`, `request_ms`, `response_ms`, `data_ready_ms`, `module_start_ms`, `module_end_ms`, `commit_ms`, `frame_ms`: 指離し（pointerup）、またはクリックを起点とする各段階の経過時間（整数、0〜86,400,000）。未到達・観測不能な段階は省略。背景にいた時間は除外し、この診断の `elapsed_ms` も同じ時計を使う。
 - `data_source`: `cached`、`in_flight`、`network`。先読み済み・先読み中・通常通信を区別する。
 - `standalone`, `backgrounded`, `recovered`: Boolean。PWA表示、遷移途中の背景化、保存記録の次回起動での再送を表す。
 - `build_version`: ビルド日時（JST）の12桁数字。

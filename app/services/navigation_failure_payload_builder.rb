@@ -3,8 +3,8 @@ require "uri"
 class NavigationFailurePayloadBuilder
   KINDS = %w[http_exception network_error navigation_stalled navigation_slow navigation_interrupted module_load_error].freeze
   BOOLEAN_KEYS = %w[prefetch prefetch_in_flight online service_worker standalone backgrounded recovered].freeze
-  TIMING_KEYS = %w[tap_ms request_ms response_ms data_ready_ms module_start_ms module_end_ms commit_ms frame_ms since_resume_ms].freeze
-  STAGES = %w[tap request response data_ready module_start module_end commit frame].freeze
+  TIMING_KEYS = %w[release_ms tap_ms request_ms response_ms data_ready_ms module_start_ms module_end_ms commit_ms frame_ms since_resume_ms].freeze
+  STAGES = %w[release tap request response data_ready module_start module_end commit frame].freeze
   CONTROLLER_STATES = %w[none installing installed activating activated redundant].freeze
   BOOLEAN_VALUES = [ true, false ].freeze
 

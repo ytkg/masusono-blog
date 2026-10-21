@@ -38,11 +38,12 @@ jsonPayload.event="navigation_failed"
 
 ## PWAのフッター遷移が遅い・止まる場合
 
-フッターの通常の左クリック／タップについて、タップ時刻を仮保持し、Inertiaが前景遷移を受け付けたら次の段階を小さい診断記録に保存する。Reactの準備前などに起きた通常のページ移動は保存せず、成功したページ移動を次回起動で未完了と誤判定しない。修飾クリック・別タブ・履歴移動・取り消された遷移は停止として扱わない。ロゴや本文をDOM走査する計測は追加しない。
+フッターで指・マウスを離した段階（`pointerup`）から記録し、クリック、Inertiaの遷移受付までを区別する。移動が12pxを超えた操作、キャンセル、1秒以上の長押し、修飾クリック・別タブ・現在のページへの操作は計測しない。キーボード操作などpointerイベントがない場合はクリックから計測する。履歴移動・取り消された遷移は停止として扱わない。Inertia受付前に通常のページ移動で`pagehide`が発生した記録は削除し、再起動時の誤報を防ぐ。ロゴや本文をDOM走査する計測は追加しない。
 
 | 項目 | 観測地点 |
 | --- | --- |
-| `tap_ms` | フッターのタップ（0ms） |
+| `release_ms` | フッターで指・マウスを離した時点（0ms）。pointerイベントなしなら省略 |
+| `tap_ms` | クリック到達時点（キーボード等はここが0ms） |
 | `request_ms` | Inertiaの前景 `before` |
 | `response_ms` | Resource Timingで対象URLのfetch/XHR完了を観測。先読みキャッシュ利用ならタップ時点。未対応環境では省略 |
 | `data_ready_ms` | Inertiaの `beforeUpdate`。応答処理のキューを抜け、画面更新用のデータを利用可能になった時点 |
@@ -50,7 +51,7 @@ jsonPayload.event="navigation_failed"
 | `commit_ms` | 対象URLのReact layout effect（DOM更新後） |
 | `frame_ms` | その後2回のrequestAnimationFrameに到達。実画面への表示やGPU処理完了そのものを保証する値ではない |
 
-`stage` は最後に到達した段階、各 `*_ms` はタップからの累積時間。差分で段階間の所要時間を調べる。`response_ms` は通知時点の時計であり、Resource Timingのコールバック自体が遅れて届く場合がある。`data_ready_ms` にはInertiaの応答処理待ちも含まれるため、サーバー所要時間と同一視しない。
+`stage` は最後に到達した段階、各 `*_ms` は指離し（pointerイベントなしならクリック）からの累積時間。差分で段階間の所要時間を調べる。`response_ms` は通知時点の時計であり、Resource Timingのコールバック自体が遅れて届く場合がある。`data_ready_ms` にはInertiaの応答処理待ちも含まれるため、サーバー所要時間と同一視しない。
 
 - `navigation_stalled`: 前景で5秒経っても描画フレームに到達しない。1回の遷移につき1件。
 - `navigation_slow`: 描画フレームまで前景で3秒以上かかった。停止から復旧した場合は停止時の記録と完了時の記録が両方出ることがある。
@@ -72,3 +73,5 @@ jsonPayload.standalone=true
 ```
 
 `response_ms` が短く `data_ready_ms` が長いなら応答処理待ち、`module_start_ms` があり `module_end_ms` がなければ追加JavaScriptの読込・評価待ち、`commit_ms` があり `frame_ms` がなければフレーム待ちを疑う。ブラウザ全体が固まるとタイマーも送信も動かないので、次回起動時の記録が重要になる。保存記録が残らないケースやService Worker経由のリクエスト自体が届かないケースは、これだけで原因確定できない。
+
+`stage=release` で停止すれば指離し後にクリック未到達、`stage=tap` で `request_ms` がなければクリック後にInertia未受付を示す。ブラウザがイベントをJavaScriptへ渡す前の停止や、指を離す前の停止は記録できない。通常のページ移動・終了で受付前の記録を削除するため、この段階の停止はページを開いたまま5秒待った際の送信が重要になる。
