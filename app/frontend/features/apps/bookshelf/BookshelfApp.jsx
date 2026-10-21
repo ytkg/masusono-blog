@@ -44,7 +44,7 @@ export default function BookshelfApp() {
           books: data.books.map((book) => ({
             ...book,
             author: book.author
-              .replace(/[,，]\s*\d{4}\s*[-–－](?:\s*\d{4})?(?=\s*(?:$|[/／・,，]))/g, "")
+              .replace(/[,，]\s*\d{4}\s*[-–－](?:\s*\d{4})?(?=$|[\s/／・,，])/g, "")
               .replace(/([\p{L}\p{M}])\s*[,，/／]\s*(?=[\p{L}\p{M}])/gu, "$1 ")
               .trim(),
           })),
@@ -199,6 +199,7 @@ export default function BookshelfApp() {
                   height: "100%",
                   width: 32,
                   flexShrink: 0,
+                  fontFamily: "'Hiragino Sans', 'Yu Gothic', 'Noto Sans CJK JP', sans-serif",
                   fontSize: 16,
                   lineHeight: "32px",
                 }}
