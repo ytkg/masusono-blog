@@ -152,8 +152,8 @@ export default function BookshelfApp() {
             gridTemplateColumns: "repeat(auto-fill, 44px)",
             gap: "24px 6px",
             justifyContent: "space-evenly",
-            p: "8px 4px 20px",
-            minHeight: 300,
+            p: state.books.length === 0 ? "8px 4px 20px" : "8px 4px 0",
+            minHeight: state.books.length === 0 ? 300 : 0,
             border: "12px solid #8a6140",
             borderTopWidth: 16,
             borderBottomWidth: 18,
@@ -183,7 +183,6 @@ export default function BookshelfApp() {
                 boxShadow: "inset 4px 0 0 #ffffff24, 2px 4px 0 #493b2b33",
                 textTransform: "none",
                 display: "flex",
-                gap: "5px",
                 alignItems: "flex-start",
                 "&:hover": { bgcolor: colors[Number(book.isbn) % colors.length], filter: "brightness(1.15)" },
                 "&:focus-visible": { outline: "3px solid", outlineColor: "text.primary", outlineOffset: 3 },
@@ -198,8 +197,10 @@ export default function BookshelfApp() {
                   whiteSpace: "nowrap",
                   textOverflow: "ellipsis",
                   height: "100%",
+                  width: 32,
+                  flexShrink: 0,
                   fontSize: 16,
-                  lineHeight: "24px",
+                  lineHeight: "32px",
                 }}
               >
                 {book.title}
