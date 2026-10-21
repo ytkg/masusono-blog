@@ -41,6 +41,14 @@ RSpec.describe "Navigation failure reports", type: :request do
     expect(StructuredLogging::EventLogger).to have_received(:navigation_failure).with(payload: trace)
   end
 
+  it "クリック前で停止したPWAの指離しを記録する" do
+    trace = { kind: "navigation_stalled", path: "/authors", stage: "release", release_ms: 0, elapsed_ms: 5000, standalone: true }
+    post "/api/app/navigation_failures", params: { failure: trace }, as: :json
+
+    expect(response).to have_http_status(:no_content)
+    expect(StructuredLogging::EventLogger).to have_received(:navigation_failure).with(payload: trace)
+  end
+
   it "開始時刻が不明な記録は経過時間なしでも受理する" do
     post "/api/app/navigation_failures", params: { failure: failure.except(:elapsed_ms) }, as: :json
 

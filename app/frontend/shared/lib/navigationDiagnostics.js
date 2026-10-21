@@ -5,6 +5,7 @@ const STALL_MS = 5000
 const SLOW_MS = 3000
 const MAX_AGE_MS = 86400000
 const TIMINGS = [
+  "release_ms",
   "tap_ms",
   "request_ms",
   "response_ms",
@@ -14,7 +15,7 @@ const TIMINGS = [
   "commit_ms",
   "frame_ms",
 ]
-const STAGES = ["tap", "request", "response", "data_ready", "module_start", "module_end", "commit", "frame"]
+const STAGES = ["release", "tap", "request", "response", "data_ready", "module_start", "module_end", "commit", "frame"]
 const KINDS = ["navigation_stalled", "navigation_slow", "navigation_interrupted", "module_load_error"]
 const CONTROLLER_STATES = ["none", "installing", "installed", "activating", "activated", "redundant"]
 let diagnostics = null
@@ -51,6 +52,7 @@ export function recordNavigationCommit(url) {
 export function installNavigationDiagnostics(router) {
   const standalone = navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches
   const { reportPayload, dispose } = createNavigationFailureReporter({ maxReports: 5 })
+  let pointer = null
   let trace = null
   let timer, frame, nextFrame, lastResume
   let storage
@@ -103,7 +105,6 @@ export function installNavigationDiagnostics(router) {
     }
   }
   function persist(entry, kind = "navigation_interrupted") {
-    if (!entry.confirmed) return
     const saved = { id: entry.id, saved_at: entry.savedAt, payload: snapshot(entry, kind) }
     try {
       storage?.setItem(STORAGE_KEY, JSON.stringify(saved))
@@ -113,7 +114,6 @@ export function installNavigationDiagnostics(router) {
     return saved
   }
   function report(entry, kind) {
-    if (!entry.confirmed) return
     const saved = persist(entry, kind)
     reportPayload(saved.payload, () => clearStored(saved.id))
   }
@@ -163,7 +163,7 @@ export function installNavigationDiagnostics(router) {
     trace = null
   }
   function mark(entry, stage) {
-    if (!entry?.confirmed || trace !== entry || entry.payload[`${stage}_ms`] !== undefined) return
+    if (!entry || trace !== entry || entry.payload[`${stage}_ms`] !== undefined) return
     entry.payload[`${stage}_ms`] = elapsed(entry)
     // ResourceTiming callbacks can arrive after a later milestone.
     if (STAGES.indexOf(stage) > STAGES.indexOf(entry.payload.stage)) entry.payload.stage = stage
@@ -171,7 +171,7 @@ export function installNavigationDiagnostics(router) {
   }
   function armTimer() {
     clearTimeout(timer)
-    if (!trace?.confirmed || trace.stalled || document.visibilityState !== "visible") return
+    if (!trace || trace.stalled || document.visibilityState !== "visible") return
     timer = setTimeout(
       () => {
         if (!trace) return
@@ -181,19 +181,14 @@ export function installNavigationDiagnostics(router) {
       Math.max(0, STALL_MS - elapsed(trace)),
     )
   }
-  function click(event) {
-    if (
-      event.defaultPrevented ||
-      event.button !== 0 ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey
-    )
-      return
+  function footerPath(event) {
     const link = event.target.closest?.('nav[aria-label="メインナビゲーション"] a[href]')
     const path = link && publicPath(link.href)
-    if (!path || link.target === "_blank" || link.hasAttribute("download")) return
+    if (!path || path === publicPath(window.location.href) || link.target === "_blank" || link.hasAttribute("download"))
+      return
+    return path
+  }
+  function begin(path, stage) {
     abandon()
     trace = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -204,8 +199,8 @@ export function installNavigationDiagnostics(router) {
       payload: {
         path,
         source_path: publicPath(window.location.href),
-        stage: "tap",
-        tap_ms: 0,
+        stage,
+        [`${stage}_ms`]: 0,
         standalone,
         build_version: import.meta.env.VITE_BUILD_VERSION,
         service_worker: Boolean(navigator.serviceWorker?.controller),
@@ -216,11 +211,52 @@ export function installNavigationDiagnostics(router) {
           : { since_resume_ms: Math.min(MAX_AGE_MS, Math.round(performance.now() - lastResume)) }),
       },
     }
-    // The click may still become a native navigation before React is hydrated.
-    // Persist only once Inertia confirms this visit in its before event.
+    persist(trace)
+    armTimer()
+  }
+  function pointerdown(event) {
+    pointer = null
+    if (
+      event.isPrimary === false ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return
+    const path = footerPath(event)
+    if (path) pointer = { id: event.pointerId, path, x: event.clientX, y: event.clientY, at: performance.now() }
+  }
+  function pointermove(event) {
+    if (pointer?.id === event.pointerId && Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) > 12)
+      pointer = null
+  }
+  function pointercancel() {
+    pointer = null
+  }
+  function pointerup(event) {
+    const pressed = pointer
+    pointermove(event)
+    if (
+      pointer &&
+      pressed.id === event.pointerId &&
+      footerPath(event) === pressed.path &&
+      performance.now() - pressed.at < 1000
+    )
+      begin(pressed.path, "release")
+    pointer = null
+  }
+  function click(event) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    const path = footerPath(event)
+    if (!path) return
+    if (!trace || trace.payload.path !== path || trace.payload.stage !== "release") begin(path, "tap")
+    else mark(trace, "tap")
   }
   function visibility() {
     if (document.visibilityState === "hidden") {
+      pointer = null
       clearTimeout(timer)
       if (trace && trace.hiddenAt === null) {
         trace.hiddenAt = performance.now()
@@ -255,7 +291,7 @@ export function installNavigationDiagnostics(router) {
     })
   }
   function fail(entry) {
-    if (!entry?.confirmed || trace !== entry) return
+    if (!entry || trace !== entry || entry.payload.request_ms === undefined) return
     report(entry, "module_load_error")
     stop()
     trace = null
@@ -266,7 +302,6 @@ export function installNavigationDiagnostics(router) {
     router.on("before", ({ detail: { visit } }) => {
       if (!trace || visit.prefetch || visit.async) return
       if (publicPath(visit.url) !== trace.payload.path) return abandon()
-      trace.confirmed = true
       trace.visitId = visit.id
       const cached = router.getCached(visit.url)
       trace.payload.data_source = cached ? "cached" : router.getPrefetching(visit.url) ? "in_flight" : "network"
@@ -275,7 +310,8 @@ export function installNavigationDiagnostics(router) {
       armTimer()
     }),
     router.on("beforeUpdate", ({ detail: { page } }) => {
-      if (trace && publicPath(page.url) === trace.payload.path) mark(trace, "data_ready")
+      if (trace?.payload.request_ms !== undefined && publicPath(page.url) === trace.payload.path)
+        mark(trace, "data_ready")
     }),
     router.on("finish", ({ detail: { visit } }) => {
       if (trace?.visitId === visit.id && (visit.cancelled || visit.interrupted)) abandon()
@@ -288,7 +324,7 @@ export function installNavigationDiagnostics(router) {
       resources = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (
-            trace &&
+            trace?.payload.request_ms !== undefined &&
             ["fetch", "xmlhttprequest"].includes(entry.initiatorType) &&
             entry.responseEnd >= trace.started &&
             publicPath(entry.name) === trace.payload.path
@@ -302,13 +338,19 @@ export function installNavigationDiagnostics(router) {
     }
   }
   const pagehide = () => {
-    if (trace) persist(trace)
+    // A native page navigation is not a failed SPA visit.
+    if (trace && trace.payload.request_ms === undefined) abandon()
+    else if (trace) persist(trace)
   }
   const pageshow = (event) => {
     if (event.persisted) lastResume = performance.now()
     armTimer()
   }
   const preloadError = () => fail(trace)
+  document.addEventListener("pointerdown", pointerdown, true)
+  document.addEventListener("pointermove", pointermove, true)
+  document.addEventListener("pointerup", pointerup, true)
+  document.addEventListener("pointercancel", pointercancel, true)
   document.addEventListener("click", click, true)
   document.addEventListener("visibilitychange", visibility)
   window.addEventListener("pagehide", pagehide)
@@ -319,6 +361,10 @@ export function installNavigationDiagnostics(router) {
     stop()
     resources?.disconnect()
     remove.forEach((off) => off())
+    document.removeEventListener("pointerdown", pointerdown, true)
+    document.removeEventListener("pointermove", pointermove, true)
+    document.removeEventListener("pointerup", pointerup, true)
+    document.removeEventListener("pointercancel", pointercancel, true)
     document.removeEventListener("click", click, true)
     document.removeEventListener("visibilitychange", visibility)
     window.removeEventListener("pagehide", pagehide)

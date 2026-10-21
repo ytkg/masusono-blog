@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { waitForClientReady } from "./helpers"
 
 const STORAGE_KEY = "footer-navigation-diagnostic-v1"
 test.use({ serviceWorkers: "block" })
@@ -18,6 +19,7 @@ const footer = (page) => page.getByRole("navigation", { name: "メインナビ�
 test("normal PWA footer navigation clears its local trace without reporting", async ({ page }) => {
   const reports = await observeReports(page)
   await page.goto("/")
+  await waitForClientReady(page)
   await footer(page).getByRole("link", { name: "著者", exact: true }).click()
   await expect(page).toHaveURL(/\/authors$/)
   await expect(page.getByRole("heading", { name: "著者", exact: true })).toBeVisible()
@@ -30,6 +32,7 @@ test("cached page data cannot hide a lazy module load failure from diagnostics",
   await page.route(/\/(?:vite\/assets\/authors-[^/]+\.js|vite-dev\/pages\/authors\/index\.jsx)(?:\?.*)?$/, (route) => route.abort("failed"))
   const prefetched = page.waitForResponse((response) => new URL(response.url()).pathname === "/authors" && response.request().headers()["purpose"] === "prefetch")
   await page.goto("/")
+  await waitForClientReady(page)
   await prefetched
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
   await footer(page).getByRole("link", { name: "著者", exact: true }).click()
@@ -58,6 +61,7 @@ test("PWA startup reports the last unfinished stage and removes acknowledged sto
     }))
   }, STORAGE_KEY)
   await page.goto("/")
+  await waitForClientReady(page)
   await expect.poll(() => reports.find((report) => report.recovered)).toMatchObject({
     kind: "navigation_interrupted", stage: "module_start", standalone: true, path: "/numbers", elapsed_ms: 101,
   })
@@ -69,8 +73,7 @@ test("PWA startup reports the last unfinished stage and removes acknowledged sto
 test("native footer navigation does not leave a false unfinished PWA trace", async ({ page }) => {
   const reports = await observeReports(page)
   await page.goto("/")
-  await page.getByRole("tab", { name: "書き出し", exact: true }).click()
-  await expect(page.getByRole("tab", { name: "書き出し", exact: true })).toHaveAttribute("aria-selected", "true")
+  await waitForClientReady(page)
   const link = footer(page).getByRole("link", { name: "著者", exact: true })
   await link.evaluate((element) => element.addEventListener("click", (event) => {
     event.preventDefault()
@@ -82,4 +85,25 @@ test("native footer navigation does not leave a false unfinished PWA trace", asy
   await expect(page.getByRole("heading", { name: "著者", exact: true })).toBeVisible()
   await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY)).toBeNull()
   expect(reports).toEqual([])
+})
+
+
+test("a footer click blocked before Inertia reports the missing acceptance", async ({ page }) => {
+  const reports = await observeReports(page)
+  await page.goto("/")
+  await waitForClientReady(page)
+  const link = footer(page).getByRole("link", { name: "著者", exact: true })
+  await link.evaluate((element) => element.addEventListener("click", (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }))
+  await link.click()
+  await expect.poll(() => reports.find((report) => report.kind === "navigation_stalled"), { timeout: 10000 }).toMatchObject({
+    stage: "tap", path: "/authors", standalone: true,
+  })
+  const report = reports.find((entry) => entry.kind === "navigation_stalled")
+  expect(report.release_ms).toBe(0)
+  expect(report.tap_ms).toBeGreaterThanOrEqual(0)
+  expect(report.request_ms).toBeUndefined()
+  await expect(page).toHaveURL(/\/$/)
 })

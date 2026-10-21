@@ -83,7 +83,69 @@ afterEach(() => {
 })
 
 describe("footer navigation diagnostics", () => {
-  it("Inertiaが受け付けなかったタップは再起動時の未完了記録にしない", () => {
+  function pointerEvent(type, extra = {}) {
+    const event = new MouseEvent(type, { bubbles: true, button: 0, clientX: 20, clientY: 20, ...extra })
+    Object.defineProperty(event, "pointerId", { value: 1 })
+    document.querySelector("a").dispatchEvent(event)
+  }
+  function prepareLink() {
+    document.body.innerHTML = '<nav aria-label="メインナビゲーション"><a href="/authors">著者</a></nav>'
+    document.querySelector("a").addEventListener("click", (event) => event.preventDefault())
+  }
+
+  it("指を離してもクリックが来ない停止を記録し、次回起動でも回収する", () => {
+    prepareLink()
+    pointerEvent("pointerdown")
+    advance(100)
+    expect(saved()).toBeNull()
+    pointerEvent("pointerup")
+    expect(saved().payload).toMatchObject({ stage: "release", release_ms: 0 })
+    advance(5000)
+    expect(payloads()[0]).toMatchObject({ kind: "navigation_stalled", stage: "release", elapsed_ms: 5000 })
+    remove()
+    remove = installNavigationDiagnostics(router)
+    expect(payloads()[1]).toMatchObject({ stage: "release", recovered: true })
+  })
+
+  it("クリック後にInertiaの受付が来ない停止を区別する", () => {
+    prepareLink()
+    pointerEvent("pointerdown")
+    pointerEvent("pointerup")
+    advance(50)
+    document.querySelector("a").click()
+    advance(4950)
+    expect(payloads()[0]).toMatchObject({ stage: "tap", release_ms: 0, tap_ms: 50 })
+    expect(payloads()[0]).not.toHaveProperty("request_ms")
+  })
+
+  it("遷移受付前の先読み応答でクリック待ちの段階を上書きしない", () => {
+    prepareLink()
+    pointerEvent("pointerdown")
+    pointerEvent("pointerup")
+    resourceCallback({
+      getEntries: () => [{ name: new URL("/authors", location.href).href, initiatorType: "fetch", responseEnd: 100 }],
+    })
+    emit("beforeUpdate", { page: { url: "/authors" } })
+    window.dispatchEvent(new Event("vite:preloadError"))
+    advance(5000)
+    expect(payloads()[0]).toMatchObject({ kind: "navigation_stalled", stage: "release" })
+    expect(payloads()[0]).not.toHaveProperty("response_ms")
+    expect(payloads()[0]).not.toHaveProperty("data_ready_ms")
+  })
+
+  it.each(["scroll", "cancel", "longpress", "modified"])("%s は停止として記録しない", (action) => {
+    prepareLink()
+    pointerEvent("pointerdown", action === "modified" ? { metaKey: true } : {})
+    if (action === "scroll") pointerEvent("pointermove", { clientY: 60 })
+    if (action === "cancel") pointerEvent("pointercancel")
+    if (action === "longpress") advance(1200)
+    pointerEvent("pointerup")
+    advance(5000)
+    expect(fetch).not.toHaveBeenCalled()
+    expect(saved()).toBeNull()
+  })
+
+  it("通常のページ移動は再起動時の未完了記録にしない", () => {
     document.body.innerHTML = '<nav aria-label="メインナビゲーション"><a href="/authors">著者</a></nav>'
     document.querySelector("a").addEventListener("click", (event) => event.preventDefault())
     document.querySelector("a").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
