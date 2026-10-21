@@ -6,6 +6,7 @@ import SeoHead from "../../shared/components/SeoHead"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
 const MasudaTatakiApp = lazy(() => import("../../features/apps/masudaTataki/MasudaTatakiApp"))
+const GreedApp = lazy(() => import("../../features/apps/greed/GreedApp"))
 const SettingsApp = lazy(() => import("../../features/apps/settings/SettingsApp"))
 const AdminApp = lazy(() => import("../../features/apps/admin/AdminApp"))
 
@@ -42,6 +43,7 @@ export default function OthersIndex() {
           <Suspense fallback={<OthersAppFallback />}>
             <MasudaRunApp />
             <MasudaTatakiApp />
+            <GreedApp />
             <SettingsApp />
             <AdminApp />
           </Suspense>

@@ -73,6 +73,7 @@ export default function AppsDialogLauncher({
   contentSx,
   showLauncherLabel = true,
   titleAccessory,
+  edgeToEdge = false,
 }) {
   const [open, setOpen] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -182,12 +183,21 @@ export default function AppsDialogLauncher({
           inert={!isActive}
           sx={{
             ...dialogContentSx,
+            ...(edgeToEdge ? { px: 0, pb: 0, gap: 0 } : {}),
             opacity: isContentVisible ? 1 : 0,
             transition: prefersReducedMotion ? "none" : "opacity 180ms ease",
             pointerEvents: isContentVisible ? "auto" : "none",
           }}
         >
-          <AppDialogHeader title={title} titleId={titleId} accessory={titleAccessory} onClose={handleClose} />
+          <Box
+            sx={
+              edgeToEdge
+                ? { px: "max(16px, env(safe-area-inset-left))", pr: "max(16px, env(safe-area-inset-right))" }
+                : undefined
+            }
+          >
+            <AppDialogHeader title={title} titleId={titleId} accessory={titleAccessory} onClose={handleClose} />
+          </Box>
           <AppsLoadingProvider value={registerLoadingTask}>
             <AppActivityProvider value={isActive}>
               <Box sx={dialogBodySx}>{children}</Box>
