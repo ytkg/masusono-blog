@@ -35,3 +35,40 @@ jsonPayload.event="navigation_failed"
 独自の `watched_files_digest` はアプリのルートを `Dir.glob` の `base` と絶対パスに指定し、作業ディレクトリを変更しない。キャッシュの時刻と計算結果は一組で更新し、並行処理が未完成の値を参照しないようにする。ファイルの並び・ダイジェストの形式・フロントテストの除外・途中で消えたファイルの扱いは維持する。
 
 本番ファイルをプロセス起動後に書き換える運用では、バージョンを更新するためにプロセスの再起動が必要になる。
+
+## PWAのフッター遷移が遅い・止まる場合
+
+フッターの通常の左クリック／タップについて、次の段階を小さい診断記録に保存する。修飾クリック・別タブ・履歴移動・取り消された遷移は停止として扱わない。ロゴや本文をDOM走査する計測は追加しない。
+
+| 項目 | 観測地点 |
+| --- | --- |
+| `tap_ms` | フッターのタップ（0ms） |
+| `request_ms` | Inertiaの前景 `before` |
+| `response_ms` | Resource Timingで対象URLのfetch/XHR完了を観測。先読みキャッシュ利用ならタップ時点。未対応環境では省略 |
+| `data_ready_ms` | Inertiaの `beforeUpdate`。応答処理のキューを抜け、画面更新用のデータを利用可能になった時点 |
+| `module_start_ms`, `module_end_ms` | ページと共通レイアウトの遅延import開始・完了 |
+| `commit_ms` | 対象URLのReact layout effect（DOM更新後） |
+| `frame_ms` | その後2回のrequestAnimationFrameに到達。実画面への表示やGPU処理完了そのものを保証する値ではない |
+
+`stage` は最後に到達した段階、各 `*_ms` はタップからの累積時間。差分で段階間の所要時間を調べる。`response_ms` は通知時点の時計であり、Resource Timingのコールバック自体が遅れて届く場合がある。`data_ready_ms` にはInertiaの応答処理待ちも含まれるため、サーバー所要時間と同一視しない。
+
+- `navigation_stalled`: 前景で5秒経っても描画フレームに到達しない。1回の遷移につき1件。
+- `navigation_slow`: 描画フレームまで前景で3秒以上かかった。停止から復旧した場合は停止時の記録と完了時の記録が両方出ることがある。
+- `module_load_error`: 遅延importの失敗。先読みデータ利用中のため既存の通信エラーイベントが出ない場合も記録する。元の例外は再throwし、遷移の動作は変更しない。
+- `navigation_interrupted`: 描画フレームまで到達しなかった保存記録を次回起動時に発見した。ユーザーによる途中終了や再読み込みも含み、必ずしもアプリの異常ではない。
+
+PWA判別は `navigator.standalone` と `(display-mode: standalone)` を使う。`service_worker=true` だけでは通常ブラウザとPWAを区別できない。`build_version` は不調なPWAと新しく開いたブラウザで実行コードが同じかを比較するために使う。`backgrounded` と `since_resume_ms` は復帰直後の発生を調べるための値。背景時間は遅延時計から除外し、非表示中は停止タイマーを止める。
+
+PWAはlocalStorage、通常ブラウザはタブ単位のsessionStorageに直近1件だけ保存する。正常完了・送信のHTTP応答受信で削除し、通信失敗・オフラインでは接続復帰や次回起動時に再送する。記録の有効期間は24時間。新しいタップは古い記録を上書きする。ストレージが利用不可の場合はメモリ内の計測だけを続ける。再送時は `recovered=true` とし、保存データを再検証してから送る。例外メッセージ・モジュールURL・検索語・本文・Cookie・永続的な利用者IDは保存も送信もしない。
+
+新しい診断の送信は1ページにつき5件まで（再送を除く）。既存の通信失敗診断は従来の10件まで。送信先・イベントは既存の `/api/app/navigation_failures` と `navigation_failed` を使い、APIの2048 bytes制限、1分20件制限、no-storeを維持する。
+
+まず `standalone=true` と対象の `build_version` で絞り、`stage` と各時刻を確認する。
+
+```
+resource.type="cloud_run_revision"
+jsonPayload.event="navigation_failed"
+jsonPayload.standalone=true
+```
+
+`response_ms` が短く `data_ready_ms` が長いなら応答処理待ち、`module_start_ms` があり `module_end_ms` がなければ追加JavaScriptの読込・評価待ち、`commit_ms` があり `frame_ms` がなければフレーム待ちを疑う。ブラウザ全体が固まるとタイマーも送信も動かないので、次回起動時の記録が重要になる。保存記録が残らないケースやService Worker経由のリクエスト自体が届かないケースは、これだけで原因確定できない。

@@ -1,6 +1,10 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
+import { recordNavigationCommit } from "../shared/lib/navigationDiagnostics"
 import AppLayout from "./AppLayout"
+
+vi.mock("@inertiajs/react", () => ({ usePage: () => ({ url: "/" }) }))
+vi.mock("../shared/lib/navigationDiagnostics", () => ({ recordNavigationCommit: vi.fn() }))
 
 vi.mock("../components/Header", () => ({
   default: () => <div>Header</div>,
@@ -18,6 +22,7 @@ describe("AppLayout", () => {
       </AppLayout>,
     )
 
+    expect(recordNavigationCommit).toHaveBeenCalledWith("/")
     expect(screen.getByText("Header")).toBeInTheDocument()
     expect(screen.getByText("MainContent")).toBeInTheDocument()
     expect(screen.getByText("FloatingBottomNavigation")).toBeInTheDocument()

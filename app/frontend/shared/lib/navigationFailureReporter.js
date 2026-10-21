@@ -11,15 +11,16 @@ export function localUrl(value) {
   }
 }
 
-export function createNavigationFailureReporter() {
+export function createNavigationFailureReporter({ maxReports = MAX_REPORTS } = {}) {
   let reportCount = 0
   let disposed = false
   const pendingReports = []
 
-  async function sendReport(payload) {
+  async function sendReport(entry) {
+    const { payload, onDelivered } = entry
     if (disposed) return
     try {
-      const response = await fetch(REPORT_URL, {
+      await fetch(REPORT_URL, {
         method: "POST",
         credentials: "omit",
         keepalive: true,
@@ -28,17 +29,17 @@ export function createNavigationFailureReporter() {
         },
         body: JSON.stringify({ failure: payload }),
       })
-      if (!response.ok) return
+      // HTTP errors are terminal too; retry only transport failures.
+      onDelivered?.()
     } catch {
-      if (!disposed && pendingReports.length < MAX_REPORTS) pendingReports.push(payload)
+      if (!disposed && pendingReports.length < MAX_REPORTS) pendingReports.push(entry)
     }
   }
 
   function report(visit, kind, response) {
-    if (disposed || reportCount >= MAX_REPORTS) return
+    if (disposed || reportCount >= maxReports) return
     const url = localUrl(visit?.url || window.location.href)
     if (!url) return
-    reportCount += 1
     const payload = {
       kind,
       path: url.pathname,
@@ -54,17 +55,25 @@ export function createNavigationFailureReporter() {
       online: navigator.onLine,
       service_worker: Boolean(navigator.serviceWorker?.controller),
     }
-    if (navigator.onLine) void sendReport(payload)
-    else pendingReports.push(payload)
+    reportPayload(payload)
+  }
+
+  function reportPayload(payload, onDelivered) {
+    if (disposed || reportCount >= maxReports) return
+    reportCount += 1
+    const entry = { payload, onDelivered }
+    if (navigator.onLine) void sendReport(entry)
+    else pendingReports.push(entry)
   }
 
   function flushReports() {
-    pendingReports.splice(0).forEach((payload) => void sendReport(payload))
+    pendingReports.splice(0).forEach((entry) => void sendReport(entry))
   }
   window.addEventListener("online", flushReports)
 
   return {
     report,
+    reportPayload,
     dispose() {
       disposed = true
       pendingReports.length = 0
