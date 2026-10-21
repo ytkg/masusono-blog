@@ -33,6 +33,8 @@ Rails.application.routes.draw do
     namespace :app do
       resources :articles, only: :index, defaults: { format: :json }
       resources :sentence_articles, only: :index, defaults: { format: :json }
+      get "bookshelf", to: "bookshelf#index"
+      get "bookshelf/:isbn/cover", to: "bookshelf#cover"
       resources :calendar_articles, only: :index, defaults: { format: :json }
       resources :navigation_failures, only: :create, defaults: { format: :json }
       resource :analytics, only: :show, controller: "analytics", defaults: { format: :json }

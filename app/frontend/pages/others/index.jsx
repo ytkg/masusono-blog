@@ -8,6 +8,7 @@ const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunA
 const MasudaTatakiApp = lazy(() => import("../../features/apps/masudaTataki/MasudaTatakiApp"))
 const GreedApp = lazy(() => import("../../features/apps/greed/GreedApp"))
 const SettingsApp = lazy(() => import("../../features/apps/settings/SettingsApp"))
+const BookshelfApp = lazy(() => import("../../features/apps/bookshelf/BookshelfApp"))
 const AdminApp = lazy(() => import("../../features/apps/admin/AdminApp"))
 
 function OthersAppFallback() {
@@ -51,6 +52,7 @@ export default function OthersIndex() {
             <MasudaRunApp />
             <MasudaTatakiApp />
             <GreedApp />
+            <BookshelfApp />
             <SettingsApp />
             <AdminApp />
           </Suspense>

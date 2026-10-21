@@ -110,7 +110,7 @@ test("home beginnings", async ({ page }) => {
 test("others launcher columns adapt to narrow screens", async ({ page }) => {
   await openPage(page, "/others")
   const buttons = page.locator("#others button")
-  await expect(buttons).toHaveCount(5)
+  await expect(buttons).toHaveCount(6)
   for (const [width, columns] of [
     [390, 5],
     [320, 4],

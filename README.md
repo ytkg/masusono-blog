@@ -448,3 +448,7 @@ SSRに失敗したリクエストは初期propsを返してブラウザで描画
 Rails アプリケーションはリポジトリ直下に配置しています。`app/frontend/` を含め、コマンドはリポジトリルートで実行します。
 
 既存 checkout の `backend/` にある Git 管理外のファイルは、Git の更新では移動されません。旧 `backend/` は Git・Docker・Cloud Run の除外対象として残し、秘密情報や古い DB の誤取り込みを防ぎます。必要な `config/master.key`・環境ファイル・`storage/` のローカル DB は、起動前に新しい配置先に同名ファイルがないことを確認して個別に移してください。不要なログやビルド出力は再生成できます。管理対象 worktree の再生成可能なデータは、通常の片付け手順に従います。
+
+### 本棚ミニアプリ
+
+`GET /api/app/bookshelf` と `GET /api/app/bookshelf/:isbn/cover` を使用します。[取得・公開前の設定と削除窓口](docs/bookshelf.md)、[レスポンス契約](docs/api-response-contract.md)を参照してください。
