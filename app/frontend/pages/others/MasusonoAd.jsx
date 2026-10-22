@@ -102,9 +102,14 @@ export default function MasusonoAd() {
         <Box
           sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", flexWrap: "wrap" }}
         >
-          <Box component="span" sx={{ fontSize: 11, color: "text.secondary" }}>
-            Masusono Ads
-          </Box>
+          <Box
+            component="img"
+            src="/images/ads/masusono-ads-logo-v5.png"
+            alt="Masusono Ads!"
+            width={2171}
+            height={724}
+            sx={{ width: 112, height: "auto" }}
+          />
           <Button
             href={ad.href}
             sx={{
