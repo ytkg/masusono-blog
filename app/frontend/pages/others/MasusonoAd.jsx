@@ -78,9 +78,7 @@ export default function MasusonoAd() {
         sx={{
           display: "block",
           width: "100%",
-          height: "clamp(130px, 40vw, 180px)",
-          objectFit: "cover",
-          objectPosition: "center 55%",
+          height: "auto",
         }}
       />
       <Box sx={{ p: "14px 16px", "@media(max-width:380px)": { p: "12px 14px" } }}>

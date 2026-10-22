@@ -3,18 +3,21 @@ import { openPage, expectNoPageOverflow } from "./helpers"
 
 for (const width of [320, 390, 1280]) {
   test(`fixed Masusono ad at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 844 })
+    await page.setViewportSize({ width, height: 800 })
     await openPage(page, "/others")
     const ad = page.getByRole("article", { name: "Masusono Ads", exact: true })
     await expect(ad).toHaveCount(1)
     const image = ad.getByRole("img")
     await expect(image).toHaveAttribute("alt", "パインを載せたハンバーグとご飯の水彩画")
     await image.evaluate((element) => element.decode())
+    const imageBox = await image.boundingBox()
+    expect(imageBox.width / imageBox.height).toBeCloseTo(1280 / 800, 2)
     const link = ad.getByRole("link", { name: "記事を読む" })
     await expect(link).toHaveAttribute("href", "/articles/zm5_f8m7vw")
     await link.focus()
     await expect(link).toBeFocused()
     await ad.scrollIntoViewIfNeeded()
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
     await expectNoPageOverflow(page)
     const box = await link.boundingBox()
     expect(box.height).toBeGreaterThanOrEqual(44)
