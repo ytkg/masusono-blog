@@ -17,6 +17,8 @@ module Api
             score: normalized_score
           )
 
+          grant_points(user_id: user_id, score: normalized_score, ranking_id: created[:id])
+
           {
             json: {
               id: created[:id],
@@ -27,6 +29,14 @@ module Api
         end
 
         private
+
+        def grant_points(user_id:, score:, ranking_id:)
+          return if score.zero?
+
+          ::PointsGrantService.execute(user_id: user_id, amount: score)
+        rescue ::PointsGrantService::Error => error
+          Rails.logger.warn(event: "masuda_run_points_grant_failed", ranking_id: ranking_id, error: error.message)
+        end
 
         def normalize_score(score)
           normalized = Integer(score, exception: false)

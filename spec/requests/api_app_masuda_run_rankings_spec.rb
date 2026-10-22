@@ -70,6 +70,20 @@ RSpec.describe "Api::App::MasudaRun::Rankings", type: :request do
       )
     end
 
+    it "ポイント付与がタイムアウトしても登録成功とno-storeを維持する" do
+      allow(Api::App::MasudaRun::RankingsCreateUsecase).to receive(:call).and_call_original
+      allow(Microcms::MasudaRun::CreateRankingService).to receive(:execute).and_return({ id: "new-ranking-id" })
+      stub_request(:post, PointsGrantService::ENDPOINT).to_timeout
+
+      post "/api/app/masuda_run/rankings.json", params: params.merge(userId: "cookie-user")
+
+      expect(response).to have_http_status(:created)
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+      expect(JSON.parse(response.body)).to eq("id" => "new-ranking-id", "userId" => "cookie-user", "score" => 1234)
+      expect(a_request(:post, PointsGrantService::ENDPOINT)
+        .with(body: { userId: "cookie-user", amount: 1234 }.to_json)).to have_been_made.once
+    end
+
     it "不正リクエスト時は400を返す" do
       allow(Api::App::MasudaRun::RankingsCreateUsecase).to receive(:call).and_raise(ArgumentError, "user_id is required")
 
