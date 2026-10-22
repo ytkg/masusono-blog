@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { expectNoPageOverflow, mockBlogmuraBanner, mockPageProps } from "./helpers"
+import { expectNoPageOverflow, mockBlogmuraBanner, mockPageProps, waitForClientReady } from "./helpers"
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -149,6 +149,7 @@ for (const [name, path, heading] of [
       await expectNoPageOverflow(page)
     }
     if (name === "others") {
+      await waitForClientReady(page)
       for (const button of ["増田RUNを開く", "設定を開く", "管理を開く"]) {
         await expect(page.getByRole("button", { name: button })).toBeVisible()
       }
