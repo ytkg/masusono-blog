@@ -7,6 +7,7 @@ RSpec.describe Api::App::MasudaRun::RankingsCreateUsecase do
   let(:user_id) { "cookie-user" }
 
   before do
+    allow(PointsGrantService).to receive(:execute)
     allow(Microcms::MasudaRun::CreateRankingService).to receive(:execute).and_return({ id: "new-ranking-id" })
   end
 
@@ -20,6 +21,36 @@ RSpec.describe Api::App::MasudaRun::RankingsCreateUsecase do
         }
       }
     )
+  end
+
+  it "ランキング登録後にスコア全額を付与する" do
+    expect(Microcms::MasudaRun::CreateRankingService).to receive(:execute).ordered.and_return({ id: "new-ranking-id" })
+    expect(PointsGrantService).to receive(:execute).with(user_id: user_id, amount: score).ordered
+    result
+  end
+
+  it "付与に失敗してもランキングを返す" do
+    allow(PointsGrantService).to receive(:execute).and_raise(PointsGrantService::Error, "unavailable")
+    allow(Rails.logger).to receive(:warn)
+
+    expect(result[:json][:id]).to eq("new-ranking-id")
+    expect(Rails.logger).to have_received(:warn).with(hash_including(event: "masuda_run_points_grant_failed", ranking_id: "new-ranking-id"))
+  end
+
+  it "ランキング登録に失敗した場合は付与しない" do
+    allow(Microcms::MasudaRun::CreateRankingService).to receive(:execute).and_raise(Faraday::TimeoutError)
+
+    expect { result }.to raise_error(Faraday::TimeoutError)
+    expect(PointsGrantService).not_to have_received(:execute)
+  end
+
+  context "0点の場合" do
+    let(:score) { 0 }
+
+    it "ポイントを付与せずランキングを返す" do
+      expect(result[:json][:score]).to eq(0)
+      expect(PointsGrantService).not_to have_received(:execute)
+    end
   end
 
   context "scoreが数値でない場合" do
