@@ -39,6 +39,7 @@ describe("Others page", () => {
     expect(await screen.findByText("GreedApp")).toBeInTheDocument()
     expect(await screen.findByText("SettingsApp")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "本棚を開く" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "広告を開く" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "管理を開く" })).toBeInTheDocument()
   })
 })

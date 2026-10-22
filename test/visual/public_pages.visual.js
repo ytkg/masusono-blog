@@ -110,7 +110,7 @@ test("home beginnings", async ({ page }) => {
 test("others launcher columns adapt to narrow screens", async ({ page }) => {
   await openPage(page, "/others")
   const buttons = page.locator("#others button")
-  await expect(buttons).toHaveCount(6)
+  await expect(buttons).toHaveCount(7)
   for (const [width, columns] of [
     [390, 5],
     [320, 4],
@@ -974,3 +974,28 @@ for (const image of [1, 2]) {
     await expect(page).toHaveScreenshot(image === 2 ? "masuda-tataki-other-character.png" : "masuda-tataki-other-character-1.png", { maxDiffPixelRatio: 0 })
   })
 }
+
+test("ads app fills the available screen", async ({ page }) => {
+  await page.route("https://ads.masusono.com/**", (route) =>
+    route.fulfill({
+      contentType: "text/html; charset=utf-8",
+      body: '<!doctype html><html lang="ja"><body style="margin:0;background:#f4f4f4">広告</body></html>',
+    }),
+  )
+  await openPage(page, "/others")
+  await page.getByRole("button", { name: "広告を開く" }).click()
+  const dialog = page.getByRole("dialog", { name: "広告（開発中）" })
+  await expect(dialog).toBeVisible()
+  const frame = dialog.locator("iframe")
+  await expect(frame).toHaveAttribute("src", "https://ads.masusono.com")
+  await expect(page.frameLocator('iframe[title="広告（開発中）"]').getByText("広告", { exact: true })).toBeVisible()
+  await expect(dialog.getByTestId("app-content")).toHaveCSS("opacity", "1")
+  const bounds = await frame.boundingBox()
+  const viewport = page.viewportSize()
+  expect(bounds.x).toBe(0)
+  expect(bounds.width).toBe(viewport.width)
+  expect(Math.abs(bounds.y + bounds.height - viewport.height)).toBeLessThan(1)
+  await screenshot(page, "ads-app")
+  await dialog.getByRole("button", { name: /閉じる/ }).click()
+  await expect(dialog).not.toBeVisible()
+})
