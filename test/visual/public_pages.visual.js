@@ -987,7 +987,8 @@ test("ads app fills the available screen", async ({ page }) => {
   const dialog = page.getByRole("dialog", { name: "広告（開発中）" })
   await expect(dialog).toBeVisible()
   const frame = dialog.locator("iframe")
-  await expect(frame).toHaveAttribute("src", "https://ads.masusono.com")
+  const userId = (await page.context().cookies()).find((cookie) => cookie.name === "user_id").value
+  await expect(frame).toHaveAttribute("src", `https://ads.masusono.com/users/${encodeURIComponent(userId)}/ads`)
   await expect(page.frameLocator('iframe[title="広告（開発中）"]').getByText("広告", { exact: true })).toBeVisible()
   await expect(dialog.getByTestId("app-content")).toHaveCSS("opacity", "1")
   const bounds = await frame.boundingBox()
