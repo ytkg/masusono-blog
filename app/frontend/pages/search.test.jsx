@@ -43,6 +43,25 @@ describe("Search page", () => {
     window.history.replaceState(null, "", "/")
   })
 
+  it("未検索時だけ広告枠を表示し、検索語の変更と履歴移動後に初期化する", () => {
+    window.history.replaceState(null, "", "/search")
+    const renderAd = vi.fn()
+    window.MasusonoAds = { render: renderAd }
+    const { container } = render(<Search articles={articles} />)
+
+    expect(container.querySelectorAll('[data-masusono-ad="search-bottom"]')).toHaveLength(1)
+    expect(renderAd).toHaveBeenCalledOnce()
+    fireEvent.change(screen.getByRole("textbox", { name: "記事を検索" }), { target: { value: "読書" } })
+    expect(container.querySelector('[data-masusono-ad="search-bottom"]')).not.toBeInTheDocument()
+    expect(renderAd).toHaveBeenCalledTimes(2)
+    expect(window.location.search).toBe("?q=%E8%AA%AD%E6%9B%B8")
+    window.history.replaceState(null, "", "/search")
+    fireEvent.popState(window)
+    expect(container.querySelectorAll('[data-masusono-ad="search-bottom"]')).toHaveLength(1)
+    expect(renderAd).toHaveBeenCalledTimes(3)
+    delete window.MasusonoAds
+  })
+
   it("検索語が空なら記事一覧を表示しない", () => {
     window.history.replaceState(null, "", "/search")
 

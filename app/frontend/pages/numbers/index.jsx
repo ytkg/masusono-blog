@@ -1,9 +1,15 @@
+import { useEffect } from "react"
+import Box from "@mui/material/Box"
 import PageHeading from "../../shared/components/PageHeading"
 import PageContainer from "../../shared/components/PageContainer"
 import SeoHead from "../../shared/components/SeoHead"
 import NumbersPreview from "../../features/apps/numbers/NumbersPreview"
 
 export default function NumbersIndex({ metrics }) {
+  useEffect(() => {
+    window.MasusonoAds?.render()
+  }, [])
+
   return (
     <>
       <SeoHead
@@ -15,6 +21,7 @@ export default function NumbersIndex({ metrics }) {
       <PageContainer id="numbers">
         <PageHeading>数字でわかる、増田とその他！</PageHeading>
         <NumbersPreview metrics={metrics} />
+        <Box data-masusono-ad="numbers-bottom" sx={{ mt: 4 }} />
       </PageContainer>
     </>
   )
