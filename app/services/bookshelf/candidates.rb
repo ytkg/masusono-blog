@@ -4,7 +4,12 @@ module Bookshelf
       books = {}
       articles.each do |article|
         next if article[:publishedAt].blank? || article[:id].blank?
-        published_at = Time.iso8601(article[:publishedAt]) rescue nil
+        published_at = begin
+          CalendarDateValidator.validate!(article[:publishedAt])
+          Time.iso8601(article[:publishedAt])
+        rescue ArgumentError, TypeError
+          nil
+        end
         next unless published_at
 
         Nokogiri::HTML.fragment(article[:content].to_s).css("a[href]").each_with_index do |link, position|
