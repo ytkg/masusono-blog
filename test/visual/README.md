@@ -34,6 +34,10 @@ Compose ラッパーや通常の `docker compose` で直接実行した場合は
 
 ラッパーの失敗時の push 停止、追加 push、対象判定、引数拒否、成功・失敗・中断時のサーバー停止は `python3 scripts/test_visual_gate.py` で検証できます。ローカルの一時 Git リポジトリを使用し、Docker・ネットワークは不要です。このテストも `frontend-visual` CI で実行します。
 
+撮影用 Rails イメージは `Dockerfile.visual-backend` で依存ライブラリだけを用意し、アプリは worktree からマウントします。CI ではフロントのビルドを Vite サービス起動時の1回にまとめ、比較ステップは `npx playwright test` で起動済みサービスが用意したビルドを使います。ローカルの `npm run test:visual` と基準画像更新コマンドは、起動後のソース変更にも対応できるよう引き続きビルドします。
+
+GitHub Actions は desktop / mobile を別ランナーで実行し、両方の成功で全比較を確認します。失敗時の artifact は `visual-test-results-desktop` / `visual-test-results-mobile` です。Docker のキャッシュも各ジョブで分け、同時書き込みの競合を避けます。
+
 テストはファイル内も含めて並列実行し、公開リポジトリの4コアCIでは4ワーカー、ローカルでは2ワーカーを使います。各テストのブラウザコンテキストとモックは独立させ、共有する撮影用データは変更しません。並列数は `run --rm visual npm run test:visual -- --workers=1` のように指定できます。
 
 コピー通知の自動終了・表示保持とRuby実行の警告は、Playwrightの仮想時計を進めて検証します。実時間で数秒待たずに、同じ時間経過後の振る舞いと基準画像を確認します。

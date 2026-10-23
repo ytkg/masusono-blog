@@ -189,7 +189,7 @@ class VisualGateTest(unittest.TestCase):
             "app/controllers/home_controller.rb",
             "config/routes.rb", "vite.config.ts",
             "playwright.config.js", "package-lock.json",
-            "compose.visual.yml", "Dockerfile.visual",
+            "compose.visual.yml", "Dockerfile.visual", "Dockerfile.visual-backend",
         ):
             with self.subTest(path=path):
                 self.change(path)

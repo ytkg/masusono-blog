@@ -17,6 +17,10 @@ jobs:
           python3 scripts/test_visual_gate.py
 
   screenshots:
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop, mobile]
     runs-on: ubuntu-24.04-arm
     env:
       COMPOSE_PROJECT_NAME: masusono-visual
@@ -36,19 +40,19 @@ jobs:
           set: |
             backend.tags=masusono-visual-backend
             visual.tags=masusono-visual-visual
-            backend.cache-from=type=gha,scope=frontend-visual-backend
-            backend.cache-to=type=gha,scope=frontend-visual-backend,mode=max
-            visual.cache-from=type=gha,scope=frontend-visual-browser
-            visual.cache-to=type=gha,scope=frontend-visual-browser,mode=max
+            backend.cache-from=type=gha,scope=frontend-visual-backend-${{ matrix.project }}
+            backend.cache-to=type=gha,scope=frontend-visual-backend-${{ matrix.project }},mode=max
+            visual.cache-from=type=gha,scope=frontend-visual-browser-${{ matrix.project }}
+            visual.cache-to=type=gha,scope=frontend-visual-browser-${{ matrix.project }},mode=max
       - name: Start visual test server
         run: docker compose -f compose.yml -f compose.visual.yml up --no-build -d backend vite
       - name: Compare screenshots
-        run: docker compose -f compose.yml -f compose.visual.yml run --rm visual
+        run: docker compose -f compose.yml -f compose.visual.yml run --rm visual npx playwright test --project=${{ matrix.project }}
       - name: Upload screenshot differences
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: visual-test-results
+          name: visual-test-results-${{ matrix.project }}
           path: |
             test-results
             playwright-report
