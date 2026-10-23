@@ -28,18 +28,37 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  policy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
-      id-token: write
-    defaults:
-      run:
-        working-directory: .
+    outputs:
+      skip: ${{ steps.policy.outputs.result }}
     steps:
-      - name: Checkout repository
+      - name: Read trusted deployment policy
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          path: deployment-policy
+          persist-credentials: false
+
+      - name: Decide whether to skip deployment
+        id: policy
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { skipProduction } = require('./deployment-policy/.github/scripts/deploy-policy.cjs');
+            return await skipProduction({ github, context, core });
+
+  ci:
+    needs: policy
+    if: needs.policy.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -65,49 +84,40 @@ jobs:
       - name: Run CI
         run: bin/ci
 
-      - name: Read trusted deployment policy
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.base.sha || github.sha }}
-          path: deployment-policy
-          persist-credentials: false
-
-      - name: Decide whether to skip deployment
-        id: policy
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const { skipProduction } = require('./deployment-policy/.github/scripts/deploy-policy.cjs');
-            return await skipProduction({ github, context, core });
+  build:
+    needs: policy
+    if: needs.policy.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image_package: ${{ steps.deployment.outputs.image_package }}
+    steps:
+      - uses: actions/checkout@v7
 
       - name: Authenticate to Google Cloud
-        if: steps.policy.outputs.result != 'true'
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/332902117625/locations/global/workloadIdentityPools/github-actions/providers/masusono-blog
           service_account: gha-cloud-run-deployer@masusono.iam.gserviceaccount.com
 
       - name: Set up Google Cloud CLI
-        if: steps.policy.outputs.result != 'true'
         uses: google-github-actions/setup-gcloud@v3
 
       - name: Resolve deployment names
-        if: steps.policy.outputs.result != 'true'
         id: deployment
         env:
           DEPLOY_BRANCH: main
         run: ./deploy.sh service-name
 
       - name: Configure Docker for Artifact Registry
-        if: steps.policy.outputs.result != 'true'
         run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
 
       - name: Set up Docker Buildx
-        if: steps.policy.outputs.result != 'true'
         uses: docker/setup-buildx-action@v4
 
       - name: Build and push image
-        if: steps.policy.outputs.result != 'true'
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -116,8 +126,25 @@ jobs:
           cache-from: type=gha,scope=cloud-run-backend
           cache-to: type=gha,scope=cloud-run-backend,mode=max,ignore-error=true
 
+  deploy:
+    needs: [ci, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/332902117625/locations/global/workloadIdentityPools/github-actions/providers/masusono-blog
+          service_account: gha-cloud-run-deployer@masusono.iam.gserviceaccount.com
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
       - name: Deploy to Cloud Run
-        if: steps.policy.outputs.result != 'true'
         env:
-          IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
+          IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ needs.build.outputs.image_package }}:${{ github.sha }}
         run: ./deploy.sh

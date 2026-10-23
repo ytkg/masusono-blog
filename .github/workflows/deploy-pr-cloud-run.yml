@@ -9,18 +9,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  policy:
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
       contains(github.event.pull_request.labels.*.name, 'ステージングデプロイ')
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
-      pull-requests: write
-    defaults:
-      run:
-        working-directory: .
+      pull-requests: read
+    outputs:
+      skip: ${{ steps.policy.outputs.result }}
+    steps:
+      - name: Read trusted deployment policy
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          path: deployment-policy
+          persist-credentials: false
+
+      - name: Decide whether to skip deployment
+        id: policy
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { skipStaging } = require('./deployment-policy/.github/scripts/deploy-policy.cjs');
+            return await skipStaging({ github, context, core });
+
+  ci:
+    needs: policy
+    if: needs.policy.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
 
@@ -39,45 +59,36 @@ jobs:
       - run: npm ci
       - run: bin/ci
 
-      - name: Read trusted deployment policy
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.base.sha || github.sha }}
-          path: deployment-policy
-          persist-credentials: false
-
-      - name: Decide whether to skip deployment
-        id: policy
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const { skipStaging } = require('./deployment-policy/.github/scripts/deploy-policy.cjs');
-            return await skipStaging({ github, context, core });
+  build:
+    needs: policy
+    if: needs.policy.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image_package: ${{ steps.deployment.outputs.image_package }}
+    steps:
+      - uses: actions/checkout@v7
 
       - uses: google-github-actions/auth@v3
-        if: steps.policy.outputs.result != 'true'
         with:
           workload_identity_provider: projects/332902117625/locations/global/workloadIdentityPools/github-actions/providers/masusono-blog
           service_account: gha-cloud-run-deployer@masusono.iam.gserviceaccount.com
 
       - uses: google-github-actions/setup-gcloud@v3
-        if: steps.policy.outputs.result != 'true'
 
       - id: deployment
-        if: steps.policy.outputs.result != 'true'
         env:
           DEPLOY_BRANCH: ${{ github.head_ref }}
         run: ./deploy.sh service-name
 
       - run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
-        if: steps.policy.outputs.result != 'true'
 
       - name: Set up Docker Buildx
-        if: steps.policy.outputs.result != 'true'
         uses: docker/setup-buildx-action@v4
 
       - name: Build and push image
-        if: steps.policy.outputs.result != 'true'
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -86,15 +97,30 @@ jobs:
           cache-from: type=gha,scope=cloud-run-backend
           cache-to: type=gha,scope=cloud-run-backend,mode=max,ignore-error=true
 
+  deploy:
+    needs: [ci, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/332902117625/locations/global/workloadIdentityPools/github-actions/providers/masusono-blog
+          service_account: gha-cloud-run-deployer@masusono.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+
       - id: deploy
-        if: steps.policy.outputs.result != 'true'
         env:
           DEPLOY_BRANCH: ${{ github.head_ref }}
-          IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ steps.deployment.outputs.image_package }}:${{ github.sha }}
+          IMAGE_URI: asia-northeast1-docker.pkg.dev/masusono/cloud-run-source-deploy/${{ needs.build.outputs.image_package }}:${{ github.sha }}
         run: ./deploy.sh
 
       - uses: actions/github-script@v9
-        if: steps.policy.outputs.result != 'true'
         env:
           SERVICE_NAME: ${{ steps.deploy.outputs.service_name }}
           SERVICE_URL: ${{ steps.deploy.outputs.service_url }}

@@ -117,3 +117,26 @@ test('production paginates commits and requires every merged PR to qualify', asy
   f.pr.base.ref = 'other';
   assert.equal(await skipProduction(f), false);
 });
+
+for (const name of ['deploy-cloud-run', 'deploy-pr-cloud-run']) {
+  test(`${name}: skip before expensive work and deploy only after CI and build succeed`, () => {
+    const { readFileSync } = require('node:fs');
+    const source = readFileSync(`${__dirname}/../workflows/${name}.yml`, 'utf8');
+    const jobs = Object.fromEntries([...source.matchAll(/^  (\w+):\n([\s\S]*?)(?=^  \w+:\n|$(?![\s\S]))/gm)]
+      .map((match) => [match[1], match[2]]));
+    assert.match(jobs.policy, /skip: \$\{\{ steps.policy.outputs.result \}\}/);
+    assert.doesNotMatch(jobs.policy, /bin\/ci|npm ci|setup-ruby|google-github-actions/);
+    for (const job of [jobs.ci, jobs.build]) {
+      assert.match(job, /^    needs: policy$/m);
+      assert.match(job, /^    if: needs.policy.outputs.skip != 'true'$/m);
+    }
+    assert.match(jobs.ci, /run: bin\/ci/);
+    assert.doesNotMatch(jobs.ci, /id-token: write/);
+    assert.match(jobs.build, /docker\/build-push-action/);
+    assert.match(jobs.deploy, /^    needs: \[ci, build\]$/m);
+    assert.doesNotMatch(jobs.deploy, /^    if:/m); // Keep the default success gate.
+    assert.match(jobs.deploy, /needs.build.outputs.image_package/);
+    assert.match(jobs.deploy, /google-github-actions\/auth/);
+    assert.match(jobs.deploy, /run: \.\/deploy.sh/);
+  });
+}
