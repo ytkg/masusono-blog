@@ -58,7 +58,8 @@ gh run watch "$RUN_ID" --repo "$REPO" --exit-status
 gh pr checks "$PR_NUMBER" --repo "$REPO"
 ```
 
-workflow は CI → イメージのビルド・公開 → `deploy.sh` → PR コメント更新の順に進む。
+workflow はデプロイ要否を先に判定し、対象の場合は CI とイメージのビルド・公開を並列実行する。
+両方が成功してから `deploy.sh` → PR コメント更新の順に進む。
 サービス反映後もキャッシュ保存などの後処理が続くことがある。
 失敗時は `gh run view "$RUN_ID" --repo "$REPO" --log-failed` で失敗箇所を確認する。
 現在のコミットの失敗を再試行する場合は `gh run rerun "$RUN_ID" --repo "$REPO" --failed` を使う。
