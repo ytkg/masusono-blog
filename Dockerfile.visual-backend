@@ -18,6 +18,9 @@ RUN apt-get update -qq && \
 ENV LD_PRELOAD=/usr/local/lib/libjemalloc.so
 
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
+    ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 COPY vendor/* ./vendor/
 COPY Gemfile Gemfile.lock ./
 RUN bundle install && \
