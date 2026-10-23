@@ -11,7 +11,7 @@ export default function AdsApp() {
     <AppsDialogLauncher
       onOpen={() => setUserId(ensureUserIdCookie())}
       edgeToEdge
-      title="広告（開発中）"
+      title="広告"
       launcherLabel="広告"
       buttonAriaLabel="広告を開く"
       buttonIcon={<CampaignIcon />}
@@ -21,7 +21,7 @@ export default function AdsApp() {
         <Box
           component="iframe"
           src={`https://ads.masusono.com/users/${encodeURIComponent(userId)}/ads`}
-          title="広告（開発中）"
+          title="広告"
           sx={{ display: "block", width: "100%", height: "100%", border: 0 }}
         />
       ) : (

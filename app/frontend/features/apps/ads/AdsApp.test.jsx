@@ -20,10 +20,7 @@ it("共通CookieのIDをURLエンコードして広告を開く", () => {
   document.cookie = "user_id=existing%2Fuser; Path=/"
   render(<AdsApp />)
   fireEvent.click(screen.getByRole("button", { name: "広告を開く" }))
-  expect(screen.getByTitle("広告（開発中）")).toHaveAttribute(
-    "src",
-    "https://ads.masusono.com/users/existing%2Fuser/ads",
-  )
+  expect(screen.getByTitle("広告")).toHaveAttribute("src", "https://ads.masusono.com/users/existing%2Fuser/ads")
 })
 
 it("Cookieがなければ共通IDを発行して使う", () => {
@@ -31,13 +28,13 @@ it("Cookieがなければ共通IDを発行して使う", () => {
   fireEvent.click(screen.getByRole("button", { name: "広告を開く" }))
   const userId = document.cookie.match(/user_id=([^;]+)/)[1]
   expect(userId).toMatch(/^[0-9a-f-]{36}$/)
-  expect(screen.getByTitle("広告（開発中）")).toHaveAttribute("src", `https://ads.masusono.com/users/${userId}/ads`)
+  expect(screen.getByTitle("広告")).toHaveAttribute("src", `https://ads.masusono.com/users/${userId}/ads`)
 })
 
 it("Cookieを保存できない場合は広告を読み込まず案内する", () => {
   vi.spyOn(document, "cookie", "set").mockImplementation(() => {})
   render(<AdsApp />)
   fireEvent.click(screen.getByRole("button", { name: "広告を開く" }))
-  expect(screen.queryByTitle("広告（開発中）")).not.toBeInTheDocument()
+  expect(screen.queryByTitle("広告")).not.toBeInTheDocument()
   expect(screen.getByRole("status")).toHaveTextContent("ブラウザのCookie設定を確認してください。")
 })
