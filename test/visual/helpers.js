@@ -44,6 +44,9 @@ export async function mockBlogmuraBanner(page) {
 }
 
 export async function openPage(page, path) {
+  await page.route("https://ads.masusono.com/ad.js", (route) =>
+    route.fulfill({ contentType: "application/javascript", body: "" }),
+  )
   await mockBlogmuraBanner(page)
   const response = await page.goto(path)
   expect(response?.status()).toBe(200)
