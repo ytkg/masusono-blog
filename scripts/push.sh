@@ -19,7 +19,7 @@ if git diff --quiet "${base}" HEAD -- \
   app config/routes.rb \
   test/visual playwright.config.js vite.config.ts \
   package.json package-lock.json \
-  compose.yml compose.visual.yml Dockerfile Dockerfile.visual \
+  compose.yml compose.visual.yml Dockerfile Dockerfile.visual Dockerfile.visual-backend \
   scripts/check-visual.sh scripts/push.sh; then
   echo "No visual inputs changed; skipping screenshot comparison."
 else

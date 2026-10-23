@@ -1,5 +1,7 @@
 services:
   backend:
+    build:
+      dockerfile: Dockerfile.visual-backend
     user: "0:0"
     depends_on:
       vite:
