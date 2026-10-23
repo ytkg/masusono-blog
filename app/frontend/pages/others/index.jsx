@@ -1,9 +1,9 @@
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, useEffect } from "react"
 import Box from "@mui/material/Box"
 import PageContainer from "../../shared/components/PageContainer"
 import PageHeading from "../../shared/components/PageHeading"
 import SeoHead from "../../shared/components/SeoHead"
-import MasusonoAd from "./MasusonoAd"
+import { usePage } from "@inertiajs/react"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
 const MasudaTatakiApp = lazy(() => import("../../features/apps/masudaTataki/MasudaTatakiApp"))
@@ -32,6 +32,12 @@ function OthersAppFallback() {
 }
 
 export default function OthersIndex() {
+  const { url } = usePage()
+
+  useEffect(() => {
+    window.MasusonoAds?.render()
+  }, [url])
+
   return (
     <>
       <SeoHead
@@ -60,7 +66,7 @@ export default function OthersIndex() {
             <AdminApp />
           </Suspense>
         </Box>
-        <MasusonoAd />
+        <Box data-masusono-ad="others-bottom" sx={{ mt: 4 }} />
       </PageContainer>
     </>
   )

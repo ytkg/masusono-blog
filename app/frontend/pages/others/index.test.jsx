@@ -28,9 +28,17 @@ vi.mock("../../features/apps/admin/AdminApp", () => ({
   default: () => <button>管理を開く</button>,
 }))
 
+vi.mock("@inertiajs/react", () => ({ usePage: () => ({ url: "/others" }) }))
+
 describe("Others page", () => {
   it("その他ページにミニアプリを表示する", async () => {
-    render(<OthersIndex />)
+    const renderAd = vi.fn()
+    window.MasusonoAds = { render: renderAd }
+    const { container } = render(<OthersIndex />)
+
+    expect(container.querySelectorAll('[data-masusono-ad="others-bottom"]')).toHaveLength(1)
+    expect(renderAd).toHaveBeenCalledOnce()
+    delete window.MasusonoAds
 
     expect(screen.getByText("seo:増田とその他のその他！:/others")).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "増田とその他のその他！" })).toBeInTheDocument()
