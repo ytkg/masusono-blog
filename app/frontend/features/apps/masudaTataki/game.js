@@ -17,7 +17,7 @@ export const PACES = [
   [10000, 700, 1000],
   [0, 900, 1200],
 ]
-export const multiplier = (combo) => (10 + Math.max(0, combo - 1)) / 10
+export const comboBonus = (combo) => (combo > 0 && combo % 5 === 0 ? (combo % 10 === 0 ? 500 : 200) : 0)
 export const rank = (score) => RANKS.find(([minimum]) => score >= minimum)[1]
 export const pace = (elapsed) => PACES.find(([minimum]) => elapsed >= minimum).slice(1)
 export const initialGame = () => ({
@@ -50,6 +50,7 @@ export function advance(game, elapsed, random = Math.random) {
   next.holes[index] = {
     kind,
     image: kind === "masuda" ? 0 : 1 + Math.floor(random() * OTHER_IMAGE_COUNT),
+    appearedAt: next.elapsed,
     until: elapsed + lifetime,
     hit: false,
   }
@@ -60,12 +61,18 @@ export function hit(game, index) {
   const character = game.holes[index]
   if (game.elapsed >= DURATION || !character || character.hit) return game
   const combo = character.kind === "masuda" ? game.combo + 1 : 0
-  const points = character.kind === "masuda" ? Math.round(BASE_HIT_POINTS * multiplier(combo)) : -BASE_HIT_POINTS
+  const fast = character.kind === "masuda" && game.elapsed - character.appearedAt <= 300
+  const basePoints = character.kind === "masuda" ? (fast ? 150 : BASE_HIT_POINTS) : 0
+  const bonus = comboBonus(combo)
+  const points = basePoints + bonus
   const holes = [...game.holes]
   holes[index] = {
     ...character,
     hit: true,
     points,
+    basePoints,
+    bonus,
+    fast,
     until: Math.min(character.until, game.elapsed + HIT_DISPLAY_DURATION_MS),
   }
   return {
@@ -73,7 +80,7 @@ export function hit(game, index) {
     holes,
     combo,
     maxCombo: Math.max(combo, game.maxCombo),
-    score: Math.max(0, game.score + points),
+    score: game.score + points,
     hits: game.hits + (character.kind === "masuda" ? 1 : 0),
     mistakes: game.mistakes + (character.kind === "other" ? 1 : 0),
   }
