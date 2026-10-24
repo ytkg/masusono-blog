@@ -31,7 +31,7 @@ gem "thruster", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
 
-gem "faraday", "~> 2.14"
+gem "faraday", "~> 2.15"
 gem "google-cloud-bigquery", "~> 1.64"
 gem "inertia_rails"
 gem "multi_json"
