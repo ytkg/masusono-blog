@@ -102,6 +102,26 @@ describe("記事・APIの鮮度とオフライン境界", () => {
 })
 
 describe("PWAアセットのキャッシュ", () => {
+  it.each([
+    ["open", false],
+    ["open", true],
+    ["put", false],
+    ["put", true],
+  ])("%s失敗・既存キャッシュ有無=%sでも取得済みの応答を返す", async (operation, hasCachedAsset) => {
+    const response = new Response("fresh asset")
+    Object.defineProperty(response, "type", { value: "basic" })
+    fetch.mockResolvedValue(response)
+    caches.match.mockResolvedValue(hasCachedAsset ? new Response("stale asset") : undefined)
+    const failure = new DOMException("Cache unavailable", "QuotaExceededError")
+    if (operation === "open") caches.open.mockRejectedValue(failure)
+    else cache.put.mockRejectedValue(failure)
+
+    const event = request("/icons/icon-192.png")
+    await expect(event.respondWith.mock.calls[0][0]).resolves.toBe(response)
+    expect(await response.text()).toBe("fresh asset")
+    expect(caches.match).not.toHaveBeenCalled()
+  })
+
   it.each(["/manifest.webmanifest", "/icons/icon-192.png", "/favicon-32.png"])(
     "%sの成功した同一オリジン応答だけを複製して保存する",
     async (path) => {
