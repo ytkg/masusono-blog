@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import Box from "@mui/material/Box"
 import ArticleSearchBox from "../features/blog/ArticleSearchBox"
 import ArticleSearchSuggestions from "../features/blog/ArticleSearchSuggestions"
@@ -6,6 +6,7 @@ import { normalizeArticleSearchText, prepareArticleQuery } from "../features/blo
 import ArticlesList from "../features/blog/ArticlesList"
 import useArticleSearchQuery from "../features/blog/useArticleSearchQuery"
 import PageContainer from "../shared/components/PageContainer"
+import MasusonoAd from "../shared/components/MasusonoAd"
 import SeoHead from "../shared/components/SeoHead"
 
 export default function Search({ articles = [] }) {
@@ -16,10 +17,6 @@ export default function Search({ articles = [] }) {
     () => articles.filter(prepareArticleQuery(normalizedQuery)),
     [articles, normalizedQuery],
   )
-
-  useEffect(() => {
-    window.MasusonoAds?.render()
-  }, [query])
 
   function handleSuggestionSelect(nextQuery) {
     pushQuery(nextQuery)
@@ -42,7 +39,7 @@ export default function Search({ articles = [] }) {
             <ArticleSearchSuggestions articles={articles} onSelect={handleSuggestionSelect} />
           )}
         </Box>
-        {!isSearching && <Box data-masusono-ad="search-bottom" sx={{ mt: 4 }} />}
+        <MasusonoAd placement="search-bottom" active={!isSearching} />
       </PageContainer>
     </>
   )
