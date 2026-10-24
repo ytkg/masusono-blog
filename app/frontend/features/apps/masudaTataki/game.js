@@ -12,18 +12,12 @@ export const RANKS = [
   [1000, "B"],
   [0, "C"],
 ]
-export const MULTIPLIERS = [
-  [20, 3],
-  [10, 2],
-  [5, 1.5],
-  [1, 1],
-]
 export const PACES = [
   [20000, 500, 800],
   [10000, 700, 1000],
   [0, 900, 1200],
 ]
-export const multiplier = (combo) => MULTIPLIERS.find(([minimum]) => combo >= minimum)?.[1] ?? 1
+export const multiplier = (combo) => (10 + Math.max(0, combo - 1)) / 10
 export const rank = (score) => RANKS.find(([minimum]) => score >= minimum)[1]
 export const pace = (elapsed) => PACES.find(([minimum]) => elapsed >= minimum).slice(1)
 export const initialGame = () => ({
@@ -66,7 +60,7 @@ export function hit(game, index) {
   const character = game.holes[index]
   if (game.elapsed >= DURATION || !character || character.hit) return game
   const combo = character.kind === "masuda" ? game.combo + 1 : 0
-  const points = character.kind === "masuda" ? BASE_HIT_POINTS * multiplier(combo) : -BASE_HIT_POINTS
+  const points = character.kind === "masuda" ? Math.round(BASE_HIT_POINTS * multiplier(combo)) : -BASE_HIT_POINTS
   const holes = [...game.holes]
   holes[index] = {
     ...character,
