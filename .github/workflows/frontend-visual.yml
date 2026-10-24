@@ -27,20 +27,16 @@ jobs:
       COMPOSE_PROJECT_NAME: masusono-visual
     steps:
       - uses: actions/checkout@v7
-      - name: Restore visual test images
-        id: images
-        uses: actions/cache@v5
+      - name: Set up Docker image store
+        uses: docker/setup-docker-action@v5
         with:
-          path: ${{ runner.temp }}/visual-images.tar
-          key: visual-images-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Dockerfile.visual', 'Dockerfile.visual.dockerignore', 'Dockerfile.visual-backend', '.dockerignore', 'Gemfile', 'Gemfile.lock', 'vendor/**', 'compose.yml', 'compose.visual.yml', '.github/workflows/frontend-visual.yml') }}
-      - name: Load visual test images
-        if: steps.images.outputs.cache-hit == 'true'
-        run: docker image load --input "${{ runner.temp }}/visual-images.tar"
+          daemon-config: |
+            {"features": {"containerd-snapshotter": true}}
       - name: Set up Docker Buildx
-        if: steps.images.outputs.cache-hit != 'true'
         uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker
       - name: Build visual test images
-        if: steps.images.outputs.cache-hit != 'true'
         uses: docker/bake-action@v7
         with:
           source: .
@@ -48,7 +44,6 @@ jobs:
             ./compose.yml
             ./compose.visual.yml
           targets: backend,visual
-          load: true
           set: |
             backend.tags=masusono-visual-backend
             visual.tags=masusono-visual-visual
@@ -56,11 +51,6 @@ jobs:
             backend.cache-to=type=gha,scope=frontend-visual-backend-${{ matrix.project }}-${{ matrix.shard }},mode=max
             visual.cache-from=type=gha,scope=frontend-visual-browser-${{ matrix.project }}-${{ matrix.shard }}
             visual.cache-to=type=gha,scope=frontend-visual-browser-${{ matrix.project }}-${{ matrix.shard }},mode=max
-      - name: Save visual test images
-        if: steps.images.outputs.cache-hit != 'true'
-        run: |
-          docker pull node:22-bookworm
-          docker image save --output "${{ runner.temp }}/visual-images.tar" masusono-visual-backend masusono-visual-visual node:22-bookworm
       - name: Cache npm downloads
         uses: actions/cache@v5
         with:

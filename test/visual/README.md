@@ -38,7 +38,7 @@ Compose ラッパーや通常の `docker compose` で直接実行した場合は
 
 GitHub Actions は desktop / mobile をそれぞれ `--shard=1/2`・`--shard=2/2` で2分割し、計4ジョブを別ランナーで実行します。`fullyParallel: true` によりファイル内のテストも分配し、4ジョブすべての成功で全比較を確認します。失敗時の artifact は `visual-test-results-desktop-1` / `visual-test-results-desktop-2` / `visual-test-results-mobile-1` / `visual-test-results-mobile-2` です。Docker のキャッシュも画面種別・分割番号ごとに分け、同時書き込みの競合を避けます。ローカルの全比較は分割せず実行します。
 
-CI は backend・撮影用ブラウザ・Node.js のビルド済みイメージを GitHub Actions のキャッシュに保存し、ヒット時は Buildx とイメージの再ビルドを省略します。キャッシュキーには OS・CPU アーキテクチャ、Dockerfile・Compose・Gemfile・vendor・撮影用フォント設定・workflow のハッシュを含めます。アプリとフロントエンドはキャッシュに含めず、各ジョブで現在のソースをマウントしてビルドします。キャッシュミス時は従来の Docker レイヤーキャッシュを利用してビルドします。npm のダウンロードは `tmp/npm-cache` に保存してロックファイルごとに再利用し、依存の導入自体は毎回 `npm ci` で行います。
+CI は containerd image store を有効にした Docker の `docker` ドライバーでビルドし、ビルド結果を直接ローカルのイメージストアへ保持します。別の BuildKit コンテナからの Docker イメージ出力・再読み込みを省き、従来の GitHub Actions レイヤーキャッシュを引き続き使います。アプリは各ジョブで現在のソースをマウントしてビルドします。npm のダウンロードは `tmp/npm-cache` に保存してロックファイルごとに再利用し、依存の導入自体は毎回 `npm ci` で行います。
 
 テストはファイル内も含めて並列実行し、公開リポジトリの4コアCIでは4ワーカー、ローカルでは2ワーカーを使います。各テストのブラウザコンテキストとモックは独立させ、共有する撮影用データは変更しません。並列数は `run --rm visual npm run test:visual -- --workers=1` のように指定できます。
 
