@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test"
+import { parse } from "parse5"
 
 export async function waitForClientReady(page) {
   await expect(page.locator("#app")).toHaveAttribute("data-client-ready", "true")
@@ -28,10 +29,19 @@ export async function mockPageProps(page, path, transform) {
       )
       expect(replaced, "Inertia initial page must be replaced").toBe(true)
       // The replacement props differ from the server HTML: mount this mocked page afresh.
-      body = body.replace(
-        /<div data-server-rendered="true" id="app">[\s\S]*<\/div>(\s*<\/body>)/,
-        '<div id="app"></div>$1',
-      )
+      const nodes = [parse(body, { sourceCodeLocationInfo: true })]
+      let root
+      while (nodes.length) {
+        const node = nodes.pop()
+        if (node.attrs?.some(({ name, value }) => name === "id" && value === "app")) {
+          root = node
+          break
+        }
+        nodes.push(...(node.childNodes || []))
+      }
+      expect(root, "Inertia root must be replaced").toBeTruthy()
+      const { startOffset, endOffset } = root.sourceCodeLocation
+      body = body.slice(0, startOffset) + '<div id="app"></div>' + body.slice(endOffset)
       await route.fulfill({ response, body })
     },
   )
