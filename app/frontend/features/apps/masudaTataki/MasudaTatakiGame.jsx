@@ -117,9 +117,9 @@ export default function MasudaTatakiGame({ active = true }) {
             <Typography sx={{ fontWeight: 700 }}>{game.score}点</Typography>
             <Typography
               key={game.combo}
-              sx={{ fontWeight: game.combo >= 5 ? 900 : 400, color: game.combo >= 5 ? "success.main" : "text.primary" }}
+              sx={{ fontWeight: game.combo >= 2 ? 900 : 400, color: game.combo >= 2 ? "success.main" : "text.primary" }}
             >
-              {game.combo}コンボ ×{multiplier(game.combo)}
+              {game.combo}コンボ ×{multiplier(game.combo).toFixed(1)}
             </Typography>
           </Box>
           <Box

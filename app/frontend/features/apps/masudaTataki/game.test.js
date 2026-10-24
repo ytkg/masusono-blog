@@ -8,7 +8,7 @@ const withCharacter = (kind = "masuda", combo = 0, score = 0) => ({
 })
 describe("増田たたき", () => {
   it("得点倍率とランクの境界", () => {
-    expect([1, 4, 5, 9, 10, 19, 20].map(multiplier)).toEqual([1, 1, 1.5, 1.5, 2, 2, 3])
+    expect([0, 1, 2, 3, 4, 10, 20, 100].map(multiplier)).toEqual([1, 1, 1.1, 1.2, 1.3, 1.9, 2.9, 10.9])
     expect([0, 999, 1000, 2999, 3000, 5999, 6000].map(rank)).toEqual(["C", "C", "B", "B", "A", "A", "S"])
     expect([0, 9999, 10000, 19999, 20000].map(pace)).toEqual([
       [900, 1200],
@@ -18,9 +18,12 @@ describe("増田たたき", () => {
       [500, 800],
     ])
   })
-  it("5回目から倍率を適用し二重加点しない", () => {
-    const next = hit(withCharacter("masuda", 4), 0)
-    expect(next).toMatchObject({ score: 150, combo: 5, maxCombo: 5, hits: 1 })
+  it("連続成功ごとの倍率を整数の得点に適用し二重加点しない", () => {
+    for (const combo of [0, 1, 2, 3, 19, 99]) {
+      expect(hit(withCharacter("masuda", combo), 0).score).toBe(100 + combo * 10)
+    }
+    const next = hit(withCharacter("masuda", 1, 100), 0)
+    expect(next).toMatchObject({ score: 210, combo: 2, maxCombo: 2, hits: 1 })
     expect(hit(next, 0)).toBe(next)
   })
   it("その他の減点は固定で下限0、コンボをリセット", () => {
