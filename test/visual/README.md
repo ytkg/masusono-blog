@@ -36,7 +36,7 @@ Compose ラッパーや通常の `docker compose` で直接実行した場合は
 
 撮影用 Rails イメージは `Dockerfile.visual-backend` で依存ライブラリだけを用意し、アプリは worktree からマウントします。CI ではフロントのビルドを Vite サービス起動時の1回にまとめ、比較ステップは `npx playwright test` で起動済みサービスが用意したビルドを使います。ローカルの `npm run test:visual` と基準画像更新コマンドは、起動後のソース変更にも対応できるよう引き続きビルドします。
 
-GitHub Actions は desktop / mobile を別ランナーで実行し、両方の成功で全比較を確認します。失敗時の artifact は `visual-test-results-desktop` / `visual-test-results-mobile` です。Docker のキャッシュも各ジョブで分け、同時書き込みの競合を避けます。
+GitHub Actions は desktop / mobile をそれぞれ `--shard=1/2`・`--shard=2/2` で2分割し、計4ジョブを別ランナーで実行します。`fullyParallel: true` によりファイル内のテストも分配し、4ジョブすべての成功で全比較を確認します。失敗時の artifact は `visual-test-results-desktop-1` / `visual-test-results-desktop-2` / `visual-test-results-mobile-1` / `visual-test-results-mobile-2` です。Docker のキャッシュも画面種別・分割番号ごとに分け、同時書き込みの競合を避けます。ローカルの全比較は分割せず実行します。
 
 テストはファイル内も含めて並列実行し、公開リポジトリの4コアCIでは4ワーカー、ローカルでは2ワーカーを使います。各テストのブラウザコンテキストとモックは独立させ、共有する撮影用データは変更しません。並列数は `run --rm visual npm run test:visual -- --workers=1` のように指定できます。
 
