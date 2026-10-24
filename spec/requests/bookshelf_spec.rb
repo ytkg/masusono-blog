@@ -24,6 +24,18 @@ RSpec.describe "Bookshelf", type: :request do
     expect(response.parsed_body.fetch("books").size).to eq(1)
   end
 
+  context "publication date does not exist" do
+    let(:article) { super().merge(publishedAt: "2026-02-29T00:00:00Z") }
+
+    it "returns an empty shelf without looking up metadata for the invalid article" do
+      get "/api/app/bookshelf"
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to eq("books" => [], "partial" => false)
+      expect(response.headers["Cache-Control"]).to include("no-store")
+      expect(a_request(:get, Bookshelf::Catalog::ENDPOINT)).not_to have_been_made
+    end
+  end
+
   context "metadata is absent" do
     let(:summary) { { isbn: "9784101010014", title: "吾輩は猫である", author: "" } }
 

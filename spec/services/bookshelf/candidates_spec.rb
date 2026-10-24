@@ -41,4 +41,16 @@ RSpec.describe Bookshelf::Candidates do
     ])
     expect(books.pluck(:isbn)).to eq(%w[9780804429573 9784101010014])
   end
+
+  it "skips invalid publication dates without rolling them into the next month" do
+    invalid_dates = [ "2026-02-29T00:00:00Z", "2026-04-31T00:00:00Z", "invalid", nil, "", 123 ]
+    articles = invalid_dates.each_with_index.map { |date, index| article("invalid-#{index}", date, link("4101010013")) }
+    articles << article("leap-day", "2024-02-29T23:00:00+09:00", link("4101010013"))
+    articles << article("valid", "2026-03-01T00:00:00Z", link("4101010013"))
+
+    book = described_class.call(articles).sole
+    expect(book[:appearances].keys).to eq(%w[leap-day valid])
+    expect(book[:first][:id]).to eq("leap-day")
+    expect(book[:appearances]["leap-day"][:publishedAt]).to eq("2024-02-29T23:00:00+09:00")
+  end
 end

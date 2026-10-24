@@ -191,7 +191,7 @@ IDなし・不正ID・除外対象は false。クエリでのID指定は受け�
 
 ## 本棚 API
 
-- `GET /api/app/bookshelf`: `{ "books": Array<{ "isbn": String, "title": String, "author": String, "amazonUrl": String, "articles": Array<{ "id": String, "title": String, "publishedAt": String }> }>, "partial": Boolean }`。公開記事全件の本文リンクを検証済みISBN-13で集約する。初登場日時降順、同日時は基準記事ID昇順・本文リンク順。対応記事は公開日時降順・同日時はID昇順。openBDの同一ISBNの書名・著者がそろう本だけを返す。正常0件は空配列、一部取得失敗は取得できた本と `partial: true`、失敗により表示できない場合は共通upstreamエラー。
+- `GET /api/app/bookshelf`: `{ "books": Array<{ "isbn": String, "title": String, "author": String, "amazonUrl": String, "articles": Array<{ "id": String, "title": String, "publishedAt": String }> }>, "partial": Boolean }`。公開記事全件の本文リンクを検証済みISBN-13で集約する。公開日時が空・不正、または存在しない暦日の記事は除外し、翌月へ丸めない。初登場日時降順、同日時は基準記事ID昇順・本文リンク順。対応記事は公開日時降順・同日時はID昇順。openBDの同一ISBNの書名・著者がそろう本だけを返す。正常0件は空配列、一部取得失敗は取得できた本と `partial: true`、失敗により表示できない場合は共通upstreamエラー。
 - `GET /api/app/bookshelf/:isbn/cover`: `{ "cover": { "imageUrl": String, "googleBooksUrl": String, "removalContactUrl": String } | null }`。Google BooksのISBN一致画像のみ返す。設定不足・画像なし・照合不可・通信障害はいずれも `null`。書誌・記事リンクの表示を妨げない。Googleの429は共通形式の503 (`upstream_rate_limited`) とし、クライアントはその起動中の追加表紙照会を止める。
 
 どちらも認証不要・`Cache-Control: no-store`。認証情報を返さず、永続保存しない。運用条件と制限は [本棚](bookshelf.md) を参照。
