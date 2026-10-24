@@ -944,7 +944,7 @@ test("masuda tataki play and replay", async ({ page }) => {
   await expect(grid).toBeInViewport()
   await expect.soft(page).toHaveScreenshot("masuda-tataki-playing.png", { maxDiffPixelRatio: 0 })
   await page.getByRole("button", { name: "穴1 増田", exact: true }).click()
-  await expect(page.getByText("100点", { exact: true })).toBeVisible()
+  await expect(page.getByText("150点", { exact: true })).toBeVisible()
   await page.clock.fastForward(30000)
   await expect(page.getByRole("status")).toHaveText("TIME UP!")
   await page.clock.runFor(1000)

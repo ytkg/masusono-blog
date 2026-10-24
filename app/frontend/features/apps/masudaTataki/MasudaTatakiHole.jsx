@@ -81,18 +81,29 @@ export default function MasudaTatakiHole({ character, index, elapsed, onTap }) {
           sx={{
             position: "absolute",
             inset: 0,
-            display: "grid",
-            placeItems: "center",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
             fontWeight: 900,
-            fontSize: 24,
+            fontSize: character.kind === "other" || character.fast || character.bonus ? 14 : 20,
+            lineHeight: 1.5,
             zIndex: 3,
             textShadow: "0 1px 2px white",
             color: character.points > 0 ? "success.main" : "error.main",
             bgcolor: "transparent",
           }}
         >
-          {character.points > 0 ? "+" : ""}
-          {character.points}
+          {character.kind === "other" ? (
+            "コンボ終了"
+          ) : (
+            <>
+              <span>
+                {character.fast ? "早い！" : ""}＋{character.basePoints}
+              </span>
+              {character.bonus > 0 && <span>コンボ＋{character.bonus}</span>}
+            </>
+          )}
         </Typography>
       )}
     </Box>

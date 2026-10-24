@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest"
-import { advance, DURATION, hit, initialGame, multiplier, pace, rank } from "./game"
+import { advance, DURATION, hit, initialGame, comboBonus, pace, rank } from "./game"
 const withCharacter = (kind = "masuda", combo = 0, score = 0) => ({
   ...initialGame(),
   combo,
   score,
-  holes: [{ kind, image: 0, until: 1200, hit: false }, ...Array(8).fill(null)],
+  holes: [{ kind, image: 0, appearedAt: 0, until: 1200, hit: false }, ...Array(8).fill(null)],
 })
 describe("増田たたき", () => {
-  it("得点倍率とランクの境界", () => {
-    expect([0, 1, 2, 3, 4, 10, 20, 100].map(multiplier)).toEqual([1, 1, 1.1, 1.2, 1.3, 1.9, 2.9, 10.9])
+  it("コンボボーナスとランクの境界", () => {
+    expect([0, 1, 4, 5, 6, 9, 10, 15, 20, 25, 30].map(comboBonus)).toEqual([
+      0, 0, 0, 200, 0, 0, 500, 200, 500, 200, 500,
+    ])
     expect([0, 999, 1000, 2999, 3000, 5999, 6000].map(rank)).toEqual(["C", "C", "B", "B", "A", "A", "S"])
     expect([0, 9999, 10000, 19999, 20000].map(pace)).toEqual([
       [900, 1200],
@@ -18,17 +20,47 @@ describe("増田たたき", () => {
       [500, 800],
     ])
   })
-  it("連続成功ごとの倍率を整数の得点に適用し二重加点しない", () => {
-    for (const combo of [0, 1, 2, 3, 19, 99]) {
-      expect(hit(withCharacter("masuda", combo), 0).score).toBe(100 + combo * 10)
+  it("出現から300ミリ秒以内は150点、それ以降は100点", () => {
+    for (const [elapsed, points] of [
+      [1000, 150],
+      [1299, 150],
+      [1300, 150],
+      [1301, 100],
+    ]) {
+      const game = withCharacter()
+      game.elapsed = elapsed
+      game.holes[0].appearedAt = 1000
+      game.holes[0].until = 2200
+      const next = hit(game, 0)
+      expect(next.score).toBe(points)
+      expect(next.holes[0]).toMatchObject({ basePoints: points, bonus: 0, fast: points === 150 })
+      expect(hit(next, 0)).toBe(next)
     }
-    const next = hit(withCharacter("masuda", 1, 100), 0)
-    expect(next).toMatchObject({ score: 210, combo: 2, maxCombo: 2, hits: 1 })
-    expect(hit(next, 0)).toBe(next)
   })
-  it("その他の減点は固定で下限0、コンボをリセット", () => {
-    expect(hit(withCharacter("other", 20, 50), 0)).toMatchObject({ score: 0, combo: 0, mistakes: 1 })
-    expect(hit(withCharacter("other", 20, 500), 0).score).toBe(400)
+  it("早叩きとコンボボーナスを別々に加算する", () => {
+    for (const [combo, bonus] of [
+      [4, 200],
+      [9, 500],
+      [14, 200],
+      [19, 500],
+    ]) {
+      const next = hit(withCharacter("masuda", combo, 1000), 0)
+      expect(next).toMatchObject({ score: 1150 + bonus, combo: combo + 1, maxCombo: combo + 1, hits: 1 })
+      expect(next.holes[0]).toMatchObject({ basePoints: 150, bonus, points: 150 + bonus })
+      expect(hit({ ...withCharacter("masuda", combo), elapsed: 301 }, 0).score).toBe(100 + bonus)
+    }
+  })
+  it("その他は減点せずコンボだけをリセットし、次の5連続でまたボーナスを狙える", () => {
+    const missed = hit({ ...withCharacter("other", 9, 1550), maxCombo: 9 }, 0)
+    expect(missed).toMatchObject({ score: 1550, combo: 0, mistakes: 1 })
+    expect(missed.holes[0].points).toBe(0)
+    let game = missed
+    for (let i = 0; i < 5; i++) {
+      game = hit({ ...withCharacter("masuda", game.combo, game.score), maxCombo: game.maxCombo }, 0)
+    }
+    expect(game).toMatchObject({ score: 2500, combo: 5, maxCombo: 9 })
+    expect(hit(withCharacter("other"), 0).score).toBe(0)
+    expect(advance(withCharacter("masuda", 9, 1550), 1200, () => 0)).toMatchObject({ score: 1550, combo: 0 })
   })
   it("空振りはコンボを維持", () => {
     const game = withCharacter("masuda", 5)

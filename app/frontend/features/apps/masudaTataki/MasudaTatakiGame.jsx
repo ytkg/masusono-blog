@@ -6,7 +6,7 @@ import { useAppLoading } from "../shared/AppsLoadingContext"
 import usePageVisible from "@/shared/hooks/usePageVisible"
 import { useAppActive } from "../shared/AppActivityContext"
 import { IMAGES, loadImages } from "./assets"
-import { DURATION, multiplier, rank } from "./game"
+import { comboBonus, DURATION, rank } from "./game"
 import { useMasudaTatakiGame } from "./useMasudaTatakiGame"
 import { FieldGround } from "./TatakiFieldArt"
 import MasudaTatakiHole from "./MasudaTatakiHole"
@@ -75,8 +75,10 @@ export default function MasudaTatakiGame({ active = true }) {
             }}
           />
           <Typography>増田をタップして +100点！</Typography>
-          <Typography>その他を叩くと -100点。</Typography>
-          <Typography sx={{ mb: 2 }}>30秒間、連続ヒットでコンボ倍率アップ！</Typography>
+          <Typography>300ミリ秒以内なら +150点！</Typography>
+          <Typography>5コンボごとに +200点！</Typography>
+          <Typography>10コンボごとは +500点！</Typography>
+          <Typography sx={{ mb: 2 }}>30秒間、その他を避けてコンボをつなごう！</Typography>
           {assets === "error" ? (
             <>
               <Typography role="alert">画像を読み込めませんでした。</Typography>
@@ -119,9 +121,12 @@ export default function MasudaTatakiGame({ active = true }) {
               key={game.combo}
               sx={{ fontWeight: game.combo >= 2 ? 900 : 400, color: game.combo >= 2 ? "success.main" : "text.primary" }}
             >
-              {game.combo}コンボ ×{multiplier(game.combo).toFixed(1)}
+              {game.combo}コンボ
             </Typography>
           </Box>
+          <Typography variant="body2">
+            次のボーナスまであと{5 - (game.combo % 5)}回（＋{comboBonus(game.combo + 5 - (game.combo % 5))}点）
+          </Typography>
           <Box
             sx={{
               position: "relative",
@@ -160,7 +165,7 @@ export default function MasudaTatakiGame({ active = true }) {
               </Box>
             )}
           </Box>
-          <Typography variant="caption">増田 +100 ／ その他 -100 ／ 連続ヒットで倍率アップ</Typography>
+          <Typography variant="caption">早いヒット +150 ／ 通常 +100 ／ その他はコンボ終了</Typography>
         </>
       )}
     </Box>

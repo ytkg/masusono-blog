@@ -13,3 +13,25 @@ it("右・中央ボタンを採点せず、通常のpointerとキーボードcli
   fireEvent.click(hole, { detail: 0 })
   expect(onTap).toHaveBeenCalledTimes(2)
 })
+
+it("早叩きとコンボボーナスの内訳、減点なしの誤タップを表示する", () => {
+  const props = { index: 0, elapsed: 100, onTap: vi.fn() }
+  const { rerender } = render(
+    <MasudaTatakiHole
+      {...props}
+      character={{ kind: "masuda", image: 0, hit: true, fast: true, basePoints: 150, bonus: 500, points: 650 }}
+    />,
+  )
+  expect(screen.getByText("早い！＋150")).toBeInTheDocument()
+  expect(screen.getByText("コンボ＋500")).toBeInTheDocument()
+  rerender(
+    <MasudaTatakiHole
+      {...props}
+      character={{ kind: "masuda", image: 0, hit: true, fast: false, basePoints: 100, bonus: 0, points: 100 }}
+    />,
+  )
+  expect(screen.getByText("＋100")).toBeInTheDocument()
+  expect(screen.queryByText(/コンボ＋/)).not.toBeInTheDocument()
+  rerender(<MasudaTatakiHole {...props} character={{ kind: "other", image: 1, hit: true, points: 0 }} />)
+  expect(screen.getByText("コンボ終了")).toBeInTheDocument()
+})
