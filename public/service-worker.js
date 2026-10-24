@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "masusono-cache-"
-const CACHE_NAME = `${CACHE_PREFIX}v9`
+const CACHE_NAME = `${CACHE_PREFIX}v10`
 const OFFLINE_URL = "/offline.html"
 const PRECACHE_URLS = [
   OFFLINE_URL,
@@ -41,8 +41,12 @@ async function handlePwaAssetRequest(request) {
   try {
     const networkResponse = await fetch(request)
     if (isSuccessfulBasicResponse(networkResponse)) {
-      const cache = await caches.open(CACHE_NAME)
-      await cache.put(request, networkResponse.clone())
+      try {
+        const cache = await caches.open(CACHE_NAME)
+        await cache.put(request, networkResponse.clone())
+      } catch (_error) {
+        // Cache storage failure must not discard a successful network response.
+      }
     }
     return networkResponse
   } catch (_error) {

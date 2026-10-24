@@ -1,7 +1,8 @@
-import { lazy, Suspense, useEffect } from "react"
+import { lazy, Suspense } from "react"
 import Box from "@mui/material/Box"
 import PageContainer from "../../shared/components/PageContainer"
 import PageHeading from "../../shared/components/PageHeading"
+import MasusonoAd from "../../shared/components/MasusonoAd"
 import SeoHead from "../../shared/components/SeoHead"
 import { usePage } from "@inertiajs/react"
 
@@ -34,10 +35,6 @@ function OthersAppFallback() {
 export default function OthersIndex() {
   const { url } = usePage()
 
-  useEffect(() => {
-    window.MasusonoAds?.render()
-  }, [url])
-
   return (
     <>
       <SeoHead
@@ -66,7 +63,7 @@ export default function OthersIndex() {
             <AdminApp />
           </Suspense>
         </Box>
-        <Box data-masusono-ad="others-bottom" sx={{ mt: 4 }} />
+        <MasusonoAd placement="others-bottom" refreshKey={url} />
       </PageContainer>
     </>
   )
