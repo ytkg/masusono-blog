@@ -1,4 +1,6 @@
 services:
+  node_modules_init:
+    image: node:22-bookworm-slim
   backend:
     build:
       dockerfile: Dockerfile.visual-backend
@@ -17,10 +19,13 @@ services:
       timeout: 2s
       retries: 60
   vite:
+    image: node:22-bookworm-slim
     user: "0:0"
+    environment:
+      npm_config_cache: /rails/tmp/npm-cache
     command: sh -lc "npm ci --no-audit --no-fund && npm run build && npm run dev -- --host 0.0.0.0 --port 3036"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:3036/"]
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3036/', {redirect: 'manual'}).then(response => process.exit(response.status < 400 ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 2s
       timeout: 2s
       retries: 60
