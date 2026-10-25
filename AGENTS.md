@@ -1,18 +1,12 @@
 # masusono-blog
 
-Rails / Inertia + React の構成・起動方法は [README](README.md) を参照する。
+Rails / Inertia + React。起動方法は [README](README.md)、詳細は [目的別の目次](docs/README.md)。文書を一括で読まず、作業に該当する文書・節だけ参照する。
 
 - コード・設定・ドキュメントの変更には [masusono-worktree](.codex/skills/masusono-worktree/SKILL.md) を使い、専用 worktree と Compose ラッパーで作業する。main や他の作業環境を変更しない。
 - 変更依頼は、ユーザーが止めた場合やレビューのみ・PR 不要の場合を除き、検証・コミット・push・PR 作成・CI 確認まで完了する。PR に検証結果を記載し、対応 Issue は `Closes #番号` で結ぶ。
 - push は `scripts/push.sh` を使う。PR 作成後の専用環境の片付けは worktree Skill に従う。保持の指定がなければマージを待たず片付ける。
 
-## 責務
-
-- アプリの Controller は1アクションにつき専用 Usecase を1つ呼ぶ。URL の別名は同じ入口を使い、薄い Usecase も許す。Rails のヘルスチェックとルートのリダイレクトは対象外。
-- Usecase は Controller からのみ呼び、Usecase 同士・Job・Batch からは呼ばない。共通処理は Service / Model に置く。
-- Controller は HTTP 入出力・認証・CSRF・セッション・HTTP ステータス・render / redirect、Usecase は処理手順と最終 props / JSON 等のデータ整形を担う。
-- Concern は独立した小さい補助メソッドに留め、アクションの処理手順を隠さない。層をまたぐ共通 Concern は `app/services/concerns/` に置く。
-- API 変更時は [レスポンス契約](docs/api-response-contract.md) と request spec を更新する。共通エラー・no-store・request ID と upstream 障害の扱いを維持する。
+- バックエンド・API 変更前に [責務と API 変更ルール](docs/architecture.md) を参照する。
 
 ## 検証・外部操作
 
