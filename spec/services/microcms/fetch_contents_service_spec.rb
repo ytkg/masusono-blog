@@ -177,6 +177,17 @@ RSpec.describe Microcms::FetchContentsService do
       end
     end
 
+    context "最初のページだけで取得件数の上限を超える場合" do
+      let(:first_page_contents) { [ { id: "first" }, { id: "second" } ] }
+
+      before { ENV["MICROCMS_MAX_TOTAL_COUNT"] = "1" }
+
+      it "上限までの内容を返し、打ち切りを記録する" do
+        expect(result.pluck(:id)).to eq([ "first" ])
+        expect(logger).to have_received(:warn).with(include("error_type=max_total_count_reached"))
+      end
+    end
+
     context "初回取得が失敗する場合" do
       let(:body) { '{"message":"server error"}' }
       let(:first_page_status) { 500 }
@@ -229,6 +240,12 @@ RSpec.describe Microcms::FetchContentsService do
       it "既存の解析エラーを維持する" do
         expect { result }.to raise_error(JSON::ParserError)
       end
+    end
+  end
+
+  describe "#parse_meta" do
+    it "不正なJSONのメタデータを空として扱う" do
+      expect(described_class.new(api_key: "test-key").parse_meta("invalid")).to eq({})
     end
   end
 end

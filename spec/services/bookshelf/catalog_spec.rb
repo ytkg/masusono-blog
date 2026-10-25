@@ -18,4 +18,13 @@ RSpec.describe Bookshelf::Catalog do
     expect(result[:books].sole[:articles].pluck(:id)).to eq(%w[new old])
     expect(a_request(:get, described_class::ENDPOINT).with(query: { isbn: "9784101010021" })).not_to have_been_made
   end
+
+  it "時間予算を使い切ったら追加リクエストを送らず取得済みの本を返す" do
+    allow(Process).to receive(:clock_gettime).and_call_original
+    allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC).and_return(0, 1, 21)
+
+    expect(result[:partial]).to be(true)
+    expect(result[:books].sole[:isbn]).to eq("9784101010014")
+    expect(a_request(:get, described_class::ENDPOINT).with(query: { isbn: "9780804429573" })).not_to have_been_made
+  end
 end
