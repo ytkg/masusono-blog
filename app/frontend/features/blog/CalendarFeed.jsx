@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box"
-import { blue } from "@mui/material/colors"
 import Button from "@mui/material/Button"
 import MenuItem from "@mui/material/MenuItem"
 import TextField from "@mui/material/TextField"
@@ -90,17 +89,17 @@ export default function CalendarFeed() {
                 px: 0,
                 flexDirection: "column",
                 border: "1px solid",
-                borderColor: selected ? blue[700] : today ? "primary.main" : "divider",
+                borderColor: selected || today ? "primary.main" : "divider",
                 ...(today && {
                   outline: "2px solid",
-                  outlineColor: count ? "primary.contrastText" : "primary.main",
+                  outlineColor: selected ? "primary.contrastText" : "primary.main",
                   outlineOffset: -4,
                 }),
-                bgcolor: selected ? blue[700] : count ? "primary.light" : "background.paper",
-                color: count ? "primary.contrastText" : "text.primary",
+                bgcolor: selected ? "primary.main" : "background.paper",
+                color: selected ? "primary.contrastText" : "text.primary",
                 "&.Mui-focusVisible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 2 },
-                "&:hover": { bgcolor: selected ? blue[800] : "primary.light" },
-                "&.Mui-disabled": { color: "text.primary", borderColor: today ? "primary.main" : "divider" },
+                "&:hover": { bgcolor: selected ? "primary.dark" : "action.hover" },
+                "&.Mui-disabled": { color: "text.disabled", borderColor: today ? "primary.main" : "divider" },
               }}
             >
               <Typography component="span" sx={{ fontWeight: 700 }}>
