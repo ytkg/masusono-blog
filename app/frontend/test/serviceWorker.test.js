@@ -1,12 +1,10 @@
 // @vitest-environment node
-import { readFileSync } from "node:fs"
-import { runInNewContext } from "node:vm"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-const source = readFileSync(new URL("../../../public/service-worker.js", import.meta.url), "utf8")
 let listeners, cache, caches, fetch, worker
 
-beforeEach(() => {
+beforeEach(async () => {
+  vi.resetModules()
   listeners = new Map()
   cache = { addAll: vi.fn().mockResolvedValue(), match: vi.fn(), put: vi.fn().mockResolvedValue() }
   caches = {
@@ -22,9 +20,13 @@ beforeEach(() => {
     skipWaiting: vi.fn().mockResolvedValue(),
     clients: { claim: vi.fn().mockResolvedValue() },
   }
-  // Execute the shipped script through its registered events without a live browser or network.
-  runInNewContext(source, { self: worker, caches, fetch, URL, Response })
+  vi.stubGlobal("self", worker)
+  vi.stubGlobal("caches", caches)
+  vi.stubGlobal("fetch", fetch)
+  await import("../../../public/service-worker.js")
 })
+
+afterEach(() => vi.unstubAllGlobals())
 
 function request(path, options = {}) {
   const event = {
@@ -197,5 +199,70 @@ describe("Service Workerの更新", () => {
     await lifecycle("activate")
     expect(caches.delete.mock.calls).toEqual([["masusono-cache-old"]])
     expect(worker.clients.claim).toHaveBeenCalledOnce()
+  })
+})
+
+describe("プッシュ通知", () => {
+  beforeEach(() => {
+    worker.registration = { showNotification: vi.fn().mockResolvedValue() }
+    worker.clients.matchAll = vi.fn().mockResolvedValue([])
+    worker.clients.openWindow = vi.fn().mockResolvedValue()
+  })
+
+  it("通知のタイトル・本文・遷移先とアイコンを渡し、表示完了を待つ", async () => {
+    const waitUntil = vi.fn()
+    listeners.get("push")({
+      data: { json: () => ({ title: "新着記事", body: "記事の概要", url: "/articles/new" }) },
+      waitUntil,
+    })
+    expect(worker.registration.showNotification).toHaveBeenCalledWith("新着記事", {
+      body: "記事の概要",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url: "/articles/new" },
+    })
+    expect(waitUntil).toHaveBeenCalledWith(worker.registration.showNotification.mock.results[0].value)
+    await waitUntil.mock.calls[0][0]
+  })
+
+  it.each([undefined, null, {}, { title: "   ", body: 42, url: "https://example.com" }, { title: 123, url: null }])(
+    "不完全な通知データ %j は既定値で表示する",
+    async (payload) => {
+      const waitUntil = vi.fn()
+      listeners.get("push")({ data: payload === undefined ? undefined : { json: () => payload }, waitUntil })
+      await waitUntil.mock.calls[0][0]
+      expect(worker.registration.showNotification).toHaveBeenCalledWith(
+        "増田とその他！",
+        expect.objectContaining({ body: "", data: { url: "/" } }),
+      )
+    },
+  )
+
+  it("同じURLのウィンドウがあれば通知を閉じてフォーカスする", async () => {
+    const other = { url: "https://masusono.com/", focus: vi.fn() }
+    const existing = { url: "https://masusono.com/articles/new", focus: vi.fn().mockResolvedValue() }
+    worker.clients.matchAll.mockResolvedValue([other, existing])
+    const notification = { close: vi.fn(), data: { url: "/articles/new" } }
+    const waitUntil = vi.fn()
+    listeners.get("notificationclick")({ notification, waitUntil })
+    await waitUntil.mock.calls[0][0]
+    expect(notification.close).toHaveBeenCalledOnce()
+    expect(worker.clients.matchAll).toHaveBeenCalledWith({ type: "window", includeUncontrolled: true })
+    expect(existing.focus).toHaveBeenCalledOnce()
+    expect(other.focus).not.toHaveBeenCalled()
+    expect(worker.clients.openWindow).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ url: "/articles/new" }, "https://masusono.com/articles/new"],
+    [undefined, "https://masusono.com/"],
+    [{}, "https://masusono.com/"],
+  ])("対象ウィンドウがなければ通知の遷移先 %j を開く", async (data, target) => {
+    const waitUntil = vi.fn()
+    const close = vi.fn()
+    listeners.get("notificationclick")({ notification: { close, data }, waitUntil })
+    await waitUntil.mock.calls[0][0]
+    expect(close).toHaveBeenCalledOnce()
+    expect(worker.clients.openWindow).toHaveBeenCalledWith(target)
   })
 })

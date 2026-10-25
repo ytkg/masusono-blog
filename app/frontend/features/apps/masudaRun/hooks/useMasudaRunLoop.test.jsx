@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react"
 import { afterEach, expect, it, vi } from "vitest"
-import { createInitialWorld, CFG } from "../lib"
+import { createInitialWorld, CFG, HIGH_SCORE_KEY, RESTART_DELAY_MS } from "../lib"
 import { useMasudaRunLoop } from "./useMasudaRunLoop"
 
 vi.mock("../lib", async () => {
@@ -140,4 +140,64 @@ it("操作不可の間はRAFを停止し、再開時に待機時間を物理計�
   expect(world.t).toBeCloseTo(2000 / 60)
   unmount()
   expect(frames.size).toBe(0)
+})
+
+it.each([0, 200])("衝突で終了し、既存ベスト %i を超えた場合だけ記録する", (high) => {
+  vi.spyOn(performance, "now").mockReturnValue(0)
+  vi.stubGlobal("ResizeObserver", undefined)
+  let frame
+  vi.stubGlobal(
+    "requestAnimationFrame",
+    vi.fn((callback) => {
+      frame = callback
+      return 1
+    }),
+  )
+  vi.stubGlobal("cancelAnimationFrame", vi.fn())
+  const saveScore = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {})
+  const world = createInitialWorld()
+  world.nextSpawn = Infinity
+  world.nextCloud = Infinity
+  world.player.y -= 10
+  world.player.onGround = false
+  world.player.spin = 100
+  world.obstacles = [{ ...world.player }]
+  const refs = {
+    scoreRef: { current: 123.9 },
+    scoreDisplayRef: { current: 123 },
+    restartReadyAtRef: { current: 0 },
+    scaleRef: { current: 1 },
+    worldRef: { current: world },
+    canvasRef: { current: { getContext: () => ({ setTransform() {} }) } },
+    canvasWrapRef: { current: document.createElement("div") },
+    imgRef: {},
+    obsShortRef: {},
+    obsTallRef: {},
+    reqRef: {},
+  }
+  const options = {
+    state: "playing",
+    high,
+    setHigh: vi.fn(),
+    setScore: vi.fn(),
+    setState: vi.fn(),
+    setRestartReadyAt: vi.fn(),
+    refs,
+  }
+  const { unmount } = renderHook(() => useMasudaRunLoop(options))
+  act(() => frame(1000 / 60))
+  expect(options.setState).toHaveBeenCalledExactlyOnceWith("gameover")
+  expect(options.setRestartReadyAt).toHaveBeenCalledWith(RESTART_DELAY_MS)
+  expect(refs.restartReadyAtRef.current).toBe(RESTART_DELAY_MS)
+  expect(refs.scoreRef.current).toBe(123.9)
+  expect(world.player.spin).toBeCloseTo(100 - 1000 / 60)
+  if (high === 0) {
+    expect(options.setHigh).toHaveBeenCalledExactlyOnceWith(123)
+    expect(saveScore).toHaveBeenCalledExactlyOnceWith(HIGH_SCORE_KEY, "123")
+  } else {
+    expect(options.setHigh).not.toHaveBeenCalled()
+    expect(saveScore).not.toHaveBeenCalled()
+  }
+  unmount()
+  expect(refs.reqRef.current).toBeNull()
 })
