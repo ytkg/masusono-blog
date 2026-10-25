@@ -75,6 +75,8 @@ JSON API を使います。認証トークンは画面へ返さず Rails セッ�
   - 増田RUNアプリ用ランキング配列を返す
 - `POST /api/app/masuda_run/rankings.json`
   - 増田RUNのランキングを登録する
+- `POST /api/app/masuda_tataki/points.json`
+  - 増田たたきの終了時にスコア分のポイントを付与する（0点・途中終了は対象外、失敗時の自動再送なし）
 - `GET /api/app/web_push/vapid_key.json`
   - Web Push公開鍵を返す
 - `GET /api/app/web_push/subscription.json?endpoint=...`

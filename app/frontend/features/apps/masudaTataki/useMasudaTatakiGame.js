@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react"
+import { postJson } from "@/shared/lib/fetchJson"
+import { getUserIdFromCookie } from "@/shared/lib/userId"
 import { advance, DURATION, hit, initialGame } from "./game"
 
 const getTime = () => performance.now()
@@ -30,11 +32,17 @@ export function useMasudaTatakiGame(active) {
     const started = performance.now() - gameRef.current.elapsed
     startedAt.current = started
     const timer = window.setInterval(() => {
+      if (gameRef.current.elapsed >= DURATION) return
       const next = advance(gameRef.current, performance.now() - started)
       gameRef.current = next
       setGame(next)
       if (next.elapsed >= DURATION) {
         setPhase("timeup")
+        const userId = getUserIdFromCookie()
+        if (userId && next.score > 0) {
+          // The grant API has no idempotency support; do not retry failed requests.
+          void postJson("/api/app/masuda_tataki/points.json", { userId, score: next.score }).catch(() => {})
+        }
       }
     }, 30)
     return () => window.clearInterval(timer)

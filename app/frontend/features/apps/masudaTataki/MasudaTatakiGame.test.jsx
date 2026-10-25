@@ -1,11 +1,15 @@
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { postJson } from "@/shared/lib/fetchJson"
 import MasudaTatakiGame from "./MasudaTatakiGame"
 import { loadImages } from "./assets"
 import { AppActivityProvider } from "../shared/AppActivityContext"
+vi.mock("@/shared/lib/fetchJson", () => ({ postJson: vi.fn() }))
+vi.mock("@/shared/lib/userId", () => ({ getUserIdFromCookie: () => "player" }))
 vi.mock("./assets", () => ({ IMAGES: ["/masuda.webp", "/other1.webp", "/other2.webp"], loadImages: vi.fn() }))
 describe("増田たたきの進行", () => {
   beforeEach(() => {
+    postJson.mockReset().mockResolvedValue({})
     vi.useFakeTimers()
     loadImages.mockResolvedValue([])
     vi.spyOn(Math, "random").mockReturnValue(0)
@@ -18,6 +22,41 @@ describe("増田たたきの進行", () => {
     await act(async () => {})
   }
   const advance = (ms) => act(() => vi.advanceTimersByTime(ms))
+  it("終了時だけスコア分を一度送り、失敗しても再プレイできる", async () => {
+    postJson.mockRejectedValue(new Error("offline"))
+    render(<MasudaTatakiGame />)
+    await ready()
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    advance(3000)
+    advance(30)
+    fireEvent.pointerDown(screen.getByRole("button", { name: "穴1 増田" }))
+    expect(postJson).not.toHaveBeenCalled()
+    advance(30000)
+    await ready()
+    expect(postJson).toHaveBeenCalledExactlyOnceWith("/api/app/masuda_tataki/points.json", {
+      userId: "player",
+      score: 150,
+    })
+    advance(1000)
+    fireEvent.click(screen.getByRole("button", { name: "もう一度遊ぶ" }))
+    advance(3000)
+    advance(30030)
+    await ready()
+    expect(postJson).toHaveBeenCalledTimes(1)
+  })
+
+  it("途中で閉じたゲームは送信しない", async () => {
+    const { unmount } = render(<MasudaTatakiGame />)
+    await ready()
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    advance(3000)
+    advance(30)
+    fireEvent.pointerDown(screen.getByRole("button", { name: "穴1 増田" }))
+    unmount()
+    advance(30000)
+    expect(postJson).not.toHaveBeenCalled()
+  })
+
   it("非表示タブではカウントダウン・持ち時間・採点を止め、同じ状態から再開する", async () => {
     const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible")
     const changeVisibility = (state) => {
