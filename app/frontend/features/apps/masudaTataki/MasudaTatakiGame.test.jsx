@@ -57,6 +57,36 @@ describe("増田たたきの進行", () => {
     expect(postJson).not.toHaveBeenCalled()
   })
 
+  it.each([30000, 30001])(
+    "タイマーより先に終了時刻%dmsでタップしても一度だけ終了し、再プレイできる",
+    async (elapsed) => {
+      render(<MasudaTatakiGame />)
+      await ready()
+      fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+      advance(3000)
+      advance(30)
+      fireEvent.pointerDown(screen.getByRole("button", { name: "穴1 増田" }))
+
+      const clock = vi.spyOn(performance, "now").mockReturnValue(performance.now() + elapsed - 30)
+      fireEvent.pointerDown(screen.getByRole("button", { name: "穴2", exact: true }))
+      expect(screen.getByText("150点")).toBeInTheDocument()
+      advance(30)
+      expect(screen.getByRole("status")).toHaveTextContent("TIME UP!")
+      expect(postJson).toHaveBeenCalledExactlyOnceWith("/api/app/masuda_tataki/points.json", {
+        userId: "player",
+        score: 150,
+      })
+
+      advance(2000)
+      expect(screen.getByText("増田ヒット数：1")).toBeInTheDocument()
+      expect(postJson).toHaveBeenCalledTimes(1)
+      clock.mockRestore()
+      fireEvent.click(screen.getByRole("button", { name: "もう一度遊ぶ" }))
+      expect(screen.getByRole("status")).toHaveTextContent("3")
+      expect(screen.getByText("0点")).toBeInTheDocument()
+    },
+  )
+
   it("非表示タブではカウントダウン・持ち時間・採点を止め、同じ状態から再開する", async () => {
     const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible")
     const changeVisibility = (state) => {
