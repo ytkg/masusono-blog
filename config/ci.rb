@@ -8,10 +8,11 @@ CI.run do
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
   step "Tests: Prepare database", "env RAILS_ENV=test bin/rails db:prepare"
-  step "Tests: RSpec", "env RAILS_ENV=test bundle exec rspec"
+  step "Tests: RSpec", "env RAILS_ENV=test COVERAGE=true bundle exec rspec"
   step "Style: Frontend", "npm run lint"
   step "Format: Frontend", "npm run format:check"
-  step "Tests: Frontend", "npm test"
+  step "Tests: Coverage badges", "node --test .github/scripts/publish-coverage.test.cjs"
+  step "Tests: Frontend", "npm run test:coverage"
   step "Tests: SSR", "npm run test:ssr"
 
   # Optional: set a green GitHub commit status to unblock PR merge.

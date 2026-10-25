@@ -46,11 +46,19 @@ export default defineConfig(async ({ command }) => {
       chunkSizeWarningLimit: 600,
     },
     test: {
+      root: fileURLToPath(new URL(".", import.meta.url)),
       // Keep jsdom workers bounded when Docker shares resources with Rails and Playwright.
       maxWorkers: process.env.CI ? 4 : 2,
+      coverage: {
+        provider: "v8",
+        reportsDirectory: fileURLToPath(new URL("./coverage/frontend", import.meta.url)),
+        reporter: ["text-summary", "html", "json-summary"],
+        include: ["app/frontend/**/*.{js,jsx}", "public/service-worker.js"],
+        exclude: ["**/*.{test,spec}.{js,jsx}", "app/frontend/test/**"],
+      },
       environment: "jsdom",
-      setupFiles: ["./test/setup.js"],
-      include: ["**/*.{test,spec}.{js,jsx}"],
+      setupFiles: ["./app/frontend/test/setup.js"],
+      include: ["app/frontend/**/*.{test,spec}.{js,jsx}"],
     },
   } as never
 })

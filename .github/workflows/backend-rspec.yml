@@ -24,6 +24,8 @@ on:
       - bin/rails
       - bin/rake
       - bin/setup
+      - .github/scripts/publish-coverage*.cjs
+      - .github/workflows/publish-coverage.yml
       - .github/workflows/backend-rspec.yml
   pull_request:
     paths:
@@ -46,6 +48,8 @@ on:
       - bin/rails
       - bin/rake
       - bin/setup
+      - .github/scripts/publish-coverage*.cjs
+      - .github/workflows/publish-coverage.yml
       - .github/workflows/backend-rspec.yml
 
 jobs:
@@ -53,6 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RAILS_ENV: test
+      COVERAGE: "true"
     defaults:
       run:
         working-directory: .
@@ -86,3 +91,21 @@ jobs:
 
       - name: Run RSpec
         run: bundle exec rspec
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-ruby
+          path: coverage/ruby/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-coverage:
+    needs: rspec
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-coverage.yml
+    with:
+      kind: ruby

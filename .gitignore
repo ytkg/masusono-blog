@@ -72,3 +72,5 @@ public/vite-ssr/
 
 # Old checkouts can retain ignored secrets, databases, and build artifacts here.
 /backend
+
+/coverage/
