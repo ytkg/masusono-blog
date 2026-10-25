@@ -5,6 +5,8 @@
 
 masusono-blog の Rails アプリケーションです。公開ページは Inertia + React/Vite で提供し、一部の機能を JSON API、RSS、サイトマップとして提供します。
 
+詳しい仕様・運用手順は [目的別の目次](docs/README.md) から、作業に必要な項目だけ参照してください。
+
 ## ローカル開発
 
 以下はすべてリポジトリルートで実行します。
@@ -37,9 +39,7 @@ npm run dev
 
 ## ブラウザごとの表示設定
 
-「その他」→「設定」の「期間限定ロゴ」で、ヘッダーを限定版／通常版に切り替えられます。未設定時は通常版を表示します。ただし記事「私に秋服を着させてくれ」（`/articles/1cxjrah487`）の詳細だけは、オフでも今回の限定ロゴを表示します。選択は `seasonal_logo_20261018_autumn_health=on|off` のCookie（有効期間1年、Path=/、SameSite=Lax、HTTPS時はSecure）に保存し、SSRの初回表示にも反映します。また、画面内に「増田とその他と、私の体調」という文言が見えている間も、設定にかかわらず今回の限定ロゴを表示します。文言が画面外に出ると元の表示に戻り、Cookieは変更しません。対象記事の常時表示は維持します。Cookieを削除すると初期設定に戻ります。キーは今回の限定ロゴ専用です。別の限定ロゴに差し替えるときは、フロントエンドとRailsのキーも変更し、以前の選択を引き継がないようにしてください。OGPやアイコンには影響しません。
-
-通常表示へ戻す際は設定をオフにすれば、対象記事だけに限定ロゴが残ります。両ロゴのアセットを保持するため、#705 の差し替えコミット `31d3d2b` を単純に revert する旧手順は使用しないでください。記事の例外表示を取り消す場合は #706 対応コミットだけを revert し、通常の PR・CI・公開手順を通します。
+[表示設定](docs/display-settings.md) を参照してください。
 
 ## エンドポイント
 
@@ -90,49 +90,7 @@ JSON API を使います。認証トークンは画面へ返さず Rails セッ�
 
 ## 記事バックアップ
 
-microCMS の記事を BigQuery に全件バックアップできます。BigQuery へは load job で投入し、`microcms_articles_backup` テーブルを毎回全件置き換えます。`tags` は microCMS のカンマ区切り文字列をそのまま保存します。
-
-事前にホストで Application Default Credentials を設定してください。
-
-```bash
-gcloud auth application-default login
-gcloud auth application-default set-quota-project YOUR_PROJECT_ID
-```
-
-`~/.config/gcloud/application_default_credentials.json` が作成されていることを確認してください。通常の `gcloud auth login` だけでは Application Default Credentials は作成されません。
-
-Docker Compose から実行する場合、ホストの `~/.config/gcloud` がコンテナの `/home/rails/.config/gcloud` に read-only でマウントされます。
-
-```bash
-BIGQUERY_PROJECT_ID=masusono \
-BIGQUERY_DATASET_ID=blog \
-docker compose run --rm backend bundle exec rails articles:backup_to_bigquery
-```
-
-初回実行時に dataset と table がなければ自動作成します。dataset location は `asia-northeast1` です。
-
-タグ付け候補を確認する場合は、BigQuery から `tags` が空の記事、タグ付き既存記事、既存タグの件数を JSON で出力します。`articles:prepare_tagging` はバックアップ後に候補ファイルとレビュー用テンプレートを `tmp/tagging/` 配下へ作成します。
-タグは記事同士の具体的なつながりを作るために使います。既存タグは参考情報であり、制約ではありません。2記事以上に自然に紐づくなら新しいタグを積極的に作って構いません。新規タグを作る場合は、そのタグでつながる既存記事も `tag-updates.json` に含め、既存記事側のタグ更新を忘れないようにします。`日常`、`生活`、`生き方`、`人間関係`、`内省` のような広いタグは、より具体的なタグで置き換えられるなら置き換えます。
-
-```bash
-BIGQUERY_PROJECT_ID=masusono \
-BIGQUERY_DATASET_ID=blog \
-docker compose run --rm backend bundle exec rails articles:prepare_tagging
-```
-
-生成されるファイルは以下です。
-
-- `tmp/tagging/candidates.json`: 候補記事、タグ付き既存記事、既存タグ件数
-- `tmp/tagging/tag-updates.json`: 適用用 JSON。初期値は `{"tag_updates":[]}`
-- `tmp/tagging/review.md`: レビュー用テンプレート
-
-確認済みのタグ案を microCMS に反映する場合は、`tmp/tagging/tag-updates.json` に `id` と `tags` を書いてから適用します。適用後は自動で BigQuery へ再バックアップし、残り候補件数を表示します。
-
-```bash
-BIGQUERY_PROJECT_ID=masusono \
-BIGQUERY_DATASET_ID=blog \
-docker compose run --rm backend bundle exec rails articles:apply_tag_updates_from_file
-```
+[記事バックアップとタグ更新](docs/article-backup.md) を参照してください。
 
 ## キャッシュ方針
 
@@ -143,74 +101,7 @@ docker compose run --rm backend bundle exec rails articles:apply_tag_updates_fro
 
 ## Web Push
 
-ブラウザの「その他」→「設定」から通知を有効にすると、端末ごとのPush subscriptionをmicroCMSへ保存します。通知の許可は、利用者が「通知を受け取る」を押した場合にのみ要求します。
-
-### microCMSの準備
-
-複数コンテンツ形式で `web_push_subscriptions` APIを作成し、次のテキストフィールドを追加します。
-
-- `endpoint`
-- `p256dh`
-- `auth`
-
-このAPIは管理用データなので、コンテンツAPIキーは公開せず、Rails credentialsの既存 `microcms.api_key` だけでアクセスします。
-
-### ユーザーコンテンツID移行
-
-`users` APIのコンテンツIDは、前後空白を除去した `user_id` のSHA-256先頭32文字に `u-` を付けた値を正規IDとして使用します。microCMSの `users` APIで、コンテンツIDに英小文字・数字・`-` を許可し、`GET`・`PUT`・`PATCH`・`DELETE` 権限を付与してください。
-
-通常保存は正規IDへの `PUT` で作成し、既存IDの場合は `PATCH` で更新します。ユーザー取得も正規IDを使います。
-
-次のコマンドはデータを変更せず、移行候補・削除予定・要確認レコードをJSONで出力します。
-
-```bash
-docker compose run --rm backend bin/rails users:preview_content_id_migration
-```
-
-出力を確認して問題がなければ、正規IDへ作成・更新してから旧IDを削除します。実行時点で要確認レコードが1件でもある場合は中止されます。`CONFIRM=true` を明示しない限り、データ変更は行いません。
-
-```bash
-docker compose run --rm -e CONFIRM=true backend bin/rails users:apply_content_id_migration
-```
-
-### VAPID鍵の準備
-
-次のコマンドで鍵ペアを生成し、標準出力をRails credentialsへ保存します。出力される秘密鍵はコミット・共有しません。
-
-```bash
-rbenv exec bin/rails web_push:generate_vapid_keys
-rbenv exec bin/rails credentials:edit
-```
-
-credentialsには次の形で設定します。`vapid_subject` は運用連絡先のメールアドレスまたはHTTPS URLです。
-
-```yaml
-web_push:
-  vapid_public_key: "..."
-  vapid_private_key: "..."
-  vapid_subject: "mailto:YOUR_EMAIL@example.com"
-  microcms_webhook_secret: "..."
-```
-
-### 通知の送信
-
-デプロイ済み環境で、管理者だけが次のコマンドを実行します。`URL` はサイト内の絶対パスを指定します。
-
-```bash
-TITLE='お知らせ' BODY='好きな本文を送れます' URL='/articles/example' rbenv exec bin/rails web_push:send
-```
-
-有効な全購読端末へ送信し、配信先から無効と判断された購読はmicroCMSから自動削除します。
-
-### 新規記事公開時の自動通知
-
-microCMSの `articles` APIで「カスタム通知」を追加し、通知先を次に設定します。
-
-```
-https://masusono.com/webhooks/microcms/articles
-```
-
-タイミングは「コンテンツの公開時・更新時」を選び、上記credentialsの `microcms_webhook_secret` と同じシークレットを設定します。Webhookの `type` が `new` の場合だけ通知するため、公開済み記事の更新では通知されません。Webhook署名は `x-microcms-signature` で検証し、記事情報はコンテンツIDからmicroCMSへ再取得します。
+[Web Push](docs/web-push.md) を参照してください。
 
 ## APIエラーレスポンス仕様
 
@@ -255,20 +146,11 @@ API で例外が発生した場合、レスポンス形式は次に統一しま�
 
 ## レスポンス整形責務
 
-- Model / Service: データ取得と共通の業務処理
-- Usecase: 1 Controller アクションの処理手順と、API 契約に合わせた最終データの整形
-- Controller: HTTP 入出力、認証・CSRF・セッション、HTTP ステータスと `render` / `redirect`
-- Serializer: 現在は導入しない
-
-Usecase は Controller からのみ呼び、Usecase 同士や Job・Batch から呼ばない。URL の別名は同じアクションの Usecase を共有し、薄い Usecase も置く。Concern は独立した小さい補助メソッドの共有に留める。
-
-この方針により、レスポンス契約の変更点は Usecase と request spec の差分として追跡します。
+[バックエンドの責務](docs/architecture.md) を参照してください。
 
 ## API変更時の手順
 
-1. `docs/api-response-contract.md` を更新
-2. Usecase で整形ロジックを実装/更新
-3. request spec で契約（キー・型・件数・代表値）を固定
+[API 変更ルール](docs/architecture.md#api-変更手順) を参照してください。
 
 ## ドキュメント相互整合性チェック（APIパス）
 
@@ -348,82 +230,7 @@ Rails・ブラウザとリソースを共有するため、CPU数だけで並列
 
 ## Cloud Run へのデプロイ
 
-リポジトリルートでデプロイスクリプトを実行します:
-
-```bash
-./deploy.sh
-```
-
-デプロイ先はチェックアウト中の Git ブランチで決まります。GitHub Actions では
-`DEPLOY_BRANCH` を明示します。判定の優先順は `DEPLOY_BRANCH`、`GITHUB_REF_NAME`、
-チェックアウト中のブランチです。デタッチされた HEAD では前者のいずれかが必要です。
-
-- `main`: 本番サービス `masusono` へデプロイ
-- その他のブランチ: ステージングサービス `masusono-<ブランチ名>` へデプロイ
-
-ステージングのサービス名では、ブランチ名を英小文字化し、英数字以外の連続を `-` に置換します。
-たとえば `feature/login` は `masusono-feature-login` になります。Cloud Run の63文字制限に
-収めるため、正規化したブランチ名が54文字を超える場合は先頭45文字と
-元のブランチ名の SHA-256 先頭8文字を `-` で結合します。デプロイ完了時には対象サービス名と
-Cloud Run URL が表示されます。
-
-Rails credentials の復号鍵はSecret Managerの `rails-master-key` からCloud Runへ注入します。
-ローカルの `config/master.key` は手動デプロイに不要です。
-
-### GitHub Actionsによる本番デプロイ
-
-`main` への push（PRマージを含む）のうち、ルートのファイル・アプリケーションのディレクトリ・本番デプロイ workflow・デプロイ判定スクリプトの変更で GitHub Actions が起動し、デプロイ判定・CI・イメージビルドを経て Cloud Run の本番サービス `masusono` へデプロイします。リポジトリ内のPRは、`ステージングデプロイ` ラベルを付けると専用の Cloud Run ステージング環境へデプロイされ、URLがPRにコメントされます。ラベルが付いたまま更新すると再デプロイします。PRのマージまたはブランチ削除時に、対応するステージングサービスとイメージを削除します。
-
-`デプロイなし` ラベルを付けると、本番・ステージングのビルド、イメージ公開、デプロイをスキップします。デプロイ workflow 内の CI もスキップします。個別の CI（テスト・静的解析）は、各 workflow の変更ファイル条件に従って実行します。`ステージングデプロイ` と両方付いている場合もスキップし、`デプロイなし` を外すとステージングをデプロイします。既存ステージング環境のマージ・ブランチ削除時の後片付けは継続します。
-
-PRの作成・再オープン・コミット更新時に、次のファイルだけの変更なら `デプロイなし` を自動付与します（テストとドキュメントの混在も対象）。
-
-- `spec/**`、`test/visual/**`、`app/frontend/test/**`
-- フロントエンドの `*.test.{js,jsx,ts,tsx}` / `*.spec.{js,jsx,ts,tsx}`
-- `.rspec`、`playwright.config.js`、`scripts/test_visual_gate.py`、`.github/scripts/deploy-policy.test.cjs`
-- `.md` ファイル、`docs/**`（`app/**`、`public/**`、`storage/**` の配信・アプリ用ファイルを除く。ただし `app/frontend/README.md` は対象）
-
-本体コード・共用設定・依存関係などが追加されたら、自動付与したラベルだけを外します。GitHubのラベル履歴の最後の付与者で判定し、手動付与分は保持します。自動付与分を手動管理に切り替える場合は、一度外してから付け直してください。手動で外した場合も、次のコミット更新時には変更内容から再判定します。リネームは変更前と変更後の両パスを確認します。
-
-本番ではpushに含まれる全コミットの対応PRを確認します。直接push・未対応のコミットが混在する場合、コミットやファイル一覧の取得漏れ・APIエラーなどでスキップを確認できない場合は、通常どおりデプロイします。自動ラベル処理より先にマージされた場合も、対応PRの変更内容からテスト・ドキュメントのみかを判定します。
-
-自動ラベル処理は `pull_request_target` でベースブランチのスクリプトだけを実行し、PR内のコードは実行しません。デプロイ判定のテストは `node --test .github/scripts/deploy-policy.test.cjs` で実行できます。
-
-
-
-`.github/workflows/deploy-pr-cloud-run.yml` は、同一リポジトリのPRへ `ステージングデプロイ` ラベルを
-付けたとき、またはそのラベルが付いたPRを再オープン・更新したときに、全CI後のステージングデプロイを
-行い、PRコメントへ最新URLを書き込みます。フォークからのPRはデプロイ対象外です。ラベルを外しても
-サービスは削除されず、PRのマージまたはブランチ削除時に削除されます。
-
-GitHub Actions は Artifact Registry へイメージをビルド・pushしてから、`deploy.sh` 経由でそのイメージをCloud Runへデプロイします。成果物はPR終了時に削除し、残ったイメージも3日後に自動削除します。本番イメージは最新3世代を保持します。Cloud Runソース用バケットにも保持ポリシーを設定しています。
-
-本番・ステージングともに、デプロイ要否の判定後に全 CI とイメージのビルド・公開を並列実行し、両方が成功した場合だけ Cloud Run へ反映します。CI が失敗した場合もイメージが公開されることはありますが、サービスには反映されません。
-
-Docker Buildx でビルドし、GitHub Actions に Docker レイヤーを
-キャッシュします。`mode=max` で gem のインストールを含む中間ステージも保存するため、
-Gemfile・Gemfile.lock・vendor が変わらないビルドでは依存関係のインストールを再利用できます。
-同じキャッシュ scope を使い、PR は GitHub のアクセス制限の範囲で main のキャッシュを
-参照します。PR が保存したキャッシュはその PR の merge ref 内に限定されます。
-初回やキャッシュ失効後は通常のビルドが必要です。キャッシュ保存に失敗してもデプロイは継続します。
-Actions のビルドサマリーで所要時間とキャッシュ利用状況を確認できます。
-
-手動で `deploy.sh` を実行する場合は、`IMAGE_URI` が未指定ならソースデプロイ、指定した場合はイメージデプロイになります。
-
-```bash
-gcloud run deploy <ブランチに対応するサービス名> \
-  --image "$IMAGE_URI" \
-  --project masusono \
-  --region asia-northeast1 \
-  --allow-unauthenticated \
-  --max-instances 1 \
-  --remove-env-vars RAILS_MASTER_KEY \
-  --update-secrets RAILS_MASTER_KEY=rails-master-key:latest
-```
-
-前提条件:
-
-- `gcloud` CLI がインストール済みで、認証済みであること
+[Cloud Run へのデプロイ](docs/deployment.md) を参照してください。
 
 ## 記事のOGP画像
 
@@ -431,20 +238,7 @@ gcloud run deploy <ブランチに対応するサービス名> \
 
 ## トップページ・記事詳細のSSR
 
-トップページ（`/`）と記事詳細（`/articles/:id`）をInertia SSRで描画し、本文・リンク・SEO情報を初回HTMLに含めます。トップページは初回取得の最大10件を描画し、続きはブラウザで取得します。著者・紹介・検索・ミニアプリ・数字ページはブラウザで描画します。
-
-描画構成は `application/InertiaApp.jsx` でブラウザとSSRに共通化しています。`ArticleBody` は抜粋と展開を担当し、`ArticleHtml` はSSRと初回描画のHTMLを揃え、コード操作部品をマウント後に読み込みます。HTMLからの文字抽出は、ブラウザでは非表示のtemplate、SSRではparse5を使います。
-
-トップページと追加取得APIは `ArticlesPageQuery` で同じ記事・ページング情報を作り、それぞれのusecaseがpropsまたはJSONとして返します。フロントエンドでは `articlePages.js` がレスポンス検証と重複除去、`useHomeArticles` が取得状態、`useHomeScrollRestoration` が履歴復元を担当します。自動取得の距離は `HOME_TABS` にタブごとに定義しています。
-
-Docker ComposeではViteのSSRエンドポイントをRailsから呼び出し、開発アセットはRailsのViteプロキシ経由で配信します。管理対象worktreeでは通常どおり専用の `compose.sh up --build` を使います。ホストでの開発はRailsと `npm run dev` を起動すると、Inertia RailsがViteを検出します。
-
-`npm run build` はクライアントとSSRの両方をビルドします。サーバー専用バンドルは公開ディレクトリ外の `ssr/ssr.mjs` に出力し、Dockerのビルドでも生成します。本番イメージにはNode.js 22を含め、Pumaの `inertia_ssr` プラグインがSSRプロセスの起動・ヘルスチェック・異常終了後の再起動・終了を管理します。SSRはコンテナ内の127.0.0.1:13714だけで待ち受けます。
-
-SSRに失敗したリクエストは初期propsを返してブラウザで描画します。Railsログの `[inertia-rails] SSR render failed` とPumaの `Inertia SSR` ログで障害を検知できます。
-
-検証には `npm run test:ssr`（実際の本番バンドルをNode.jsで描画）、 `bundle exec rspec spec/requests/ssr_spec.rb`（対象ページの選択・HTML・障害時の切り替え）、全画面の `scripts/check-visual.sh` を使用します。撮影環境では本番と同じSSRバンドルをPumaから起動し、クライアントとSSRの画像URLを一致させます。Visual RegressionにはJavaScript無効での本文・メタ情報検証と、hydration後の操作確認も含まれます。実際のCloud Runデプロイは別途実行します。
-
+[トップページ・記事詳細のSSR](docs/ssr.md) を参照してください。
 
 ## 作業環境
 
@@ -462,20 +256,4 @@ Rails アプリケーションはリポジトリ直下に配置しています�
 
 ## テストカバレッジ
 
-RSpec は SimpleCov、Vitest は V8 で行カバレッジを計測します。未実行ファイルも集計対象です。
-Ruby は `app/**/*.rb` と `lib/**/*.rb`、フロントは `app/frontend/**/*.{js,jsx}` と
-`public/service-worker.js` を対象にし、テストファイルは除外します。
-SSR・Visual Regression の実行結果はカバレッジに合算しません。
-
-```bash
-docker compose run --rm -e RAILS_ENV=test backend bin/rails db:prepare
-docker compose run --rm -e RAILS_ENV=test -e COVERAGE=true backend bundle exec rspec
-docker compose run --rm vite npm run test:coverage
-```
-
-HTML レポートは `coverage/ruby/index.html` と `coverage/frontend/index.html` に生成されます。
-`bin/ci` と各 GitHub Actions のテストでも計測し、Actions のレポートは14日間 artifact に保存します。
-README のバッジは main の成功した各テストの最新行カバレッジです。
-main の CI が `coverage-badges` ブランチの JSON を自動更新し、Shields.io がバッジを描画します。
-初回マージ後の main CI が成功するまではバッジの数値は表示されません。
-ブランチは自動生成物専用です。カバレッジの最低値による CI の失敗条件は設けていません。
+[テストカバレッジ](docs/coverage.md) を参照してください。
