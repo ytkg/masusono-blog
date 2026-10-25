@@ -195,3 +195,10 @@ IDなし・不正ID・除外対象は false。クエリでのID指定は受け�
 - `GET /api/app/bookshelf/:isbn/cover`: `{ "cover": { "imageUrl": String, "googleBooksUrl": String, "removalContactUrl": String } | null }`。Google BooksのISBN一致画像のみ返す。設定不足・画像なし・照合不可・通信障害はいずれも `null`。書誌・記事リンクの表示を妨げない。Googleの429は共通形式の503 (`upstream_rate_limited`) とし、クライアントはその起動中の追加表紙照会を止める。
 
 どちらも認証不要・`Cache-Control: no-store`。認証情報を返さず、永続保存しない。運用条件と制限は [本棚](bookshelf.md) を参照。
+
+## POST /api/app/masuda_tataki/points.json
+
+- Request: `{ "userId": "String", "score": Integer }`。ユーザーIDは空白だけを除く1〜200文字、スコアは0以上の安全な整数（整数文字列も可）。
+- Response (`201 Created`): `{ "userId": "String", "score": Integer }`。スコア全額をポイント付与する。0点は付与しない。
+- 不正入力は400 (`invalid_request`)、付与失敗は502 (`upstream_error`) と共通エラー形式。すべて `Cache-Control: no-store`。
+- ゲーム終了時に1回送信し、途中終了では送信しない。失敗しても結果表示と再プレイを維持する。冪等性がないため自動再送しない。

@@ -45,6 +45,10 @@ Rails.application.routes.draw do
         resource :subscription, only: %i[show create destroy], controller: "subscriptions", defaults: { format: :json }
       end
 
+      namespace :masuda_tataki do
+        resources :points, only: :create, defaults: { format: :json }
+      end
+
       namespace :masuda_run do
         resources :rankings, only: %i[index create]
       end
