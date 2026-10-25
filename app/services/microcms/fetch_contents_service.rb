@@ -30,9 +30,7 @@ module Microcms
 
     # Fetch exactly one upstream page; full-collection callers still use execute.
     def page(limit:, offset:)
-      response = fetch_response(limit:, offset:)
-      raise_on_error!(response)
-      page = parse_page(response.body)
+      page = parse_page(fetch_response(limit:, offset:))
       meta = page.fetch(:meta)
       unless pageable?(meta) && valid_pagination_meta?(meta) && meta[:limit] == limit && meta[:offset] == offset
         raise FetchError.new(status: 502, body: "Invalid pagination metadata")
@@ -51,10 +49,7 @@ module Microcms
     end
 
     def execute(response: nil)
-      initial_response = response || self.response
-      raise_on_error!(initial_response)
-
-      first_page = parse_page(initial_response.body)
+      first_page = parse_page(response || self.response)
       contents = []
       first_page_append_result = append_contents(contents, first_page.fetch(:contents))
       if first_page_append_result == :max_total_count_reached
@@ -80,9 +75,7 @@ module Microcms
         end
 
         offset += limit
-        res = fetch_response(limit: limit, offset: offset)
-        raise_on_error!(res)
-        page = parse_page(res.body)
+        page = parse_page(fetch_response(limit:, offset:))
         append_result = append_contents(contents, page.fetch(:contents))
         page_count += 1
         if append_result == :max_total_count_reached
@@ -125,8 +118,9 @@ module Microcms
       raise FetchError.new(status: response.status, body: response.body)
     end
 
-    def parse_page(body)
-      json = parse_payload(body)
+    def parse_page(response)
+      raise_on_error!(response)
+      json = parse_payload(response.body)
       { contents: contents_from(json), meta: meta_from(json) }
     end
 
