@@ -25,7 +25,6 @@
     "@ruby/4.0-wasm-wasi": "^2.9.3-2.9.4",
     "@ruby/wasm-wasi": "^2.9.3-2.9.4",
     "parse5": "^8.0.1",
-    "prism-react-renderer": "^2.4.1",
     "prismjs": "^1.30.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
