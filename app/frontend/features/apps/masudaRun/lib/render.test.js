@@ -92,3 +92,20 @@ describe("drawPlayer", () => {
     expect(ctx.fillRect).toHaveBeenCalledTimes(1)
   })
 })
+
+it.each([CFG.SPIN_MS, CFG.SPIN_MS / 2, CFG.SPIN_MS / 4])("回転の残り時間 %i に応じて中心を軸に描画する", (spin) => {
+  const ctx = Object.fromEntries(["save", "translate", "rotate", "drawImage", "restore"].map((key) => [key, vi.fn()]))
+  const player = { x: 20, y: 100, w: 40, h: 50, spin }
+  const image = { width: 10, height: 10 }
+  drawPlayer(ctx, player, image)
+  expect(ctx.translate).toHaveBeenCalledWith(
+    Math.round(player.x - (CHAR_W - player.w) / 2) + CHAR_W / 2,
+    Math.round(player.y + player.h - CHAR_H) + CHAR_H / 2,
+  )
+  expect(ctx.rotate).toHaveBeenCalledWith((1 - spin / CFG.SPIN_MS) * Math.PI * 2)
+  expect(ctx.drawImage).toHaveBeenCalledWith(image, -CHAR_W / 2, -CHAR_H / 2, CHAR_W, CHAR_H)
+  expect(ctx.save).toHaveBeenCalledOnce()
+  expect(ctx.restore).toHaveBeenCalledOnce()
+  expect(ctx.save.mock.invocationCallOrder[0]).toBeLessThan(ctx.rotate.mock.invocationCallOrder[0])
+  expect(ctx.drawImage.mock.invocationCallOrder[0]).toBeLessThan(ctx.restore.mock.invocationCallOrder[0])
+})
