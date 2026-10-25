@@ -68,58 +68,44 @@ describe("Home page", () => {
     requestJson.mockResolvedValue({ articles: [] })
   })
 
-  it("こよみを開いたときだけ全期間を取得し、切り替え後も取得済み一覧を維持する", async () => {
+  it("今月を未選択で開き、日付選択・月変更・タブ間の状態保持ができる", async () => {
+    vi.setSystemTime(new Date("2026-01-01T00:00:00+09:00"))
     requestJson.mockResolvedValue({
       groups: [
         { monthDay: "01/01", articles: [{ id: "new" }, { id: "old" }] },
         { monthDay: "02/29", articles: [{ id: "leap" }] },
       ],
     })
-    render(<Home articles={[]} pagination={{ nextOffset: 10 }} />)
+    render(<Home articles={[]} />)
     expect(requestJson).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
-    const january = await screen.findByRole("button", { name: "1月", exact: true })
-    const february = screen.getByRole("button", { name: "2月", exact: true })
-    expect(january).toHaveAttribute("aria-expanded", "false")
+    const first = await screen.findByRole("button", { name: "1月1日、記事2件" })
+    expect(first).toHaveAttribute("aria-current", "date")
+    expect(first).toHaveAttribute("aria-pressed", "false")
+    expect(screen.getByRole("button", { name: "1月2日、記事0件" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "1月31日、記事0件" })).toBeInTheDocument()
     expect(screen.queryByRole("heading", { name: "1月1日" })).not.toBeInTheDocument()
-    fireEvent.click(january)
+    fireEvent.click(first)
+    expect(first).toHaveAttribute("aria-pressed", "true")
     expect(screen.getByRole("heading", { name: "1月1日" })).toBeInTheDocument()
-    fireEvent.click(february)
-    expect(january).toHaveAttribute("aria-expanded", "false")
-    await waitFor(() => expect(screen.queryByRole("heading", { name: "1月1日" })).not.toBeInTheDocument())
+    expect(screen.getByText("articles:2")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "翌月" }))
+    expect(screen.queryByRole("heading", { name: "1月1日" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "2月30日、記事0件" })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "2月29日、記事1件" }))
     expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "さらに読み込む" })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
-    expect(screen.getByRole("tabpanel", { name: "フィード" })).toHaveAttribute(
-      "id",
-      screen.getByRole("tab", { name: "フィード" }).getAttribute("aria-controls"),
-    )
     fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
     expect(requestJson).toHaveBeenCalledTimes(1)
-    expect(screen.getByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "false")
-    expect(screen.getByRole("button", { name: "2月", exact: true })).toHaveAttribute("aria-expanded", "true")
     expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "3月", exact: true })).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole("button", { name: "2月", exact: true }))
-    expect(screen.getByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "false")
-    expect(screen.getByRole("button", { name: "2月", exact: true })).toHaveAttribute("aria-expanded", "false")
-    await waitFor(() => expect(screen.queryByRole("heading", { name: "2月29日" })).not.toBeInTheDocument())
-  })
-
-  it("以前に複数月を開いていた履歴では最後の月だけを復元する", async () => {
-    rememberedStates.set("home-calendar-months", ["01", "02"])
-    requestJson.mockResolvedValue({
-      groups: [
-        { monthDay: "01/01", articles: [{ id: "january" }] },
-        { monthDay: "02/29", articles: [{ id: "february" }] },
-      ],
-    })
-    render(<Home articles={[]} />)
-    fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
-    expect(await screen.findByRole("button", { name: "1月", exact: true })).toHaveAttribute("aria-expanded", "false")
-    expect(screen.getByRole("button", { name: "2月", exact: true })).toHaveAttribute("aria-expanded", "true")
-    expect(screen.queryByRole("heading", { name: "1月1日" })).not.toBeInTheDocument()
-    expect(screen.getByRole("heading", { name: "2月29日" })).toBeInTheDocument()
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "月" }))
+    fireEvent.click(screen.getByRole("option", { name: "12月", exact: true }))
+    expect(screen.queryByRole("heading", { name: "2月29日" })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "翌月" }))
+    expect(screen.getByRole("button", { name: "1月1日、記事2件" })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "前月" }))
+    expect(screen.getByRole("button", { name: "12月31日、記事0件" })).toBeInTheDocument()
+    vi.useRealTimers()
   })
 
   it("こよみの取得失敗から再試行し、空の一覧を表示する", async () => {
@@ -154,6 +140,7 @@ describe("Home page", () => {
   afterEach(() => {
     rememberedStates.clear()
     window.sessionStorage.clear()
+    vi.useRealTimers()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
     requestJson.mockReset()
@@ -389,7 +376,7 @@ describe("Home page", () => {
       field: "groups",
       endpoint: "/api/app/calendar_articles",
       collection: [{ monthDay: "01/01", articles: [] }],
-      loadedText: "1月",
+      loadedText: "前月",
     },
     {
       tab: "書き出し",
@@ -417,20 +404,26 @@ describe("Home page", () => {
       window.history.replaceState({ page: { rememberedState: { other: "preserved" } } }, "")
       try {
         await act(async () => currentRequest.resolve({ [field]: collection }))
-        expect(screen.getByText(loadedText)).toBeInTheDocument()
+        expect(
+          tab === "こよみ" ? screen.getByRole("button", { name: loadedText }) : screen.getByText(loadedText),
+        ).toBeInTheDocument()
         const currentHistory = structuredClone(window.history.state)
         expect(currentHistory.page.rememberedState).toEqual({ other: "preserved", [key]: collection })
         router.remember.mockClear()
 
         // Abortを無視して完了する通信でも、古い結果を履歴に書き込ませない。
         await act(async () => oldRequest.resolve({ [field]: [] }))
-        expect(screen.getByText(loadedText)).toBeInTheDocument()
+        expect(
+          tab === "こよみ" ? screen.getByRole("button", { name: loadedText }) : screen.getByText(loadedText),
+        ).toBeInTheDocument()
         expect(rememberedStates.get(key)).toEqual(collection)
         expect(window.history.state).toEqual(currentHistory)
         expect(router.remember).not.toHaveBeenCalled()
         home.unmount()
         render(<Home articles={[]} />)
-        expect(screen.getByText(loadedText)).toBeInTheDocument()
+        expect(
+          tab === "こよみ" ? screen.getByRole("button", { name: loadedText }) : screen.getByText(loadedText),
+        ).toBeInTheDocument()
         expect(requestJson).toHaveBeenCalledTimes(2)
       } finally {
         window.history.replaceState(null, "")
