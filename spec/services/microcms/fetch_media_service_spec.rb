@@ -57,4 +57,24 @@ RSpec.describe Microcms::FetchMediaService do
       described_class.call(query: "cat", page: 2, cursor: "cursor", api_key: "test-key", connection:)
     end.to raise_error(described_class::FetchError, "microCMS media request failed")
   end
+
+  context "実際のHTTPクライアントで取得するとき" do
+    it "認証ヘッダーを付けて最初のページを取得する" do
+      stub_request(:get, "#{described_class::BASE_URL}api/v2/media")
+        .with(query: { limit: 20 }, headers: { "X-MICROCMS-API-KEY" => "test-key" })
+        .to_return(body: { media: [ { id: "one" } ], totalCount: 1 }.to_json)
+
+      page = described_class.call(query: "", page: 1, api_key: "test-key")
+
+      expect(page[:media]).to eq([ { "id" => "one" } ])
+    end
+
+    it "不正なJSON応答を取得エラーにする" do
+      stub_request(:get, "#{described_class::BASE_URL}api/v2/media")
+        .with(query: { limit: 20 }).to_return(body: "invalid")
+
+      expect { described_class.call(query: "", page: 1, api_key: "test-key") }
+        .to raise_error(described_class::FetchError, "microCMS media request failed")
+    end
+  end
 end

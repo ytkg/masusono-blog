@@ -50,9 +50,7 @@ RSpec.describe "Api::App::WebPush", type: :request do
 
   describe "GET /api/app/web_push/vapid_key.json" do
     before do
-      allow(Api::App::WebPush::VapidPublicKeyUsecase).to receive(:call).and_return(
-        { json: { publicKey: "public-vapid-key" } }
-      )
+      allow(Rails.application.credentials).to receive(:dig).with(:web_push, :vapid_public_key).and_return(" public-vapid-key ")
     end
 
     it "VAPID公開鍵を返す" do
@@ -87,17 +85,24 @@ RSpec.describe "Api::App::WebPush", type: :request do
 
   describe "DELETE /api/app/web_push/subscription.json" do
     before do
-      allow(Api::App::WebPush::SubscriptionsDestroyUsecase).to receive(:call).and_return(
-        { json: {} }
-      )
+      allow(Microcms::WebPushSubscriptionsService).to receive(:delete_by_endpoint)
     end
 
     it "Push subscriptionを削除する" do
       delete "/api/app/web_push/subscription.json", params: { endpoint: "https://fcm.googleapis.com/fcm/send/example" }
 
-      expect(Api::App::WebPush::SubscriptionsDestroyUsecase).to have_received(:call).with(endpoint: "https://fcm.googleapis.com/fcm/send/example")
+      expect(Microcms::WebPushSubscriptionsService).to have_received(:delete_by_endpoint).with(endpoint: "https://fcm.googleapis.com/fcm/send/example")
       expect(response).to have_http_status(:no_content)
       expect(response.headers["Cache-Control"]).to eq("no-store")
+    end
+
+    it "空白だけのendpointは削除せず入力エラーにする" do
+      delete "/api/app/web_push/subscription.json", params: { endpoint: "  " }
+
+      expect(response).to have_http_status(:bad_request)
+      expect(response.parsed_body.dig("error", "code")).to eq("invalid_request")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+      expect(Microcms::WebPushSubscriptionsService).not_to have_received(:delete_by_endpoint)
     end
   end
 end

@@ -48,4 +48,34 @@ RSpec.describe Microcms::FetchManagedArticlesService do
   it "不正な状態を拒否する" do
     expect { described_class.call(query: "", status: "unknown", page: 1, api_key: "test-key", connection:) }.to raise_error(ArgumentError)
   end
+
+  context "実際のHTTPクライアントで取得するとき" do
+    subject(:result) { described_class.call(query: "", status: "all", page: 1, api_key: "test-key") }
+
+    before do
+      stub_request(:get, described_class::MANAGEMENT_ENDPOINT)
+        .with(query: { limit: 100, offset: 0 }, headers: { "X-MICROCMS-API-KEY" => "test-key", "Accept" => "application/json" })
+        .to_return(body: { contents: [ { id: "one", status: [ "PUBLISH" ] }, { id: "two", status: [ "DRAFT" ] } ] }.to_json)
+    end
+
+    it "複数ページの記事を認証ヘッダー付きで取得する" do
+      [ [ 0, "one" ], [ 100, "two" ] ].each do |offset, id|
+        stub_request(:get, described_class::CONTENT_ENDPOINT)
+          .with(query: { limit: 100, offset:, fields: "id,title" }, headers: { "X-MICROCMS-API-KEY" => "test-key", "Accept" => "application/json" })
+          .to_return(body: { contents: [ { id:, title: id } ], totalCount: 101, limit: 100 }.to_json)
+      end
+
+      expect(result[:articles].pluck(:id)).to contain_exactly("one", "two")
+      expect(result[:total_count]).to eq(2)
+    end
+
+    it "不正なJSON応答を原因付きの取得エラーにする" do
+      stub_request(:get, described_class::CONTENT_ENDPOINT)
+        .with(query: { limit: 100, offset: 0, fields: "id,title" }).to_return(body: "invalid")
+
+      expect { result }.to raise_error(described_class::FetchError) { |error|
+        expect(error.cause).to be_a(JSON::ParserError)
+      }
+    end
+  end
 end

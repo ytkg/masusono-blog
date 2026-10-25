@@ -189,4 +189,69 @@ RSpec.describe "Admin mini app", type: :request do
     expect(response).to have_http_status(:bad_gateway)
     expect(response.parsed_body.dig("error", "code")).to eq("media_upload_failed")
   end
+
+  context "認証サービスに障害があるとき" do
+    it "ログイン時に502と共通のエラー形式を返す" do
+      allow(auth_client).to receive(:login).and_raise(Admin::AuthClient::Error)
+
+      login(username: "owner", password: "password")
+
+      expect(response).to have_http_status(:bad_gateway)
+      expect(response.parsed_body.dig("error", "code")).to eq("auth_unavailable")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+    end
+
+    it "セッション確認時に502を返す" do
+      allow(Admin::AuthenticatedSession).to receive(:valid?).and_raise(Admin::AuthClient::Error)
+
+      get "/api/app/management/session"
+
+      expect(response).to have_http_status(:bad_gateway)
+      expect(response.parsed_body.dig("error", "code")).to eq("auth_unavailable")
+    end
+
+    it "保護された一覧へ認証を迂回せず502を返す" do
+      allow(Admin::AuthenticatedSession).to receive(:valid?).and_raise(Admin::AuthClient::Error)
+
+      get "/api/app/management/articles"
+
+      expect(response).to have_http_status(:bad_gateway)
+      expect(response.parsed_body.dig("error", "code")).to eq("auth_unavailable")
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+    end
+  end
+
+  context "認証済みの一覧取得" do
+    before do
+      allow(auth_client).to receive(:login).and_return("access_token" => "access", "refresh_token" => "refresh")
+      allow(auth_client).to receive(:verify).and_return(true)
+      login(username: "owner", password: "correct")
+    end
+
+    [
+      [ "articles", Microcms::FetchManagedArticlesService, "articles_unavailable" ],
+      [ "media", Microcms::FetchMediaService, "media_unavailable" ]
+    ].each do |resource, service, error_code|
+      it "#{resource}の検索条件が不正なら400を返す" do
+        allow(service).to receive(:call).and_raise(ArgumentError)
+
+        get "/api/app/management/#{resource}", params: { page: "invalid" }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body.dig("error", "code")).to eq("invalid_request")
+        expect(response.headers["Cache-Control"]).to eq("no-store")
+      end
+
+      it "#{resource}の上流障害を502で返す" do
+        allow(service).to receive(:call).and_raise(service::FetchError)
+
+        get "/api/app/management/#{resource}"
+
+        expect(response).to have_http_status(:bad_gateway)
+        expect(response.parsed_body.dig("error", "code")).to eq(error_code)
+        expect(response.headers["Cache-Control"]).to eq("no-store")
+        expect(response.parsed_body.dig("error", "request_id")).to be_present
+      end
+    end
+  end
 end

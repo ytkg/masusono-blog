@@ -31,4 +31,12 @@ RSpec.describe StructuredLogging::JsonFormatter do
       )
     end
   end
+
+  context "JSON配列のログの場合" do
+    let(:message) { '["one","two"]' }
+
+    it "イベント項目として展開せずmessageに保持する" do
+      expect(JSON.parse(formatted_log)).to include("message" => message)
+    end
+  end
 end

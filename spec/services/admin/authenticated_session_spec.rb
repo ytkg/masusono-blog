@@ -24,4 +24,20 @@ RSpec.describe Admin::AuthenticatedSession do
     expect(described_class.valid?(session:, client:)).to be(false)
     expect(session[:admin_auth]).to be_nil
   end
+
+  it "リフレッシュトークンが拒否されたらセッションを破棄する" do
+    allow(client).to receive(:verify).and_return(false)
+    allow(client).to receive(:refresh).and_return(nil)
+
+    expect(described_class.valid?(session:, client:)).to be(false)
+    expect(session).not_to have_key(:admin_auth)
+  end
+
+  it "更新後のアクセストークンも無効ならセッションを破棄する" do
+    allow(client).to receive(:verify).and_return(false)
+    allow(client).to receive(:refresh).and_return("access_token" => "invalid", "refresh_token" => "refresh")
+
+    expect(described_class.valid?(session:, client:)).to be(false)
+    expect(session).not_to have_key(:admin_auth)
+  end
 end

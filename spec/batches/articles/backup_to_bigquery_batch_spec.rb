@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Articles::BackupToBigqueryBatch do
+  include ActiveSupport::Testing::TimeHelpers
   describe ".call" do
     subject(:result) do
       described_class.call(
@@ -163,6 +164,33 @@ RSpec.describe Articles::BackupToBigqueryBatch do
 
       it do
         expect { result }.to raise_error(described_class::LoadError, /invalid json/)
+      end
+    end
+
+    context "load jobが主エラーを持たない場合" do
+      before do
+        allow(load_job).to receive(:failed?).and_return(true)
+        allow(load_job).to receive(:error).and_return(nil)
+      end
+
+      it "errorsの詳細を伝える" do
+        allow(load_job).to receive(:errors).and_return([ { "message" => "bad row" } ])
+
+        expect { result }.to raise_error(described_class::LoadError, /bad row/)
+      end
+
+      it "詳細のないジョブでも失敗を伝える" do
+        allow(dataset).to receive(:load_job).and_return(double(wait_until_done!: true, failed?: true))
+
+        expect { result }.to raise_error(described_class::LoadError, "unknown BigQuery load error")
+      end
+    end
+
+    it "時計を指定しない場合は現在時刻を保存する" do
+      travel_to(Time.utc(2026, 10, 25)) do
+        described_class.call(project_id: "test-project", dataset_id: "blog_backup", bigquery:, article_fetcher:)
+
+        expect(@loaded_rows.sole.fetch("backed_up_at")).to eq(Time.current.utc.iso8601(6))
       end
     end
 
