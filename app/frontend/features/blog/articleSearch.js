@@ -36,7 +36,3 @@ export function prepareArticleQuery(normalizedQuery) {
     return queryGroups.some((group) => group.every((token) => articleMatchesToken(article, token, getSearchTarget)))
   }
 }
-
-export function articleMatchesQuery(article, normalizedQuery) {
-  return prepareArticleQuery(normalizedQuery)(article)
-}
