@@ -69,34 +69,23 @@ test("home feed", async ({ page }) => {
 })
 
 test("home calendar", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-01-12T12:00:00+09:00"))
   await openPage(page, "/")
   await page.getByRole("tab", { name: "こよみ" }).click()
-  const month = page.getByRole("button", { name: "1月", exact: true })
-  await expect(month).toHaveAttribute("aria-expanded", "false")
-  const spacing = await page.getByRole("heading", { name: "1月", exact: true }).evaluate((heading) => {
-    const label = heading.querySelector(".MuiTypography-root")
-    const tabs = document.querySelector('[role="tablist"]').parentElement
-    return {
-      topGap: label.getBoundingClientRect().top - tabs.getBoundingClientRect().bottom,
-      buttonHeight: heading.querySelector("button").getBoundingClientRect().height,
-    }
-  })
-  // The sticky tabs can move by their 1px border relative to the grid layout.
-  expect(spacing.topGap).toBeGreaterThanOrEqual(16)
-  expect(spacing.topGap).toBeLessThanOrEqual(17)
-  expect(spacing.buttonHeight).toBeGreaterThanOrEqual(44)
+  const day = page.getByRole("button", { name: /^1月12日、記事/ })
+  await expect(day).toHaveAttribute("aria-pressed", "false")
+  await expect(day).toHaveAttribute("aria-current", "date")
+  await expect(page.getByRole("button", { name: "1月1日、記事0件" })).toBeDisabled()
   await screenshot(page, "home-calendar-collapsed")
-  await month.focus()
+  await day.focus()
   await page.keyboard.press("Enter")
-  await expect(month).toHaveAttribute("aria-expanded", "true")
+  await expect(day).toHaveAttribute("aria-pressed", "true")
   const dateHeading = page.getByRole("heading", { name: "1月12日", exact: true })
   await expect(dateHeading).toBeVisible()
-  await expect(dateHeading).toHaveCSS("font-size", "14px")
-  await expect(dateHeading).toHaveCSS("color", "rgb(102, 102, 102)")
-  await expect(page.getByRole("heading", { name: "1月15日", exact: true })).toBeVisible()
   await screenshot(page, "home-calendar")
-  await month.click()
+  await page.getByRole("button", { name: "翌月" }).click()
   await expect(dateHeading).not.toBeVisible()
+  await expect(page.getByRole("button", { name: /^2月29日、記事/ })).toBeVisible()
 })
 
 test("home beginnings", async ({ page }) => {

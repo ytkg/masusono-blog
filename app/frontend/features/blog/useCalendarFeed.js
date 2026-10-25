@@ -4,7 +4,14 @@ import useImmediateRemember from "@/shared/hooks/useImmediateRemember"
 
 export default function useCalendarFeed() {
   const { state: groups, commit } = useImmediateRemember(null, "home-calendar")
-  const { state: expandedMonths, commit: commitExpandedMonths } = useImmediateRemember([], "home-calendar-months")
+  const [todayMonth, todayDay] = new Date()
+    .toLocaleDateString("en-US", { timeZone: "Asia/Tokyo", month: "numeric", day: "numeric" })
+    .split("/")
+    .map(Number)
+  const { state: selection, commit: commitSelection } = useImmediateRemember(
+    { month: todayMonth, day: null },
+    "home-calendar-selection",
+  )
   const [attempt, setAttempt] = useState(0)
   const [failed, setFailed] = useState(false)
   const retry = useCallback(() => {
@@ -35,9 +42,13 @@ export default function useCalendarFeed() {
     return () => controller.abort()
   }, [groups, commit, attempt])
 
-  function changeMonth(month, expanded) {
-    commitExpandedMonths(expanded ? [month] : [])
+  function changeMonth(month) {
+    commitSelection({ month, day: null })
   }
 
-  return { groups, expandedMonths, failed, retry, changeMonth }
+  function selectDay(day) {
+    commitSelection({ ...selection, day })
+  }
+
+  return { groups, selection, todayMonth, todayDay, failed, retry, changeMonth, selectDay }
 }

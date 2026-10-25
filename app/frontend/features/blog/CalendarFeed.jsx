@@ -1,16 +1,18 @@
-import Accordion from "@mui/material/Accordion"
-import AccordionDetails from "@mui/material/AccordionDetails"
-import AccordionSummary from "@mui/material/AccordionSummary"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
+import MenuItem from "@mui/material/MenuItem"
+import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
+import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import useCalendarFeed from "./useCalendarFeed"
 import EmptyStatus from "../../shared/components/EmptyStatus"
 import ArticlesList from "./ArticlesList"
 
+const monthLengths = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
 export default function CalendarFeed() {
-  const { groups, expandedMonths, failed, retry, changeMonth } = useCalendarFeed()
+  const { groups, selection, todayMonth, todayDay, failed, retry, changeMonth, selectDay } = useCalendarFeed()
 
   if (groups === null) {
     return (
@@ -24,75 +26,100 @@ export default function CalendarFeed() {
   }
   if (!groups.length) return <EmptyStatus>記事がありません。</EmptyStatus>
 
-  const months = new Map()
-  for (const group of groups) {
-    const month = group.monthDay.split("/")[0]
-    if (!months.has(month)) months.set(month, [])
-    months.get(month).push(group)
-  }
+  const { month, day: selectedDay } = selection
+  const articlesByDay = new Map(
+    groups
+      .filter(({ monthDay }) => Number(monthDay.split("/")[0]) === month)
+      .map(({ monthDay, articles }) => [Number(monthDay.split("/")[1]), articles]),
+  )
+  const selectedLabel = `${month}月${selectedDay}日`
 
   return (
     <Box>
-      {[...months].map(([month, days], index) => (
-        <Accordion
-          key={month}
-          expanded={expandedMonths.at(-1) === month}
-          onChange={(_, expanded) => changeMonth(month, expanded)}
-          disableGutters
-          elevation={0}
-          slotProps={{ heading: { component: "h2" }, transition: { unmountOnExit: true } }}
-          sx={{
-            bgcolor: "transparent",
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            "&::before": { display: "none" },
-          }}
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+        <Button
+          aria-label="前月"
+          onClick={() => changeMonth(month === 1 ? 12 : month - 1)}
+          sx={{ minWidth: 44, minHeight: 44 }}
         >
-          <AccordionSummary
-            id={`calendar-month-${month}-heading`}
-            aria-controls={`calendar-month-${month}-content`}
-            expandIcon={<ExpandMoreIcon />}
-            sx={{
-              px: 0,
-              minHeight: index === 0 ? 44 : 56,
-              ...(index === 0 && {
-                alignItems: "flex-start",
-                "& .MuiAccordionSummary-content": { mt: 0, mb: 1.5 },
-                "& .MuiAccordionSummary-expandIconWrapper": { mt: 0.5 },
-              }),
-            }}
-          >
-            <Typography component="span" variant="h6" sx={{ fontWeight: 700 }}>
-              {Number(month)}月
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ px: 0, pt: 1, pb: 2 }}>
-            <Box sx={{ display: "grid", gap: 1.5 }}>
-              {days.map(({ monthDay, articles }, index) => {
-                const [monthNumber, day] = monthDay.split("/").map(Number)
-                const label = `${monthNumber}月${day}日`
-                return (
-                  <Box
-                    component="section"
-                    key={monthDay}
-                    aria-label={label}
-                    sx={{
-                      borderBottom: index < days.length - 1 ? "1px solid" : 0,
-                      borderColor: "divider",
-                      pb: index < days.length - 1 ? 1.5 : 0,
-                    }}
-                  >
-                    <Typography component="h3" variant="body2" sx={{ mb: 2, color: "text.secondary", fontWeight: 700 }}>
-                      {label}
-                    </Typography>
-                    <ArticlesList articles={articles} />
-                  </Box>
-                )
-              })}
-            </Box>
-          </AccordionDetails>
-        </Accordion>
-      ))}
+          <ChevronLeftIcon />
+        </Button>
+        <TextField
+          select
+          label="月"
+          value={month}
+          onChange={(event) => changeMonth(Number(event.target.value))}
+          size="small"
+          sx={{ minWidth: 120 }}
+        >
+          {monthLengths.map((_, index) => (
+            <MenuItem key={index + 1} value={index + 1}>
+              {index + 1}月
+            </MenuItem>
+          ))}
+        </TextField>
+        <Button
+          aria-label="翌月"
+          onClick={() => changeMonth(month === 12 ? 1 : month + 1)}
+          sx={{ minWidth: 44, minHeight: 44 }}
+        >
+          <ChevronRightIcon />
+        </Button>
+      </Box>
+      <Box
+        aria-label={`${month}月の日付`}
+        sx={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: { xs: 0.5, sm: 1 } }}
+      >
+        {Array.from({ length: monthLengths[month - 1] }, (_, index) => {
+          const day = index + 1
+          const count = articlesByDay.get(day)?.length ?? 0
+          const selected = selectedDay === day
+          const today = todayMonth === month && todayDay === day
+          return (
+            <Button
+              key={day}
+              disabled={!count}
+              aria-label={`${month}月${day}日、記事${count}件`}
+              aria-pressed={selected}
+              aria-current={today ? "date" : undefined}
+              onClick={() => selectDay(day)}
+              sx={{
+                minWidth: 0,
+                minHeight: { xs: 64, sm: 80 },
+                px: 0,
+                flexDirection: "column",
+                border: "1px solid",
+                borderColor: today ? "primary.main" : "divider",
+                ...(today && {
+                  outline: "2px solid",
+                  outlineColor: count ? "primary.contrastText" : "primary.main",
+                  outlineOffset: -4,
+                }),
+                bgcolor: selected ? "primary.main" : count ? "primary.light" : "background.paper",
+                color: count ? "primary.contrastText" : "text.primary",
+                "&.Mui-focusVisible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 2 },
+                "&:hover": { bgcolor: selected ? "primary.dark" : "primary.light" },
+                "&.Mui-disabled": { color: "text.primary", borderColor: today ? "primary.main" : "divider" },
+              }}
+            >
+              <Typography component="span" sx={{ fontWeight: 700 }}>
+                {day}
+              </Typography>
+              <Typography component="span" sx={{ fontSize: { xs: 10, sm: 12 } }}>
+                {count}件
+              </Typography>
+            </Button>
+          )
+        })}
+      </Box>
+      {selectedDay !== null ? (
+        <Box component="section" aria-label={selectedLabel} sx={{ mt: 3 }}>
+          <Typography component="h2" variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+            {selectedLabel}
+          </Typography>
+          <ArticlesList articles={articlesByDay.get(selectedDay) ?? []} />
+        </Box>
+      ) : null}
     </Box>
   )
 }
