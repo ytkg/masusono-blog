@@ -381,4 +381,123 @@ describe("Home page", () => {
       expect(await screen.findByText("記事がありません。")).toBeInTheDocument()
     },
   )
+
+  describe.each([
+    {
+      tab: "こよみ",
+      key: "home-calendar",
+      field: "groups",
+      endpoint: "/api/app/calendar_articles",
+      collection: [{ monthDay: "01/01", articles: [] }],
+      loadedText: "1月",
+    },
+    {
+      tab: "書き出し",
+      key: "home-sentence-articles",
+      field: "articles",
+      endpoint: "/api/app/sentence_articles",
+      collection: [{ id: "current", content: "現在の記事。" }],
+      loadedText: "articles:1",
+    },
+  ])("$tab の取得と履歴", ({ tab, key, field, endpoint, collection, loadedText }) => {
+    it("離脱した取得を中断し、再取得後の画面・履歴を遅い旧応答で上書きしない", async () => {
+      const { router } = await import("@inertiajs/react")
+      const oldRequest = Promise.withResolvers()
+      const currentRequest = Promise.withResolvers()
+      requestJson.mockReturnValueOnce(oldRequest.promise).mockReturnValueOnce(currentRequest.promise)
+      const home = render(<Home articles={[]} />)
+      fireEvent.click(screen.getByRole("tab", { name: tab }))
+      const oldSignal = requestJson.mock.calls[0][1].signal
+      fireEvent.click(screen.getByRole("tab", { name: "フィード" }))
+      expect(oldSignal.aborted).toBe(true)
+      expect(rememberedStates.has(key)).toBe(false)
+      fireEvent.click(screen.getByRole("tab", { name: tab }))
+      expect(requestJson.mock.calls.map(([url]) => url)).toEqual([endpoint, endpoint])
+      expect(requestJson.mock.calls[1][1].signal.aborted).toBe(false)
+      window.history.replaceState({ page: { rememberedState: { other: "preserved" } } }, "")
+      try {
+        await act(async () => currentRequest.resolve({ [field]: collection }))
+        expect(screen.getByText(loadedText)).toBeInTheDocument()
+        const currentHistory = structuredClone(window.history.state)
+        expect(currentHistory.page.rememberedState).toEqual({ other: "preserved", [key]: collection })
+        router.remember.mockClear()
+
+        // Abortを無視して完了する通信でも、古い結果を履歴に書き込ませない。
+        await act(async () => oldRequest.resolve({ [field]: [] }))
+        expect(screen.getByText(loadedText)).toBeInTheDocument()
+        expect(rememberedStates.get(key)).toEqual(collection)
+        expect(window.history.state).toEqual(currentHistory)
+        expect(router.remember).not.toHaveBeenCalled()
+        home.unmount()
+        render(<Home articles={[]} />)
+        expect(screen.getByText(loadedText)).toBeInTheDocument()
+        expect(requestJson).toHaveBeenCalledTimes(2)
+      } finally {
+        window.history.replaceState(null, "")
+      }
+    })
+
+    it("取得済みの空配列を復元し、未取得として再リクエストしない", () => {
+      rememberedStates.set(key, [])
+      render(<Home articles={[]} />)
+      fireEvent.click(screen.getByRole("tab", { name: tab }))
+      expect(screen.getByText(tab === "こよみ" ? "記事がありません。" : "articles:0")).toBeInTheDocument()
+      expect(screen.queryByText("記事を読み込んでいます…")).not.toBeInTheDocument()
+      expect(requestJson).not.toHaveBeenCalled()
+    })
+  })
+
+  it.each([
+    {},
+    { articles: null },
+    { articles: {} },
+    { articles: [null] },
+    { articles: [{ id: 1, content: "本文" }] },
+    { articles: [{ id: "one", content: null }] },
+  ])("不正な書き出し応答を履歴に保存せず、同じURLから再試行する: %j", async (payload) => {
+    requestJson.mockResolvedValueOnce(payload).mockResolvedValueOnce({ articles: [] })
+    render(<Home articles={[{ id: "recent" }]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "書き出し" }))
+    expect(await screen.findByText("記事を読み込めませんでした。")).toBeInTheDocument()
+    expect(screen.queryByTestId("sentence-feed")).not.toBeInTheDocument()
+    expect(rememberedStates.has("home-sentence-articles")).toBe(false)
+    fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+    expect(await screen.findByTestId("sentence-feed")).toHaveTextContent("articles:0")
+    expect(requestJson.mock.calls.map(([url]) => url)).toEqual([
+      "/api/app/sentence_articles",
+      "/api/app/sentence_articles",
+    ])
+    expect(rememberedStates.get("home-sentence-articles")).toEqual([])
+  })
+
+  it("離脱前のフィード応答を無視し、別ページの履歴を汚さず同じ位置から再取得する", async () => {
+    const oldRequest = Promise.withResolvers()
+    requestJson.mockReturnValueOnce(oldRequest.promise)
+    const home = render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
+    fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
+    const signal = requestJson.mock.calls[0][1].signal
+    home.unmount()
+    expect(signal.aborted).toBe(true)
+    const otherPage = { page: { url: "/about", rememberedState: { other: "preserved" } } }
+    window.history.replaceState(otherPage, "")
+    try {
+      await act(async () => oldRequest.resolve({ articles: [{ id: "stale" }], pagination: { nextOffset: null } }))
+      expect(window.history.state).toEqual(otherPage)
+      expect(rememberedStates.has("home-articles")).toBe(false)
+      requestJson.mockResolvedValueOnce({ articles: [{ id: "two" }], pagination: { nextOffset: null } })
+      render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
+      fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
+      await waitFor(() => expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:2"))
+      expect(requestJson.mock.calls.map(([url]) => url)).toEqual([
+        "/api/app/articles?offset=10",
+        "/api/app/articles?offset=10",
+      ])
+      expect(rememberedStates.get("home-articles")).toEqual({
+        articles: [{ id: "one" }, { id: "two" }],
+        nextOffset: null,
+      })
+    } finally {
+      window.history.replaceState(null, "")
+    }
+  })
 })
