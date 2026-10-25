@@ -12,6 +12,8 @@ on:
       - package-lock.json
       - vite.config.ts
       - config/vite.json
+      - .github/scripts/publish-coverage*.cjs
+      - .github/workflows/publish-coverage.yml
       - .github/workflows/frontend-vitest.yml
   pull_request:
     paths:
@@ -22,6 +24,8 @@ on:
       - package-lock.json
       - vite.config.ts
       - config/vite.json
+      - .github/scripts/publish-coverage*.cjs
+      - .github/workflows/publish-coverage.yml
       - .github/workflows/frontend-vitest.yml
 
 jobs:
@@ -44,8 +48,29 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Test coverage badge publication
+        run: node --test .github/scripts/publish-coverage.test.cjs
+
       - name: Run Vitest
-        run: npm test
+        run: npm run test:coverage
 
       - name: Verify production SSR bundle
         run: npm run test:ssr
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-frontend
+          path: coverage/frontend/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-coverage:
+    needs: vitest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-coverage.yml
+    with:
+      kind: frontend

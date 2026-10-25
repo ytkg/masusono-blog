@@ -1,0 +1,31 @@
+name: publish-coverage
+
+on:
+  workflow_call:
+    inputs:
+      kind:
+        required: true
+        type: string
+
+# Both suites update the same branch; serialize read/modify/write operations.
+concurrency:
+  group: coverage-badges
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: coverage-${{ inputs.kind }}
+          path: coverage/${{ inputs.kind }}
+      - uses: actions/github-script@v9
+        env:
+          COVERAGE_KIND: ${{ inputs.kind }}
+        with:
+          script: |
+            await require('./.github/scripts/publish-coverage.cjs')({ github, context })
