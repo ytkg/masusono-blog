@@ -23,3 +23,23 @@ test("code decoration preserves mixed pre contents and fragment targets", async 
   await expect(page.locator("#sample-code")).toHaveText("puts :anchor")
   await expectNoPageOverflow(page)
 })
+
+test("code decoration keeps links and named fragment targets usable", async ({ page }) => {
+  await mockPageProps(page, "/articles/visual-article-1", (props) => {
+    props.article.content =
+      '<pre><code class="language-ruby"><a href="#named-code">コード内リンク</a></code></pre>' +
+      '<pre><code class="language-js"><a href="/about">コード内のAbout</a></code></pre>' +
+      '<div style="height:900px"></div><pre><code class="language-ruby"><a name="named-code">puts :target</a></code></pre>' +
+      '<pre><code class="language-js">const decorated = 2</code></pre>'
+  })
+  await openPage(page, "/articles/visual-article-1")
+  await expect(page.locator("[data-code-block-shell]")).toHaveCount(1)
+  await expect(page.getByRole("button", { name: "▶ 実行" })).toHaveCount(0)
+  await page.getByRole("link", { name: "コード内リンク", exact: true }).click()
+  await expect(page).toHaveURL(/#named-code$/)
+  await expect(page.locator('a[name="named-code"]')).toBeInViewport()
+  await expect(page.locator('a[name="named-code"]')).toHaveText("puts :target")
+  await expectNoPageOverflow(page)
+  await page.getByRole("link", { name: "コード内のAbout", exact: true }).click()
+  await expect(page).toHaveURL(/\/about$/)
+})

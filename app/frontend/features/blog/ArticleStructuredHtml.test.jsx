@@ -171,3 +171,21 @@ it("passes br line breaks to the Ruby runner and syntax highlighted code", () =>
   expect(lines).toHaveLength(2)
   expect(lines[1]).toHaveTextContent("const n = 1")
 })
+
+it.each([
+  '<a href="/about" target="_blank" rel="noopener">puts :link</a>',
+  '<span><a href="#destination">puts :fragment</a></span>',
+  '<a href="">puts :reload</a>',
+  '<a name="destination">puts :target</a>',
+])("コード内のリンクと名前付きアンカーを元のDOMで保持する: %s", (content) => {
+  const html = `<pre><code class="language-ruby">${content}</code></pre>`
+  render(
+    <ArticleStructuredHtml
+      html={`${html}<pre><code class="language-ruby">puts :normal</code></pre>`}
+      enableRubyRunner
+    />,
+  )
+  expect(screen.getByTestId("article-body-html").querySelector("pre")?.outerHTML).toBe(html)
+  expect(screen.getAllByTestId("ruby-runner")).toHaveLength(1)
+  expect(screen.getByTestId("ruby-runner")).toHaveTextContent("puts :normal")
+})

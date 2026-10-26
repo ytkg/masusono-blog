@@ -12,7 +12,7 @@ export function buildHtmlParts(html) {
     if (
       Array.from(preElement.childNodes).some((node) => node !== codeElement && node.nodeType !== Node.COMMENT_NODE) ||
       preElement.id ||
-      preElement.querySelector("[id]")
+      preElement.querySelector("[id], a[href], a[name]")
     )
       return
     const block = buildCodeBlockDataFromElement(codeElement)
