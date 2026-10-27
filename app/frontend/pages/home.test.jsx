@@ -357,15 +357,36 @@ describe("Home page", () => {
     expect(await screen.findByTestId("sentence-feed")).toHaveTextContent("articles:0")
   })
 
-  it.each([[{}], [null], [{ monthDay: 12, articles: [] }], [{ monthDay: "01/01", articles: null }]])(
-    "不正なこよみグループを保存せず再試行できる: %j",
-    async (...groups) => {
-      requestJson.mockResolvedValueOnce({ groups }).mockResolvedValueOnce({ groups: [] })
+  it.each([
+    [{}],
+    [null],
+    [{ monthDay: 12, articles: [] }],
+    [{ monthDay: "1/01", articles: [] }],
+    [{ monthDay: "01/01", articles: null }],
+  ])("不正なこよみグループを保存せず再試行できる: %j", async (...groups) => {
+    requestJson.mockResolvedValueOnce({ groups }).mockResolvedValueOnce({ groups: [] })
+    render(<Home articles={[]} />)
+    fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
+    expect(await screen.findByText("記事を読み込めませんでした。")).toBeInTheDocument()
+    expect(rememberedStates.has("home-calendar")).toBe(false)
+    fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+    expect(await screen.findByText("記事がありません。")).toBeInTheDocument()
+  })
+
+  it.each([null, {}, { groups: null }, { groups: {} }])(
+    "不正なこよみ応答を保存せず同じURLから再試行する: %j",
+    async (payload) => {
+      requestJson.mockResolvedValueOnce(payload).mockResolvedValueOnce({ groups: [] })
       render(<Home articles={[]} />)
       fireEvent.click(screen.getByRole("tab", { name: "こよみ" }))
       expect(await screen.findByText("記事を読み込めませんでした。")).toBeInTheDocument()
+      expect(rememberedStates.has("home-calendar")).toBe(false)
       fireEvent.click(screen.getByRole("button", { name: "再試行" }))
       expect(await screen.findByText("記事がありません。")).toBeInTheDocument()
+      expect(requestJson.mock.calls.map(([url]) => url)).toEqual([
+        "/api/app/calendar_articles",
+        "/api/app/calendar_articles",
+      ])
     },
   )
 
