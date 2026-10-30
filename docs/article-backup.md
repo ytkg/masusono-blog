@@ -38,6 +38,8 @@ docker compose run --rm backend bundle exec rails articles:prepare_tagging
 - `tmp/tagging/tag-updates.json`: 適用用 JSON。初期値は `{"tag_updates":[]}`
 - `tmp/tagging/review.md`: レビュー用テンプレート
 
+既存の3ファイルのいずれかがある場合、`articles:prepare_tagging` はバックアップやファイル書き込みを行わずエラーで停止します。編集中のタグ案・レビューと候補の組み合わせを保護するためです。再準備する場合は、既存ファイルを残したまま `TAGGING_OUTPUT_DIR` に新しい出力ディレクトリを指定してください。別ディレクトリのタグ案を適用する場合は、`TAG_UPDATES_PATH` にその `tag-updates.json` のパスを指定します。
+
 確認済みのタグ案を microCMS に反映する場合は、`tmp/tagging/tag-updates.json` に `id` と `tags` を書いてから適用します。適用後は自動で BigQuery へ再バックアップし、残り候補件数を表示します。
 
 ```bash

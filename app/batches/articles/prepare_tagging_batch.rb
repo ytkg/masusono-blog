@@ -29,6 +29,11 @@ module Articles
     end
 
     def call
+      existing_path = [ candidates_path, tag_updates_path, review_path ].find(&:exist?)
+      if existing_path
+        raise ArgumentError, "Tagging file already exists: #{existing_path}. Use a new TAGGING_OUTPUT_DIR to preserve existing work."
+      end
+
       FileUtils.mkdir_p(output_dir)
 
       backup = backup_batch.call
