@@ -26,7 +26,7 @@ export default function NumbersDistributionChart({ distribution }) {
           記事がありません。全区間0本です。
         </Typography>
       ) : null}
-      <Box sx={{ display: "flex", minWidth: 0, maxWidth: 584 }}>
+      <Box sx={{ display: "flex", minWidth: 0, maxWidth: 452 }}>
         <Box
           component="svg"
           width="56"
@@ -63,20 +63,20 @@ export default function NumbersDistributionChart({ distribution }) {
         >
           <Box
             component="svg"
-            width="528"
+            width="396"
             height="280"
-            sx={{ display: "block", minWidth: 528 }}
+            sx={{ display: "block", minWidth: 396 }}
             role="group"
             aria-label="本文文字数（字）ごとの記事数（本）"
           >
             {Array.from({ length: 5 }, (_, index) => {
               const y = baseline - (index / 4) * chartHeight
               return (
-                <line key={index} x1="0" x2="528" y1={y} y2={y} stroke={theme.palette.divider} aria-hidden="true" />
+                <line key={index} x1="0" x2="396" y1={y} y2={y} stroke={theme.palette.divider} aria-hidden="true" />
               )
             })}
             {distribution.map((bucket, index) => {
-              const x = 24 + index * 48
+              const x = 18 + index * 36
               const height = (bucket.articles / maximum) * chartHeight
               const label =
                 bucket.maxChars === null
@@ -94,14 +94,16 @@ export default function NumbersDistributionChart({ distribution }) {
                   >
                     {format(bucket.articles)}本
                   </text>
-                  <text x={x} y="238" textAnchor="middle" fontSize="12" fill={theme.palette.text.secondary}>
-                    <tspan x={x}>
-                      {format(bucket.minChars)}
-                      {bucket.maxChars === null ? "" : "〜"}
+                  <text x={x} y="232" textAnchor="middle" fontSize="12" fill={theme.palette.text.secondary}>
+                    <tspan x={x}>{format(bucket.minChars)}</tspan>
+                    <tspan x={x} dy="14">
+                      {bucket.maxChars === null ? "以上" : "〜"}
                     </tspan>
-                    <tspan x={x} dy="16">
-                      {bucket.maxChars === null ? "以上" : format(bucket.maxChars)}
-                    </tspan>
+                    {bucket.maxChars !== null ? (
+                      <tspan x={x} dy="14">
+                        {format(bucket.maxChars)}
+                      </tspan>
+                    ) : null}
                   </text>
                 </g>
               )
@@ -109,7 +111,7 @@ export default function NumbersDistributionChart({ distribution }) {
           </Box>
         </Box>
       </Box>
-      <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", maxWidth: 584 }}>
+      <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", maxWidth: 452 }}>
         本文文字数（字）
       </Typography>
     </Stack>

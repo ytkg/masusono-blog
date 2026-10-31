@@ -1014,7 +1014,7 @@ test("numbers distribution", async ({ page }) => {
       return bounds.left >= region.left && bounds.right <= region.right
     }).length
   })
-  expect(visibleBars).toBeGreaterThanOrEqual(page.viewportSize().width === 390 ? 6 : 11)
+  expect(visibleBars).toBeGreaterThanOrEqual(page.viewportSize().width === 390 ? 8 : 11)
   const labelsOverlap = await chart.locator('g[role="img"]').evaluateAll((buckets) => {
     const labels = buckets.map((bucket) => bucket.querySelector("text:last-child").getBoundingClientRect())
     return labels.some((label, index) => index > 0 && labels[index - 1].right > label.left)
