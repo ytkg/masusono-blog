@@ -998,3 +998,23 @@ test("ads app fills the available screen", async ({ page }) => {
   await dialog.getByRole("button", { name: /閉じる/ }).click()
   await expect(dialog).not.toBeVisible()
 })
+
+test("numbers distribution", async ({ page }) => {
+  await openPage(page, "/numbers")
+  const chart = page.getByTestId("numbers-distribution")
+  await chart.scrollIntoViewIfNeeded()
+  await expect(chart.getByRole("img", { name: "0〜199字：2本", exact: true })).toBeVisible()
+  const region = chart.getByRole("region")
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
+  await expect(chart).toHaveScreenshot("numbers-distribution.png")
+  await region.focus()
+  await page.keyboard.press("ArrowRight")
+  if (await region.evaluate((element) => element.scrollWidth > element.clientWidth)) {
+    await expect.poll(() => region.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0)
+    await region.evaluate((element) => {
+      element.scrollLeft = element.scrollWidth
+    })
+    await expect(chart).toHaveScreenshot("numbers-distribution-end.png")
+  }
+})

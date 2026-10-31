@@ -22,6 +22,7 @@ module Numbers
       character_counter = cached_character_counter
       article_summary = ArticleMetricsSummary.call(articles:, character_counter:)
       metrics = MetricsPayloadBuilder.call(article_summary:)
+      metrics[:distribution] = article_summary.fetch(:totals).fetch(:distribution)
       metrics[:trend] = MetricsTrendBuilder.call(
         articles:,
         start_date: LAUNCH_DATE,

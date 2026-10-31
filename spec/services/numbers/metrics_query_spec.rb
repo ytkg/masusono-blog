@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Numbers::MetricsQuery do
+  include ActiveSupport::Testing::TimeHelpers
   describe ".call" do
     subject(:result) { described_class.call }
 
@@ -74,6 +75,53 @@ RSpec.describe Numbers::MetricsQuery do
 
       it "全体だけを表示する" do
         expect(rows).to eq([ { label: "全体", articles: "0 本", chars: "0 字", averageChars: "—" } ])
+      end
+    end
+
+    it "分布を集計・推移と同じ1時間キャッシュで更新する" do
+      first = described_class.call
+      articles << { content: "あ" * 200, publishedDate: "2025/10/09" }
+      expect(described_class.call).to eq(first)
+      travel 1.hour + 1.second do
+        refreshed = described_class.call[:metrics]
+        expect(refreshed[:distribution].sum { |bucket| bucket[:articles] }).to eq(5)
+        expect(refreshed[:rows].first[:articles]).to eq("5 本")
+        expect(refreshed[:trend][:series].first[:finalValue]).to eq("5 本")
+      end
+    end
+
+    describe "文字数の分布" do
+      it "集計と同じ文字数で0本の区間も返す" do
+        buckets = result[:metrics][:distribution]
+        expect(buckets.size).to eq(11)
+        expect(buckets.first).to eq(minChars: 0, maxChars: 199, articles: 4)
+        expect(buckets.last).to eq(minChars: 2000, maxChars: nil, articles: 0)
+        expect(buckets.sum { |bucket| bucket[:articles] }).to eq(4)
+      end
+
+      context "各境界と上限を超える本文の場合" do
+        let(:articles) do
+          lengths = [ 0, *((1..10).flat_map { |index| [ index * 200 - 1, index * 200 ] }), 9000 ]
+          lengths.map { |length| { content: "あ" * length } }
+        end
+
+        it "各記事をちょうど1区間に計上する" do
+          expect(result[:metrics][:distribution].map { |bucket| bucket[:articles] }).to eq(Array.new(11, 2))
+          expect(rows.first[:articles]).to eq("22 本")
+        end
+      end
+
+      context "記事がない場合" do
+        let(:articles) { [] }
+
+        it "全区間0本を返す" do
+          expect(result[:metrics][:distribution].map { |bucket| bucket[:articles] }).to eq(Array.new(11, 0))
+        end
+      end
+
+      it "取得失敗を空の分布に変換しない" do
+        allow(Article).to receive(:all).and_raise(StandardError, "upstream failure")
+        expect { result }.to raise_error(StandardError, "upstream failure")
       end
     end
 

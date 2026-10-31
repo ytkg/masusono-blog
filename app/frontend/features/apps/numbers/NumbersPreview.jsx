@@ -1,6 +1,7 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import SectionHeading from "@/shared/components/SectionHeading"
+import NumbersDistributionChart from "./NumbersDistributionChart"
 import NumbersMetricsTable from "./NumbersMetricsTable"
 import NumbersTrendChart from "./NumbersTrendChart"
 
@@ -22,6 +23,7 @@ export default function NumbersPreview({ metrics }) {
         <SectionHeading>集計</SectionHeading>
         <NumbersMetricsTable rows={metricRows} />
       </Stack>
+      <NumbersDistributionChart distribution={metrics?.distribution} />
       <NumbersTrendChart trend={trend} />
     </Stack>
   )
