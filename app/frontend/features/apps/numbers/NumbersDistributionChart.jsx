@@ -11,8 +11,8 @@ export default function NumbersDistributionChart({ distribution }) {
   const total = distribution.reduce((sum, bucket) => sum + bucket.articles, 0)
   const step = Math.max(1, Math.ceil(Math.max(...distribution.map((bucket) => bucket.articles)) / 4))
   const maximum = step * 4
-  const baseline = 244
-  const chartHeight = 184
+  const baseline = 214
+  const chartHeight = 160
   const format = (value) => value.toLocaleString("ja-JP")
 
   return (
@@ -26,68 +26,92 @@ export default function NumbersDistributionChart({ distribution }) {
           記事がありません。全区間0本です。
         </Typography>
       ) : null}
-      <Box
-        role="region"
-        aria-label="文字数の分布グラフ（左右の矢印キーでスクロール）"
-        tabIndex={0}
-        sx={{
-          overflowX: "auto",
-          maxWidth: "100%",
-          "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main" },
-        }}
-      >
+      <Box sx={{ display: "flex", minWidth: 0, maxWidth: 716 }}>
         <Box
           component="svg"
-          viewBox="0 0 1100 320"
-          sx={{ display: "block", width: "100%", minWidth: 1000 }}
-          role="group"
-          aria-label="本文文字数（字）ごとの記事数（本）"
+          width="56"
+          height="280"
+          sx={{ flexShrink: 0 }}
+          aria-hidden="true"
+          data-testid="distribution-axis"
         >
-          <text x="8" y="20" fill={theme.palette.text.secondary} fontSize="13">
-            記事数（本）
+          <text x="4" y="18" fill={theme.palette.text.secondary} fontSize="12">
+            記事数
+          </text>
+          <text x="4" y="34" fill={theme.palette.text.secondary} fontSize="12">
+            （本）
           </text>
           {Array.from({ length: 5 }, (_, index) => {
             const value = step * index
             const y = baseline - (value / maximum) * chartHeight
             return (
-              <g key={value} aria-hidden="true">
-                <line x1="58" x2="1090" y1={y} y2={y} stroke={theme.palette.divider} />
-                <text x="48" y={y + 4} textAnchor="end" fontSize="12" fill={theme.palette.text.secondary}>
-                  {format(value)}
-                </text>
-              </g>
+              <text key={value} x="48" y={y + 4} textAnchor="end" fontSize="12" fill={theme.palette.text.secondary}>
+                {format(value)}
+              </text>
             )
           })}
-          {distribution.map((bucket, index) => {
-            const x = 105 + index * 94
-            const height = (bucket.articles / maximum) * chartHeight
-            const label =
-              bucket.maxChars === null
-                ? `${format(bucket.minChars)}字以上`
-                : `${format(bucket.minChars)}〜${format(bucket.maxChars)}字`
-            return (
-              <g key={bucket.minChars} role="img" aria-label={`${label}：${format(bucket.articles)}本`}>
-                <rect x={x - 25} y={baseline - height} width="50" height={height} fill={theme.palette.primary.main} />
-                <text
-                  x={x}
-                  y={baseline - height - 9}
-                  textAnchor="middle"
-                  fontSize="13"
-                  fill={theme.palette.text.primary}
-                >
-                  {format(bucket.articles)}本
-                </text>
-                <text x={x} y="270" textAnchor="middle" fontSize="12" fill={theme.palette.text.secondary}>
-                  {label.replace("字", "")}
-                </text>
-              </g>
-            )
-          })}
-          <text x="580" y="308" textAnchor="middle" fontSize="13" fill={theme.palette.text.secondary}>
-            本文文字数（字）
-          </text>
+        </Box>
+        <Box
+          role="region"
+          aria-label="文字数の分布グラフ（左右の矢印キーでスクロール）"
+          tabIndex={0}
+          sx={{
+            overflowX: "auto",
+            minWidth: 0,
+            "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main" },
+          }}
+        >
+          <Box
+            component="svg"
+            width="660"
+            height="280"
+            sx={{ display: "block", minWidth: 660 }}
+            role="group"
+            aria-label="本文文字数（字）ごとの記事数（本）"
+          >
+            {Array.from({ length: 5 }, (_, index) => {
+              const y = baseline - (index / 4) * chartHeight
+              return (
+                <line key={index} x1="0" x2="660" y1={y} y2={y} stroke={theme.palette.divider} aria-hidden="true" />
+              )
+            })}
+            {distribution.map((bucket, index) => {
+              const x = 30 + index * 60
+              const height = (bucket.articles / maximum) * chartHeight
+              const label =
+                bucket.maxChars === null
+                  ? `${format(bucket.minChars)}字以上`
+                  : `${format(bucket.minChars)}〜${format(bucket.maxChars)}字`
+              return (
+                <g key={bucket.minChars} role="img" aria-label={`${label}：${format(bucket.articles)}本`}>
+                  <rect x={x - 10} y={baseline - height} width="20" height={height} fill={theme.palette.primary.main} />
+                  <text
+                    x={x}
+                    y={baseline - height - 9}
+                    textAnchor="middle"
+                    fontSize="13"
+                    fill={theme.palette.text.primary}
+                  >
+                    {format(bucket.articles)}本
+                  </text>
+                  <text x={x} y="238" textAnchor="middle" fontSize="12" fill={theme.palette.text.secondary}>
+                    <tspan x={x}>
+                      {format(bucket.minChars)}
+                      {bucket.maxChars === null ? "" : "〜"}
+                    </tspan>
+                    <tspan x={x} dy="16">
+                      {bucket.maxChars === null ? "以上" : format(bucket.maxChars)}
+                    </tspan>
+                  </text>
+                </g>
+              )
+            })}
+          </Box>
         </Box>
       </Box>
+      <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", maxWidth: 716 }}>
+        本文文字数（字）
+      </Typography>
     </Stack>
   )
 }

@@ -1005,16 +1005,21 @@ test("numbers distribution", async ({ page }) => {
   await chart.scrollIntoViewIfNeeded()
   await expect(chart.getByRole("img", { name: "0〜199字：2本", exact: true })).toBeVisible()
   const region = chart.getByRole("region")
+  const axis = chart.getByTestId("distribution-axis")
+  const axisBefore = await axis.boundingBox()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
   await expect(chart).toHaveScreenshot("numbers-distribution.png")
   await region.focus()
   await page.keyboard.press("ArrowRight")
-  if (await region.evaluate((element) => element.scrollWidth > element.clientWidth)) {
+  const scrollable = await region.evaluate((element) => element.scrollWidth > element.clientWidth)
+  if (page.viewportSize().width === 390) expect(scrollable).toBe(true)
+  if (scrollable) {
     await expect.poll(() => region.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0)
     await region.evaluate((element) => {
       element.scrollLeft = element.scrollWidth
     })
+    expect(await axis.boundingBox()).toEqual(axisBefore)
     await expect(chart).toHaveScreenshot("numbers-distribution-end.png")
   }
 })
