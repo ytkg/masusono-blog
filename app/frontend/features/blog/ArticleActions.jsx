@@ -8,6 +8,8 @@ import MenuItem from "@mui/material/MenuItem"
 import Snackbar from "@mui/material/Snackbar"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
+import CampaignIcon from "@mui/icons-material/Campaign"
+import { ensureUserIdCookie } from "@/shared/lib/userId"
 import { buildArticleCopyText } from "./articleCopyText"
 
 function buildArticleUrl(articleId) {
@@ -43,6 +45,24 @@ export default function ArticleActions({ article }) {
     }
   }
 
+  const handleSubmitAd = () => {
+    handleClose()
+    const sequence = ++copyAttemptRef.current
+    const userId = ensureUserIdCookie()
+    if (userId) {
+      window.location.assign(
+        `https://ads.masusono.com/users/${encodeURIComponent(userId)}/ads/new?articleId=${encodeURIComponent(article.id)}`,
+      )
+    } else {
+      setFeedback({
+        severity: "error",
+        kind: "ad",
+        message: "広告を表示できません。ブラウザのCookie設定を確認してください。",
+        sequence,
+      })
+    }
+  }
+
   return (
     <>
       <AuxiliaryIconButton
@@ -62,6 +82,10 @@ export default function ArticleActions({ article }) {
           <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
           記事全文をコピー
         </MenuItem>
+        <MenuItem onClick={handleSubmitAd}>
+          <CampaignIcon fontSize="small" sx={{ mr: 1 }} />
+          広告を出稿する
+        </MenuItem>
       </Menu>
       <Snackbar
         key={feedback?.sequence}
@@ -79,9 +103,11 @@ export default function ArticleActions({ article }) {
           action={
             feedback?.severity === "error" ? (
               <>
-                <Button color="inherit" size="small" onClick={() => handleCopy(feedback.kind)}>
-                  再試行
-                </Button>
+                {feedback.kind !== "ad" && (
+                  <Button color="inherit" size="small" onClick={() => handleCopy(feedback.kind)}>
+                    再試行
+                  </Button>
+                )}
                 <Button color="inherit" size="small" onClick={() => setFeedback(null)}>
                   閉じる
                 </Button>
