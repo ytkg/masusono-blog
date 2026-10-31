@@ -101,5 +101,34 @@ RSpec.describe Articles::PrepareTaggingBatch do
         "| id | title | current | proposed | reason |"
       )
     end
+    context "when tagging files already exist" do
+      [ "candidates.json", "tag-updates.json", "review.md" ].each do |filename|
+        it "preserves an existing #{filename} without starting external batches" do
+          FileUtils.mkdir_p(output_dir)
+          path = output_dir.join(filename)
+          path.write("existing manual work")
+
+          expect { result }.to raise_error(ArgumentError, /TAGGING_OUTPUT_DIR/)
+          expect(path.read).to eq("existing manual work")
+          expect(output_dir.children).to eq([ path ])
+          expect(backup_batch).not_to have_received(:call)
+          expect(candidates_batch).not_to have_received(:call)
+        end
+      end
+
+      it "preserves all files on a repeated preparation" do
+        result
+        output_dir.join("tag-updates.json").write('{"tag_updates":[{"id":"candidate-1","tags":"提案"}]}')
+        output_dir.join("review.md").write("Reviewed by hand")
+        original_files = output_dir.children.to_h { |path| [ path, path.read ] }
+
+        expect do
+          described_class.call(output_dir: output_dir, backup_batch: backup_batch, candidates_batch: candidates_batch)
+        end.to raise_error(ArgumentError, /TAGGING_OUTPUT_DIR/)
+        expect(output_dir.children.to_h { |path| [ path, path.read ] }).to eq(original_files)
+        expect(backup_batch).to have_received(:call).once
+        expect(candidates_batch).to have_received(:call).once
+      end
+    end
   end
 end
