@@ -8,6 +8,8 @@ import MenuItem from "@mui/material/MenuItem"
 import Snackbar from "@mui/material/Snackbar"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
+import CampaignIcon from "@mui/icons-material/Campaign"
+import AdsApp from "../apps/ads/AdsApp"
 import { buildArticleCopyText } from "./articleCopyText"
 
 function buildArticleUrl(articleId) {
@@ -44,56 +46,73 @@ export default function ArticleActions({ article }) {
   }
 
   return (
-    <>
-      <AuxiliaryIconButton
-        aria-label="記事メニューを開く"
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-        onClick={handleOpen}
-      >
-        <MoreHorizIcon fontSize="small" />
-      </AuxiliaryIconButton>
-      <Menu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
-        <MenuItem onClick={() => handleCopy("url")}>
-          <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
-          記事URLをコピー
-        </MenuItem>
-        <MenuItem onClick={() => handleCopy("full")}>
-          <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
-          記事全文をコピー
-        </MenuItem>
-      </Menu>
-      <Snackbar
-        key={feedback?.sequence}
-        open={Boolean(feedback)}
-        autoHideDuration={feedback?.severity === "success" ? 3000 : null}
-        onClose={(_event, reason) => {
-          if (reason !== "clickaway" && feedback?.severity === "success") setFeedback(null)
-        }}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        sx={{ bottom: navigationNoticeBottomSx }}
-      >
-        <StatusAlert
-          severity={feedback?.severity || "success"}
-          onClose={() => setFeedback(null)}
-          action={
-            feedback?.severity === "error" ? (
-              <>
-                <Button color="inherit" size="small" onClick={() => handleCopy(feedback.kind)}>
-                  再試行
-                </Button>
-                <Button color="inherit" size="small" onClick={() => setFeedback(null)}>
-                  閉じる
-                </Button>
-              </>
-            ) : undefined
-          }
-          sx={{ width: "100%", minWidth: 0, "& .MuiAlert-message": { overflowWrap: "anywhere" } }}
-        >
-          {feedback?.message}
-        </StatusAlert>
-      </Snackbar>
-    </>
+    <AdsApp
+      articleId={article.id}
+      renderLauncher={({ onClick: openAd, ref }) => (
+        <>
+          <AuxiliaryIconButton
+            ref={ref}
+            aria-label="記事メニューを開く"
+            aria-haspopup="menu"
+            aria-expanded={isOpen}
+            onClick={handleOpen}
+          >
+            <MoreHorizIcon fontSize="small" />
+          </AuxiliaryIconButton>
+          <Menu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
+            <MenuItem onClick={() => handleCopy("url")}>
+              <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
+              記事URLをコピー
+            </MenuItem>
+            <MenuItem onClick={() => handleCopy("full")}>
+              <ContentCopyIcon fontSize="small" sx={{ mr: 1 }} />
+              記事全文をコピー
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose()
+                setFeedback(null)
+                ++copyAttemptRef.current
+                openAd()
+              }}
+            >
+              <CampaignIcon fontSize="small" sx={{ mr: 1 }} />
+              広告を出稿する
+            </MenuItem>
+          </Menu>
+          <Snackbar
+            key={feedback?.sequence}
+            open={Boolean(feedback)}
+            autoHideDuration={feedback?.severity === "success" ? 3000 : null}
+            onClose={(_event, reason) => {
+              if (reason !== "clickaway" && feedback?.severity === "success") setFeedback(null)
+            }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            sx={{ bottom: navigationNoticeBottomSx }}
+          >
+            <StatusAlert
+              severity={feedback?.severity || "success"}
+              onClose={() => setFeedback(null)}
+              action={
+                feedback?.severity === "error" ? (
+                  <>
+                    <Button color="inherit" size="small" onClick={() => handleCopy(feedback.kind)}>
+                      再試行
+                    </Button>
+                    <Button color="inherit" size="small" onClick={() => setFeedback(null)}>
+                      閉じる
+                    </Button>
+                  </>
+                ) : undefined
+              }
+              sx={{ width: "100%", minWidth: 0, "& .MuiAlert-message": { overflowWrap: "anywhere" } }}
+            >
+              {feedback?.message}
+            </StatusAlert>
+          </Snackbar>
+        </>
+      )}
+    />
   )
 }
 

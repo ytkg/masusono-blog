@@ -99,8 +99,8 @@ class VisualGateTest(unittest.TestCase):
         self.assertEqual(self.push().returncode, 0)
         calls = self.log.read_text().splitlines()
         self.assertEqual(len(calls), 3)
-        self.assertIn("up --build -d backend vite", calls[0])
-        self.assertTrue(calls[1].endswith("run --build --rm visual npm run test:visual"))
+        self.assertIn("up --build --force-recreate -d backend vite", calls[0])
+        self.assertTrue(calls[1].endswith("run --build --rm visual npx playwright test"))
         self.assertEqual(calls[2], "-f compose.visual.yml stop --timeout 10 backend vite")
         self.assertTrue(self.remote_task())
 

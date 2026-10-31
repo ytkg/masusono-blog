@@ -3,7 +3,7 @@ import LauncherZoomTransition from "./LauncherZoomTransition"
 import { animationDuration } from "./appDialogAnimation"
 import AppLoadingScreen from "./AppLoadingScreen"
 import AppDialogHeader from "./AppDialogHeader"
-import { useId, useRef, useState } from "react"
+import { useId, useState } from "react"
 import AppsIcon from "@mui/icons-material/Apps"
 import Box from "@mui/material/Box"
 import Dialog from "@mui/material/Dialog"
@@ -74,6 +74,7 @@ export default function AppsDialogLauncher({
   showLauncherLabel = true,
   titleAccessory,
   edgeToEdge = false,
+  renderLauncher,
 }) {
   const [open, setOpen] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -87,7 +88,7 @@ export default function AppsDialogLauncher({
     height: 1,
     borderRadius: 8,
   })
-  const launcherButtonRef = useRef(null)
+  const [launcherButton, setLauncherButton] = useState(null)
   const titleId = useId()
   const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
   const launcherLabelText = launcherLabel ?? title
@@ -98,7 +99,7 @@ export default function AppsDialogLauncher({
   const isActive = open && isContentVisible && !isTransitioning
 
   const updateTransitionOrigin = () => {
-    const rect = launcherButtonRef.current?.getBoundingClientRect()
+    const rect = launcherButton?.getBoundingClientRect()
     if (!rect) return
 
     setTransitionOrigin({
@@ -136,21 +137,28 @@ export default function AppsDialogLauncher({
 
   const handleExited = () => {
     setIsTransitioning(false)
-    launcherButtonRef.current?.focus()
+    launcherButton?.focus()
   }
 
   return (
-    <Box sx={launcherContainerSx}>
-      <Box sx={launcherSx}>
-        <IconButton ref={launcherButtonRef} aria-label={buttonAriaLabel} onClick={handleOpen} sx={iconButtonSx}>
-          {buttonIcon ?? <AppsIcon />}
-        </IconButton>
-        {showLauncherLabel ? (
-          <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", width: "100%" }}>
-            {launcherLabelText}
-          </Typography>
-        ) : null}
-      </Box>
+    <Box sx={renderLauncher ? undefined : launcherContainerSx}>
+      {renderLauncher ? (
+        renderLauncher({
+          onClick: handleOpen,
+          ref: setLauncherButton,
+        })
+      ) : (
+        <Box sx={launcherSx}>
+          <IconButton ref={setLauncherButton} aria-label={buttonAriaLabel} onClick={handleOpen} sx={iconButtonSx}>
+            {buttonIcon ?? <AppsIcon />}
+          </IconButton>
+          {showLauncherLabel ? (
+            <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", width: "100%" }}>
+              {launcherLabelText}
+            </Typography>
+          ) : null}
+        </Box>
+      )}
       <Dialog
         open={open}
         onClose={handleClose}

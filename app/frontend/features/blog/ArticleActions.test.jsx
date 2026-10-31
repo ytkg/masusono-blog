@@ -1,6 +1,9 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import ArticleActions from "./ArticleActions"
+import { ensureUserIdCookie } from "@/shared/lib/userId"
+
+vi.mock("@/shared/lib/userId", () => ({ ensureUserIdCookie: vi.fn() }))
 
 describe("ArticleActions", () => {
   function openArticleMenu() {
@@ -129,4 +132,15 @@ it.each([false, true])("古いコピーの完了は新しい全文コピー通�
   expect(await screen.findByText("記事全文をコピーしました")).toBeInTheDocument()
   await act(async () => finishOld())
   expect(screen.getByRole("alert")).toHaveTextContent("記事全文をコピーしました")
+})
+
+it("Cookieを取得できない場合はモーダル内に理由を表示する", async () => {
+  ensureUserIdCookie.mockReturnValue(null)
+  render(<ArticleActions article={{ id: "a" }} />)
+  fireEvent.click(screen.getByRole("button", { name: "記事メニューを開く" }))
+  fireEvent.click(screen.getByRole("menuitem", { name: "広告を出稿する" }))
+  expect(await screen.findByText("広告を表示できません。ブラウザのCookie設定を確認してください。")).toBeInTheDocument()
+  expect(screen.queryByRole("button", { name: "再試行" })).not.toBeInTheDocument()
+  fireEvent.click(await screen.findByRole("button", { name: "閉じる" }, { timeout: 2000 }))
+  await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
 })
