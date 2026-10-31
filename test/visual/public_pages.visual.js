@@ -11,6 +11,10 @@ test.beforeEach(async ({ page }) => {
   })
 })
 
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: "wait" })
+})
+
 async function openPage(page, path, status = 200) {
   await mockBlogmuraBanner(page)
   const response = await page.goto(path)

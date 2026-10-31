@@ -46,5 +46,5 @@ trap cleanup EXIT
 trap 'interrupt 130' INT
 trap 'interrupt 143' TERM
 
-run_compose -f compose.visual.yml up --build -d backend vite
-run_compose -f compose.visual.yml run --build --rm visual npm run test:visual
+run_compose -f compose.visual.yml up --build --force-recreate -d backend vite
+run_compose -f compose.visual.yml run --build --rm visual npx playwright test
