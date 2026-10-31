@@ -202,3 +202,11 @@ IDなし・不正ID・除外対象は false。クエリでのID指定は受け�
 - Response (`201 Created`): `{ "userId": "String", "score": Integer }`。スコア全額をポイント付与する。0点は付与しない。
 - 不正入力は400 (`invalid_request`)、付与失敗は502 (`upstream_error`) と共通エラー形式。すべて `Cache-Control: no-store`。
 - ゲーム終了時に1回送信し、途中終了では送信しない。失敗しても結果表示と再プレイを維持する。冪等性がないため自動再送しない。
+
+## GET /numbers
+
+Inertia props の `metrics.distribution` は固定順の11区間。各要素は
+`{ minChars: Integer, maxChars: Integer | null, articles: Integer }`。
+0〜199字から200字刻みで、最後は2,000字以上（`maxChars: null`）。
+0本の区間も返し、合計は全体の記事数と一致する。文字数定義・対象記事・1時間キャッシュは既存集計と共有。
+正常0件は全区間0本、取得失敗は既存のエラー応答を維持し、0本へ変換しない。

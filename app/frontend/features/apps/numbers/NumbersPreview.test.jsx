@@ -24,6 +24,25 @@ describe("NumbersPreview", () => {
     expect(screen.getByRole("heading", { name: "集計", level: 2 })).toBeInTheDocument()
   })
 
+  it("分布を集計と推移の間に表示する", () => {
+    render(
+      <NumbersPreview
+        metrics={{
+          rows: [{ label: "全体" }],
+          distribution: [{ minChars: 0, maxChars: 199, articles: 1 }],
+          trend: { title: "推移" },
+        }}
+      />,
+    )
+    const distribution = screen.getByTestId("numbers-distribution")
+    expect(screen.getByTestId("numbers-grid").compareDocumentPosition(distribution)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    expect(distribution.compareDocumentPosition(screen.getByTestId("numbers-trend"))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+  })
+
   it("推移データがあればグラフを表示する", () => {
     render(<NumbersPreview metrics={{ rows: [{ label: "記事数" }], trend: { title: "推移" } }} />)
 

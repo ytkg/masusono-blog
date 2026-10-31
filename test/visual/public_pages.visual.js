@@ -998,3 +998,42 @@ test("ads app fills the available screen", async ({ page }) => {
   await dialog.getByRole("button", { name: /閉じる/ }).click()
   await expect(dialog).not.toBeVisible()
 })
+
+test("numbers distribution", async ({ page }) => {
+  await openPage(page, "/numbers")
+  const chart = page.getByTestId("numbers-distribution")
+  await chart.scrollIntoViewIfNeeded()
+  await expect(chart.getByRole("img", { name: "0〜199字：2本", exact: true })).toBeVisible()
+  const region = chart.getByRole("region")
+  const axis = chart.getByTestId("distribution-axis")
+  const axisBefore = await axis.boundingBox()
+  expect(axisBefore.width).toBeLessThan(24)
+  const visibleBars = await chart.locator("rect").evaluateAll((bars) => {
+    const region = bars[0].closest('[role="region"]').getBoundingClientRect()
+    return bars.filter((bar) => {
+      const bounds = bar.getBoundingClientRect()
+      return bounds.left >= region.left && bounds.right <= region.right
+    }).length
+  })
+  expect(visibleBars).toBeGreaterThanOrEqual(page.viewportSize().width === 390 ? 9 : 11)
+  const labelsOverlap = await chart.locator('g[role="img"]').evaluateAll((buckets) => {
+    const labels = buckets.map((bucket) => bucket.querySelector("text:last-child").getBoundingClientRect())
+    return labels.some((label, index) => index > 0 && labels[index - 1].right > label.left)
+  })
+  expect(labelsOverlap).toBe(false)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await page.addStyleTag({ content: "header, nav { visibility: hidden !important; }" })
+  await expect(chart).toHaveScreenshot("numbers-distribution.png")
+  await region.focus()
+  await page.keyboard.press("ArrowRight")
+  const scrollable = await region.evaluate((element) => element.scrollWidth > element.clientWidth)
+  if (page.viewportSize().width === 390) expect(scrollable).toBe(true)
+  if (scrollable) {
+    await expect.poll(() => region.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0)
+    await region.evaluate((element) => {
+      element.scrollLeft = element.scrollWidth
+    })
+    expect(await axis.boundingBox()).toEqual(axisBefore)
+    await expect(chart).toHaveScreenshot("numbers-distribution-end.png")
+  }
+})

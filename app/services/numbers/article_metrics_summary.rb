@@ -30,6 +30,7 @@ module Numbers
       articles.each_with_object(initial_article_totals) do |article, totals|
         char_count = character_counter.call(article)
         add_counts(totals, char_count)
+        totals[:distribution][[ char_count / 200, 10 ].min][:articles] += 1
         author_name = normalize_author_name(article[:author])
         add_counts(totals[:authors][author_name], char_count)
       end
@@ -39,6 +40,7 @@ module Numbers
       {
         articles: 0,
         chars: 0,
+        distribution: Array.new(11) { |index| { minChars: index * 200, maxChars: index == 10 ? nil : index * 200 + 199, articles: 0 } },
         authors: Hash.new { |hash, key| hash[key] = { articles: 0, chars: 0 } }
       }
     end

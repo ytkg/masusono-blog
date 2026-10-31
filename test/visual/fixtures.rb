@@ -35,6 +35,7 @@ module VisualTestFixtures
   ].freeze
 
   METRICS = {
+    distribution: Array.new(11) { |index| { minChars: index * 200, maxChars: index == 10 ? nil : index * 200 + 199, articles: index.zero? ? 2 : 0 } },
     rows: [
       { label: "全体", articles: "2 本", chars: "96 字", averageChars: "48 字" },
       { label: "増田愛美", articles: "1 本", chars: "60 字", averageChars: "60 字" },
