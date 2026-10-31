@@ -11,9 +11,10 @@ export default function NumbersDistributionChart({ distribution }) {
   const total = distribution.reduce((sum, bucket) => sum + bucket.articles, 0)
   const step = Math.max(1, Math.ceil(Math.max(...distribution.map((bucket) => bucket.articles)) / 4))
   const maximum = step * 4
-  const baseline = 214
+  const baseline = 188
   const chartHeight = 160
   const format = (value) => value.toLocaleString("ja-JP")
+  const axisWidth = Math.max(14, format(maximum).length * 7 + 6)
 
   return (
     <Stack spacing={1.5} sx={{ minWidth: 0 }} data-testid="numbers-distribution">
@@ -26,26 +27,30 @@ export default function NumbersDistributionChart({ distribution }) {
           記事がありません。全区間0本です。
         </Typography>
       ) : null}
-      <Box sx={{ display: "flex", minWidth: 0, maxWidth: 452 }}>
+      <Typography variant="caption" color="text.secondary">
+        記事数（本）
+      </Typography>
+      <Box sx={{ display: "flex", minWidth: 0, maxWidth: 396 + axisWidth }}>
         <Box
           component="svg"
-          width="56"
-          height="280"
+          width={axisWidth}
+          height="254"
           sx={{ flexShrink: 0 }}
           aria-hidden="true"
           data-testid="distribution-axis"
         >
-          <text x="4" y="18" fill={theme.palette.text.secondary} fontSize="12">
-            記事数
-          </text>
-          <text x="4" y="34" fill={theme.palette.text.secondary} fontSize="12">
-            （本）
-          </text>
           {Array.from({ length: 5 }, (_, index) => {
             const value = step * index
             const y = baseline - (value / maximum) * chartHeight
             return (
-              <text key={value} x="48" y={y + 4} textAnchor="end" fontSize="12" fill={theme.palette.text.secondary}>
+              <text
+                key={value}
+                x={axisWidth - 4}
+                y={y + 4}
+                textAnchor="end"
+                fontSize="12"
+                fill={theme.palette.text.secondary}
+              >
                 {format(value)}
               </text>
             )
@@ -64,7 +69,7 @@ export default function NumbersDistributionChart({ distribution }) {
           <Box
             component="svg"
             width="396"
-            height="280"
+            height="254"
             sx={{ display: "block", minWidth: 396 }}
             role="group"
             aria-label="本文文字数（字）ごとの記事数（本）"
@@ -94,7 +99,7 @@ export default function NumbersDistributionChart({ distribution }) {
                   >
                     {format(bucket.articles)}本
                   </text>
-                  <text x={x} y="232" textAnchor="middle" fontSize="12" fill={theme.palette.text.secondary}>
+                  <text x={x} y="206" textAnchor="middle" fontSize="12" fill={theme.palette.text.secondary}>
                     <tspan x={x}>{format(bucket.minChars)}</tspan>
                     <tspan x={x} dy="14">
                       {bucket.maxChars === null ? "以上" : "〜"}
@@ -111,7 +116,7 @@ export default function NumbersDistributionChart({ distribution }) {
           </Box>
         </Box>
       </Box>
-      <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", maxWidth: 452 }}>
+      <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", maxWidth: 396 + axisWidth }}>
         本文文字数（字）
       </Typography>
     </Stack>

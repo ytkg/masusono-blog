@@ -1007,6 +1007,7 @@ test("numbers distribution", async ({ page }) => {
   const region = chart.getByRole("region")
   const axis = chart.getByTestId("distribution-axis")
   const axisBefore = await axis.boundingBox()
+  expect(axisBefore.width).toBeLessThan(24)
   const visibleBars = await chart.locator("rect").evaluateAll((bars) => {
     const region = bars[0].closest('[role="region"]').getBoundingClientRect()
     return bars.filter((bar) => {
@@ -1014,7 +1015,7 @@ test("numbers distribution", async ({ page }) => {
       return bounds.left >= region.left && bounds.right <= region.right
     }).length
   })
-  expect(visibleBars).toBeGreaterThanOrEqual(page.viewportSize().width === 390 ? 8 : 11)
+  expect(visibleBars).toBeGreaterThanOrEqual(page.viewportSize().width === 390 ? 9 : 11)
   const labelsOverlap = await chart.locator('g[role="img"]').evaluateAll((buckets) => {
     const labels = buckets.map((bucket) => bucket.querySelector("text:last-child").getBoundingClientRect())
     return labels.some((label, index) => index > 0 && labels[index - 1].right > label.left)
