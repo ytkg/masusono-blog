@@ -38,3 +38,13 @@ it("Cookieを保存できない場合は広告を読み込まず案内する", (
   expect(screen.queryByTitle("広告")).not.toBeInTheDocument()
   expect(screen.getByRole("status")).toHaveTextContent("ブラウザのCookie設定を確認してください。")
 })
+
+it("対象記事を選択する新規出稿画面をiframeで開く", () => {
+  document.cookie = "user_id=existing%2Fuser; Path=/"
+  render(<AdsApp articleId="article/id ?記事&other=value" />)
+  fireEvent.click(screen.getByRole("button", { name: "広告を開く" }))
+  expect(screen.getByTitle("広告を出稿する")).toHaveAttribute(
+    "src",
+    `https://ads.masusono.com/users/existing%2Fuser/ads/new?articleId=${encodeURIComponent("article/id ?記事&other=value")}`,
+  )
+})
