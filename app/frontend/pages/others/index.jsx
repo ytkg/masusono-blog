@@ -8,6 +8,7 @@ import { usePage } from "@inertiajs/react"
 
 const MasudaRunApp = lazy(() => import("../../features/apps/masudaRun/MasudaRunApp"))
 const MasudaTatakiApp = lazy(() => import("../../features/apps/masudaTataki/MasudaTatakiApp"))
+const MasudaSlotApp = lazy(() => import("../../features/apps/masudaSlot/MasudaSlotApp"))
 const GreedApp = lazy(() => import("../../features/apps/greed/GreedApp"))
 const SettingsApp = lazy(() => import("../../features/apps/settings/SettingsApp"))
 const BookshelfApp = lazy(() => import("../../features/apps/bookshelf/BookshelfApp"))
@@ -57,6 +58,7 @@ export default function OthersIndex() {
             <MasudaRunApp />
             <MasudaTatakiApp />
             <GreedApp />
+            <MasudaSlotApp />
             <BookshelfApp />
             <AdsApp />
             <SettingsApp />
