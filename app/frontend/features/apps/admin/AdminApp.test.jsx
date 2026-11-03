@@ -60,4 +60,45 @@ describe("AdminApp", () => {
 
     await waitFor(() => expect(screen.getByRole("button", { name: "ログイン" })).toBeInTheDocument())
   })
+  it("認証状態の取得失敗を表示し、再試行で回復する", async () => {
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce(jsonResponse({ authenticated: true, csrf_token: "csrf" }))
+    vi.stubGlobal("fetch", fetch)
+    render(<AdminApp />)
+    fireEvent.click(screen.getByRole("button", { name: "管理を開く" }))
+    expect(
+      await screen.findByText(
+        "認証状態を確認できませんでした。時間をおいて再度お試しください。",
+        {},
+        { timeout: 2000 },
+      ),
+    ).toBeInTheDocument()
+    fireEvent.click(await screen.findByRole("button", { name: "再試行" }, { timeout: 2000 }))
+    expect(await screen.findByRole("button", { name: "記事一覧へ" })).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
+
+  it("ログイン失敗時に理由を表示し、パスワードを直して再試行できる", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ authenticated: false, csrf_token: "csrf" }))
+      .mockResolvedValueOnce(jsonResponse({ error: { code: "unauthorized", message: "入力を確認してください" } }, 401))
+      .mockResolvedValueOnce(jsonResponse({ authenticated: true, csrf_token: "new-csrf" }))
+    vi.stubGlobal("fetch", fetch)
+    render(<AdminApp />)
+    fireEvent.click(screen.getByRole("button", { name: "管理を開く" }))
+    await screen.findByRole("button", { name: "ログイン" }, { timeout: 2000 })
+    fireEvent.change(screen.getByRole("textbox", { name: "ユーザー名" }), { target: { value: "owner" } })
+    const password = document.querySelector('input[name="password"]')
+    fireEvent.change(password, { target: { value: "wrong" } })
+    fireEvent.click(screen.getByRole("button", { name: "ログイン" }))
+    expect(await screen.findByText("入力を確認してください")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "ログイン" })).toBeEnabled()
+    fireEvent.change(password, { target: { value: "correct" } })
+    fireEvent.click(screen.getByRole("button", { name: "ログイン" }))
+    expect(await screen.findByRole("button", { name: "記事一覧へ" })).toBeInTheDocument()
+    expect(fetch.mock.calls[2][1].body).toBe(JSON.stringify({ username: "owner", password: "correct" }))
+  })
 })

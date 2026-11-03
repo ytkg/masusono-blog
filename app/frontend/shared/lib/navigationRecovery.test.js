@@ -1,5 +1,10 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest"
-import { dismissNavigationFailure, getNavigationFailure, installNavigationRecovery } from "./navigationRecovery"
+import {
+  dismissNavigationFailure,
+  getNavigationFailure,
+  installNavigationRecovery,
+  subscribeNavigationFailure,
+} from "./navigationRecovery"
 
 let events, router, remove
 const visit = (overrides = {}) => ({
@@ -160,5 +165,53 @@ describe("navigation recovery", () => {
     expect(fetch).toHaveBeenCalledTimes(10)
     emit("before", { visit: visit({ id: "next" }) })
     expect(getNavigationFailure()).toBeNull()
+  })
+  it("AbortErrorは通信失敗として案内や送信を行わない", () => {
+    emit("before", { visit: visit() })
+    const event = emit("networkError", { error: { name: "AbortError" } })
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(getNavigationFailure()).toBeNull()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("完了済みの先読みを次の前景遷移の処理中先読みとして記録しない", () => {
+    const prefetch = visit({ id: "prefetch-finished", prefetch: true, async: true })
+    emit("before", { visit: prefetch })
+    emit("finish", { visit: prefetch })
+    emit("before", { visit: visit() })
+    emit("networkError", { error: { url: visit().url.href } })
+    expect(reportBody()).toMatchObject({ prefetch_in_flight: false, prefetch: false })
+  })
+
+  it("遷移成功で案内を閉じ、完了後の応答を前の遷移へ関連付けない", () => {
+    emit("before", { visit: visit() })
+    emit("start", { visit: visit() })
+    const listener = vi.fn()
+    const unsubscribe = subscribeNavigationFailure(listener)
+    try {
+      emit("httpException", { response: { status: 503, headers: {} } })
+      expect(listener).toHaveBeenCalledOnce()
+      emit("navigate", {})
+      expect(getNavigationFailure()).toBeNull()
+      expect(listener).toHaveBeenCalledTimes(2)
+      unsubscribe()
+      dismissNavigationFailure()
+      expect(listener).toHaveBeenCalledTimes(2)
+      emit("httpException", { response: { status: 503, headers: {} } })
+      expect(getNavigationFailure().url).toBe(window.location.href)
+      expect(reportBody()).not.toHaveProperty("elapsed_ms")
+    } finally {
+      unsubscribe()
+    }
+  })
+
+  it("外部URLの遷移を記録対象へ取り込まない", () => {
+    const external = visit({ url: new URL("https://example.com/private") })
+    emit("before", { visit: external })
+    emit("start", { visit: external })
+    emit("httpException", { response: { status: 503, headers: {} } })
+    expect(getNavigationFailure().url).toBe(window.location.href)
+    expect(reportBody().path).toBe(window.location.pathname)
+    expect(fetch.mock.calls[0][1].body).not.toContain("example.com")
   })
 })
