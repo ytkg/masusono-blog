@@ -314,9 +314,7 @@ for (const [name, button] of [
 ]) {
   test(name, async ({ page }) => {
     if (name === "settings") {
-      await page
-        .context()
-        .addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
+      await page.context().addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
     }
     await openPage(page, "/others")
     await page.getByRole("button", { name: button }).click()
@@ -492,9 +490,7 @@ test("article body spacing and expansion", async ({ page }) => {
 
 for (const state of ["input", "save", "notification"]) {
   test(`settings ${state} error`, async ({ page }) => {
-    await page
-      .context()
-      .addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
+    await page.context().addCookies([{ name: "user_id", value: "11111111-1111-4111-8111-111111111111", url: "http://localhost:3000" }])
     await page.route("**/api/app/users.json", (route) => route.fulfill({ status: 500, body: "{}" }))
     await page.addInitScript(() => {
       Object.defineProperty(window, "Notification", {
@@ -653,13 +649,11 @@ for (const state of ["success", "error"]) {
     await page.getByRole("menuitem", { name: "記事URLをコピー" }).click()
     await expect(page.getByRole("alert")).toContainText(state === "success" ? "完了" : "失敗")
     await page.clock.fastForward(300)
-    await expect
-      .poll(async () => {
-        const navigation = await page.getByRole("navigation", { name: "メインナビゲーション" }).boundingBox()
-        const notice = await page.getByRole("alert").boundingBox()
-        return Math.round(navigation.y - (notice.y + notice.height))
-      })
-      .toBe(8)
+    await expect.poll(async () => {
+      const navigation = await page.getByRole("navigation", { name: "メインナビゲーション" }).boundingBox()
+      const notice = await page.getByRole("alert").boundingBox()
+      return Math.round(navigation.y - (notice.y + notice.height))
+    }).toBe(8)
     await screenshot(page, `copy-${state}`)
     await page.clock.fastForward(3200)
     if (state === "error") {
@@ -717,9 +711,7 @@ for (const state of ["loading", "warning", "error"]) {
         postMessage() {
           if (state === "error") this.listener({ data: { error: "Ruby の実行に失敗しました。" } })
         }
-        terminate() {
-          window.Worker.terminated++
-        }
+        terminate() { window.Worker.terminated++ }
       }
     }, state)
     await mockPageProps(page, "/articles/visual-article-1", (props) => {
@@ -810,74 +802,69 @@ for (const width of [390, 600, 1280, 1920, 2560]) {
 test.describe("admin feedback states", () => {
   test.use({ serviceWorkers: "block" })
 
-  for (const state of ["session", "login", "articles", "media", "upload"]) {
-    test(`admin feedback ${state}`, async ({ page }) => {
-      const error = { error: { message: "テスト用の通信失敗" } }
-      if (state === "session") {
-        await page.route("**/api/app/management/session", (route) => route.fulfill({ status: 500, json: error }))
-        await openAdmin(page)
-      } else if (state === "login") {
-        await page.route("**/api/app/management/session", (route) =>
-          route.request().method() === "POST" ? route.fulfill({ status: 500, json: error }) : route.continue(),
-        )
-        await openAdmin(page)
-        await page.getByRole("textbox", { name: "ユーザー名" }).fill("visual-owner")
-        await page.getByLabel("パスワード").fill("visual-password")
-        await page.getByRole("button", { name: "ログイン", exact: true }).click()
+for (const state of ["session", "login", "articles", "media", "upload"]) {
+  test(`admin feedback ${state}`, async ({ page }) => {
+    const error = { error: { message: "テスト用の通信失敗" } }
+    if (state === "session") {
+      await page.route("**/api/app/management/session", (route) => route.fulfill({ status: 500, json: error }))
+      await openAdmin(page)
+    } else if (state === "login") {
+      await page.route("**/api/app/management/session", (route) =>
+        route.request().method() === "POST" ? route.fulfill({ status: 500, json: error }) : route.continue(),
+      )
+      await openAdmin(page)
+      await page.getByRole("textbox", { name: "ユーザー名" }).fill("visual-owner")
+      await page.getByLabel("パスワード").fill("visual-password")
+      await page.getByRole("button", { name: "ログイン", exact: true }).click()
+    } else {
+      await loginAdmin(page)
+      if (state === "articles" || state === "media") {
+        await page.route(`**/api/app/management/${state}?*`, (route) => route.fulfill({ status: 500, json: error }))
+        await page.getByRole("button", { name: state === "articles" ? "記事一覧へ" : "メディア一覧へ" }).click()
       } else {
-        await loginAdmin(page)
-        if (state === "articles" || state === "media") {
-          await page.route(`**/api/app/management/${state}?*`, (route) => route.fulfill({ status: 500, json: error }))
-          await page.getByRole("button", { name: state === "articles" ? "記事一覧へ" : "メディア一覧へ" }).click()
-        } else {
-          await page.getByRole("button", { name: "メディア一覧へ" }).click()
-          await page
-            .locator('input[type="file"]')
-            .setInputFiles({ name: "invalid.txt", mimeType: "text/plain", buffer: Buffer.from("test") })
-        }
+        await page.getByRole("button", { name: "メディア一覧へ" }).click()
+        await page.locator('input[type="file"]').setInputFiles({ name: "invalid.txt", mimeType: "text/plain", buffer: Buffer.from("test") })
       }
-      const alert = page.getByRole("alert")
-      await expect(alert).toContainText("失敗")
-      await expect(alert).toHaveCSS("font-size", "14px")
-      await expect(alert).toHaveCSS("line-height", "21px")
-      if (["session", "articles", "media"].includes(state)) {
-        await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible()
-      }
-      await screenshot(page, `admin-feedback-${state}`)
-    })
-  }
-
-  test("admin feedback empty", async ({ page }) => {
-    await loginAdmin(page)
-    await page.route("**/api/app/management/articles?*", (route) =>
-      route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } }),
-    )
-    await page.getByRole("button", { name: "記事一覧へ" }).click()
-    const empty = page.getByText("記事が見つかりませんでした。")
-    await expect(empty).toHaveCSS("font-size", "14px")
-    await expect(empty).toHaveCSS("color", "rgb(102, 102, 102)")
-    await screenshot(page, "admin-feedback-empty")
-  })
-
-  test("admin feedback loading", async ({ page }) => {
-    await loginAdmin(page)
-    let release
-    const ready = new Promise((resolve) => {
-      release = resolve
-    })
-    await page.route("**/api/app/management/articles?*", async (route) => {
-      await ready
-      await route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } })
-    })
-    await page.getByRole("button", { name: "記事一覧へ" }).click()
-    await expect(page.getByRole("status").filter({ hasText: "読み込み中" })).toBeVisible()
-    try {
-      await screenshot(page, "admin-feedback-loading")
-    } finally {
-      release()
     }
-    await expect(page.getByText("記事が見つかりませんでした。")).toBeVisible()
+    const alert = page.getByRole("alert")
+    await expect(alert).toContainText("失敗")
+    await expect(alert).toHaveCSS("font-size", "14px")
+    await expect(alert).toHaveCSS("line-height", "21px")
+    if (["session", "articles", "media"].includes(state)) {
+      await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible()
+    }
+    await screenshot(page, `admin-feedback-${state}`)
   })
+}
+
+test("admin feedback empty", async ({ page }) => {
+  await loginAdmin(page)
+  await page.route("**/api/app/management/articles?*", (route) => route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } }))
+  await page.getByRole("button", { name: "記事一覧へ" }).click()
+  const empty = page.getByText("記事が見つかりませんでした。")
+  await expect(empty).toHaveCSS("font-size", "14px")
+  await expect(empty).toHaveCSS("color", "rgb(102, 102, 102)")
+  await screenshot(page, "admin-feedback-empty")
+})
+
+test("admin feedback loading", async ({ page }) => {
+  await loginAdmin(page)
+  let release
+  const ready = new Promise((resolve) => { release = resolve })
+  await page.route("**/api/app/management/articles?*", async (route) => {
+    await ready
+    await route.fulfill({ json: { articles: [], page: 1, has_more: false, total_count: 0 } })
+  })
+  await page.getByRole("button", { name: "記事一覧へ" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "読み込み中" })).toBeVisible()
+  try {
+    await screenshot(page, "admin-feedback-loading")
+  } finally {
+    release()
+  }
+  await expect(page.getByText("記事が見つかりませんでした。")).toBeVisible()
+})
+
 })
 
 test("public empty status", async ({ page }) => {
@@ -895,12 +882,11 @@ for (const target of ["title", "author", "sentence"]) {
     if (target === "sentence") {
       await page.getByRole("tab", { name: "書き出し" }).click()
     }
-    const link =
-      target === "title"
-        ? page.getByRole("heading", { name: "週末の散歩で見つけたもの" }).getByRole("link")
-        : target === "author"
-          ? page.getByTestId("article-meta-author").first()
-          : page.locator(".sentence-card").first()
+    const link = target === "title"
+      ? page.getByRole("heading", { name: "週末の散歩で見つけたもの" }).getByRole("link")
+      : target === "author"
+        ? page.getByTestId("article-meta-author").first()
+        : page.locator(".sentence-card").first()
     await page.keyboard.press("Tab")
     await link.focus()
     await expect(link).toHaveCSS("outline", "rgb(0, 0, 0) solid 2px")
@@ -919,24 +905,21 @@ for (const width of [390, 600, 1280]) {
       await openPage(page, path)
       await page.addStyleTag({ content: "main { min-height: 200vh; }" })
       const fixed = path === "/" ? page.getByRole("tablist") : page.getByRole("textbox", { name: "記事を検索" })
-      const bounds = async () =>
-        fixed.evaluate((element) => {
-          let parent = element
-          while (parent && getComputedStyle(parent).position !== "sticky") parent = parent.parentElement
-          return {
-            top: parent.getBoundingClientRect().top,
-            headerBottom: document.querySelector("header").getBoundingClientRect().bottom,
-            headerHeight: document.querySelector("header").getBoundingClientRect().height,
-          }
-        })
+      const bounds = async () => fixed.evaluate((element) => {
+        let parent = element
+        while (parent && getComputedStyle(parent).position !== "sticky") parent = parent.parentElement
+        return {
+          top: parent.getBoundingClientRect().top,
+          headerBottom: document.querySelector("header").getBoundingClientRect().bottom,
+          headerHeight: document.querySelector("header").getBoundingClientRect().height,
+        }
+      })
       for (const scrollY of [0, 80]) {
         await page.evaluate((y) => window.scrollTo(0, y), scrollY)
-        await expect
-          .poll(async () => {
-            const value = await bounds()
-            return Math.round(value.top - value.headerBottom)
-          })
-          .toBe(0)
+        await expect.poll(async () => {
+          const value = await bounds()
+          return Math.round(value.top - value.headerBottom)
+        }).toBe(0)
         expect(Math.round((await bounds()).headerHeight)).toBe(width < 600 ? 45 : 55)
       }
       await screenshot(page, `sticky-${path === "/" ? "home" : "search"}-${width}`)
@@ -949,9 +932,7 @@ test("masuda tataki play and replay", async ({ page }) => {
   await page.getByRole("button", { name: "増田たたきを開く" }).click()
   await expect(page.getByTestId("app-content")).toHaveAttribute("aria-hidden", "false")
   await expect(page.getByRole("button", { name: "スタート", exact: true })).toBeEnabled()
-  await page.evaluate(() => {
-    Math.random = () => 0
-  })
+  await page.evaluate(() => { Math.random = () => 0 })
   await page.clock.install()
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000))
   await page.getByRole("button", { name: "スタート", exact: true }).click()
@@ -985,16 +966,13 @@ for (const image of [1, 2]) {
     await expect(page.getByRole("button", { name: "スタート", exact: true })).toBeEnabled()
     await page.evaluate((image) => {
       let calls = 0
-      Math.random = () => (++calls % 3 === 0 ? (image - 1) / 2 : 0.99)
+      Math.random = () => ++calls % 3 === 0 ? (image - 1) / 2 : 0.99
     }, image)
     await page.clock.install()
     await page.getByRole("button", { name: "スタート", exact: true }).click()
     await page.clock.runFor(3300)
     await expect(page.getByRole("button", { name: "穴9 その他", exact: true })).toBeVisible()
-    await expect(page).toHaveScreenshot(
-      image === 2 ? "masuda-tataki-other-character.png" : "masuda-tataki-other-character-1.png",
-      { maxDiffPixelRatio: 0 },
-    )
+    await expect(page).toHaveScreenshot(image === 2 ? "masuda-tataki-other-character.png" : "masuda-tataki-other-character-1.png", { maxDiffPixelRatio: 0 })
   })
 }
 
