@@ -132,9 +132,12 @@
   background: linear-gradient(#0003, transparent 32%, transparent 68%, #0003);
 }
 .slot-strip {
+  display: flex;
+  flex-direction: column;
   will-change: transform;
 }
 .slot-symbol {
+  flex-shrink: 0;
   height: var(--slot-cell);
   display: flex;
   align-items: center;
@@ -143,6 +146,11 @@
   line-height: 1;
   font-weight: 900;
   user-select: none;
+}
+.slot-glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .symbol-seven {
   color: #c41425;
@@ -156,8 +164,8 @@
   color: #fff7df;
   background: #19202a;
   font-size: clamp(16px, 14cqh, 54px);
-  height: calc(var(--slot-cell) * 0.6);
-  margin-block: calc(var(--slot-cell) * 0.2);
+  width: 80%;
+  height: 60%;
   border-radius: 4px;
   border: 2px solid #b79b60;
   box-sizing: border-box;

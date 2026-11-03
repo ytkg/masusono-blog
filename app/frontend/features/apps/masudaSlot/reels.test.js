@@ -56,3 +56,31 @@ it("evaluates all five lines, both bonuses, cherry in all three rows, and dedupl
         expect(new Set(result).size).toBe(result.length)
       }
 })
+
+it("makes the first two sevens easy after a bonus draw while retaining the final reel aim", () => {
+  for (const role of ["BIG", "REG"]) {
+    for (const order of [
+      [0, 1],
+      [1, 0],
+    ]) {
+      let pairs = 0
+      for (let first = 0; first < SIZE; first++) {
+        for (let second = 0; second < SIZE; second++) {
+          const positions = [-1, -1, -1]
+          positions[order[0]] = stopReel(role, positions, order[0], first).position
+          positions[order[1]] = stopReel(role, positions, order[1], second).position
+          if (LINES.some((line) => order.every((reel) => symbolAt(reel, positions[reel], line[reel]) === "seven")))
+            pairs++
+        }
+      }
+      expect(pairs / SIZE ** 2).toBeGreaterThanOrEqual(0.85)
+    }
+    expect(
+      Array.from({ length: SIZE }, (_, press) => {
+        const positions = [-1, -1, -1]
+        for (const reel of [0, 1, 2]) positions[reel] = stopReel(role, positions, reel, press).position
+        return outcomes(positions).includes(role)
+      }),
+    ).toContain(false)
+  }
+})

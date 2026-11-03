@@ -28,8 +28,8 @@ function pressFor(game, reel, model) {
   if (model === "ideal") return idealPress(game, reel)
   if (game.bonus || model === "random") return Math.floor(random() * SIZE)
   // No internal-role knowledge: alternate cherry/melon targets outside pending,
-  // aim at the second seven on all reels after the public lamp lights up.
-  const aims = game.pending ? [10, 8, random() < 0.5 ? 8 : 12] : [random() < 0.75 ? 8 : 1, 3, 5]
+  // aim at sevens on the left/middle and alternate seven/BAR on the right after the lamp lights up.
+  const aims = game.pending ? [12, 12, random() < 0.5 ? 8 : 12] : [random() < 0.75 ? 8 : 1, 3, 5]
   const error = random() < 0.75 ? 0 : Math.floor(random() * 7) - 3
   return wrap(aims[reel] + error)
 }

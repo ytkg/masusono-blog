@@ -42,11 +42,13 @@ export default function MasudaSlotGame() {
     }
   }, [game.stops])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!game.spinning || !active) return
+    let cancelled = false
     let frame
     let previous
     function animate(now) {
+      if (cancelled) return
       const elapsed = previous === undefined ? 0 : Math.min(now - previous, 50)
       previous = now
       game.stops.forEach((position, reel) => {
@@ -58,7 +60,10 @@ export default function MasudaSlotGame() {
       frame = requestAnimationFrame(animate)
     }
     frame = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(frame)
+    }
   }, [game.spinning, game.stops, active])
 
   useEffect(() => {
@@ -191,8 +196,8 @@ export default function MasudaSlotGame() {
                 }}
               >
                 {[...strip, ...strip, ...strip, ...strip].map((symbol, index) => (
-                  <div className={`slot-symbol symbol-${symbol}`} key={index}>
-                    {SYMBOLS[symbol]}
+                  <div className="slot-symbol" key={index}>
+                    <span className={`slot-glyph symbol-${symbol}`}>{SYMBOLS[symbol]}</span>
                   </div>
                 ))}
               </div>

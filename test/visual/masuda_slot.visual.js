@@ -3,16 +3,29 @@ import { expectNoPageOverflow, openPage } from "./helpers"
 
 async function openSlot(page) {
   await openPage(page, "/others")
-  await page.getByRole("button", { name: "増田スロットを開く" }).click()
+  await page.getByRole("button", { name: "スロットを開く" }).click()
   const game = page.getByRole("region", { name: "増田の野望 スロットゲーム" })
   await expect(game.getByRole("button", { name: /レバー/ })).toBeEnabled()
   return game
 }
 
-test("slot fills the area below the site header and resets on reopening", async ({ page }) => {
+test("slot uses the shared app header and resets on reopening", async ({ page }) => {
+  await openPage(page, "/others")
+  await expect(page.getByText("スロット", { exact: true })).toBeVisible()
+  await page.getByRole("button", { name: "強欲を開く" }).click()
+  const other = page.getByRole("dialog", { name: "強欲は身を滅ぼす？", exact: true })
+  await expect(other.getByRole("button", { name: "買い物を始める" })).toBeEnabled()
+  const reference = await other
+    .getByRole("heading", { name: "強欲は身を滅ぼす？", level: 2, exact: true })
+    .boundingBox()
+  await other.getByRole("button", { name: "閉じる", exact: true }).click()
+  await expect(other).not.toBeVisible()
   const game = await openSlot(page)
   const dialog = page.getByRole("dialog", { name: "増田の野望", exact: true })
-  await expect(dialog.getByRole("img", { name: "増田とその他！", exact: true })).toBeVisible()
+  await expect(dialog.getByRole("img", { name: "増田とその他！", exact: true })).toHaveCount(0)
+  const heading = await dialog.getByRole("heading", { name: "増田の野望", level: 2, exact: true }).boundingBox()
+  expect(heading.y).toBe(reference.y)
+  expect(heading.height).toBe(reference.height)
   await expect(game.getByLabel("残高 1000ポイント")).toBeVisible()
   await expectNoPageOverflow(page)
   const geometry = await game.evaluate((element) => {
@@ -31,7 +44,7 @@ test("slot fills the area below the site header and resets on reopening", async 
   await expect(game.getByLabel("残高 997ポイント")).toBeVisible()
   await dialog.getByRole("button", { name: "閉じる", exact: true }).click()
   await expect(dialog).not.toBeVisible()
-  await page.getByRole("button", { name: "増田スロットを開く" }).click()
+  await page.getByRole("button", { name: "スロットを開く" }).click()
   await expect(game.getByLabel("残高 1000ポイント")).toBeVisible()
   await game.getByRole("button", { name: "遊び方・配列表" }).click()
   await expect(page.getByRole("dialog", { name: "遊び方・配列表" })).toBeVisible()

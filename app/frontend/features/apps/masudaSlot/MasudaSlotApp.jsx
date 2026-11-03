@@ -8,10 +8,9 @@ export default function MasudaSlotApp() {
   return (
     <AppsDialogLauncher
       edgeToEdge
-      preserveSiteHeader
       title="増田の野望"
-      launcherLabel="増田スロット"
-      buttonAriaLabel="増田スロットを開く"
+      launcherLabel="スロット"
+      buttonAriaLabel="スロットを開く"
       buttonIcon={<CasinoIcon />}
       contentSx={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}
       onClose={() => setSession((value) => value + 1)}

@@ -84,3 +84,24 @@ it("pauses for help and resets after unmount without writing storage", () => {
   expect(screen.getByLabelText("残高 1000ポイント")).toBeInTheDocument()
   expect(storage).not.toHaveBeenCalled()
 })
+
+it("ignores an animation frame delivered after its reel has stopped", () => {
+  const frames = []
+  vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+    frames.push(callback)
+    return frames.length
+  })
+  vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {})
+  vi.spyOn(Math, "random").mockReturnValue(0.99)
+  render(<MasudaSlotGame />)
+  click(/レバー/)
+  const staleFrame = frames.at(-1)
+  click("左リール停止")
+  const strip = document.querySelector(".slot-strip")
+  const stopped = strip.style.transform
+  act(() => {
+    staleFrame(1000)
+    staleFrame(1050)
+  })
+  expect(strip.style.transform).toBe(stopped)
+})
