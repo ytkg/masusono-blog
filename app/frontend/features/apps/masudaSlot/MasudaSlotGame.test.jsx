@@ -50,7 +50,7 @@ it("preserves credit and reel positions while hidden or inactive and blocks inpu
   stopAll()
 })
 
-it("keeps bonus type secret until entry and auto consumes only the current bonus", () => {
+it("keeps bonus type secret until entry and supports canceling auto after a payout", () => {
   vi.useFakeTimers()
   render(<MasudaSlotGame />)
   vi.spyOn(Math, "random").mockReturnValueOnce(0).mockReturnValue(0.99)
@@ -61,10 +61,10 @@ it("keeps bonus type secret until entry and auto consumes only the current bonus
   stopAll()
   expect(screen.getByText("BIG 入賞！ 7・7・7")).toBeInTheDocument()
   click("オート消化")
-  for (let i = 0; i < 1000 && !screen.queryByText("野望タイム突入！ 50ゲームのチャンス。"); i++)
-    act(() => vi.advanceTimersByTime(400))
-  expect(screen.getByText("野望タイム突入！ 50ゲームのチャンス。")).toBeInTheDocument()
-  expect(screen.queryByRole("button", { name: "オートを解除" })).not.toBeInTheDocument()
+  for (let i = 0; i < 30 && !screen.queryByText("ベル！ +9pt"); i++) act(() => vi.advanceTimersByTime(400))
+  expect(screen.getByText("ベル！ +9pt")).toBeInTheDocument()
+  click("オートを解除")
+  expect(screen.getByRole("button", { name: "オート消化" })).toHaveAttribute("aria-pressed", "false")
   const credit = screen.getByLabelText(/残高/).textContent
   act(() => vi.advanceTimersByTime(10000))
   expect(screen.getByLabelText(/残高/).textContent).toBe(credit)
