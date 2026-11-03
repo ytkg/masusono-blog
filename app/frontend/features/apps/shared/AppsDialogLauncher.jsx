@@ -1,3 +1,4 @@
+import Header from "../../../components/Header"
 import useAppLoadingTasks from "./useAppLoadingTasks"
 import LauncherZoomTransition from "./LauncherZoomTransition"
 import { animationDuration } from "./appDialogAnimation"
@@ -74,6 +75,7 @@ export default function AppsDialogLauncher({
   showLauncherLabel = true,
   titleAccessory,
   edgeToEdge = false,
+  preserveSiteHeader = false,
   renderLauncher,
 }) {
   const [open, setOpen] = useState(false)
@@ -177,6 +179,7 @@ export default function AppsDialogLauncher({
           },
         }}
       >
+        {preserveSiteHeader ? <Header /> : null}
         <AppLoadingScreen
           title={title}
           reduceMotion={prefersReducedMotion}
@@ -191,6 +194,7 @@ export default function AppsDialogLauncher({
           inert={!isActive}
           sx={{
             ...dialogContentSx,
+            ...(preserveSiteHeader ? { pt: 0, height: "auto", flex: 1, minHeight: 0 } : {}),
             ...(edgeToEdge ? { px: 0, pb: 0, gap: 0 } : {}),
             opacity: isContentVisible ? 1 : 0,
             transition: prefersReducedMotion ? "none" : "opacity 180ms ease",

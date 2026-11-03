@@ -33,6 +33,8 @@
   - 取得・公開前の設定と削除窓口
 - [GA4](ga4.md)
   - アクセス解析の設定
+- [増田スロット「増田の野望」](games/masuda-slot.md)
+  - 抽選・停止制御・収支試算
 - [Greed](games/greed.md)
   - ゲームの仕様
 - [著者プロフィール更新手順](./zukan-profile-update.md)
