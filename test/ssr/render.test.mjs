@@ -108,7 +108,6 @@ test("article initial HTML contains content, links, styles and SEO metadata", as
   }
 })
 
-
 test("logo preference is rendered per request without leaking between SSR pages", async () => {
   for (const enabled of [false, true, false]) {
     const { body } = await render("blog/show", "/articles/ssr-article", {
@@ -119,7 +118,6 @@ test("logo preference is rendered per request without leaking between SSR pages"
     assert.match(body, enabled ? /logo-autumn-health-v8/ : /logo-[^/]+\.webp/)
   }
 })
-
 
 test("the designated article keeps its logo with the preference off", async () => {
   for (const [url, limited] of [
@@ -134,4 +132,57 @@ test("the designated article keeps its logo with the preference off", async () =
     assert.ok(body.includes(`alt="${limited ? "増田とその他！と、私の体調" : "増田とその他！"}"`))
     assert.match(body, limited ? /logo-autumn-health-v8/ : /logo-[^/]+\.webp/)
   }
+})
+
+const author = { id: "ssr-author", name: "SSR著者", title: "肩書き", bio: "紹介本文", imageUrl: null }
+for (const page of [
+  { component: "about", url: "/about", props: {}, text: "プライバシーについて" },
+  { component: "authors/index", url: "/authors", props: { authors: [author] }, text: "SSR著者" },
+  { component: "authors/show", url: "/authors/ssr-author", props: { author, articles: [article] }, text: "紹介本文" },
+  { component: "search", url: "/search", props: { articles: [article] }, text: "記事を検索" },
+  {
+    component: "numbers/index",
+    url: "/numbers",
+    text: "対象別の記事の指標",
+    props: { metrics: { rows: [{ label: "全体", articles: "1 本", chars: "10 字", averageChars: "10 字" }] } },
+  },
+  { component: "others/index", url: "/others", props: {}, text: "増田とその他のその他！" },
+]) {
+  test(`${page.component}: production SSR renders page content and its canonical URL without browser globals`, async () => {
+    const { head, body } = await render(page.component, page.url, page.props)
+    assert.ok(body.includes(page.text), page.component)
+    if (page.component === "authors/show") assert.doesNotMatch(body, /alt="SSR著者のアイコン"/)
+    assert.match(body, /data-server-rendered/)
+    assert.ok(head.join("").includes(`href="https://masusono.com${page.url}"`))
+    assert.match(head.join(""), /<title/)
+  })
+}
+
+test("not found production SSR contains noindex and a home link", async () => {
+  const { head, body } = await render("errors/not_found", "/missing", {})
+  assert.ok(body.includes("ページが見つかりません"))
+  assert.match(body, /href="\/"/)
+  assert.match(head.join(""), /name="robots" content="noindex, nofollow"/)
+})
+
+test("search production SSR uses the requested query for the form, results and canonical URL", async () => {
+  const query = "SSR記事"
+  const url = `/search?q=${encodeURIComponent(query)}`
+  const { head, body } = await render("search", url, { articles: [article] })
+  assert.ok(body.includes(`value="${query}"`))
+  assert.match(body, /href="\/articles\/ssr-article"/)
+  assert.ok(head.join("").includes(`href="https://masusono.com${url}"`))
+})
+
+test("search production SSR escapes query markup and keeps requests independent", async () => {
+  const query = '"><script>alert(1)</script>'
+  const url = `/search?q=${encodeURIComponent(query)}`
+  const { head, body } = await render("search", url, { articles: [] })
+  assert.ok(body.includes("&lt;script&gt;alert(1)&lt;/script&gt;"))
+  assert.doesNotMatch(body, /<script>alert\(1\)<\/script>/)
+  assert.ok(head.join("").includes(`href="https://masusono.com${url}"`))
+  const next = await render("search", "/search", { articles: [] })
+  assert.ok(next.body.includes('value=""'))
+  assert.ok(next.head.join("").includes('href="https://masusono.com/search"'))
+  assert.doesNotMatch(next.body, /alert\(1\)/)
 })

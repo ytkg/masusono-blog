@@ -47,4 +47,9 @@ describe("useArticleSearchQuery", () => {
 
     expect(result.current[0]).toBe("after")
   })
+  it("ブラウザでは古いInertia URLより現在の検索語を優先する", () => {
+    window.history.replaceState({}, "", "/search?q=current")
+    const { result } = renderHook(() => useArticleSearchQuery("/search?q=stale"))
+    expect(result.current[0]).toBe("current")
+  })
 })

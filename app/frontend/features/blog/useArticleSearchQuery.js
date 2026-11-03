@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react"
 import { notifyLocationChange } from "@/shared/lib/locationEvents"
 
-function readInitialQuery() {
-  if (typeof window === "undefined") {
-    return ""
-  }
-
-  return new URLSearchParams(window.location.search).get("q") ?? ""
+function readInitialQuery(pageUrl = "/") {
+  const search =
+    typeof window === "undefined" ? new URL(pageUrl, "https://masusono.com").search : window.location.search
+  return new URLSearchParams(search).get("q") ?? ""
 }
 
 function writeQueryToUrl(query, mode = "replace") {
@@ -30,8 +28,8 @@ function writeQueryToUrl(query, mode = "replace") {
   notifyLocationChange()
 }
 
-export default function useArticleSearchQuery() {
-  const [query, setQuery] = useState(readInitialQuery)
+export default function useArticleSearchQuery(pageUrl) {
+  const [query, setQuery] = useState(() => readInitialQuery(pageUrl))
 
   function replaceQuery(nextQuery) {
     writeQueryToUrl(nextQuery, "replace")
