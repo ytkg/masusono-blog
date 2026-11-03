@@ -73,4 +73,31 @@ RSpec.describe Admin::AuthClient do
       end
     end
   end
+  { login: { username: "owner", password: "password" }, refresh: { refresh_token: "refresh" } }.each do |operation, arguments|
+    describe "#{operation}の通信・応答の検証" do
+      subject(:result) { client.public_send(operation, **arguments) }
+
+      [ Faraday::TimeoutError, Faraday::ConnectionFailed ].each do |error_class|
+        context "#{error_class}の場合" do
+          before { allow(connection).to receive(:post).and_raise(error_class) }
+
+          it "認証サービスのエラーに変換し原因を保持する" do
+            expect { result }.to raise_error(described_class::Error, "Authentication service is unavailable") { |error|
+              expect(error.cause).to be_a(error_class)
+            }
+          end
+        end
+      end
+
+      [ "null", "[]", "true", "123", '"token"' ].each do |body|
+        context "HTTP200の本文が#{body}の場合" do
+          before { allow(connection).to receive(:post).and_return(double(status: 200, body:)) }
+
+          it "JSONオブジェクト以外を不正な認証応答として拒否する" do
+            expect { result }.to raise_error(described_class::Error, "Invalid authentication response")
+          end
+        end
+      end
+    end
+  end
 end
