@@ -65,4 +65,41 @@ RSpec.describe Microcms::UploadMediaService do
     expect { described_class.call(file: uploaded_image, api_key: "test-key", connection:) }
       .to raise_error(Microcms::UploadMediaService::UploadError)
   end
+  it "不正なJSON応答を原因を保持したUploadErrorに変換する" do
+    connection = Connection.new(double(success?: true, body: "invalid json"))
+
+    expect { described_class.call(file: uploaded_image, api_key: "test-key", connection:) }
+      .to raise_error(described_class::UploadError, "microCMS media upload failed") { |error|
+        expect(error.cause).to be_a(JSON::ParserError)
+      }
+  end
+
+  it "通信失敗を原因を保持したUploadErrorに変換する" do
+    connection = instance_double(Faraday::Connection)
+    allow(connection).to receive(:post).and_raise(Faraday::TimeoutError)
+
+    expect { described_class.call(file: uploaded_image, api_key: "test-key", connection:) }
+      .to raise_error(described_class::UploadError, "microCMS media upload failed") { |error|
+        expect(error.cause).to be_a(Faraday::TimeoutError)
+      }
+  end
+
+  it "ファイルがなければ送信せず入力エラーを返す" do
+    connection = Connection.new(nil)
+
+    expect { described_class.call(file: nil, api_key: "test-key", connection:) }
+      .to raise_error(described_class::ValidationError) { |error| expect(error.code).to eq("file_required") }
+    expect(connection.request).to be_nil
+  end
+
+  it "ファイル名の改行・引用符・バックスラッシュでmultipartヘッダーを追加させない" do
+    file = uploaded_image
+    allow(file).to receive(:original_filename).and_return("photo\"\r\nX-Forged: yes\\.png")
+    connection = Connection.new(double(success?: true, body: '{}'))
+
+    described_class.call(file:, api_key: "test-key", connection:)
+
+    expect(connection.request.body).to include('filename="photo___X-Forged: yes_.png"')
+    expect(connection.request.body).not_to include("\r\nX-Forged:")
+  end
 end

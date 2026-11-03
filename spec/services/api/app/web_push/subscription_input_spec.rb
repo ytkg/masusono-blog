@@ -34,4 +34,32 @@ RSpec.describe Api::App::WebPush::SubscriptionInput do
       expect { result }.to raise_error(ArgumentError, "subscription p256dh is too long")
     end
   end
+  [ nil, [], "subscription" ].each do |value|
+    context "購読オブジェクトが#{value.inspect}の場合" do
+      let(:subscription) { value }
+      it { expect { result }.to raise_error(ArgumentError, "subscription is required") }
+    end
+  end
+
+  [ "https://web.push.apple.com.evil/id", "https://example.com/id", "https://web.push.apple.com/%ZZ" ].each do |endpoint|
+    context "配信先が不正な#{endpoint}の場合" do
+      let(:subscription) { super().merge("endpoint" => endpoint) }
+      it { expect { result }.to raise_error(ArgumentError, "subscription endpoint is invalid") }
+    end
+  end
+
+  context "鍵が許容上限の場合" do
+    let(:subscription) { super().merge("keys" => { "p256dh" => "x" * 1_000, "auth" => "y" * 1_000 }) }
+    it { is_expected.to eq([ "https://web.push.apple.com/push/id", "x" * 1_000, "y" * 1_000 ]) }
+  end
+
+  context "auth鍵が上限を超える場合" do
+    let(:subscription) { super().merge("keys" => { "p256dh" => "key", "auth" => "x" * 1_001 }) }
+    it { expect { result }.to raise_error(ArgumentError, "subscription auth is too long") }
+  end
+
+  context "鍵が欠落している場合" do
+    let(:subscription) { super().except("keys") }
+    it { expect { result }.to raise_error(ArgumentError, "subscription p256dh is required") }
+  end
 end
