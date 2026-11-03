@@ -22,6 +22,8 @@ module Api
           raise ArgumentError, "subscription is required" unless source.is_a?(Hash)
 
           keys = source["keys"] || source[:keys]
+          raise ArgumentError, "subscription keys must be an object" unless keys.nil? || keys.is_a?(Hash)
+
           endpoint = required_string(source["endpoint"] || source[:endpoint], "subscription endpoint", MAX_ENDPOINT_LENGTH)
           p256dh = required_string(keys&.[]("p256dh") || keys&.[](:p256dh), "subscription p256dh", MAX_KEY_LENGTH)
           auth = required_string(keys&.[]("auth") || keys&.[](:auth), "subscription auth", MAX_KEY_LENGTH)
