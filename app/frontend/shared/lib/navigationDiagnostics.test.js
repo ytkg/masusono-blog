@@ -384,4 +384,58 @@ describe("footer navigation diagnostics", () => {
     advance(5000)
     expect(fetch).not.toHaveBeenCalled()
   })
+  it("過大な保存データを送らず削除し、その後の遷移を計測できる", () => {
+    remove()
+    localStorage.setItem(KEY, "x".repeat(2049))
+    remove = installNavigationDiagnostics(router)
+    expect(saved()).toBeNull()
+    expect(fetch).not.toHaveBeenCalled()
+    click()
+    advance(5000)
+    expect(payloads()[0]).toMatchObject({ kind: "navigation_stalled", path: "/authors" })
+  })
+
+  it.each([
+    { age: 86400000, id: "expired", stage: "request" },
+    { age: -1, id: "future", stage: "request" },
+    { age: 0, id: "x".repeat(101), stage: "request" },
+    { age: 0, id: "bad-stage", stage: "private" },
+  ])("復元できない保存値%jを送信しない", ({ age, id, stage }) => {
+    remove()
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        id,
+        saved_at: Date.now() - age,
+        payload: { kind: "navigation_interrupted", path: "/authors", stage },
+      }),
+    )
+    remove = installNavigationDiagnostics(router)
+    expect(saved()).toBeNull()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("bfcacheから復帰した後の最初のタップに復帰からの時間を付ける", () => {
+    advance(1000)
+    window.dispatchEvent(Object.assign(new Event("pageshow"), { persisted: true }))
+    advance(50)
+    click()
+    advance(5000)
+    expect(payloads()[0]).toMatchObject({ since_resume_ms: 50, kind: "navigation_stalled" })
+  })
+
+  it("別の遷移が始まったら前のタップの停止タイマーを破棄する", () => {
+    click()
+    emit("before", { visit: { id: "other", url: new URL("/numbers", location.href), prefetch: false, async: false } })
+    advance(5000)
+    expect(saved()).toBeNull()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("別のリクエストの取消で現在の前景遷移を破棄しない", () => {
+    click()
+    emit("finish", { visit: { id: "background", cancelled: true } })
+    advance(5000)
+    expect(payloads()[0]).toMatchObject({ kind: "navigation_stalled", path: "/authors" })
+  })
 })

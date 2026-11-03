@@ -53,4 +53,53 @@ describe("AdminArticles", () => {
       { cache: "no-store", signal: expect.any(AbortSignal) },
     )
   })
+  it("取得エラーを空の一覧と区別し、再試行で回復する", async () => {
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce(
+        jsonResponse({
+          articles: [{ id: "one", title: "復旧した記事", status: "PUBLISH", updated_at: "2026-01-01T00:00:00Z" }],
+          total_count: 1,
+          has_more: false,
+          page: 1,
+        }),
+      )
+    vi.stubGlobal("fetch", fetch)
+    render(<AdminArticles onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    expect(await screen.findByRole("alert")).toHaveTextContent("記事を取得できませんでした")
+    expect(screen.queryByText("記事が見つかりませんでした。")).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "再試行" }))
+    expect(await screen.findByText("復旧した記事")).toBeInTheDocument()
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+  })
+
+  it("タイトルや日時がない記事を表示でき、同じ条件の再検索で新しい一覧に更新する", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          articles: [{ id: "empty", title: "", status: "DRAFT", updated_at: "" }],
+          total_count: 1,
+          has_more: false,
+          page: 1,
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          articles: [{ id: "new", title: "更新した記事", status: "DRAFT", updated_at: "" }],
+          total_count: 1,
+          has_more: false,
+          page: 1,
+        }),
+      )
+    vi.stubGlobal("fetch", fetch)
+    render(<AdminArticles onBack={vi.fn()} onUnauthorized={vi.fn()} />)
+    expect(await screen.findByText("（タイトルなし）")).toBeInTheDocument()
+    expect(screen.getByText("更新: -")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "検索" }))
+    expect(await screen.findByText("更新した記事")).toBeInTheDocument()
+    expect(screen.queryByText("（タイトルなし）")).not.toBeInTheDocument()
+    expect(fetch.mock.calls[1][0]).toBe(fetch.mock.calls[0][0])
+  })
 })

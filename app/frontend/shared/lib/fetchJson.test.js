@@ -165,3 +165,35 @@ it.each([null, { error: { code: "failure", request_id: "body-id" } }])(
     }
   },
 )
+
+it.each([
+  [null, "代替文言"],
+  [{ message: "   " }, "代替文言"],
+  [{ message: 123 }, "代替文言"],
+  [{ message: "  詳細な理由  " }, "詳細な理由"],
+  [{ code: "toString", message: "詳細な理由" }, "詳細な理由"],
+])("コード別文言がない入力%jから安全な表示文言を選ぶ", (error, expected) => {
+  expect(getApiErrorDisplayMessage(error, "代替文言", {})).toBe(expected)
+})
+
+it("エラー本文のフィールド型が不正でもHTTPステータスとヘッダーIDを保つ", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      ok: false,
+      status: 502,
+      headers: new Headers({ "X-Request-ID": "request-id" }),
+      json: async () => ({ error: { code: 123, message: " ", request_id: false } }),
+    }),
+  )
+  try {
+    await expect(fetchJson("/example")).rejects.toMatchObject({
+      status: 502,
+      code: null,
+      message: "Request failed with status 502",
+      requestId: "request-id",
+    })
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})

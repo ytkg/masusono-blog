@@ -36,14 +36,21 @@ test("visible phrase overrides preference only while the actual text is visible"
   await expect(logo).toHaveAttribute("alt", normalAlt)
   await trigger.evaluate((element) => element.scrollIntoView({ block: "center" }))
   await expect(logo).toHaveAttribute("alt", limitedAlt)
-  await trigger.evaluate((element) => {
-    element.style.visibility = "hidden"
-  })
-  await expect(logo).toHaveAttribute("alt", normalAlt)
-  await trigger.evaluate((element) => {
-    element.style.visibility = "visible"
-  })
-  await expect(logo).toHaveAttribute("alt", limitedAlt)
+  for (const state of ["visibility", "collapse", "display", "opacity", "hidden", "inert", "aria-hidden"]) {
+    await trigger.evaluate((element, state) => {
+      if (state === "visibility" || state === "collapse")
+        element.style.visibility = state === "collapse" ? "collapse" : "hidden"
+      else if (state === "display") element.style.display = "none"
+      else if (state === "opacity") element.style.opacity = "0"
+      else element.setAttribute(state, state === "aria-hidden" ? "true" : "")
+    }, state)
+    await expect(logo).toHaveAttribute("alt", normalAlt)
+    await trigger.evaluate((element) => {
+      element.removeAttribute("style")
+      for (const attribute of ["hidden", "inert", "aria-hidden"]) element.removeAttribute(attribute)
+    })
+    await expect(logo).toHaveAttribute("alt", limitedAlt)
+  }
   await page.evaluate(() => {
     const overlay = document.createElement("div")
     overlay.id = "test-overlay"
