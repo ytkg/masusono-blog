@@ -111,6 +111,16 @@ RSpec.describe Articles::ExportTaggingCandidatesBatch do
       SQL
     end
 
+    context "BigQueryの行がシンボルキーの場合" do
+      let(:rows) { [ { id: "symbol", title: "記事", tags: nil, author_name: "著者", published_at: Time.utc(2026, 1, 1), content: "本文" } ] }
+
+      it "文字列キーと同じ候補形式にする" do
+        expect(result.candidate_articles).to eq([
+          { id: "symbol", title: "記事", author_name: "著者", published_at: "2026-01-01T00:00:00Z", content: "本文" }
+        ])
+      end
+    end
+
     context "limit が 0 の場合" do
       let(:limit) { "0" }
 
@@ -154,6 +164,27 @@ RSpec.describe Articles::ExportTaggingCandidatesBatch do
           /gcloud auth application-default login/
         )
       end
+    end
+  end
+  [
+    [ nil, "blog", "BIGQUERY_PROJECT_ID is required" ],
+    [ "project", " ", "BIGQUERY_DATASET_ID is required" ],
+    [ "project", "blog;DROP", "BIGQUERY_DATASET_ID contains invalid characters" ]
+  ].each do |project_id, dataset_id, message|
+    it "#{message}ならクエリを送らない" do
+      client = double(query: [])
+      expect { described_class.call(project_id:, dataset_id:, bigquery: client) }
+        .to raise_error(described_class::ConfigurationError, message)
+      expect(client).not_to have_received(:query)
+    end
+  end
+
+  [ nil, "", "invalid", "-1" ].each do |limit|
+    it "limit #{limit.inspect}は既定の10件へ戻す" do
+      rows = 12.times.map { |index| { "id" => index.to_s, "tags" => nil } }
+      client = double(query: rows)
+      result = described_class.call(project_id: "project", dataset_id: "blog", bigquery: client, limit:)
+      expect(result.candidate_articles.pluck(:id)).to eq((0...10).map(&:to_s))
     end
   end
 end

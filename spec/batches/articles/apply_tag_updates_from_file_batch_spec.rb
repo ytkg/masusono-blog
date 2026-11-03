@@ -79,6 +79,26 @@ RSpec.describe Articles::ApplyTagUpdatesFromFileBatch do
       end
     end
 
+    context "トップレベルが空のJSON配列の場合" do
+      let(:updates_json) { "[]" }
+
+      it "記事更新を行わずバックアップと候補取得を返す" do
+        expect(result).to have_attributes(updated_count: 0, updated_articles: [], backup: backup_result, candidates: candidates_result)
+        expect(apply_batch).not_to have_received(:call)
+      end
+    end
+
+    context "更新値が配列でない場合" do
+      let(:updates_json) { { tag_updates: "invalid" }.to_json }
+
+      it "更新・バックアップ・候補取得を始めない" do
+        expect { result }.to raise_error(described_class::ConfigurationError, "tag updates must be an array")
+        expect(apply_batch).not_to have_received(:call)
+        expect(backup_batch).not_to have_received(:call)
+        expect(candidates_batch).not_to have_received(:call)
+      end
+    end
+
     context "ファイルがない場合" do
       before do
         FileUtils.rm_f(updates_path)

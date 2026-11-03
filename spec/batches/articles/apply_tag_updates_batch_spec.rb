@@ -93,4 +93,17 @@ RSpec.describe Articles::ApplyTagUpdatesBatch do
       end
     end
   end
+  [
+    [ "null", "tag updates must be an array" ],
+    [ '{}', "tag updates must be an array" ],
+    [ '[null]', "tag update must be an object" ],
+    [ '[{"id":" ","tags":"本"}]', "tag update id is required" ]
+  ].each do |updates_json, message|
+    it "#{updates_json}は更新前に拒否する" do
+      service = class_double(Microcms::Articles::UpdateTagsService, execute: nil)
+      expect { described_class.call(updates_json:, update_service: service) }
+        .to raise_error(described_class::ConfigurationError, message)
+      expect(service).not_to have_received(:execute)
+    end
+  end
 end

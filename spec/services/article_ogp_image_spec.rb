@@ -78,4 +78,23 @@ RSpec.describe ArticleOgpImage do
       expect(described_class.new.render(title:)).not_to eq(automatic_renderer.render(title:))
     end
   end
+  it "感嘆符に続く助詞でタイトルを分割しない" do
+    title = "いつも楽しい増田とその他！の新しいお話を皆さんへお届け"
+    automatic_renderer = described_class.new
+    allow(automatic_renderer).to receive(:prefer_punctuation_breaks)
+    expect(described_class.new.render(title:)).to eq(automatic_renderer.render(title:))
+  end
+
+  it "描画コマンド失敗時の代替画像を記事の版としてキャッシュしない" do
+    allow(Rails).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new)
+    status = instance_double(Process::Status, success?: false)
+    allow(Open3).to receive(:capture3).and_return([ "", "private stderr", status ])
+    allow(Rails.logger).to receive(:warn)
+
+    2.times do
+      expect(described_class.call(article:)).to eq(File.binread(Rails.root.join("public/ogp-fallback.png")))
+    end
+    expect(Open3).to have_received(:capture3).twice
+    expect(Rails.logger).to have_received(:warn).with("Article OGP generation failed; serving common image").twice
+  end
 end

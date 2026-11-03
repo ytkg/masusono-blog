@@ -65,4 +65,17 @@ RSpec.describe StructuredLogging::EventLogger do
       )
     end
   end
+  it "本番では数値とBooleanの型を保ったJSONを出力し、未設定項目を省略する" do
+    allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+    CurrentRequest.set(request_id: "report-123") do
+      described_class.navigation_failure(payload: { kind: "network_error", elapsed_ms: 0, online: false, status: nil })
+    end
+
+    expect(logger).to have_received(:warn) { |message|
+      expect(JSON.parse(message)).to eq(
+        "kind" => "network_error", "elapsed_ms" => 0, "online" => false,
+        "event" => "navigation_failed", "report_request_id" => "report-123"
+      )
+    }
+  end
 end

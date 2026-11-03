@@ -78,4 +78,35 @@ RSpec.describe Microcms::FetchManagedArticlesService do
       }
     end
   end
+  [ 0, -1, 10_001, "invalid" ].each do |page|
+    it "不正なページ#{page.inspect}では外部取得を開始しない" do
+      expect(connection).not_to receive(:get)
+      expect { described_class.call(query: "", status: "all", page:, api_key: "test-key", connection:) }
+        .to raise_error(ArgumentError, "Invalid page")
+    end
+  end
+
+  context "上流の応答が失敗している場合" do
+    before { allow(connection).to receive(:get).and_return(double(success?: false)) }
+
+    it "空の一覧にせず取得エラーを返す" do
+      expect { result }.to raise_error(described_class::FetchError, "microCMS articles request failed")
+    end
+  end
+
+  context "上流のcontentsが配列でない場合" do
+    before { allow(connection).to receive(:get).and_return(double(success?: true, body: { contents: {} }.to_json)) }
+
+    it "不正な応答として拒否する" do
+      expect { result }.to raise_error(described_class::FetchError, "microCMS articles response is invalid")
+    end
+  end
+
+  it "対応する本文がない管理レコードと未知の状態を一覧に含めない" do
+    allow(connection).to receive(:get).and_return(
+      double(success?: true, body: { contents: [ { id: "known", title: "記事" } ] }.to_json),
+      double(success?: true, body: { contents: [ { id: "missing", status: [ "PUBLISH" ] }, { id: "known", status: [ "UNKNOWN" ] } ] }.to_json)
+    )
+    expect(result).to include(articles: [], total_count: 0, has_more: false)
+  end
 end

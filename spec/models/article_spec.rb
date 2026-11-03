@@ -110,4 +110,12 @@ RSpec.describe Article do
       end
     end
   end
+  describe ".fetch_by_filter" do
+    [ nil, "" ].each do |filters|
+      it "フィルターが#{filters.inspect}なら全記事の取得を開始しない" do
+        expect(Microcms::FetchArticlesService).not_to receive(:execute)
+        expect(described_class.fetch_by_filter(filters)).to eq([])
+      end
+    end
+  end
 end

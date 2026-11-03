@@ -27,4 +27,11 @@ RSpec.describe Bookshelf::Catalog do
     expect(result[:books].sole[:isbn]).to eq("9784101010014")
     expect(a_request(:get, described_class::ENDPOINT).with(query: { isbn: "9780804429573" })).not_to have_been_made
   end
+  [ {}, [], [ "invalid" ] ].each do |payload|
+    it "書誌応答が#{payload.inspect}なら成功や正常0件として扱わず後続取得を止める" do
+      stub_request(:get, described_class::ENDPOINT).with(query: { isbn: "9784101010014" }).to_return(body: payload.to_json)
+      expect { result }.to raise_error(Faraday::Error, "Book metadata unavailable")
+      expect(a_request(:get, described_class::ENDPOINT).with(query: { isbn: "9780804429573" })).not_to have_been_made
+    end
+  end
 end

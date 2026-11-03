@@ -18,7 +18,7 @@ RSpec.describe Bookshelf::Candidates do
   end
 
   it "rejects wrong hosts, shortened URLs, malformed paths, Kindle and non-book IDs" do
-    html = [ "https://amazon.co.jp.evil/dp/4101010013", "https://evil/amazon.co.jp/dp/4101010013", "https://amzn.to/4101010013", "https://amazon.co.jp/dp/4101010013extra", "https://amazon.co.jp/dp/B012345678", "https://amazon.co.jp/dp/4101010014" ].map { |url| %(<a href="#{url}">本</a>) }.join
+    html = [ "https://amazon.co.jp/%ZZ", "https://user@amazon.co.jp/dp/4101010013", "https://amazon.co.jp.evil/dp/4101010013", "https://evil/amazon.co.jp/dp/4101010013", "https://amzn.to/4101010013", "https://amazon.co.jp/dp/4101010013extra", "https://amazon.co.jp/dp/B012345678", "https://amazon.co.jp/dp/4101010014" ].map { |url| %(<a href="#{url}">本</a>) }.join
     expect(described_class.call([ article("a", "2026-01-01T00:00:00Z", html) ])).to be_empty
   end
 
