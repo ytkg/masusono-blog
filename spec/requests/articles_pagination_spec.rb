@@ -39,6 +39,28 @@ RSpec.describe "Public articles pagination", type: :request do
     expect(response.parsed_body["pagination"]).to eq("nextOffset" => 10)
   end
 
+  it "10件ちょうどの最終ページで追加読み込みを終了する" do
+    stub_microcms_get(endpoint:, query: { limit: "10", offset: "10", orders: "-publishedAt" },
+                      contents: articles, total_count: 20, limit: 10, offset: 10)
+
+    get "/api/app/articles", params: { offset: 10 }
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body.fetch("articles").pluck("id")).to eq(articles.pluck(:id))
+    expect(response.parsed_body["pagination"]).to eq("nextOffset" => nil)
+  end
+
+  it "10件未満でも続きがあれば実際に取得した件数だけ次の位置を進める" do
+    stub_microcms_get(endpoint:, query: { limit: "10", offset: "10", orders: "-publishedAt" },
+                      contents: articles.first(2), total_count: 20, limit: 10, offset: 10)
+
+    get "/api/app/articles", params: { offset: 10 }
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body.fetch("articles").pluck("id")).to eq(articles.first(2).pluck(:id))
+    expect(response.parsed_body["pagination"]).to eq("nextOffset" => 12)
+  end
+
   context "本文に非表示要素がある場合" do
     let(:content) { "<p>本文</p><div hidden=\"\">#{'あ' * 401}</div><iframe>代替本文</iframe>" }
     let(:articles) { [ { id: "hidden-content", content: } ] }
