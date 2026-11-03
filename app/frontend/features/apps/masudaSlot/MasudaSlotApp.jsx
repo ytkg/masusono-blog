@@ -8,7 +8,7 @@ export default function MasudaSlotApp() {
   return (
     <AppsDialogLauncher
       edgeToEdge
-      title="増田の野望"
+      title="増田スロット"
       launcherLabel="スロット"
       buttonAriaLabel="スロットを開く"
       buttonIcon={<CasinoIcon />}
