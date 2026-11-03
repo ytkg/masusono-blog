@@ -40,8 +40,8 @@ test("slot fills the area below the site header and resets on reopening", async 
 
 test("slot announces a pending bonus without its type and supports keyboard stops", async ({ page }) => {
   const game = await openSlot(page)
-  await page.clock.install()
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000))
+  await page.clock.install({ time: new Date("2026-11-03T00:00:00Z") })
+  await page.clock.pauseAt(new Date("2026-11-03T00:00:01Z"))
   await page.evaluate(() => {
     let count = 0
     Math.random = () => (count++ === 0 ? 0 : 0.99)
@@ -76,8 +76,8 @@ test("slot controls fit a short narrow smartphone", async ({ page }) => {
 test("slot bonus auto stops at the next ambition time", async ({ page }) => {
   test.setTimeout(90000)
   const game = await openSlot(page)
-  await page.clock.install()
-  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000))
+  await page.clock.install({ time: new Date("2026-11-03T00:00:00Z") })
+  await page.clock.pauseAt(new Date("2026-11-03T00:00:01Z"))
   await page.evaluate(() => {
     let count = 0
     Math.random = () => (count++ === 0 ? 0 : 0.99)
@@ -93,7 +93,9 @@ test("slot bonus auto stops at the next ambition time", async ({ page }) => {
     await page.clock.runFor(1000)
   await expect(game.locator(".slot-message")).toHaveText("野望タイム突入！ 50ゲームのチャンス。")
   await expect(game.getByLabel("残高 1301ポイント")).toBeVisible()
-  await expect(page).toHaveScreenshot("slot-ambition.png")
+  // Auto stopping follows animation frames, so compare the deterministic mode/status here.
+  // Reel appearance is covered by the initial, pending and bonus page screenshots.
+  await expect(game.locator(".slot-status")).toHaveScreenshot("slot-ambition.png")
   await page.clock.runFor(10000)
   await expect(game.getByLabel("残高 1301ポイント")).toBeVisible()
 })
