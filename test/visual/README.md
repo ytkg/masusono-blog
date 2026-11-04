@@ -118,3 +118,9 @@ SSRのHTMLやページのload完了だけでは操作イベントの準備完了
 最大200件の `pushState` / `replaceState` の呼び出し元スタック、変更前後のURL、
 履歴内のページURL、`popstate` / `inertia:navigate` を記録します。
 Cookie・認証情報・ページpropsは記録しません。履歴操作の失敗は再試行で隠さず、このログとトレースを照合します。
+
+## 文書のみの変更
+
+ローカルの `scripts/push.sh` とCIの `frontend-visual` は、共通の `scripts/visual-docs-only.sh` で変更ファイルを判定します。ルートの `README.md`・`AGENTS.md`、`docs/` 配下のMarkdown、`app/frontend/README.md`、`test/visual/README.md`、`.codex/skills/` 配下の `SKILL.md` だけの変更では、全画面比較と撮影環境の起動を省きます。CIのpushゲートテストは引き続き実行します。
+
+既存の検証対象となるコード・基準画像・設定が混在する変更は省略しません。上記以外のMarkdownも実行用の素材やfixtureになり得るため文書扱いにはしません。追加・削除・名前変更も判定し、コードから文書への移動によってコードの削除が隠れないようにします。CIの比較元が取得できない場合は失敗として止め、初回pushなどで比較元がない場合は全比較を実行します。

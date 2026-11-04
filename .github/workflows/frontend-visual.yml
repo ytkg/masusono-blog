@@ -9,14 +9,35 @@ on:
 jobs:
   push-gate:
     runs-on: ubuntu-24.04-arm
+    outputs:
+      docs_only: ${{ steps.changes.outputs.docs_only }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Validate checked push scripts
         run: |
-          bash -n scripts/check-visual.sh scripts/push.sh
+          bash -n scripts/check-visual.sh scripts/push.sh scripts/visual-docs-only.sh
           python3 scripts/test_visual_gate.py
+      - name: Check for documentation-only changes
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          elif bash scripts/visual-docs-only.sh "$BASE_SHA" "$HEAD_SHA"; then
+            echo "docs_only=true" >> "$GITHUB_OUTPUT"
+          else
+            result=$?
+            if [[ "$result" != 1 ]]; then exit "$result"; fi
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          fi
 
   screenshots:
+    needs: push-gate
+    if: needs.push-gate.outputs.docs_only != 'true'
     strategy:
       fail-fast: false
       matrix:

@@ -15,12 +15,17 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 base="$(git merge-base origin/main HEAD)"
-if git diff --quiet "${base}" HEAD -- \
+docs_status=0
+bash "${repo_root}/scripts/visual-docs-only.sh" "${base}" HEAD || docs_status=$?
+if ((docs_status > 1)); then
+  exit "${docs_status}"
+fi
+if [[ "${docs_status}" == 0 ]] || git diff --quiet "${base}" HEAD -- \
   app config/routes.rb \
   test/visual playwright.config.js vite.config.ts \
   package.json package-lock.json \
   compose.yml compose.visual.yml Dockerfile Dockerfile.visual Dockerfile.visual-backend \
-  scripts/check-visual.sh scripts/push.sh; then
+  scripts/check-visual.sh scripts/push.sh scripts/visual-docs-only.sh; then
   echo "No visual inputs changed; skipping screenshot comparison."
 else
   diff_status=$?

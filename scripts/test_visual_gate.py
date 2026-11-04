@@ -26,7 +26,7 @@ class VisualGateTest(unittest.TestCase):
         self.git("config", "user.email", "gate@example.invalid")
         self.git("remote", "add", "origin", str(self.remote))
         (self.root / "scripts").mkdir()
-        for name in ("check-visual.sh", "push.sh"):
+        for name in ("check-visual.sh", "push.sh", "visual-docs-only.sh"):
             shutil.copy2(SCRIPTS / name, self.root / "scripts" / name)
         compose = self.root / ".codex/skills/masusono-worktree/scripts/compose.sh"
         compose.parent.mkdir(parents=True)
@@ -178,11 +178,62 @@ class VisualGateTest(unittest.TestCase):
         self.assertEqual(self.push(result=7).returncode, 7)
         self.assertEqual(self.remote_task(), pushed)
 
+    def docs_only(self, base="origin/main", head="HEAD"):
+        return self.run_command("bash", "scripts/visual-docs-only.sh", base, head, check=False)
+
     def test_documentation_only_push_skips_visual_check(self):
-        self.change("README.md")
-        self.assertEqual(self.push().returncode, 0)
-        self.assertFalse(self.log.exists())
-        self.assertTrue(self.remote_task())
+        for path in ("README.md", "AGENTS.md", "docs/testing.md", "docs/games/slot.md",
+                     "test/visual/README.md", "app/frontend/README.md",
+                     ".codex/skills/example/SKILL.md"):
+            with self.subTest(path=path):
+                self.change(path)
+                self.assertEqual(self.docs_only().returncode, 0)
+                self.assertEqual(self.push().returncode, 0)
+                self.assertFalse(self.log.exists())
+                self.assertTrue(self.remote_task())
+                self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+
+    def test_documentation_mixed_with_runtime_files_still_runs_comparison(self):
+        for path in ("app/frontend/Card.jsx", "app/frontend/article.md", "test/visual/fixture.md"):
+            with self.subTest(path=path):
+                document = self.root / "test/visual/README.md"
+                document.parent.mkdir(parents=True, exist_ok=True)
+                document.write_text(path)
+                self.change(path)
+                self.assertEqual(self.docs_only().returncode, 1)
+                self.assertEqual(self.push(result=7).returncode, 7)
+                self.assertFalse(self.remote_task())
+                self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+
+    def test_document_additions_deletions_and_renames(self):
+        self.change("test/visual/README.md")
+        self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+        (self.root / "docs").mkdir()
+        self.git("mv", "test/visual/README.md", "docs/visual.md")
+        self.commit()
+        self.assertEqual(self.docs_only().returncode, 0)
+        self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+        self.git("rm", "docs/visual.md")
+        self.commit()
+        self.assertEqual(self.docs_only().returncode, 0)
+        self.change("app/frontend/Card.jsx")
+        self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+        (self.root / "docs").mkdir(exist_ok=True)
+        self.git("mv", "app/frontend/Card.jsx", "docs/deleted-runtime.md")
+        self.commit()
+        self.assertEqual(self.docs_only().returncode, 1)
+        self.assertEqual(self.push(result=7).returncode, 7)
+        self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+        self.git("mv", "docs/deleted-runtime.md", "app/frontend/Card.jsx")
+        self.commit()
+        self.assertEqual(self.docs_only().returncode, 1)
+        self.assertEqual(self.push(result=7).returncode, 7)
+
+    def test_document_classifier_rejects_missing_base_and_arguments(self):
+        self.assertGreater(self.docs_only(base="missing-ref").returncode, 1)
+        self.assertEqual(self.run_command(
+            "bash", "scripts/visual-docs-only.sh", check=False,
+        ).returncode, 2)
 
     def test_page_data_and_visual_configuration_also_trigger_comparison(self):
         for path in (
