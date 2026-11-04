@@ -140,3 +140,64 @@ for (const name of ['deploy-cloud-run', 'deploy-pr-cloud-run']) {
     assert.match(jobs.deploy, /run: \.\/deploy.sh/);
   });
 }
+
+test('label lookup permission failures do not add or create labels', async () => {
+  const f = fixture();
+  const error = Object.assign(new Error('forbidden'), { status: 403 });
+  f.github.rest.issues.getLabel = async () => { throw error; };
+  await assert.rejects(reconcileLabel(f), (caught) => caught === error);
+  assert.deepEqual(f.calls, []);
+});
+
+test('a concurrent label creation is rechecked before adding the label', async () => {
+  const f = fixture();
+  let lookups = 0;
+  f.github.rest.issues.getLabel = async () => { if (++lookups === 1) throw { status: 404 }; };
+  f.github.rest.issues.createLabel = async () => { throw { status: 422 }; };
+  await reconcileLabel(f);
+  assert.equal(lookups, 2);
+  assert.deepEqual(f.calls.map(([name]) => name), ['add']);
+});
+
+test('label creation failures are not mistaken for an existing label', async () => {
+  const f = fixture();
+  const error = Object.assign(new Error('unavailable'), { status: 503 });
+  f.github.rest.issues.getLabel = async () => { throw { status: 404 }; };
+  f.github.rest.issues.createLabel = async () => { throw error; };
+  await assert.rejects(reconcileLabel(f), (caught) => caught === error);
+  assert.deepEqual(f.calls, []);
+});
+
+for (const before of ['', '0000000000000000000000000000000000000000']) {
+  test(`production does not skip a push with an invalid previous revision ${JSON.stringify(before)}`, async () => {
+    const f = fixture();
+    f.context.payload.before = before;
+    assert.equal(await skipProduction(f), false);
+  });
+}
+
+for (const status of ['behind', 'diverged']) {
+  test(`production does not skip an unconfirmed ${status} comparison`, async () => {
+    const f = fixture();
+    f.github.rest.repos.compareCommitsWithBasehead = async () => ({ data: { status, total_commits: 1, commits: [{ sha: 'merge' }] } });
+    assert.equal(await skipProduction(f), false);
+  });
+}
+
+test('production does not skip empty or inconsistent commit lists', async () => {
+  assert.equal(await skipProduction(fixture({ commits: [] })), false);
+  const f = fixture();
+  f.github.rest.repos.compareCommitsWithBasehead = async () => ({ data: {
+    status: 'ahead', total_commits: 1, commits: [{ sha: 'merge' }, { sha: 'unexpected' }],
+  } });
+  assert.equal(await skipProduction(f), false);
+});
+
+for (const invalid of ['open', 'other-repository']) {
+  test(`an associated ${invalid} PR does not authorize skipping production`, async () => {
+    const f = fixture();
+    if (invalid === 'open') f.pr.merged_at = null;
+    else f.pr.base.repo.full_name = 'other/repo';
+    assert.equal(await skipProduction(f), false);
+  });
+}

@@ -189,4 +189,61 @@ describe("MasudaRunGame", () => {
     fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
     expect(player.jumps).toBe(1)
   })
+  it("二段ジャンプで回転し、三段目の入力を加算しない", () => {
+    useMasudaRunLoopMock.mockReset()
+    render(<MasudaRunGame rankings={[]} rankingsLoading={false} rankingsError={false} />)
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    const player = useMasudaRunLoopMock.mock.calls.at(-1)[0].refs.worldRef.current.player
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(player.jumps).toBe(1)
+    expect(player.spin).toBe(0)
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(player.jumps).toBe(2)
+    expect(player.spin).toBe(500)
+    fireEvent.click(screen.getByRole("button", { name: "ジャンプ" }))
+    expect(player.jumps).toBe(2)
+  })
+
+  it.each([0, -1])("終了スコア%sでは登録を送信しない", (score) => {
+    useMasudaRunLoopMock.mockReset()
+    useMasudaRunLoopMock.mockImplementation(({ state, setState, refs }) => {
+      useEffect(() => {
+        if (state === "playing") {
+          refs.scoreRef.current = score
+          setState("gameover")
+        }
+      }, [state, setState, refs.scoreRef])
+    })
+    const submit = vi.fn()
+    render(<MasudaRunGame rankings={[]} rankingsLoading={false} rankingsError={false} onScoreSubmit={submit} />)
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    expect(screen.getByRole("button", { name: "リスタート" })).toBeInTheDocument()
+    expect(submit).not.toHaveBeenCalled()
+  })
+
+  it("スコア登録が失敗しても再プレイでき、同じラウンドを再送しない", async () => {
+    useMasudaRunLoopMock.mockReset()
+    useMasudaRunLoopMock.mockImplementation(({ state, setState, refs }) => {
+      useEffect(() => {
+        if (state === "playing") {
+          refs.scoreRef.current = 88.9
+          setState("gameover")
+        }
+      }, [state, setState, refs.scoreRef])
+    })
+    const submit = vi.fn().mockRejectedValue(new Error("offline"))
+    const game = (onScoreSubmit) => (
+      <MasudaRunGame rankings={[]} rankingsLoading={false} rankingsError={false} onScoreSubmit={onScoreSubmit} />
+    )
+    const { rerender } = render(game(submit))
+    fireEvent.click(screen.getByRole("button", { name: "スタート" }))
+    await waitFor(() => expect(submit).toHaveBeenCalledOnce())
+    expect(submit).toHaveBeenCalledWith(88)
+    const replacement = vi.fn().mockResolvedValue(undefined)
+    rerender(game(replacement))
+    expect(replacement).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole("button", { name: "リスタート" }))
+    await waitFor(() => expect(replacement).toHaveBeenCalledOnce())
+    expect(submit).toHaveBeenCalledOnce()
+  })
 })

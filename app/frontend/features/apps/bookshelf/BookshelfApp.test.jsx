@@ -198,4 +198,13 @@ describe("Bookshelf", () => {
     expect.soft(signal.aborted).toBe(true)
     expect(fetch).toHaveBeenCalledTimes(2)
   })
+  it("一部の書誌取得に失敗しても取得済みの本と警告を同時に表示する", async () => {
+    fetch.mockImplementation(() => json({ books: [book], partial: true }))
+    render(<BookshelfApp />)
+    fireEvent.click(screen.getByText("起動"))
+    expect(await screen.findByRole("button", { name: `${book.title} / ${book.author}` })).toBeInTheDocument()
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "一部の本を読み込めませんでした。取得できた本を表示しています。",
+    )
+  })
 })

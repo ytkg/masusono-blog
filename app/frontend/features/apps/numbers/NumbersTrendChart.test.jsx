@@ -1,4 +1,4 @@
-import { fireEvent, render as testingLibraryRender, screen, within } from "@testing-library/react"
+import { act, fireEvent, render as testingLibraryRender, screen, within } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import NumbersTrendChart from "./NumbersTrendChart"
 import { ThemeProvider } from "@mui/material/styles"
@@ -179,4 +179,41 @@ it("データが短くなった後も有効な日付を表示し、矢印キー�
   expect(screen.getByRole("status")).toHaveTextContent("2025/10/05")
   fireEvent.keyDown(screen.getByRole("img"), { key: "Escape" })
   expect(screen.queryByRole("status")).not.toBeInTheDocument()
+})
+
+it("フォーカスで最新日を案内し、フォーカスを離すと選択を閉じる", () => {
+  render(<NumbersTrendChart trend={trend} />)
+  const chart = screen.getByRole("img")
+  const originalMatches = chart.matches.bind(chart)
+  const focusVisible = vi
+    .spyOn(chart, "matches")
+    .mockImplementation((selector) => (selector === ":focus-visible" ? true : originalMatches(selector)))
+  try {
+    act(() => chart.focus())
+    expect(document.activeElement).toBe(chart)
+    expect(screen.getByRole("status")).toHaveTextContent("2025/10/08")
+    act(() => chart.blur())
+    expect(screen.queryByRole("status")).not.toBeInTheDocument()
+  } finally {
+    focusVisible.mockRestore()
+  }
+})
+
+it("幅を測れない間のポインター移動は既存のキーボード選択を変更しない", () => {
+  render(<NumbersTrendChart trend={trend} />)
+  const chart = screen.getByRole("img")
+  chart.getBoundingClientRect = () => ({ left: 0, width: 0 })
+  fireEvent.keyDown(chart, { key: "Home" })
+  fireEvent(chart, new MouseEvent("pointermove", { bubbles: true, clientX: 500 }))
+  expect(screen.getByRole("status")).toHaveTextContent("2025/10/05")
+})
+
+it("操作対象外のキーを妨げず、選択した日付を保つ", () => {
+  render(<NumbersTrendChart trend={trend} />)
+  const chart = screen.getByRole("img")
+  fireEvent.keyDown(chart, { key: "Home" })
+  const event = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true })
+  fireEvent(chart, event)
+  expect(event.defaultPrevented).toBe(false)
+  expect(screen.getByRole("status")).toHaveTextContent("2025/10/05")
 })

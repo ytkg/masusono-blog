@@ -617,14 +617,17 @@ test("numbers trend selection", async ({ page }, testInfo) => {
   if (testInfo.project.name === "desktop") {
     await page.mouse.move(0, 0)
     await expect(values).toHaveCount(0)
+    await page.keyboard.press("Tab")
     await graph.focus()
-    await graph.press("End")
     await expect(values).toContainText("2026/01/15")
     await graph.press("ArrowLeft")
     await expect(values).toContainText("2026/01/14")
     await graph.press("Home")
     await expect(values).toContainText("2026/01/12")
     await graph.press("Escape")
+    await expect(values).toHaveCount(0)
+    await graph.press("Tab")
+    await expect(graph).not.toBeFocused()
     await expect(values).toHaveCount(0)
   }
 })

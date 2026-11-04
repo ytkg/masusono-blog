@@ -25,4 +25,12 @@ describe("resizeCanvas", () => {
     expect(canvas.style.width).toBe("600px")
     expect(canvas.style.height).toBe("200px")
   })
+  it("ラッパーをまだ計測できない場合も基準サイズの描画領域を確保する", () => {
+    const canvas = { style: {}, width: 0, height: 0 }
+    resizeCanvas({ clientWidth: 0, clientHeight: 0 }, canvas, { current: 0 })
+    expect(canvas.style.width).toBe(`${CFG.BASE_W}px`)
+    expect(canvas.style.height).toBe(`${CFG.BASE_H}px`)
+    expect(canvas.width).toBeGreaterThanOrEqual(CFG.BASE_W)
+    expect(canvas.height).toBeGreaterThanOrEqual(CFG.BASE_H)
+  })
 })

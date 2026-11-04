@@ -207,4 +207,74 @@ describe("analytics", () => {
     expect(browser["ga-disable-G-5930S30RWS"]).toBe(true)
     expect(events()).toEqual([])
   })
+  it.each([{ prefetch: true }, { async: true }])("背景の遷移%jで現在ページの計測許可を失わない", async (background) => {
+    const handlers = {}
+    browser.addEventListener = vi.fn()
+    analytics.installAnalyticsNavigation({
+      on: (name, handler) => {
+        handlers[name] = handler
+      },
+    })
+    await analytics.trackPageView("A")
+    handlers.before({ detail: { visit: { url: "/authors", ...background } } })
+    await analytics.trackRelatedArticleClick("a", "b", 1)
+    expect(browser["ga-disable-G-5930S30RWS"]).toBe(false)
+    expect(fetch).toHaveBeenCalledOnce()
+    expect(events().map(([, name]) => name)).toEqual(["page_view", "related_article_click"])
+  })
+
+  it.each(["finish", "popstate"])("%sで除外設定を再確認し、以後のクリックを送らない", async (name) => {
+    const handlers = {}
+    const listeners = {}
+    browser.addEventListener = vi.fn((event, callback) => {
+      listeners[event] = callback
+    })
+    analytics.installAnalyticsNavigation({
+      on: (event, handler) => {
+        handlers[event] = handler
+      },
+    })
+    await analytics.trackPageView("A")
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ allowed: false }) })
+    const previousCalls = fetch.mock.calls.length
+    if (name === "finish") handlers.finish()
+    else listeners.popstate()
+    expect(browser["ga-disable-G-5930S30RWS"]).toBe(true)
+    await analytics.trackRelatedArticleClick("a", "b", 1)
+    expect(fetch.mock.calls.length).toBeGreaterThan(previousCalls)
+    expect(events()).toHaveLength(1)
+  })
+
+  it("許可確認中にCookieが変わったら旧IDでGoogleを初期化しない", async () => {
+    let resolvePolicy
+    fetch.mockReturnValue(
+      new Promise((resolve) => {
+        resolvePolicy = resolve
+      }),
+    )
+    const tracking = analytics.trackPageView("A")
+    document.cookie = "user_id=22222222-2222-4222-8222-222222222222; Path=/"
+    resolvePolicy({ ok: true, json: async () => ({ allowed: true }) })
+    await tracking
+    expect(events()).toEqual([])
+    expect(document.querySelector("script")).toBeNull()
+    expect(browser["ga-disable-G-5930S30RWS"]).toBe(true)
+  })
+
+  it("許可確認中に現在地が変わったら古いページ名を送信せず、最新ページを記録する", async () => {
+    let resolvePolicy
+    fetch.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolvePolicy = resolve
+      }),
+    )
+    const tracking = analytics.trackPageView("Old title")
+    browser.location = new URL("https://masusono.com/articles/b")
+    resolvePolicy({ ok: true, json: async () => ({ allowed: true }) })
+    await tracking
+    expect(events()).toEqual([])
+    await analytics.trackPageView("New title")
+    expect(events()).toHaveLength(1)
+    expect(events()[0][2]).toMatchObject({ page_title: "New title", page_location: browser.location.href })
+  })
 })

@@ -1,4 +1,5 @@
 import { useMemo } from "react"
+import { usePage } from "@inertiajs/react"
 import Box from "@mui/material/Box"
 import ArticleSearchBox from "../features/blog/ArticleSearchBox"
 import ArticleSearchSuggestions from "../features/blog/ArticleSearchSuggestions"
@@ -10,7 +11,8 @@ import MasusonoAd from "../shared/components/MasusonoAd"
 import SeoHead from "../shared/components/SeoHead"
 
 export default function Search({ articles = [] }) {
-  const [query, setQuery, pushQuery] = useArticleSearchQuery()
+  const { url } = usePage()
+  const [query, setQuery, pushQuery] = useArticleSearchQuery(url)
   const normalizedQuery = normalizeArticleSearchText(query)
   const isSearching = Boolean(normalizedQuery)
   const filteredArticles = useMemo(

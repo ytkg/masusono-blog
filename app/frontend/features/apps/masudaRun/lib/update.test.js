@@ -67,6 +67,24 @@ describe("maybeSpawnObstacle", () => {
   })
 })
 
+it("低い障害物を高さ範囲内で地面にそろえて生成する", () => {
+  const random = vi.spyOn(Math, "random").mockReturnValue(0.5)
+  random.mockReturnValueOnce(0.99)
+  try {
+    const world = { nextSpawn: 0, groundY: 200, obstacles: [], t: 10 }
+    maybeSpawnObstacle(world, 900, 16)
+    const obstacle = world.obstacles[0]
+    expect(obstacle.kind).toBe("short")
+    expect(obstacle.h).toBeGreaterThanOrEqual(CFG.SHORT_H_MIN)
+    expect(obstacle.h).toBeLessThan(CFG.SHORT_H_MIN + CFG.SHORT_H_RANGE)
+    expect(obstacle.y + obstacle.h).toBe(world.groundY)
+    expect(obstacle.x).toBe(920)
+    expect(world.nextSpawn).toBeGreaterThan(0)
+  } finally {
+    random.mockRestore()
+  }
+})
+
 describe("updateObstacles", () => {
   it("画面外の障害物を除去する", () => {
     const world = {
