@@ -32,13 +32,9 @@ else
     exit 1
   fi
 
-  # Cloud Run のサービス名は63文字以下。長いブランチ名はハッシュを付けて衝突を防ぐ。
-  if (( ${#BRANCH_SLUG} > 54 )); then
-    BRANCH_HASH="$(printf '%s' "${CURRENT_BRANCH}" | shasum -a 256 | cut -c1-8)"
-    SERVICE_NAME="${PRODUCTION_SERVICE}-${BRANCH_SLUG:0:45}-${BRANCH_HASH}"
-  else
-    SERVICE_NAME="${PRODUCTION_SERVICE}-${BRANCH_SLUG}"
-  fi
+  # 63文字以内に収め、正規化で同じ名前になるブランチも区別する。
+  BRANCH_HASH="$(printf '%s' "${CURRENT_BRANCH}" | shasum -a 256 | cut -c1-8)"
+  SERVICE_NAME="${PRODUCTION_SERVICE}-${BRANCH_SLUG:0:45}-${BRANCH_HASH}"
 fi
 
 if [[ "${CURRENT_BRANCH}" == "${PRODUCTION_BRANCH}" ]]; then

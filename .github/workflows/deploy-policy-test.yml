@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - .github/scripts/deploy-policy*.cjs
+      - deploy.sh
+      - scripts/test_deploy.py
       - .github/workflows/deploy-policy-test.yml
       - .github/workflows/label-no-deploy.yml
       - .github/workflows/deploy-cloud-run.yml
@@ -12,6 +14,8 @@ on:
   pull_request:
     paths:
       - .github/scripts/deploy-policy*.cjs
+      - deploy.sh
+      - scripts/test_deploy.py
       - .github/workflows/deploy-policy-test.yml
       - .github/workflows/label-no-deploy.yml
       - .github/workflows/deploy-cloud-run.yml
@@ -29,3 +33,4 @@ jobs:
         with:
           node-version: 22
       - run: node --test .github/scripts/deploy-policy.test.cjs
+      - run: bash -n deploy.sh && python3 scripts/test_deploy.py
