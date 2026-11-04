@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, expect, it, vi } from "vitest"
 import MasudaSlotGame from "./MasudaSlotGame"
+import * as slotGame from "./game"
 import { AppActivityProvider } from "../shared/AppActivityContext"
 
 const click = (name) => fireEvent.click(screen.getByRole("button", { name }))
@@ -104,4 +105,22 @@ it("ignores an animation frame delivered after its reel has stopped", () => {
     staleFrame(1050)
   })
   expect(strip.style.transform).toBe(stopped)
+})
+
+it("shows payout separately from ambition games and allows retry after game over", () => {
+  vi.spyOn(slotGame, "initialGame").mockReturnValueOnce({
+    ...slotGame.initialGame(),
+    ambition: 50,
+    lastPayout: 9,
+  })
+  const { unmount } = render(<MasudaSlotGame />)
+  expect(screen.getByText("残り 50 G")).toBeInTheDocument()
+  expect(document.querySelector(".slot-status")).toHaveTextContent("PAYOUT9 pt")
+  unmount()
+  slotGame.initialGame.mockReturnValueOnce({ ...slotGame.initialGame(), balance: 2 })
+  render(<MasudaSlotGame />)
+  expect(screen.getByText("GAME OVER")).toBeInTheDocument()
+  expect(screen.getByRole("button", { name: /レバー/ })).toBeDisabled()
+  click("1,000ptでやり直す")
+  expect(screen.getByLabelText("残高 1000ポイント")).toBeInTheDocument()
 })

@@ -140,39 +140,13 @@ export default function MasudaSlotGame() {
   return (
     <section className="masuda-slot" aria-label="増田の野望 スロットゲーム">
       <div className="slot-cabinet">
-        <div className="slot-brand">
-          <span>MASUDA SLOT</span>
-          <strong>増田の野望</strong>
-          <span>その一回に、野望を。</span>
+        <div className="slot-crown" aria-hidden="true">
+          <span>❦</span>
         </div>
-        <div className="slot-status">
-          <div>
-            <span>CREDIT</span>
-            <strong aria-label={`残高 ${game.balance}ポイント`}>
-              {game.balance.toLocaleString()}
-              <small> pt</small>
-            </strong>
-          </div>
-          <div>
-            <span>{game.bonus ? "BONUS" : "MODE"}</span>
-            <strong>{game.bonus || (game.ambition ? "野望タイム" : "通常")}</strong>
-          </div>
-          <div>
-            <span>{game.ambition ? "残りゲーム" : "PAYOUT"}</span>
-            <strong>
-              {game.ambition || game.lastPayout}
-              <small>{game.ambition ? " G" : " pt"}</small>
-            </strong>
-          </div>
-        </div>
-        <div className="slot-lamp-row">
-          <div
-            className={`slot-lamp ${game.pending ? "lit" : ""}`}
-            role="status"
-            aria-label={game.pending ? "野望ランプ点灯 ボーナス当選" : "野望ランプ消灯"}
-          >
-            野望！
-          </div>
+        <div className="slot-mode">
+          <span>MODE</span>
+          <strong>{game.bonus || (game.ambition ? "野望タイム" : "通常")}</strong>
+          {game.ambition > 0 && <span>残り {game.ambition} G</span>}
           <span>
             {game.bonus
               ? `1pt掛け・ベル${BONUS[game.bonus].payout}pt / 累計 ${game.bonusPaid} / ${BONUS[game.bonus].limit}pt`
@@ -205,19 +179,56 @@ export default function MasudaSlotGame() {
           ))}
           <div className="slot-payline" aria-hidden="true" />
         </div>
-        <div className="slot-stops">
-          {reelNames.map((name, reel) => (
-            <button
-              className="slot-stop"
-              key={name}
-              aria-label={`${name}リール停止`}
-              disabled={!active || !game.spinning || game.stops[reel] !== -1}
-              onClick={() => stop(reel)}
-            >
-              <span />
-              {name} STOP
-            </button>
-          ))}
+        <div className="slot-status">
+          <div
+            className={`slot-lamp ${game.pending ? "lit" : ""}`}
+            role="status"
+            aria-label={game.pending ? "野望ランプ点灯 ボーナス当選" : "野望ランプ消灯"}
+          >
+            野望！
+          </div>
+          <div>
+            <span>CREDIT</span>
+            <strong aria-label={`残高 ${game.balance}ポイント`}>
+              {game.balance.toLocaleString()}
+              <small> pt</small>
+            </strong>
+          </div>
+          <div>
+            <span>PAYOUT</span>
+            <strong>
+              {game.lastPayout}
+              <small> pt</small>
+            </strong>
+          </div>
+        </div>
+        <div className="slot-controls">
+          <button
+            className="slot-handle"
+            aria-label={`レバー ${wager(game)}pt`}
+            disabled={over || !active || game.spinning || settling || auto}
+            onClick={start}
+          >
+            <span aria-hidden="true" />
+            <small>レバー</small>
+          </button>
+          <div className="slot-stops">
+            {reelNames.map((name, reel) => (
+              <button
+                className="slot-stop"
+                key={name}
+                aria-label={`${name}リール停止`}
+                disabled={!active || !game.spinning || game.stops[reel] !== -1}
+                onClick={() => stop(reel)}
+              >
+                <span />
+                {name} STOP
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="slot-brand">
+          <strong>増田の野望</strong>
         </div>
         <p className="slot-message" role="status">
           {paused ? "一時停止中" : game.message}
@@ -238,9 +249,6 @@ export default function MasudaSlotGame() {
           </div>
         ) : (
           <div className="slot-play">
-            <button className="slot-lever" disabled={!active || game.spinning || settling || auto} onClick={start}>
-              ▶ レバー <small>{wager(game)}pt</small>
-            </button>
             {game.bonus ? (
               <button className="slot-auto" aria-pressed={auto} onClick={() => setAuto((value) => !value)}>
                 {auto ? "オートを解除" : "オート消化"}
