@@ -53,4 +53,41 @@ RSpec.describe Microcms::Users::Client do
       end
     end
   end
+  describe "#fetch_content" do
+    subject(:result) { client.fetch_content(content_id: "user-1") }
+
+    let(:client) { described_class.new(endpoint: "https://example.test/users", api_key: "test-api-key") }
+    let(:status) { 200 }
+    let(:body) { { id: "user-1", name: "名前" }.to_json }
+
+    before do
+      stub_request(:get, "https://example.test/users/user-1")
+        .with(headers: microcms_request_headers)
+        .to_return(status:, body:)
+    end
+
+    it "単一ユーザーを取得する" do
+      expect(result).to eq("id" => "user-1", "name" => "名前")
+    end
+
+    context "ユーザーが削除されている場合" do
+      let(:status) { 404 }
+      let(:body) { "not found" }
+      it { is_expected.to eq({}) }
+    end
+
+    context "成功応答のJSONが壊れている場合" do
+      let(:body) { "invalid json" }
+      it { is_expected.to eq({}) }
+    end
+
+    context "サービスが失敗した場合" do
+      let(:status) { 503 }
+      let(:body) { "unavailable" }
+
+      it "ユーザー不在として扱わずエラーを返す" do
+        expect { result }.to raise_error(Microcms::FetchContentsService::FetchError, "microCMS request failed: status=503")
+      end
+    end
+  end
 end

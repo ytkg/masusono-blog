@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { StrictMode } from "react"
 import { SettingsContent } from "./SettingsApp"
-import { getWebPushState, subscribeToWebPush } from "./webPush"
+import { getWebPushState, subscribeToWebPush, unsubscribeFromWebPush } from "./webPush"
 
 vi.mock("./webPush", () => ({
   getWebPushState: vi.fn(),
@@ -254,5 +254,60 @@ describe("SettingsContent", () => {
     expect(screen.getByText("最新名")).toBeInTheDocument()
     view.unmount()
     expect(requests[1].signal.aborted).toBe(true)
+  })
+  it("Cookieを保存できずユーザーIDがなければ取得や保存を送信しない", async () => {
+    document.cookie = "user_id=; Max-Age=0; Path=/"
+    const cookie = vi.spyOn(document, "cookie", "get").mockReturnValue("")
+    const fetch = vi.fn()
+    vi.stubGlobal("fetch", fetch)
+    render(<SettingsContent loadOnMount />)
+    fireEvent.click(screen.getByRole("button", { name: "変更" }))
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "名前" } })
+    fireEvent.click(screen.getByRole("button", { name: "保存" }))
+    expect(await screen.findByText("ユーザーIDが見つかりません")).toBeInTheDocument()
+    expect(screen.getByRole("textbox")).toHaveValue("名前")
+    expect(fetch).not.toHaveBeenCalled()
+    cookie.mockRestore()
+  })
+
+  it.each([null, { name: "   " }])("取得結果%jに名前がなければ既定名を表示する", async (current) => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => current }))
+    render(<SettingsContent loadOnMount />)
+    expect(await screen.findByText("NO NAME")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "変更" }))
+    expect(screen.getByRole("textbox")).toHaveValue("NO NAME")
+  })
+
+  it("表示名の取得に失敗しても既定名から編集・保存できる", async () => {
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+    vi.stubGlobal("fetch", fetch)
+    render(<SettingsContent loadOnMount />)
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce())
+    fireEvent.click(screen.getByRole("button", { name: "変更" }))
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "復旧した名前" } })
+    fireEvent.click(screen.getByRole("button", { name: "保存" }))
+    expect(await screen.findByText("復旧した名前")).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
+  it("通知解除に失敗したらONを維持し、再試行でOFFにする", async () => {
+    getWebPushState.mockResolvedValue({ supported: true, subscribed: true, permission: "granted" })
+    unsubscribeFromWebPush
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce({ supported: true, subscribed: false, permission: "granted" })
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ name: "現在名" }) }))
+    render(<SettingsContent loadOnMount />)
+    const toggle = screen.getByRole("switch", { name: "新着記事の通知" })
+    await waitFor(() => expect(toggle).toBeEnabled())
+    expect(toggle).toBeChecked()
+    fireEvent.click(toggle)
+    expect(await screen.findByText("通知設定の更新に失敗しました")).toBeInTheDocument()
+    expect(toggle).toBeChecked()
+    expect(toggle).toBeEnabled()
+    fireEvent.click(toggle)
+    await waitFor(() => expect(toggle).not.toBeChecked())
+    expect(screen.queryByText("通知設定の更新に失敗しました")).not.toBeInTheDocument()
   })
 })

@@ -4,12 +4,13 @@ RSpec.describe Bookshelf::Cover do
   subject(:result) { described_class.call("9784101010014") }
 
   let(:info) { { industryIdentifiers: [ { type: "ISBN_13", identifier: "9784101010014" } ], imageLinks: { thumbnail: "http://books.google.com/cover?id=test" }, infoLink: "https://books.google.com/books?id=test" } }
+  let(:response_body) { { items: items }.to_json }
   let(:items) { [ { volumeInfo: info, saleInfo: { isEbook: false } } ] }
 
   before do
     allow(Rails.application.credentials).to receive(:dig).with(:google_books, :api_key).and_return("private-key")
     allow(Rails.application.credentials).to receive(:dig).with(:google_books, :removal_contact_url).and_return("https://example.com/contact")
-    stub_request(:get, described_class::ENDPOINT).with(query: { q: "isbn:9784101010014", key: "private-key", maxResults: 10 }).to_return(body: { items: items }.to_json)
+    stub_request(:get, described_class::ENDPOINT).with(query: { q: "isbn:9784101010014", key: "private-key", maxResults: 10 }).to_return(body: response_body)
   end
 
   it "only returns the matched edition with attribution URLs and no key" do
@@ -53,5 +54,27 @@ RSpec.describe Bookshelf::Cover do
     allow(Rails.application.credentials).to receive(:dig).with(:google_books, :removal_contact_url).and_return(nil)
     expect(result).to be_nil
     expect(a_request(:get, described_class::ENDPOINT)).not_to have_been_made
+  end
+  [ "https://books.google.com.evil/cover", "https://user:password@books.google.com/cover", "javascript:alert(1)", "https://books.google.com/%ZZ" ].each do |url|
+    context "画像URLが不正な#{url.inspect}の場合" do
+      let(:info) { super().merge(imageLinks: { thumbnail: url }) }
+      it { is_expected.to be_nil }
+    end
+  end
+
+  context "書籍ページが許可外ホストの場合" do
+    let(:info) { super().merge(infoLink: "https://example.com/books") }
+    it { is_expected.to be_nil }
+  end
+
+  it "APIキーが未設定なら問い合わせない" do
+    allow(Rails.application.credentials).to receive(:dig).with(:google_books, :api_key).and_return(nil)
+    expect(result).to be_nil
+    expect(a_request(:get, described_class::ENDPOINT)).not_to have_been_made
+  end
+
+  context "JSONの解析に失敗した場合" do
+    let(:response_body) { "invalid json" }
+    it { is_expected.to be_nil }
   end
 end

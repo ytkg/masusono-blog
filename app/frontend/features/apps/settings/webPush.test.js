@@ -112,4 +112,31 @@ describe("Web Pushの購読状態", () => {
 
     await expect(getWebPushState()).rejects.toThrow("lookup failed")
   })
+  it.each(["denied", "default"])("通知許可が%sなら鍵取得や購読を開始しない", async (permission) => {
+    Notification.requestPermission.mockResolvedValue(permission)
+    expect(await subscribeToWebPush()).toEqual({ supported: true, subscribed: false, permission })
+    expect(requestJson).not.toHaveBeenCalled()
+    expect(pushManager.subscribe).not.toHaveBeenCalled()
+  })
+
+  it("購読が既になければサーバー削除やブラウザ解除を呼ばない", async () => {
+    expect(await unsubscribeFromWebPush()).toEqual({ supported: true, subscribed: false, permission: "granted" })
+    expect(requestJson).not.toHaveBeenCalled()
+    expect(subscription.unsubscribe).not.toHaveBeenCalled()
+  })
+
+  it("開発環境ではサービスワーカーの準備を待たず非対応を返す", async () => {
+    vi.stubEnv("DEV", true)
+    expect(await getWebPushState()).toEqual({ supported: false, subscribed: false, permission: "unsupported" })
+    expect(pushManager.getSubscription).not.toHaveBeenCalled()
+    expect(requestJson).not.toHaveBeenCalled()
+  })
+
+  it("PushManagerがないブラウザでは非対応を返す", async () => {
+    vi.stubGlobal("PushManager", undefined)
+    // The support contract checks property presence; remove it to emulate an unsupported browser.
+    delete window.PushManager
+    expect(await getWebPushState()).toEqual({ supported: false, subscribed: false, permission: "unsupported" })
+    expect(requestJson).not.toHaveBeenCalled()
+  })
 })
