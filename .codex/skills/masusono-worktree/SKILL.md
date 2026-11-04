@@ -28,6 +28,11 @@ description: Masusono Blog の変更タスクを専用 Git worktree と Docker C
 
 開始時は worktree のパス、ブランチ、ベース参照をユーザーに短く伝える。
 
+### 検証の順序
+
+- ステージングデプロイまで依頼された場合は、専用環境の依存を準備した時点で、実装に着手する前に `compose.sh run --rm --no-deps backend bin/bundler-audit check --update` を実行する。既存依存の脆弱性で終盤のデプロイが止まるのを早期に検出する。ここでの `compose.sh` は下記のComposeラッパーを指す。デプロイ時の `bin/ci` による監査も維持する。
+- 画面変更の最終全比較は、差分を確認してコミットした後の `scripts/push.sh` にまとめる。同じ内容でコミット前に全比較を重ねない。push時の全比較成功を確認してからPRを作成・更新する。調査中の絞り込みや基準画像更新だけでは完了にしない。
+
 ## Docker Compose
 
 worktree のルートで以下を使う。
