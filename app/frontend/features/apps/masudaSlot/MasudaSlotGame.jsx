@@ -92,6 +92,7 @@ export default function MasudaSlotGame() {
   )
 
   useEffect(() => {
+    if (!active) return
     function keydown(event) {
       if (
         event.repeat ||
@@ -113,7 +114,7 @@ export default function MasudaSlotGame() {
     }
     window.addEventListener("keydown", keydown)
     return () => window.removeEventListener("keydown", keydown)
-  }, [start, stop])
+  }, [active, start, stop])
 
   useEffect(() => {
     if (!auto || !game.bonus || !active || settling) return
