@@ -101,6 +101,20 @@ RSpec.describe Articles::PrepareTaggingBatch do
         "| id | title | current | proposed | reason |"
       )
     end
+    context "タグも候補記事もない場合" do
+      let(:candidates_result) do
+        Articles::ExportTaggingCandidatesBatch::Result.new(existing_tags: [], tagged_articles: [], candidate_articles: [])
+      end
+
+      it "空であることをレビュー文書と機械可読の出力に記録する" do
+        result
+        expect(output_dir.join("review.md").read).to include("_No existing tags._", "_No candidate articles._")
+        expect(JSON.parse(output_dir.join("candidates.json").read)).to eq(
+          "existing_tags" => [], "tagged_articles" => [], "candidate_articles" => []
+        )
+      end
+    end
+
     context "when tagging files already exist" do
       [ "candidates.json", "tag-updates.json", "review.md" ].each do |filename|
         it "preserves an existing #{filename} without starting external batches" do

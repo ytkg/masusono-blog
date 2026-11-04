@@ -14,11 +14,11 @@ module Admin
     end
 
     def login(username:, password:)
-      token_response(@connection.post("login", { username:, password: }.to_json, json_headers))
+      token_response { @connection.post("login", { username:, password: }.to_json, json_headers) }
     end
 
     def refresh(refresh_token:)
-      token_response(@connection.post("refresh", { refreshToken: refresh_token }.to_json, json_headers))
+      token_response { @connection.post("refresh", { refreshToken: refresh_token }.to_json, json_headers) }
     end
 
     def verify(access_token:)
@@ -40,11 +40,13 @@ module Admin
       { "Content-Type" => "application/json", "Accept" => "application/json" }
     end
 
-    def token_response(response)
+    def token_response
+      response = yield
       return nil if response.status == 401
       raise Error, "Authentication service is unavailable" unless response.status == 200
 
       body = JSON.parse(response.body)
+      raise Error, "Invalid authentication response" unless body.is_a?(Hash)
       access_token = body["accessToken"] || body["token"]
       refresh_token = body["refreshToken"]
       raise Error, "Invalid authentication response" unless access_token.is_a?(String) && access_token.present? &&

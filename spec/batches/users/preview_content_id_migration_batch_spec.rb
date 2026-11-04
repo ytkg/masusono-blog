@@ -62,4 +62,17 @@ RSpec.describe Users::PreviewContentIdMigrationBatch do
       )
     end
   end
+  context "オブジェクトでないレコードや名前が空のレコードの場合" do
+    let(:records) { [ nil, "invalid", { id: "blank-name", user_id: "alice", name: " " } ] }
+
+    it "移行候補にせず、理由付きで報告する" do
+      result = described_class.call(user_fetcher:)
+      expect(result.migrations).to eq([])
+      expect(result.skipped_records).to eq([
+        { id: nil, reason: "record is not an object" },
+        { id: nil, reason: "record is not an object" },
+        { id: "blank-name", reason: "name is blank" }
+      ])
+    end
+  end
 end

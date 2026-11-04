@@ -49,6 +49,18 @@ RSpec.describe "Webhooks::Microcms::Articles", type: :request do
     expect(WebPush::ArticlePublishedNotifier).not_to have_received(:call)
   end
 
+  context "署名の秘密鍵が設定されていない場合" do
+    let(:secret) { nil }
+
+    it "署名を省略して通知せず、設定エラーで停止する" do
+      expect do
+        post "/webhooks/microcms/articles", params: payload,
+             headers: { "CONTENT_TYPE" => "application/json", "X-Microcms-Signature" => "0" * 64 }
+      end.to raise_error(RuntimeError, "web_push.microcms_webhook_secret is missing")
+      expect(WebPush::ArticlePublishedNotifier).not_to have_received(:call)
+    end
+  end
+
   def signature(body)
     OpenSSL::HMAC.hexdigest("SHA256", secret, body)
   end

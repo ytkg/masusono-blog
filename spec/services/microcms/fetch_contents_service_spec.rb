@@ -248,4 +248,43 @@ RSpec.describe Microcms::FetchContentsService do
       expect(described_class.new(api_key: "test-key").parse_meta("invalid")).to eq({})
     end
   end
+  describe "ページング保護の設定値" do
+    [ "MICROCMS_MAX_PAGES", "MICROCMS_MAX_TOTAL_COUNT" ].each do |key|
+      [ "invalid", "0", "-1" ].each do |value|
+        it "#{key}=#{value}でも有効な既定値で後続ページを取得する" do
+          allow(ENV).to receive(:[]).and_call_original
+          allow(ENV).to receive(:[]).with(key).and_return(value)
+          endpoint = Microcms::FetchArticlesService::ENDPOINT
+          [ 0, 1 ].each do |offset|
+            stub_request(:get, endpoint).with(query: { limit: offset.zero? ? "100" : "1", offset: offset.to_s, orders: "-publishedAt" })
+              .to_return(body: { contents: [ { id: offset.to_s } ], totalCount: 2, limit: 1, offset: }.to_json)
+          end
+
+          expect(Microcms::FetchArticlesService.execute(api_key: "test-key").pluck(:id)).to eq(%w[0 1])
+        end
+      end
+    end
+  end
+
+  it "ページング情報のない古い形式の応答を追加取得せず返す" do
+    response = double(success?: true, body: { contents: [ { id: "only" } ] }.to_json)
+    expect(described_class.new(api_key: "test-key").execute(response:)).to eq([ { id: "only" } ])
+  end
+
+  it "contentsが配列でなければ空の記事一覧として扱う" do
+    response = double(success?: true, body: { contents: {} }.to_json)
+    expect(described_class.new(api_key: "test-key").execute(response:)).to eq([])
+  end
+  it "件数上限とちょうど一致した後の空ページで追加取得を打ち切る" do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("MICROCMS_MAX_TOTAL_COUNT").and_return("1")
+    endpoint = Microcms::FetchArticlesService::ENDPOINT
+    stub_request(:get, endpoint).with(query: { limit: "100", offset: "0", orders: "-publishedAt" })
+      .to_return(body: { contents: [ { id: "first" } ], totalCount: 100, limit: 1, offset: 0 }.to_json)
+    stub_request(:get, endpoint).with(query: { limit: "1", offset: "1", orders: "-publishedAt" })
+      .to_return(body: { contents: [], totalCount: 100, limit: 1, offset: 1 }.to_json)
+
+    expect(Microcms::FetchArticlesService.execute(api_key: "test-key")).to eq([ { id: "first" } ])
+    expect(a_request(:get, endpoint).with(query: hash_including("orders" => "-publishedAt"))).to have_been_made.twice
+  end
 end

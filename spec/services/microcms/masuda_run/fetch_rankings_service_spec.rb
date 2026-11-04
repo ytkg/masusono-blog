@@ -100,4 +100,22 @@ RSpec.describe Microcms::MasudaRun::FetchRankingsService do
       expect(result).to eq(25)
     end
   end
+  [ nil, 0, -1, "invalid" ].each do |limit|
+    it "limit #{limit.inspect}は既存の全件取得へ戻す" do
+      response = double(success?: true, body: { contents: [ { id: "ranking" } ] }.to_json)
+      expect(described_class.execute(api_key: "test-key", limit:, response:)).to eq([ { id: "ranking" } ])
+    end
+  end
+
+  [ nil, -1, "25" ].each do |total_count|
+    it "不正な総件数#{total_count.inspect}を0件と偽らず不明として返す" do
+      response = double(success?: true, body: { contents: [], totalCount: total_count }.to_json)
+      expect(described_class.fetch_total_count(api_key: "test-key", response:)).to be_nil
+    end
+  end
+
+  it "総件数0は不明値と区別して返す" do
+    response = double(success?: true, body: { contents: [], totalCount: 0 }.to_json)
+    expect(described_class.fetch_total_count(api_key: "test-key", response:)).to eq(0)
+  end
 end

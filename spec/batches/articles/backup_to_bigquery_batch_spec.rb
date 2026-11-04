@@ -141,6 +141,16 @@ RSpec.describe Articles::BackupToBigqueryBatch do
       end
     end
 
+    context "著者のメタデータがオブジェクトでない場合" do
+      let(:articles) { [ { id: "article", author: "invalid" } ] }
+
+      it "元データを保ち、展開できない著者項目をnullにする" do
+        expect(result.rows_count).to eq(1)
+        expect(@loaded_rows.sole).to include("id" => "article", "author_name" => nil, "author_icon_url" => nil)
+        expect(@loaded_rows.sole.fetch("raw")).to eq("id" => "article", "author" => "invalid")
+      end
+    end
+
     context "環境変数が足りない場合" do
       subject(:result) do
         described_class.call(
@@ -216,6 +226,17 @@ RSpec.describe Articles::BackupToBigqueryBatch do
           /gcloud auth application-default login/
         )
       end
+    end
+  end
+  context "データセットが未設定の場合" do
+    it "記事取得やBigQuery操作を始めない" do
+      bigquery = double(dataset: nil)
+      fetcher = class_double(Microcms::FetchArticlesService, execute: [])
+
+      expect { described_class.call(project_id: "project", dataset_id: " ", bigquery:, article_fetcher: fetcher) }
+        .to raise_error(described_class::ConfigurationError, "BIGQUERY_DATASET_ID is required")
+      expect(bigquery).not_to have_received(:dataset)
+      expect(fetcher).not_to have_received(:execute)
     end
   end
 end

@@ -53,7 +53,7 @@ RSpec.describe Bookshelf::Cover do
   it "does not query Google without a rights-holder contact" do
     allow(Rails.application.credentials).to receive(:dig).with(:google_books, :removal_contact_url).and_return(nil)
     expect(result).to be_nil
-    expect(a_request(:get, described_class::ENDPOINT)).not_to have_been_made
+    expect(a_request(:get, described_class::ENDPOINT).with(query: hash_including({}))).not_to have_been_made
   end
   [ "https://books.google.com.evil/cover", "https://user:password@books.google.com/cover", "javascript:alert(1)", "https://books.google.com/%ZZ" ].each do |url|
     context "画像URLが不正な#{url.inspect}の場合" do

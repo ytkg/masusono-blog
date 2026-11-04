@@ -92,7 +92,7 @@ RSpec.describe "Public articles pagination", type: :request do
       expect(response).to have_http_status(:bad_request)
       expect(response.parsed_body.dig("error", "code")).to eq("invalid_request")
       expect(response.headers["Cache-Control"]).to include("no-store")
-      expect(a_request(:get, endpoint)).not_to have_been_made
+      expect(a_request(:get, endpoint).with(query: hash_including({}))).not_to have_been_made
     end
   end
 

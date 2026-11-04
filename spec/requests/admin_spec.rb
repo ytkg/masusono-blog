@@ -254,4 +254,23 @@ RSpec.describe "Admin mini app", type: :request do
       end
     end
   end
+  context "実際の認証クライアントの通信が失敗する場合" do
+    before do
+      allow(Admin::AuthClient).to receive(:new).and_call_original
+      stub_request(:post, "#{Admin::AuthClient::BASE_URL}login").to_timeout
+    end
+
+    it "ログインを502の共通エラーとして返し、セッションを開始しない" do
+      login(username: "owner", password: "password")
+
+      expect(response).to have_http_status(:bad_gateway)
+      expect(response.parsed_body.dig("error", "code")).to eq("auth_unavailable")
+      expect(response.parsed_body.dig("error", "request_id")).to eq(response.headers["X-Request-Id"])
+      expect(response.headers["Cache-Control"]).to eq("no-store")
+      expect(response.headers["X-Request-Id"]).to be_present
+      expect(response.body).not_to include("password", "access_token", "refresh_token")
+      get "/api/app/management/session"
+      expect(response.parsed_body.fetch("authenticated")).to be(false)
+    end
+  end
 end

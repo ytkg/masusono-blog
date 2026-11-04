@@ -32,7 +32,7 @@ RSpec.describe "Bookshelf", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body).to eq("books" => [], "partial" => false)
       expect(response.headers["Cache-Control"]).to include("no-store")
-      expect(a_request(:get, Bookshelf::Catalog::ENDPOINT)).not_to have_been_made
+      expect(a_request(:get, Bookshelf::Catalog::ENDPOINT).with(query: hash_including({}))).not_to have_been_made
     end
   end
 

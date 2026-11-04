@@ -121,7 +121,7 @@ RSpec.describe Microcms::Users::FetchByUserIdsService do
 
       it "microCMSへ問い合わせず空Hashを返す" do
         expect(result).to eq({})
-        expect(WebMock).not_to have_requested(:get, endpoint)
+        expect(WebMock).not_to have_requested(:get, endpoint).with(query: hash_including({}))
       end
     end
 
@@ -205,5 +205,17 @@ RSpec.describe Microcms::Users::FetchByUserIdsService do
         )
       end
     end
+  end
+  it "壊れたレコードを除き、入力済みの同一ユーザー名を後続レコードで上書きしない" do
+    stub_microcms_api_key
+    stub_request(:get, described_class::ENDPOINT)
+      .with(query: { limit: "100", filters: "user_id[equals]alice" })
+      .to_return(body: { contents: [ nil, 123, { user_id: " " },
+        { id: "first", user_id: "alice", name: "表示名" },
+        { id: "later", user_id: "alice", name: "別名" } ] }.to_json)
+
+    expect(described_class.execute(user_ids: [ "alice" ])).to eq(
+      "alice" => { id: "first", user_id: "alice", name: "表示名" }
+    )
   end
 end
