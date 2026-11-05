@@ -20,8 +20,8 @@ module Microcms
       end
     end
 
-    def self.execute(api_key: nil, faraday: nil, filters: nil, ids: nil, response: nil)
-      new(api_key: api_key, faraday: faraday, filters: filters, ids: ids).execute(response: response)
+    def self.execute(api_key: nil, faraday: nil, filters: nil, ids: nil, response: nil, require_complete: false)
+      new(api_key: api_key, faraday: faraday, filters: filters, ids: ids).execute(response: response, require_complete:)
     end
 
     def self.page(limit:, offset:, api_key: nil, faraday: nil)
@@ -48,19 +48,20 @@ module Microcms
       @ids = ids
     end
 
-    def execute(response: nil)
+    def execute(response: nil, require_complete: false)
       first_page = parse_page(response || self.response)
+      validate_complete_page!(first_page, offset: 0) if require_complete
       contents = []
       first_page_append_result = append_contents(contents, first_page.fetch(:contents))
       if first_page_append_result == :max_total_count_reached
-        log_pagination_warning("max_total_count_reached")
+        handle_pagination_stop("max_total_count_reached", require_complete:)
         return contents
       end
 
       meta = first_page.fetch(:meta)
       return contents unless pageable?(meta)
       unless valid_pagination_meta?(meta)
-        log_pagination_warning("invalid_pagination_meta")
+        handle_pagination_stop("invalid_pagination_meta", require_complete:)
         return contents
       end
 
@@ -70,16 +71,17 @@ module Microcms
       page_count = 1
       while offset + limit < total_count
         if page_count >= max_pages
-          log_pagination_warning("max_pages_reached")
+          handle_pagination_stop("max_pages_reached", require_complete:)
           break
         end
 
         offset += limit
         page = parse_page(fetch_response(limit:, offset:))
+        validate_complete_page!(page, offset:, expected: meta) if require_complete
         append_result = append_contents(contents, page.fetch(:contents))
         page_count += 1
         if append_result == :max_total_count_reached
-          log_pagination_warning("max_total_count_reached")
+          handle_pagination_stop("max_total_count_reached", require_complete:)
           break
         end
       end
@@ -182,8 +184,17 @@ module Microcms
       parsed
     end
 
-    def log_pagination_warning(error_type)
+    def handle_pagination_stop(error_type, require_complete:)
       StructuredLogging::EventLogger.microcms_warning(error_type:)
+      raise FetchError.new(status: 502, body: "Incomplete microCMS collection") if require_complete
+    end
+
+    def validate_complete_page!(page, offset:, expected: nil)
+      meta = page.fetch(:meta)
+      valid = pageable?(meta) && valid_pagination_meta?(meta) && meta[:offset] == offset
+      valid &&= expected.nil? || meta.values_at(:limit, :total_count) == expected.values_at(:limit, :total_count)
+      valid &&= page.fetch(:contents).size == [ meta[:limit], meta[:total_count] - offset ].min
+      raise FetchError.new(status: 502, body: "Incomplete microCMS collection") unless valid
     end
 
     def microcms_uri(limit:, offset:)
