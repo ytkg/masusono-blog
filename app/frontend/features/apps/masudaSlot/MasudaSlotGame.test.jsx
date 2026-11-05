@@ -124,3 +124,38 @@ it("shows payout separately from ambition games and allows retry after game over
   click("1,000ptでやり直す")
   expect(screen.getByLabelText("残高 1000ポイント")).toBeInTheDocument()
 })
+
+it.each(["inactive", "hidden", "help"])(
+  "leaves keyboard defaults intact while %s and restores shortcuts on resume",
+  (reason) => {
+    const tree = (active) => (
+      <AppActivityProvider value={active}>
+        <MasudaSlotGame />
+      </AppActivityProvider>
+    )
+    const { rerender } = render(tree(true))
+    vi.spyOn(Math, "random").mockReturnValue(0.99)
+    let hidden
+    if (reason === "inactive") rerender(tree(false))
+    if (reason === "hidden") {
+      hidden = vi.spyOn(document, "hidden", "get").mockReturnValue(true)
+      act(() => document.dispatchEvent(new Event("visibilitychange")))
+    }
+    if (reason === "help") click("遊び方・配列表")
+    const target = reason === "help" ? screen.getByRole("dialog", { name: "遊び方・配列表" }) : window
+    for (const code of ["Space", "Digit1", "Digit2", "Digit3"]) {
+      expect(fireEvent.keyDown(target, { code })).toBe(true)
+    }
+    expect(screen.getByLabelText("残高 1000ポイント")).toBeInTheDocument()
+    expect(screen.getByText("0 G · BONUS 0")).toBeInTheDocument()
+    if (reason === "inactive") rerender(tree(true))
+    if (reason === "hidden") {
+      hidden.mockReturnValue(false)
+      act(() => document.dispatchEvent(new Event("visibilitychange")))
+    }
+    if (reason === "help") click("ゲームに戻る")
+    expect(fireEvent.keyDown(window, { code: "Space" })).toBe(false)
+    expect(screen.getByLabelText("残高 997ポイント")).toBeInTheDocument()
+    expect(screen.getByText("1 G · BONUS 0")).toBeInTheDocument()
+  },
+)
