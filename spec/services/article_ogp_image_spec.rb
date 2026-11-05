@@ -97,4 +97,29 @@ RSpec.describe ArticleOgpImage do
     expect(Open3).to have_received(:capture3).twice
     expect(Rails.logger).to have_received(:warn).with("Article OGP generation failed; serving common image").twice
   end
+
+  it "描画コマンドが見つからなくても代替画像を返し、次回は再試行する" do
+    allow(Rails).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new)
+    allow(Open3).to receive(:capture3).and_raise(Errno::ENOENT, "renderer unavailable")
+
+    2.times do
+      expect(described_class.call(article:)).to eq(File.binread(Rails.root.join("public/ogp-fallback.png")))
+    end
+    expect(Open3).to have_received(:capture3).twice
+  end
+
+  [ IOError, Errno::EACCES ].each do |error_class|
+    it "生成画像の読込みで#{error_class}が起きても代替画像を返し一時ディレクトリを片付ける" do
+      output_path = nil
+      allow(File).to receive(:binread).and_call_original
+      allow(File).to receive(:binread).with(end_with("/image.png")) do |path|
+        output_path = path
+        raise error_class, "image unavailable"
+      end
+
+      expect(described_class.call(article:)).to eq(File.binread(Rails.root.join("public/ogp-fallback.png")))
+      expect(output_path).not_to be_nil
+      expect(File.directory?(File.dirname(output_path))).to be(false)
+    end
+  end
 end
