@@ -11,6 +11,7 @@ afterEach(() => {
   document.cookie = "seasonal_logo=; Max-Age=0; Path=/"
   document.cookie = "seasonal_logo_other_campaign=; Max-Age=0; Path=/"
   vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
 it("未設定・不正値はオフにし、保存後は全購読先に即時反映する", () => {
@@ -57,4 +58,14 @@ it("共通キーや別の限定ロゴのCookieを引き継がない", () => {
   document.cookie = "seasonal_logo_other_campaign=on; Path=/"
   render(<LogoState />)
   expect(screen.getByText("通常版")).toBeInTheDocument()
+})
+
+it("HTTPSでは限定ロゴCookieにSecure属性を付ける", () => {
+  vi.stubGlobal("location", { protocol: "https:" })
+  vi.spyOn(document, "cookie", "get").mockReturnValue("seasonal_logo_20261018_autumn_health=on")
+  const write = vi.spyOn(document, "cookie", "set").mockImplementation(() => {})
+  setSeasonalLogoEnabled(true)
+  expect(write).toHaveBeenCalledExactlyOnceWith(
+    "seasonal_logo_20261018_autumn_health=on; Max-Age=31536000; Path=/; SameSite=Lax; Secure",
+  )
 })

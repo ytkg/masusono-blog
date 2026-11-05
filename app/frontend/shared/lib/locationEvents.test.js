@@ -3,6 +3,7 @@ import { LOCATION_CHANGE_EVENT, currentLocationPath, notifyLocationChange } from
 
 describe("locationEvents", () => {
   afterEach(() => {
+    vi.unstubAllGlobals()
     window.history.replaceState({}, "", "/")
   })
 
@@ -20,5 +21,11 @@ describe("locationEvents", () => {
 
     expect(listener).toHaveBeenCalledOnce()
     window.removeEventListener(LOCATION_CHANGE_EVENT, listener)
+  })
+
+  it("SSRではwindowに触れず既定パスを返し通知を省略する", () => {
+    vi.stubGlobal("window", undefined)
+    expect(currentLocationPath()).toBe("/")
+    expect(() => notifyLocationChange()).not.toThrow()
   })
 })

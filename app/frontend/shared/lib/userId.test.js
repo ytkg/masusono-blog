@@ -11,6 +11,7 @@ describe("userId", () => {
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     clearUserIdCookie()
     vi.unstubAllGlobals()
   })
@@ -47,5 +48,16 @@ describe("userId", () => {
     const cookie = vi.spyOn(document, "cookie", "set").mockImplementation(() => {})
     expect(ensureUserIdCookie()).toBeNull()
     cookie.mockRestore()
+  })
+
+  it.each(["http:", "https:"])("%s で適切なCookie属性を付けて期限を更新する", (protocol) => {
+    vi.stubGlobal("location", { protocol })
+    vi.spyOn(document, "cookie", "get").mockReturnValue("user_id=existing%2Fid")
+    const write = vi.spyOn(document, "cookie", "set").mockImplementation(() => {})
+
+    expect(ensureUserIdCookie()).toBe("existing/id")
+    expect(write).toHaveBeenCalledExactlyOnceWith(
+      `user_id=existing%2Fid; Max-Age=31536000; Path=/; SameSite=Lax${protocol === "https:" ? "; Secure" : ""}`,
+    )
   })
 })
