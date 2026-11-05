@@ -9,8 +9,8 @@ module Api
         end
 
         def call(name:, user_id:)
+          validate_user_id!(user_id)
           normalized_user_id = ::Microcms::Users::Identity.normalize(user_id)
-          validate_user_id!(normalized_user_id)
           normalized_name = normalize_name(name)
           content_id = ::Microcms::Users::Identity.content_id(normalized_user_id)
 
@@ -32,6 +32,8 @@ module Api
         private
 
         def normalize_name(name)
+          raise ArgumentError, "name must be a string" unless name.nil? || name.is_a?(String)
+
           normalized = name.to_s.strip
           return normalized unless normalized.empty?
 

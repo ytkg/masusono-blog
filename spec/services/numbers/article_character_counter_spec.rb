@@ -52,5 +52,12 @@ RSpec.describe Numbers::ArticleCharacterCounter do
         expect(result).to eq(3)
       end
     end
+    context "templateとnoscriptに本文がある場合" do
+      let(:html) { "<template>隠す<p>子孫</p></template><noscript>代替本文</noscript><p>見える😊</p>" }
+
+      it "非表示の部分木を文字数に含めない" do
+        expect(result).to eq(4)
+      end
+    end
   end
 end
