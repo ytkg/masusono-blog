@@ -155,4 +155,21 @@ RSpec.describe "Navigation failure reports", type: :request do
       expect(response).to have_http_status(:no_content)
     end
   end
+
+  it "全公開診断項目を型と値を保持して渡し、未知項目を除く" do
+    trace = {
+      kind: "navigation_slow", path: "/authors", source_path: "/numbers", status: 599,
+      response_request_id: "failed-id", content_type: "application/json", elapsed_ms: 86_400_000,
+      prefetch: true, prefetch_in_flight: false, online: true, service_worker: false,
+      standalone: true, backgrounded: false, recovered: true, build_version: "202611050000",
+      stage: "frame", controller_state: "activated", data_source: "network", visibility: "visible",
+      release_ms: 0, tap_ms: 1, request_ms: 2, response_ms: 3, data_ready_ms: 4,
+      module_start_ms: 5, module_end_ms: 6, commit_ms: 7, frame_ms: 8, since_resume_ms: 9
+    }
+    post "/api/app/navigation_failures", params: { failure: trace.merge(token: "private", message: "private") }, as: :json
+
+    expect(response).to have_http_status(:no_content)
+    expect(response.headers["Cache-Control"]).to eq("no-store")
+    expect(StructuredLogging::EventLogger).to have_received(:navigation_failure).with(payload: trace)
+  end
 end
