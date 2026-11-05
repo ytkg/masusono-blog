@@ -166,6 +166,23 @@ RSpec.describe Articles::BackupToBigqueryBatch do
       end
     end
 
+    context "実際の記事取得が不正なcontentsを返す場合" do
+      let(:article_fetcher) { Microcms::FetchArticlesService }
+
+      before do
+        allow(article_fetcher).to receive(:execute).and_call_original
+        stub_microcms_get(
+          endpoint: Microcms::FetchArticlesService::ENDPOINT,
+          query: { limit: 100, offset: 0, orders: "-publishedAt" }, contents: {}
+        )
+      end
+
+      it "正常0件として既存バックアップをtruncateしない" do
+        expect { result }.to raise_error(Microcms::FetchContentsService::FetchError)
+        expect(dataset).not_to have_received(:load_job)
+      end
+    end
+
     context "load job が失敗した場合" do
       before do
         allow(load_job).to receive(:failed?).and_return(true)

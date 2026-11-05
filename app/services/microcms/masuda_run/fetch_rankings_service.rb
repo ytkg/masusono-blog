@@ -16,9 +16,7 @@ module Microcms
         return super(response: response) unless normalized_limit&.positive?
 
         limited_response = response || fetch_response(limit: normalized_limit, offset: 0)
-        raise_on_error!(limited_response)
-
-        parse_contents(limited_response.body)
+        parse_page(limited_response).fetch(:contents)
       end
 
       def fetch_total_count(response: nil)

@@ -223,26 +223,6 @@ RSpec.describe Microcms::FetchContentsService do
     end
   end
 
-  describe "#parse_contents" do
-    subject(:result) { described_class.new(api_key: "test-key").parse_contents(body) }
-
-    let(:body) do
-      { contents: [ { id: "article", author: { name: "増田" }, tags: [ { name: "Ruby" } ], enabled: true, missing: nil } ] }.to_json
-    end
-
-    it "配列と入れ子のキーをシンボルにし、値を維持する" do
-      expect(result).to eq([ { id: "article", author: { name: "増田" }, tags: [ { name: "Ruby" } ], enabled: true, missing: nil } ])
-    end
-
-    context "不正なJSONの場合" do
-      let(:body) { "invalid" }
-
-      it "既存の解析エラーを維持する" do
-        expect { result }.to raise_error(JSON::ParserError)
-      end
-    end
-  end
-
   describe "#parse_meta" do
     it "不正なJSONのメタデータを空として扱う" do
       expect(described_class.new(api_key: "test-key").parse_meta("invalid")).to eq({})
@@ -271,9 +251,9 @@ RSpec.describe Microcms::FetchContentsService do
     expect(described_class.new(api_key: "test-key").execute(response:)).to eq([ { id: "only" } ])
   end
 
-  it "contentsが配列でなければ空の記事一覧として扱う" do
+  it "contentsが配列でなければ正常0件と区別して取得エラーにする" do
     response = double(success?: true, body: { contents: {} }.to_json)
-    expect(described_class.new(api_key: "test-key").execute(response:)).to eq([])
+    expect { described_class.new(api_key: "test-key").execute(response:) }.to raise_error(described_class::FetchError)
   end
   it "件数上限とちょうど一致した後の空ページで追加取得を打ち切る" do
     allow(ENV).to receive(:[]).and_call_original

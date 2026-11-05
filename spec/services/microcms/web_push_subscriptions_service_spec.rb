@@ -104,4 +104,19 @@ RSpec.describe Microcms::WebPushSubscriptionsService do
       expect { described_class.create(attributes:) }.to raise_error(/MICROCMS api key is missing/)
     end
   end
+
+  [ :upsert, :delete_by_endpoint ].each do |operation|
+    [ {}, [ { id: "existing" }, nil ] ].each do |contents|
+      it "#{operation}は既存購読の不正な応答#{contents.inspect}で書き込みを始めない" do
+        stub_microcms_get(
+          endpoint:, query: { limit: 100, offset: 0, orders: "-publishedAt", filters: "endpoint[equals]#{attributes[:endpoint]}" },
+          contents: contents
+        )
+        arguments = operation == :upsert ? attributes : { endpoint: attributes[:endpoint] }
+
+        expect { described_class.public_send(operation, **arguments) }.to raise_error(Microcms::FetchContentsService::FetchError)
+        expect(a_request(:any, /web_push_subscriptions/).with { |request| [ :post, :patch, :delete ].include?(request.method) }).not_to have_been_made
+      end
+    end
+  end
 end

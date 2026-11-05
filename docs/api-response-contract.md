@@ -9,11 +9,11 @@ Usecase は各 Controller アクション専用の入口としてレスポンス
 
 ## GET /api/app/articles?offset=0
 
-トップページの追加読み込み用。認証不要。`offset` は0以上の整数（省略時0）で、公開日時の降順に1回10記事まで取得する。不正なoffsetは400と共通エラー形式（`invalid_request`）。microCMSから取得するのもこの1ページだけで、全件取得はしない。
+トップページの追加読み込み用。認証不要。`offset` は0以上の整数（省略時0）で、公開日時の降順に1回10記事まで取得する。不正なoffset（配列・オブジェクト等も含む）は取得前に400と共通エラー形式（`invalid_request`）で拒否する。microCMSから取得するのもこの1ページだけで、全件取得はしない。
 
 Response: `{ "articles": Array<Article>, "pagination": { "nextOffset": Integer | null } }`
 
-`articles` はトップページと同じ記事形式（本文・著者・文字数・読了時間を含む）。`nextOffset` は次回取得位置で、末尾では `null`。初回の `GET /` も同じデータをInertia propsとして返す。すべて `Cache-Control: no-store` を返し、upstreamエラーには共通のエラー形式を使う。
+`articles` はトップページと同じ記事形式（本文・著者・文字数・読了時間を含む）。`nextOffset` は次回取得位置で、末尾では `null`。初回の `GET /` も同じデータをInertia propsとして返す。すべて `Cache-Control: no-store` を返し、upstreamエラーには共通のエラー形式を使う。microCMSのコンテンツ取得がHTTP成功でも、本文が不正JSON・オブジェクトでない・`contents` が配列でない・要素がオブジェクトでない場合は、正常0件に変換せず502 (`upstream_server_error`) を返す。この検証は全件取得とRUNの件数限定取得にも共通。`contents: []` は正常0件。全件取得とRUN限定取得はmetadataなしの旧形式も受け付けるが、ページ指定取得には要求と一致するmetadataが必要。
 
 `characterCount` と `readingTimeMinutes` は、空白・不可視文字のみの書記素、script/style/template/noscript/iframeの本文、`hidden` 属性のある部分木を除いて計算する。`aria-hidden` だけでは視覚的な本文を除外しない。CSSによる表示判定は行わず、`content` のHTML自体は維持する。
 

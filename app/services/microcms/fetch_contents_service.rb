@@ -98,12 +98,11 @@ module Microcms
       end
     end
 
-    def parse_contents(body)
-      contents_from(parse_payload(body))
-    end
-
     def parse_meta(body)
-      meta_from(parse_payload(body))
+      return {} unless body.is_a?(String)
+
+      json = parse_payload(body)
+      json.is_a?(Hash) ? meta_from(json) : {}
     rescue JSON::ParserError
       {}
     end
@@ -120,17 +119,19 @@ module Microcms
 
     def parse_page(response)
       raise_on_error!(response)
-      json = parse_payload(response.body)
-      { contents: contents_from(json), meta: meta_from(json) }
+      json = parse_payload(response.body) if response.body.is_a?(String)
+      contents = json[:contents] if json.is_a?(Hash)
+      unless contents.is_a?(Array) && contents.all? { |entry| entry.is_a?(Hash) }
+        raise FetchError.new(status: 502, body: "Invalid microCMS response")
+      end
+
+      { contents:, meta: meta_from(json) }
+    rescue JSON::ParserError
+      raise FetchError.new(status: 502, body: "Invalid microCMS response"), cause: nil
     end
 
     def parse_payload(body)
       JSON.parse(body, symbolize_names: true)
-    end
-
-    def contents_from(json)
-      contents = json[:contents]
-      contents.is_a?(Array) ? contents : []
     end
 
     def meta_from(json)
