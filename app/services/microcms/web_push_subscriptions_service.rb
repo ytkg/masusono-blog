@@ -11,13 +11,14 @@ module Microcms
 
       return create(attributes:, api_key:, faraday:) unless existing
 
-      update(id: existing.fetch(:id), attributes:, api_key:, faraday:)
+      update(id: existing[:id], attributes:, api_key:, faraday:)
     end
 
     def self.delete_by_endpoint(endpoint:, api_key: nil, faraday: nil)
-      execute(api_key:, faraday:, filters: "endpoint[equals]#{endpoint}").each do |subscription|
-        delete(id: subscription.fetch(:id), api_key:, faraday:)
-      end
+      subscriptions = execute(api_key:, faraday:, filters: "endpoint[equals]#{endpoint}")
+      ids = subscriptions.map { |subscription| subscription_id!(subscription[:id]) }
+      ids.each { |id| delete(id:, api_key:, faraday:) }
+      subscriptions
     end
 
     def self.create(attributes:, api_key: nil, faraday: nil)
@@ -26,10 +27,14 @@ module Microcms
       end
       raise_on_error!(response)
 
-      { id: JSON.parse(response.body).fetch("id") }
+      json = JSON.parse(response.body) if response.body.is_a?(String)
+      { id: subscription_id!(json.is_a?(Hash) ? json["id"] : nil) }
+    rescue JSON::ParserError
+      raise FetchError.new(status: 502, body: "Invalid microCMS response"), cause: nil
     end
 
     def self.update(id:, attributes:, api_key: nil, faraday: nil)
+      subscription_id!(id)
       response = client(api_key:, faraday:).patch("#{ENDPOINT}/#{id}") do |request|
         write_request(request, attributes, api_key:)
       end
@@ -39,11 +44,19 @@ module Microcms
     end
 
     def self.delete(id:, api_key: nil, faraday: nil)
+      subscription_id!(id)
       response = client(api_key:, faraday:).delete("#{ENDPOINT}/#{id}") do |request|
         request.headers["X-MICROCMS-API-KEY"] = resolved_api_key(api_key)
       end
       raise_on_error!(response)
     end
+
+    def self.subscription_id!(id)
+      return id if id.is_a?(String) && !id.strip.empty?
+
+      raise FetchError.new(status: 502, body: "Invalid microCMS response")
+    end
+    private_class_method :subscription_id!
 
     def self.client(api_key:, faraday:)
       return faraday if faraday

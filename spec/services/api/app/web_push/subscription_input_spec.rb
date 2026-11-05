@@ -62,4 +62,39 @@ RSpec.describe Api::App::WebPush::SubscriptionInput do
     let(:subscription) { super().except("keys") }
     it { expect { result }.to raise_error(ArgumentError, "subscription p256dh is required") }
   end
+
+  %w[android.googleapis.com fcm.googleapis.com updates.push.services.mozilla.com web.push.apple.com].each do |host|
+    context "許可した配信先#{host}の場合" do
+      let(:subscription) { { endpoint: "https://#{host}/id", keys: { p256dh: "key", auth: "auth" } } }
+      it { is_expected.to eq([ "https://#{host}/id", "key", "auth" ]) }
+    end
+  end
+
+  [ 2_000, 2_001 ].each do |length|
+    context "endpointが#{length}文字の場合" do
+      let(:endpoint) { "https://fcm.googleapis.com/".ljust(length, "x") }
+      let(:subscription) { super().merge("endpoint" => endpoint) }
+
+      it "正規化後の上限を判定する" do
+        if length == 2_000
+          expect(result.first).to eq(endpoint)
+        else
+          expect { result }.to raise_error(ArgumentError, "subscription endpoint is too long")
+        end
+      end
+    end
+  end
+
+  %w[endpoint p256dh auth].each do |field|
+    [ "", "  " ].each do |value|
+      context "#{field}が空文字#{value.inspect}の場合" do
+        let(:subscription) do
+          source = super()
+          field == "endpoint" ? source[field] = value : source["keys"][field] = value
+          source
+        end
+        it { expect { result }.to raise_error(ArgumentError, "subscription #{field} is required") }
+      end
+    end
+  end
 end
