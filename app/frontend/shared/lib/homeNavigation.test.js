@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { consumeHomeFeedIntent, requestHomeFeed } from "./homeNavigation"
 
 describe("home navigation intent", () => {
@@ -31,4 +31,30 @@ it("処理済みclickでは既存intentを変更せず、通常clickはintentを
   requestHomeFeed(new MouseEvent("click", { button: 0 }))
   requestHomeFeed(new MouseEvent("click", { metaKey: true }))
   expect(consumeHomeFeedIntent()).toBe(true)
+})
+
+it.each(["setItem", "getItem", "removeItem"])("Storage.%sが失敗しても遷移を壊さずintent取得はfalseを返す", (method) => {
+  window.sessionStorage.clear()
+  const storage = vi.spyOn(Storage.prototype, method).mockImplementation(() => {
+    throw new Error("denied")
+  })
+  try {
+    expect(() => requestHomeFeed()).not.toThrow()
+    expect(consumeHomeFeedIntent()).toBe(false)
+  } finally {
+    storage.mockRestore()
+    window.sessionStorage.clear()
+  }
+})
+
+it("sessionStorage自体へアクセスできない場合も遷移を妨げない", () => {
+  const storage = vi.spyOn(window, "sessionStorage", "get").mockImplementation(() => {
+    throw new DOMException("denied", "SecurityError")
+  })
+  try {
+    expect(() => requestHomeFeed()).not.toThrow()
+    expect(consumeHomeFeedIntent()).toBe(false)
+  } finally {
+    storage.mockRestore()
+  }
 })

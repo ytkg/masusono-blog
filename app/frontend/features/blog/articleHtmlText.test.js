@@ -94,3 +94,8 @@ it.each([false, true])("意味のあるブロックとhrの前後に境界を保
   expect(extractTextFromHtml("前<hr>後")).toBe("前 後")
   expect(extractTextFromHtml("前<strong>中</strong>後")).toBe("前中後")
 })
+
+it.each([false, true])("HTMLコメントを可視テキストに含めず、両側の文字を連結する SSR=%s", (ssr) => {
+  vi.stubEnv("SSR", ssr)
+  expect(extractHtmlText("<p>前<!--private-->後</p>")).toBe("前後\n")
+})

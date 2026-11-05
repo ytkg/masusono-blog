@@ -514,4 +514,33 @@ describe("Home page", () => {
       window.history.replaceState(null, "")
     }
   })
+
+  it.each(["SecurityError", "QuotaExceededError"])(
+    "履歴保存が%sで失敗しても記事と取得位置を更新し、次のページへ進める",
+    async (name) => {
+      requestJson
+        .mockResolvedValueOnce({ articles: [{ id: "two" }], pagination: { nextOffset: 20 } })
+        .mockResolvedValueOnce({ articles: [{ id: "three" }], pagination: { nextOffset: null } })
+      render(<Home articles={[{ id: "one" }]} pagination={{ nextOffset: 10 }} />)
+      const originalHistory = window.history.state
+      window.history.replaceState({ page: { rememberedState: {} } }, "")
+      const replace = vi.spyOn(window.history, "replaceState").mockImplementation(() => {
+        throw new DOMException("history unavailable", name)
+      })
+      try {
+        fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
+        await waitFor(() => expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:2"))
+        expect(screen.queryByText("記事を読み込めませんでした。")).not.toBeInTheDocument()
+        fireEvent.click(screen.getByRole("button", { name: "さらに読み込む" }))
+        await waitFor(() => expect(screen.getByTestId("articles-list")).toHaveTextContent("articles:3"))
+        expect(requestJson.mock.calls.map(([url]) => url)).toEqual([
+          "/api/app/articles?offset=10",
+          "/api/app/articles?offset=20",
+        ])
+      } finally {
+        replace.mockRestore()
+        window.history.replaceState(originalHistory, "")
+      }
+    },
+  )
 })

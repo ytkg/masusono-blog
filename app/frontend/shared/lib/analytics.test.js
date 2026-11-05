@@ -277,4 +277,16 @@ describe("analytics", () => {
     expect(events()).toHaveLength(1)
     expect(events()[0][2]).toMatchObject({ page_title: "New title", page_location: browser.location.href })
   })
+
+  it("許可確認の通信失敗後は同じURLを再試行でき、成功後は重複を送らない", async () => {
+    fetch.mockRejectedValueOnce(new Error("offline"))
+    await analytics.trackPageView("A")
+    expect(events()).toEqual([])
+    expect(document.querySelector("script")).toBeNull()
+    await analytics.trackPageView("A")
+    await analytics.trackPageView("A")
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(events()).toHaveLength(1)
+    expect(events()[0][2]).toMatchObject({ page_title: "A", page_location: browser.location.href })
+  })
 })
