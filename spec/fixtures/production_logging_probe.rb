@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "webmock"
+WebMock.enable!
 WebMock.disable_net_connect!
 require_relative "../../config/environment"
 
