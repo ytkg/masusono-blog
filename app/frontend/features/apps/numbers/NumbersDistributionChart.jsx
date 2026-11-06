@@ -19,9 +19,6 @@ export default function NumbersDistributionChart({ distribution }) {
   return (
     <Stack spacing={1.5} sx={{ minWidth: 0 }} data-testid="numbers-distribution">
       <SectionHeading>文字数の分布</SectionHeading>
-      <Typography variant="body2" color="text.secondary">
-        200字ごとに集計。2,000字以上はまとめて表示。
-      </Typography>
       {total === 0 ? (
         <Typography variant="body2" color="text.secondary">
           記事がありません。全区間0本です。

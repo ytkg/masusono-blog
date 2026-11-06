@@ -86,4 +86,17 @@ RSpec.describe YearAgoArticlesBuilder do
     ])
     expect(described_class.call(article: { publishedAt: "2026-02-29T00:00:00Z" })).to eq([])
   end
+
+  context "同じ公開日時の候補がある場合" do
+    let(:candidates) do
+      [
+        { id: "z", title: "後", publishedAt: "2025-01-15T03:00:00Z" },
+        { id: "a", title: "先", publishedAt: "2025-01-15T12:00:00+09:00" }
+      ]
+    end
+
+    it "タイムゾーン表記によらずID順で安定して返す" do
+      expect(result).to eq([ { id: "a", title: "先" }, { id: "z", title: "後" } ])
+    end
+  end
 end

@@ -34,4 +34,61 @@ RSpec.describe Bookshelf::Catalog do
       expect(a_request(:get, described_class::ENDPOINT).with(query: { isbn: "9780804429573" })).not_to have_been_made
     end
   end
+
+  context "候補がない場合" do
+    before { allow(Bookshelf::Candidates).to receive(:call).and_return([]) }
+
+    it "外部取得せず正常な空一覧を返す" do
+      expect(result).to eq(books: [], partial: false)
+      expect(a_request(:get, described_class::ENDPOINT)).not_to have_been_made
+    end
+  end
+
+  context "単一候補の場合" do
+    before { allow(Bookshelf::Candidates).to receive(:call).and_return([ first ]) }
+
+    [ nil, {}, { summary: nil }, { summary: { isbn: "unknown", title: "書名", author: "著者" } },
+      { summary: { isbn: "9784101010014", title: " ", author: "著者" } },
+      { summary: { isbn: "9784101010014", title: "書名", author: nil } },
+      { summary: { isbn: "9784101010014", title: 123, author: "著者" } } ].each do |entry|
+      it "未登録・不完全な書誌 #{entry.inspect} は正常な空一覧として扱う" do
+        stub_request(:get, described_class::ENDPOINT).with(query: { isbn: first[:isbn] }).to_return(body: [ entry ].to_json)
+        expect(result).to eq(books: [], partial: false)
+      end
+    end
+  end
+
+  [ :timeout, :invalid_json, :unavailable ].each do |failure|
+    context "最初の取得で#{failure}の場合" do
+      before do
+        request = stub_request(:get, described_class::ENDPOINT).with(query: { isbn: first[:isbn] })
+        case failure
+        when :timeout then request.to_timeout
+        when :invalid_json then request.to_return(body: "{")
+        when :unavailable then request.to_return(status: 503)
+        end
+      end
+
+      it "正常0件にせず失敗を伝え、後続の取得を止める" do
+        expect { result }.to raise_error(Faraday::Error, "Book metadata unavailable")
+        expect(a_request(:get, described_class::ENDPOINT).with(query: { isbn: "9780804429573" })).not_to have_been_made
+      end
+    end
+  end
+
+  it "時間予算のちょうど上限でも取得を開始しない" do
+    allow(Process).to receive(:clock_gettime).and_call_original
+    allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC).and_return(0, described_class::BUDGET_SECONDS)
+
+    expect { result }.to raise_error(Faraday::Error, "Book metadata unavailable")
+    expect(a_request(:get, described_class::ENDPOINT)).not_to have_been_made
+  end
+
+  it "後続バッチのJSONが壊れていても取得済みの本を保持する" do
+    stub_request(:get, described_class::ENDPOINT).with(query: { isbn: "9780804429573" }).to_return(body: "{")
+
+    expect(result[:partial]).to be(true)
+    expect(result[:books].sole[:isbn]).to eq(first[:isbn])
+    expect(a_request(:get, described_class::ENDPOINT).with(query: { isbn: "9784101010021" })).not_to have_been_made
+  end
 end

@@ -72,12 +72,12 @@ RSpec.describe Api::App::WebPush::SubscriptionInput do
 
   [ 2_000, 2_001 ].each do |length|
     context "endpointが#{length}文字の場合" do
-      let(:endpoint) { "https://fcm.googleapis.com/".ljust(length, "x") }
+      let(:endpoint) { "https://web.push.apple.com/".ljust(length, "x") }
       let(:subscription) { super().merge("endpoint" => endpoint) }
 
-      it "正規化後の上限を判定する" do
+      it "長さ上限を厳密に適用する" do
         if length == 2_000
-          expect(result.first).to eq(endpoint)
+          expect(result).to eq([ endpoint, "key", "auth" ])
         else
           expect { result }.to raise_error(ArgumentError, "subscription endpoint is too long")
         end
@@ -85,14 +85,14 @@ RSpec.describe Api::App::WebPush::SubscriptionInput do
     end
   end
 
-  %w[endpoint p256dh auth].each do |field|
-    [ "", "  " ].each do |value|
-      context "#{field}が空文字#{value.inspect}の場合" do
+  [ "endpoint", "p256dh", "auth" ].each do |field|
+    [ nil, "", " \t\n " ].each do |value|
+      context "#{field}が#{value.inspect}の場合" do
         let(:subscription) do
-          source = super()
-          field == "endpoint" ? source[field] = value : source["keys"][field] = value
-          source
+          input = super()
+          field == "endpoint" ? input.merge(field => value) : input.merge("keys" => input["keys"].merge(field => value))
         end
+
         it { expect { result }.to raise_error(ArgumentError, "subscription #{field} is required") }
       end
     end
