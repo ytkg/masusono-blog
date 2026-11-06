@@ -13,11 +13,12 @@ export const articleBodyHtmlSx = {
   overflowWrap: "anywhere",
   wordBreak: "break-word",
   "& blockquote": {
-    m: "0 0 1em",
+    m: "0 8px 1em",
     p: { xs: 1.5, sm: 2 },
     borderLeft: "3px solid",
     borderColor: "divider",
     bgcolor: "action.hover",
+    color: "text.secondary",
   },
   "& blockquote > :last-child": { marginBottom: 0 },
   "& a": {
