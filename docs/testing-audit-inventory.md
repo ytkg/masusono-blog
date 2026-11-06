@@ -6,7 +6,7 @@
 
 「契約照合済」は現行の呼出元における正常・異常・境界・競合・後始末と、記載したunit / SSR / visualの対応を読み、具体的な残不足がないと判断した状態。任意入力の全組合せや将来仕様の保証ではない。「部分照合」は記載した契約のみ確認済みで、残る確認がある状態。残る確認が必要な場合は理由欄に明記する。全体の完了は未照合と未解決の契約を解消し、unit / request / SSR / visual / scriptの責務を照合してから判定する。
 
-対象 415 ファイル。契約照合済 68件、未照合 331件、部分照合 16件。未照合は既存テストがないという意味ではない。
+対象 415 ファイル。契約照合済 69件、未照合 331件、部分照合 15件。未照合は既存テストがないという意味ではない。
 
 | 実装ファイル | 状態 | テストまたは候補 | 確認した契約・追加不要理由／残作業 |
 | --- | --- | --- | --- |
@@ -34,7 +34,7 @@
 | `Dockerfile.visual-backend` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/batches/articles/apply_tag_updates_batch.rb` | 未照合 | spec/batches/articles/apply_tag_updates_batch_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/batches/articles/apply_tag_updates_from_file_batch.rb` | 未照合 | spec/batches/articles/apply_tag_updates_from_file_batch_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/batches/articles/backup_to_bigquery_batch.rb` | 部分照合 | spec/batches/articles/backup_to_bigquery_batch_spec.rb | Issue #853で実microCMS取得の不正contentsを0件とせずload_job/truncateへ進まないことをfake BigQueryで検証。全体のschema/ADC/cleanup照合、件数・ページ保護で返る部分結果をsnapshotに使う契約は未完了。 |
+| `app/batches/articles/backup_to_bigquery_batch.rb` | 契約照合済 | spec/batches/articles/backup_to_bigquery_batch_spec.rb; spec/batches/articles/backup_completeness_spec.rb; spec/batches/articles/bigquery_client_configuration_spec.rb | schema/raw/UTC時刻、設定/ADC初期化、dataset/table再利用、load失敗と一時ファイル削除をfake BigQueryで照合。Issue #856で全件取得を要求し、metadata/件数/位置/ID不正・上限打ち切り時はdataset操作前に停止、上限一致/正常0件の置換を照合。実GCP権限・原子的CMSスナップショットは対象外。 |
 | `app/batches/articles/export_tagging_candidates_batch.rb` | 未照合 | spec/batches/articles/export_tagging_candidates_batch_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/batches/articles/prepare_tagging_batch.rb` | 未照合 | spec/batches/articles/prepare_tagging_batch_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/batches/users/apply_content_id_migration_batch.rb` | 未照合 | spec/batches/users/apply_content_id_migration_batch_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -295,7 +295,7 @@
 | `app/services/microcms/create_content_service.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/microcms/fetch_articles_service.rb` | 契約照合済 | spec/services/microcms/fetch_articles_service_spec.rb; spec/services/microcms/fetch_articles_page_spec.rb; spec/services/microcms/fetch_response_shape_spec.rb; spec/requests/upstream_response_shape_spec.rb | endpoint指定だけの継承。実HTTP fixtureで通常・厳密な1ページ・不正応答・後続不正を照合。共通取得/認証/上限は親で検証し同じ内部mockを追加しない。 |
 | `app/services/microcms/fetch_authors_service.rb` | 契約照合済 | spec/services/microcms/fetch_authors_service_spec.rb; spec/services/microcms/fetch_contents_service_spec.rb | endpointとorders=publishedAtだけを指定。実HTTP fixtureのquery/header/dataと、super.mergeが他の共通引数を保持するsourceを照合。共通JSON/ページ保護は親の対応specで検証。 |
-| `app/services/microcms/fetch_contents_service.rb` | 契約照合済 | spec/services/microcms/fetch_contents_service_spec.rb; spec/services/microcms/fetch_response_shape_spec.rb; spec/requests/upstream_response_shape_spec.rb | 初回/追加ページ、filters/ids・認証/順序、最大ページ/件数と不正設定fallback、HTTP失敗優先、strict pageの型/負値/位置不一致/件数制限を照合。Issue #853で不正JSON/過深nest/root/list/要素型をFetchError502へ統一し本文とcauseを抑止。空配列/全件legacy metadataなしを維持し、不正contentsの正常0件化は廃止。 |
+| `app/services/microcms/fetch_contents_service.rb` | 契約照合済 | spec/services/microcms/fetch_contents_service_spec.rb; spec/services/microcms/fetch_response_shape_spec.rb; spec/requests/upstream_response_shape_spec.rb | 初回/追加ページ、filters/ids・認証/順序、最大ページ/件数と不正設定fallback、HTTP失敗優先、strict pageの型/負値/位置不一致/件数制限を照合。Issue #853で不正JSON/過深nest/root/list/要素型をFetchError502へ統一し本文とcauseを抑止。標準取得では空配列/全件legacy metadataなしを維持し、不正contentsの正常0件化は廃止。Issue #856のrequire_completeではmetadata必須・ページ件数/位置/総件数整合と打ち切り失敗を実バックアップ入口で照合。 |
 | `app/services/microcms/fetch_managed_articles_service.rb` | 未照合 | spec/services/microcms/fetch_managed_articles_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/microcms/fetch_media_service.rb` | 未照合 | spec/services/microcms/fetch_media_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/microcms/masuda_run/create_ranking_service.rb` | 未照合 | spec/services/microcms/masuda_run/create_ranking_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |

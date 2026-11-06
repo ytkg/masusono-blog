@@ -32,11 +32,17 @@ module Articles
     def call
       validate_configuration!
 
-      dataset = find_or_create_dataset
-      find_or_create_table(dataset)
+      bigquery_client
+      articles = article_fetcher.execute(require_complete: true)
+      ids = articles.map { |article| value(article, :id) }
+      unless ids.all? { |id| id.is_a?(String) && !id.strip.empty? } && ids.uniq.size == ids.size
+        raise LoadError, "Article IDs must be present and unique"
+      end
 
       backed_up_at = timestamp_string(clock.call)
-      rows = article_fetcher.execute.map { |article| build_row(article, backed_up_at:) }
+      rows = articles.map { |article| build_row(article, backed_up_at:) }
+      dataset = find_or_create_dataset
+      find_or_create_table(dataset)
       load_job = load_rows(dataset, rows)
       raise_on_load_error!(load_job)
 

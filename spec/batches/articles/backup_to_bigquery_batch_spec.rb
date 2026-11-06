@@ -183,6 +183,29 @@ RSpec.describe Articles::BackupToBigqueryBatch do
       end
     end
 
+    context "load jobの作成が例外を返す場合" do
+      before do
+        allow(dataset).to receive(:load_job) do |_table_id, file_path, **_options|
+          @loaded_file_path = file_path
+          raise "fixture load failure"
+        end
+      end
+
+      it "例外を伝播し、一時ファイルを残さない" do
+        expect { result }.to raise_error(RuntimeError, "fixture load failure")
+        expect(File.exist?(@loaded_file_path)).to be(false)
+      end
+    end
+
+    context "load jobの待機が例外を返す場合" do
+      before { allow(load_job).to receive(:wait_until_done!).and_raise("fixture wait failure") }
+
+      it "例外を伝播し、一時ファイルを残さない" do
+        expect { result }.to raise_error(RuntimeError, "fixture wait failure")
+        expect(File.exist?(@loaded_file_path)).to be(false)
+      end
+    end
+
     context "load job が失敗した場合" do
       before do
         allow(load_job).to receive(:failed?).and_return(true)

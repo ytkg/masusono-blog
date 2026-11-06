@@ -4,6 +4,8 @@
 
 microCMS の記事を BigQuery に全件バックアップできます。BigQuery へは load job で投入し、`microcms_articles_backup` テーブルを毎回全件置き換えます。`tags` は microCMS のカンマ区切り文字列をそのまま保存します。
 
+バックアップは各ページの件数・位置・総件数と記事IDの存在・一意性を確認してから、dataset/tableの準備とload jobへ進みます。ページ上限・総取得件数上限による打ち切り、metadataの欠落・変化、不完全なページはエラーとなり、既存テーブルを置き換えません。上限に達した場合は `MICROCMS_MAX_PAGES` / `MICROCMS_MAX_TOTAL_COUNT` の設定と記事件数を確認してください。metadataで0件と確認できた場合は空のバックアップを保存します。取得中に同じ件数のまま記事が更新される場合まで固定するものではなく、各ページで受信した内容を保存します。
+
 事前にホストで Application Default Credentials を設定してください。
 
 ```bash
