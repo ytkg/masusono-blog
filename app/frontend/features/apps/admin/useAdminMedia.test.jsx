@@ -150,4 +150,34 @@ describe("useAdminMedia", () => {
     expect(result.current.items).toEqual([])
     expect(result.current.error).toBeNull()
   })
+
+  it.each(["success", "unauthorized"])(
+    "古い初回取得の%sで新しい検索の待機状態・認証・一覧を上書きしない",
+    async (outcome) => {
+      const oldRequest = Promise.withResolvers()
+      const newRequest = Promise.withResolvers()
+      const fetch = vi.fn().mockReturnValueOnce(oldRequest.promise).mockReturnValueOnce(newRequest.promise)
+      vi.stubGlobal("fetch", fetch)
+      const onUnauthorized = vi.fn()
+      const { result, rerender } = renderHook(({ query }) => useAdminMedia({ query, refreshKey: 0, onUnauthorized }), {
+        initialProps: { query: "old" },
+      })
+      const signal = fetch.mock.calls[0][1].signal
+      rerender({ query: "new" })
+      expect(signal.aborted).toBe(true)
+      await act(async () =>
+        oldRequest.resolve(
+          outcome === "success" ? response([{ id: "stale" }]) : { ok: false, status: 401, json: async () => ({}) },
+        ),
+      )
+      expect(result.current.loading).toBe(true)
+      expect(result.current.items).toEqual([])
+      expect(result.current.error).toBeNull()
+      expect(onUnauthorized).not.toHaveBeenCalled()
+      await act(async () => newRequest.resolve(response([{ id: "current" }], false)))
+      expect(result.current.loading).toBe(false)
+      expect(result.current.items).toEqual([{ id: "current" }])
+      expect(fetch).toHaveBeenCalledTimes(2)
+    },
+  )
 })

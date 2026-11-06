@@ -197,3 +197,34 @@ it("エラー本文のフィールド型が不正でもHTTPステータスとヘ
     vi.unstubAllGlobals()
   }
 })
+
+it.each([new TypeError("offline"), new DOMException("cancelled", "AbortError")])(
+  "通信エラー%sを元の例外のまま伝える",
+  async (error) => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(error))
+    try {
+      await expect(fetchJson("/example")).rejects.toBe(error)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  },
+)
+
+it("成功応答のJSON解析失敗を成功データに変換せず伝える", async () => {
+  const error = new SyntaxError("invalid JSON")
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => {
+        throw error
+      },
+    }),
+  )
+  try {
+    await expect(fetchJson("/example")).rejects.toBe(error)
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})

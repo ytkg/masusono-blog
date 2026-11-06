@@ -5,18 +5,23 @@ export function rememberInCurrentHistoryEntry(key, value) {
   if (typeof window === "undefined" || !window.history.state?.page) return
 
   const currentState = window.history.state
-  window.history.replaceState(
-    {
-      ...currentState,
-      page: {
-        ...currentState.page,
-        rememberedState: {
-          ...currentState.page.rememberedState,
-          [key]: value,
+  try {
+    window.history.replaceState(
+      {
+        ...currentState,
+        page: {
+          ...currentState.page,
+          rememberedState: {
+            ...currentState.page.rememberedState,
+            [key]: value,
+          },
         },
       },
-    },
-    "",
-    window.location.href,
-  )
+      "",
+      window.location.href,
+    )
+  } catch (error) {
+    // Quota and throttling failures must not prevent the visible state from advancing.
+    if (error?.name !== "SecurityError" && error?.name !== "QuotaExceededError") throw error
+  }
 }

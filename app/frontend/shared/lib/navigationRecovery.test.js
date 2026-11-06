@@ -214,4 +214,42 @@ describe("navigation recovery", () => {
     expect(reportBody().path).toBe(window.location.pathname)
     expect(fetch.mock.calls[0][1].body).not.toContain("example.com")
   })
+
+  it.each([200, 500])("Inertia先読みHTTP%iは画面を妨げず、500応答だけを記録する", (status) => {
+    const event = emit("prefetched", {
+      visit: visit({ prefetch: true }),
+      response: { status, headers: { "x-inertia": "true" } },
+    })
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(getNavigationFailure()).toBeNull()
+    expect(fetch).toHaveBeenCalledTimes(status === 500 ? 1 : 0)
+    if (status === 500) expect(reportBody()).toMatchObject({ status: 500, prefetch: true })
+  })
+
+  it("無関係な取得の終了で現在の前景遷移を失わない", () => {
+    emit("before", { visit: visit() })
+    emit("start", { visit: visit() })
+    emit("finish", { visit: visit({ id: "background", async: true }) })
+    emit("networkError", { error: { url: visit().url.href } })
+    expect(getNavigationFailure().url).toBe(visit().url.href)
+    expect(reportBody()).toMatchObject({ path: "/authors", prefetch: false, elapsed_ms: expect.any(Number) })
+  })
+
+  it.each([true, false])("通信失敗にURLがなければ前景か現在地から復旧する（前景=%s）", (foreground) => {
+    if (foreground) emit("before", { visit: visit() })
+    const event = emit("networkError", { error: {} })
+    expect(event.preventDefault).toHaveBeenCalledOnce()
+    expect(getNavigationFailure().url).toBe(foreground ? visit().url.href : window.location.href)
+    expect(reportBody().path).toBe(foreground ? "/authors" : window.location.pathname)
+  })
+
+  it("前景取得のfinish後は後続の失敗を完了した遷移へ関連付けない", () => {
+    emit("before", { visit: visit() })
+    emit("start", { visit: visit() })
+    emit("finish", { visit: visit() })
+    emit("networkError", { error: {} })
+    expect(getNavigationFailure().url).toBe(window.location.href)
+    expect(reportBody().path).toBe(window.location.pathname)
+    expect(reportBody()).not.toHaveProperty("elapsed_ms")
+  })
 })

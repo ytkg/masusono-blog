@@ -69,3 +69,42 @@ it("HTTPSでは限定ロゴCookieにSecure属性を付ける", () => {
     "seasonal_logo_20261018_autumn_health=on; Max-Age=31536000; Path=/; SameSite=Lax; Secure",
   )
 })
+
+it("Cookieの読込みが拒否されても通常ロゴを表示できる", () => {
+  const read = vi.spyOn(document, "cookie", "get").mockImplementation(() => {
+    throw new DOMException("denied", "SecurityError")
+  })
+  try {
+    render(<LogoState />)
+    expect(screen.getByText("通常版")).toBeInTheDocument()
+    act(() => window.dispatchEvent(new Event("focus")))
+    expect(screen.getByText("通常版")).toBeInTheDocument()
+  } finally {
+    read.mockRestore()
+  }
+})
+
+it("Cookieの書込みが拒否されたら成功イベントを送らない", () => {
+  const onChange = vi.fn()
+  window.addEventListener("seasonal-logo-change", onChange)
+  const write = vi.spyOn(document, "cookie", "set").mockImplementation(() => {
+    throw new DOMException("denied", "SecurityError")
+  })
+  try {
+    expect(() => setSeasonalLogoEnabled(true)).toThrow("denied")
+    expect(onChange).not.toHaveBeenCalled()
+  } finally {
+    write.mockRestore()
+    window.removeEventListener("seasonal-logo-change", onChange)
+  }
+})
+
+it("アンマウントすると変更とフォーカスの購読を解除する", () => {
+  const added = vi.spyOn(window, "addEventListener")
+  const removed = vi.spyOn(window, "removeEventListener")
+  const { unmount } = render(<LogoState />)
+  const subscriptions = added.mock.calls.filter(([name]) => ["seasonal-logo-change", "focus"].includes(name))
+  expect(subscriptions).toHaveLength(2)
+  unmount()
+  subscriptions.forEach(([name, listener]) => expect(removed).toHaveBeenCalledWith(name, listener))
+})

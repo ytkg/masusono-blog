@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { rememberInCurrentHistoryEntry } from "./rememberedState"
 
 describe("rememberInCurrentHistoryEntry", () => {
@@ -40,4 +40,18 @@ describe("rememberInCurrentHistoryEntry", () => {
 
     expect(window.history.state).toBeNull()
   })
+})
+
+it("直列化できない履歴データのエラーは隠さない", () => {
+  window.history.replaceState({ page: {} }, "", "/")
+  const error = new DOMException("not serializable", "DataCloneError")
+  const replace = vi.spyOn(window.history, "replaceState").mockImplementation(() => {
+    throw error
+  })
+  try {
+    expect(() => rememberInCurrentHistoryEntry("invalid", {})).toThrow(error)
+  } finally {
+    replace.mockRestore()
+    window.history.replaceState(null, "", "/")
+  }
 })

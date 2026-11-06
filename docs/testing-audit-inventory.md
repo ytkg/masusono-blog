@@ -1,12 +1,12 @@
 # テスト監査のファイル一覧
 
-基準: `63509376`。全体の目的と完了条件は [監査記録](testing-audit.md)、追跡は [Issue #819](https://github.com/ytkg/masusono-blog/issues/819)。
+一覧の基準: `63509376`。契約照合は PR #844 (`75176fc7`) と [Issue #845](https://github.com/ytkg/masusono-blog/issues/845) の変更を含むソースで更新した。全体の目的と完了条件は [監査記録](testing-audit.md)、追跡は [Issue #819](https://github.com/ytkg/masusono-blog/issues/819)。
 
 アプリ・バッチ・運用スクリプト・設定・CI・DB定義を含む。画像・フォント・lockfile・暗号化資格情報・テスト自体は一覧から除く。隣接テスト欄はファイル名からの候補であり、内容を照合した証拠ではない。既存の過去の部分監査を未転記の行も「未照合」にしており、テストがないという意味ではない。
 
-「部分照合」は記載した契約を確認した状態で、ファイル全体の追加不要判定ではない。残る確認が必要な場合は理由欄に明記する。全体の完了は未照合と未解決の契約を解消し、unit / request / SSR / visual / scriptの責務を照合してから判定する。
+「契約照合済」は現行の呼出元における正常・異常・境界・競合・後始末と、記載したunit / SSR / visualの対応を読み、具体的な残不足がないと判断した状態。任意入力の全組合せや将来仕様の保証ではない。「部分照合」は記載した契約のみ確認済みで、残る確認がある状態。残る確認が必要な場合は理由欄に明記する。全体の完了は未照合と未解決の契約を解消し、unit / request / SSR / visual / scriptの責務を照合してから判定する。
 
-対象 415 ファイル。今回内容を照合した9ファイルを部分照合として記録した。
+対象 415 ファイル。契約照合済 25件、未照合 381件、部分照合 9件。未照合は既存テストがないという意味ではない。
 
 | 実装ファイル | 状態 | テストまたは候補 | 確認した契約・追加不要理由／残作業 |
 | --- | --- | --- | --- |
@@ -69,7 +69,7 @@
 | `app/controllers/webhooks/microcms/articles_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/application/AppProviders.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/application/InertiaApp.jsx` | 未照合 | app/frontend/application/InertiaApp.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/application/pageResolver.jsx` | 未照合 | app/frontend/application/pageResolver.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/application/pageResolver.jsx` | 契約照合済 | app/frontend/application/pageResolver.test.jsx; test/ssr/*.test.mjs | 大文字小文字・flat/index、既存layout保持、未知ページエラーを照合。production import graphはSSRで、module完了/拒否の診断はnavigationDiagnosticsで保証するため重複fixtureは足さない。 |
 | `app/frontend/components/FloatingBottomNavigation.jsx` | 未照合 | app/frontend/components/FloatingBottomNavigation.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/components/Header.jsx` | 未照合 | app/frontend/components/Header.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/components/NavigationFailureDialog.jsx` | 未照合 | app/frontend/components/NavigationFailureDialog.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -87,12 +87,12 @@
 | `app/frontend/features/apps/admin/MediaItemCard.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/apps/admin/MediaPreview.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/apps/admin/MediaUploadField.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/apps/admin/adminListReducer.js` | 未照合 | app/frontend/features/apps/admin/adminListReducer.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/apps/admin/adminListReducer.js` | 契約照合済 | app/frontend/features/apps/admin/adminListReducer.test.js; app/frontend/features/apps/admin/useAdminMedia.test.jsx | 記事/媒体reset差、追加dedup・順序/総数/状態不変、失敗/再試行/初回・追加の待機解除を照合。未知actionは現callerに存在せず、switchのdefaultだけの試験は追加しない。 |
 | `app/frontend/features/apps/admin/mediaData.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/apps/admin/useAdminArticles.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/apps/admin/useAdminList.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/apps/admin/useAdminMedia.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/apps/admin/useMediaUpload.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/apps/admin/useAdminArticles.js` | 部分照合 | app/frontend/features/apps/admin/AdminArticles.test.jsx | 公開状態/日本語query/追加page/再検索とエラー復旧を照合。queryのパラメータ区切り文字を含む検索のconsumer保証は追加照合が必要。 |
+| `app/frontend/features/apps/admin/useAdminList.js` | 契約照合済 | app/frontend/features/apps/admin/useAdminMedia.test.jsx; app/frontend/features/apps/admin/AdminApp.test.jsx; app/frontend/features/apps/admin/AdminArticles.test.jsx | 初回と追加の成功/401/通信失敗、検索変更と古い成功/401、古いfinallyの待機状態変更抑止、同時取得抑止、cursor再試行、refresh・離脱abortを照合。URL生成とAPI形状はcaller/Backendの契約。 |
+| `app/frontend/features/apps/admin/useAdminMedia.js` | 部分照合 | app/frontend/features/apps/admin/useAdminMedia.test.jsx; app/frontend/features/apps/admin/AdminMedia.test.jsx | 媒体URL/ページ/tokenと件数reset、取得競合と復旧は照合済み。query/tokenの特殊文字を含むURL生成のconsumer保証は追加照合が必要。 |
+| `app/frontend/features/apps/admin/useMediaUpload.js` | 契約照合済 | app/frontend/features/apps/admin/useMediaUpload.test.jsx; app/frontend/features/apps/admin/AdminMedia.test.jsx | 選択キャンセル・非画像・5MiB許容/+1拒否、FormData/CSRF、送信中/成功/401/失敗再試行、input復元とref不在を照合。failure.messageなしは標準fetch/ApiErrorでは発生しない防御枝で、型を外した架空例外は足さない。 |
 | `app/frontend/features/apps/ads/AdsApp.jsx` | 未照合 | app/frontend/features/apps/ads/AdsApp.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/apps/bookshelf/BookshelfApp.jsx` | 未照合 | app/frontend/features/apps/bookshelf/BookshelfApp.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/apps/bookshelf/useBookshelf.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -160,7 +160,7 @@
 | `app/frontend/features/apps/shared/AppsLoadingContext.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/apps/shared/LauncherZoomTransition.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/apps/shared/appDialogAnimation.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/apps/shared/loadImage.js` | 未照合 | app/frontend/features/apps/shared/loadImage.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/apps/shared/loadImage.js` | 契約照合済 | app/frontend/features/apps/shared/loadImage.test.js | 成功/失敗、中断済み/進行中abort、遅い成功/失敗の無視、重複settleとイベント/abort購読解除を照合。cache evictはこの関数の契約外。 |
 | `app/frontend/features/apps/shared/useAppLoadingTasks.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/authors/AuthorProfile.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/authors/AuthorsList.jsx` | 未照合 | app/frontend/features/authors/AuthorsList.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -187,15 +187,15 @@
 | `app/frontend/features/blog/SentenceFeed.jsx` | 未照合 | app/frontend/features/blog/SentenceFeed.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/SentenceFeedCard.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/articleBodyHtmlSx.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/blog/articleCopyText.js` | 未照合 | app/frontend/features/blog/articleCopyText.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/blog/articleCopyText.js` | 契約照合済 | app/frontend/features/blog/articleCopyText.test.js | 段落/改行/inline/文字参照、埋込み・hidden・commentの除外、本文なし、preの先頭末尾/入れ子空白、表のth/tdタブと行境界を照合。 |
 | `app/frontend/features/blog/articleExcerpt.js` | 未照合 | app/frontend/features/blog/articleExcerpt.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/blog/articleHtmlText.js` | 未照合 | app/frontend/features/blog/articleHtmlText.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/blog/articlePages.js` | 未照合 | app/frontend/features/blog/articlePages.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/blog/articleHtmlText.js` | 契約照合済 | app/frontend/features/blog/articleHtmlText.test.js; test/ssr/*.test.mjs | browser/SSRの同じ断片処理、壊れたHTML/不正文字参照/未知entity、inline・block・table境界、埋込み/hidden/comment除外を照合。静的HTML抽出の契約で、CSSのcomputed style解釈は行わない。 |
+| `app/frontend/features/blog/articlePages.js` | 契約照合済 | app/frontend/features/blog/articlePages.test.js; app/frontend/pages/home.test.jsx | 配列とcursorのinteger/前進/null契約、初出ID保持・重複排除・元状態の不変・古いscroll除去を照合。取得失敗はHome consumerで空一覧と区別。 |
 | `app/frontend/features/blog/articleSearch.js` | 未照合 | app/frontend/features/blog/articleSearch.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/articleSearchTerm.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/articleSearchText.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/articleSearchToken.js` | 未照合 | app/frontend/features/blog/articleSearchToken.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/blog/articleStats.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/blog/articleStats.js` | 契約照合済 | app/frontend/features/blog/articleStats.test.js; app/frontend/features/blog/ArticleCard.test.jsx | 正の文字数/0.5分/数値文字列、0・負・非有限・欠落の文字数非表示、有効文字数と不正読了時間の併存を照合。 |
 | `app/frontend/features/blog/articleStructuredHtmlParts.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/codeBlockData.js` | 未照合 | app/frontend/features/blog/codeBlockData.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/codeBlockLanguage.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -209,10 +209,10 @@
 | `app/frontend/features/blog/sentenceFeedLayout.js` | 未照合 | app/frontend/features/blog/sentenceFeedLayout.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/useArticleSearchQuery.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/useCalendarFeed.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/blog/useHomeArticles.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/blog/useHomeScrollRestoration.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/blog/useHomeArticles.js` | 契約照合済 | app/frontend/pages/home.test.jsx; test/visual/home_pagination.visual.js | 重複追加防止、最終cursor、同時取得抑止、同位置再試行、離脱中断・遅い旧応答の無視、履歴/scroll復元と保存失敗時の表示をconsumerで保証。APIページの型/進行性はarticlePagesで保証。 |
+| `app/frontend/features/blog/useHomeScrollRestoration.js` | 契約照合済 | app/frontend/features/blog/useHomeScrollRestoration.test.jsx; test/visual/home_pagination.visual.js | 最新一覧/scrollの前景保存・背景無視、二段RAF後の復元、0位置、途中離脱と変更前の予約取消、購読解除を照合。実ブラウザの戻る復元も保証。 |
 | `app/frontend/features/blog/useHomeTabState.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/features/blog/useRememberedFeed.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/features/blog/useRememberedFeed.js` | 契約照合済 | app/frontend/pages/home.test.jsx | こよみ/書き出しの遅延取得、空配列キャッシュ、失敗と同URL再試行、tab離脱のabort・古い結果の履歴汚染抑止をconsumerで保証。loadは各callerのPromise関数で、同期例外を投げる架空のloaderは追加しない。 |
 | `app/frontend/features/blog/useSentenceFeedLayout.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/useSentenceFeedProgress.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/features/blog/useSentenceFeedState.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -238,23 +238,23 @@
 | `app/frontend/shared/components/SeoHead.jsx` | 未照合 | app/frontend/shared/components/SeoHead.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/shared/components/StatusAlert.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/shared/hooks/useApiSWR.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/hooks/useImmediateRemember.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/shared/hooks/useImmediateRemember.js` | 契約照合済 | app/frontend/pages/home.test.jsx; test/visual/home_pagination.visual.js | consumerで即時履歴/React状態/refの同期、素早い戻り、旧応答の履歴汚染抑止、履歴保存例外後のページ追加と次cursorを照合。keyは各callerの固定値で、実行中の任意key差替えの新機能は試験対象に足さない。 |
 | `app/frontend/shared/hooks/usePageVisible.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/analytics.js` | 未照合 | app/frontend/shared/lib/analytics.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/appendUniqueById.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/fetchJson.js` | 未照合 | app/frontend/shared/lib/fetchJson.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/homeNavigation.js` | 未照合 | app/frontend/shared/lib/homeNavigation.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/htmlBlockTags.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/shared/lib/analytics.js` | 契約照合済 | app/frontend/shared/lib/analytics.test.js; test/visual/analytics.visual.js | 許可前のGoogle抑止、公開パス/計測ID/UUID、Cookie・遷移と古い許可応答の競合、再試行、URL/fragment/並行重複、履歴・クリックを照合。実ブラウザのGoogleは偽応答。SSRではeffectの計測呼出しがないため窓不在の枝だけを重複追加しない。 |
+| `app/frontend/shared/lib/appendUniqueById.js` | 契約照合済 | app/frontend/features/blog/articlePages.test.js; app/frontend/features/apps/admin/adminListReducer.test.js | IDを持つ記事/媒体配列の既存ID・追加内重複、初出データ/順序保持、元配列の不変を両consumerで保証。helperの同じ入出力を別testへ複製しない。 |
+| `app/frontend/shared/lib/fetchJson.js` | 契約照合済 | app/frontend/shared/lib/fetchJson.test.js | no-store、JSON/204/HTTP契約と非JSON、request ID優先、型不正・表示文言のown-key、Headers形式と追記・中断signal、成功JSON失敗とtransport/Abort例外保持を照合。 |
+| `app/frontend/shared/lib/homeNavigation.js` | 契約照合済 | app/frontend/shared/lib/homeNavigation.test.js; app/frontend/pages/home.test.jsx | 一度だけのintent、通常/修飾/処理済みクリック、Storage取得/読込/書込/削除の失敗を照合。通常の戻る履歴と明示ホーム操作の区別はHomeの消費側で保証。 |
+| `app/frontend/shared/lib/htmlBlockTags.js` | 契約照合済 | app/frontend/features/blog/articleHtmlText.test.js; app/frontend/features/blog/articleCopyText.test.js | 静的タグ集合。代表的block・hr・inlineと前後境界を両parserで保証する。定数一覧をそのまま期待値に複写するだけの試験は追加しない。 |
 | `app/frontend/shared/lib/locationEvents.js` | 部分照合 | app/frontend/shared/lib/locationEvents.test.js | パス・検索・ハッシュ、通知イベント、SSRのwindow欠落を照合。 |
-| `app/frontend/shared/lib/navigationDiagnostics.js` | 未照合 | app/frontend/shared/lib/navigationDiagnostics.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/shared/lib/navigationDiagnostics.js` | 契約照合済 | app/frontend/shared/lib/navigationDiagnostics.test.js; test/visual/navigation_diagnostics.visual.js | 段階・停止/遅延閾値、公開URL/保存値/時刻の境界、Storage/Observer不在、古いmodule/commit/ResourceTiming、背景受付・中断・重複visibility、解除時のtimer/RAFと再登録を照合。実ブラウザでPWA・先読みmodule失敗・復元も保証。cancel済みtimer/RAFをブラウザ仕様に反して実行するだけの分岐試験は追加しない。 |
 | `app/frontend/shared/lib/navigationFailureReporter.js` | 部分照合 | app/frontend/shared/lib/navigationFailureReporter.test.js | 個人情報除外、外部URL・壊れたURI、上限、オフライン再送、HTTP失敗の終端、完了callback、解除中失敗を照合。 |
-| `app/frontend/shared/lib/navigationPrefetch.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/navigationRecovery.js` | 未照合 | app/frontend/shared/lib/navigationRecovery.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/rememberedState.js` | 未照合 | app/frontend/shared/lib/rememberedState.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/seasonalLogo.js` | 部分照合 | app/frontend/shared/lib/seasonalLogo.test.jsx | キャンペーン分離、保存不可、購読先同期、フォーカス読込み、Cookie期限・HTTP/HTTPS属性を照合。SSR初期値・購読解除は追加照合が必要。 |
-| `app/frontend/shared/lib/truncateText.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/frontend/shared/lib/navigationPrefetch.js` | 契約照合済 | app/frontend/components/FloatingBottomNavigation.test.jsx; test/visual/home_pagination.visual.js | activeリンク除外、hover/mount、homeの30s/5m、path変更時のremountをconsumerで保証。古い先読みと戻りの競合は実ブラウザで保証。 |
+| `app/frontend/shared/lib/navigationRecovery.js` | 契約照合済 | app/frontend/shared/lib/navigationRecovery.test.js; test/visual/navigation_recovery.visual.js | 前景/先読み/非同期の区別、通常Inertia/500/409、network/HTTP失敗・Abort、URLなし/外部URL、finish/navigateの帰属と復旧案内、オフライン再送・上限・購読解除を照合。 |
+| `app/frontend/shared/lib/rememberedState.js` | 契約照合済 | app/frontend/shared/lib/rememberedState.test.js; app/frontend/pages/home.test.jsx; test/visual/home_pagination.visual.js | Inertia履歴なしの無操作、既存履歴フィールド保持、即時保存、容量/権限制限での表示・次cursor更新を照合。DataCloneErrorは伝播。履歴不能時の戻る位置保証はしない。PC/スマホで本物のInertiaも検証。 |
+| `app/frontend/shared/lib/seasonalLogo.js` | 契約照合済 | app/frontend/shared/lib/seasonalLogo.test.jsx; test/visual/logo_setting.visual.js; test/ssr/*.test.mjs | campaign分離、保存不可/読込拒否/書込拒否、同期/フォーカス/解除、期限・HTTP/HTTPS属性を照合。SSR初期値とrequest間分離は既存production SSR/実ブラウザで保証済みのため重複unitは足さない。 |
+| `app/frontend/shared/lib/truncateText.js` | 契約照合済 | app/frontend/features/blog/articleExcerpt.test.js; app/frontend/pages/blog/show.test.jsx | 実callerの80/120 UTF-16予算でexact-fit、切れるemoji・結合文字/旗/家族の保持を照合。callerにない負/小数の任意予算を新しい契約として追加しない。 |
 | `app/frontend/shared/lib/useVisibleHealthPhrase.js` | 未照合 | app/frontend/shared/lib/useVisibleHealthPhrase.test.js | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/frontend/shared/lib/userId.js` | 部分照合 | app/frontend/shared/lib/userId.test.js | Cookieの既存値／作成、壊れたエンコード、書込み不可、HTTP/HTTPS属性・期限・再利用を照合。 |
+| `app/frontend/shared/lib/userId.js` | 契約照合済 | app/frontend/shared/lib/userId.test.js | Cookieの既存/作成、encode/decode・期限更新・HTTP/HTTPS属性、壊れたencode、保存不可/読込拒否/UUID API不在を照合。SSRではeffectからの呼出しがない。 |
 | `app/frontend/shared/styles/focusStyles.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/shared/styles/supportingActionStyles.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/shared/styles/typographyStyles.js` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |

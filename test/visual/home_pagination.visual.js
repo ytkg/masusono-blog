@@ -20,13 +20,16 @@ test("ホームの追加読み込み・再試行・記事から戻った位置�
   })
   const prefetchReady = Promise.withResolvers()
   const releasePrefetch = Promise.withResolvers()
-  await page.route((url) => url.pathname === "/", async (route) => {
-    if (route.request().headers().purpose !== "prefetch") return route.fallback()
-    const response = await route.fetch()
-    prefetchReady.resolve()
-    await releasePrefetch.promise
-    await route.fulfill({ response })
-  })
+  await page.route(
+    (url) => url.pathname === "/",
+    async (route) => {
+      if (route.request().headers().purpose !== "prefetch") return route.fallback()
+      const response = await route.fetch()
+      prefetchReady.resolve()
+      await releasePrefetch.promise
+      await route.fulfill({ response })
+    },
+  )
   let requests = 0
   await context.route("**/api/app/articles?offset=10", async (route) => {
     requests += 1
@@ -73,3 +76,53 @@ test("ホームの追加読み込み・再試行・記事から戻った位置�
     .toBeLessThan(100)
   expect(requests).toBe(2)
 })
+
+for (const errorName of ["SecurityError", "QuotaExceededError"]) {
+  test(`history storage ${errorName} keeps pagination visible and advances the cursor`, async ({ page, context }) => {
+    const article = (id) => ({ id, title: `履歴保存記事${id}`, content: "<p>本文</p>", publishedDate: "2026/01/15" })
+    await page.addInitScript(() => {
+      window.IntersectionObserver = undefined
+    })
+    await mockPageProps(page, "/", (props) => {
+      props.articles = [article("one")]
+      props.pagination = { nextOffset: 10 }
+    })
+    const offsets = []
+    await context.route("**/api/app/articles?offset=*", (route) => {
+      const offset = new URL(route.request().url()).searchParams.get("offset")
+      offsets.push(offset)
+      return route.fulfill({
+        json: {
+          articles: [article(offset === "10" ? "two" : "three")],
+          pagination: { nextOffset: offset === "10" ? 20 : null },
+        },
+      })
+    })
+    const errors = []
+    page.on("pageerror", (error) => errors.push(error.message))
+    await openPage(page, "/")
+    await expect(page.locator("main h3")).toHaveCount(1)
+    await page.evaluate((name) => {
+      const original = window.history.replaceState.bind(window.history)
+      window.restoreHistoryForTest = () => {
+        window.history.replaceState = original
+      }
+      window.history.replaceState = () => {
+        throw new DOMException("history.replaceState temporarily unavailable", name)
+      }
+    }, errorName)
+    try {
+      await page.getByRole("button", { name: "さらに読み込む" }).click()
+      await expect(page.locator("main h3")).toHaveCount(2)
+      await expect(page.getByText("記事を読み込めませんでした。")).toHaveCount(0)
+      await page.getByRole("button", { name: "さらに読み込む" }).click()
+      await expect(page.locator("main h3")).toHaveCount(3)
+      await expect(page.getByRole("button", { name: "さらに読み込む" })).toHaveCount(0)
+      await page.waitForLoadState("networkidle")
+      expect(offsets).toEqual(["10", "20"])
+      expect(errors).toEqual([])
+    } finally {
+      await page.evaluate(() => window.restoreHistoryForTest())
+    }
+  })
+}

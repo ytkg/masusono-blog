@@ -59,3 +59,17 @@ it.each([
 ])("preの外側だけをtrimし、整形済み空白を保つ: %s", (content, expected) => {
   expect(buildArticleCopyText({ title: "題名", content })).toBe(`題名\n\n${expected}`)
 })
+
+it.each([
+  ["前<!--private-->後", "前後"],
+  ["<pre>  a<!--private-->b\n</pre>", "  ab\n"],
+])("HTMLコメントをコピーせず、周囲の本文とコード空白を保つ: %s", (content, expected) => {
+  expect(buildArticleCopyText({ content })).toBe(expected)
+})
+
+it("表の見出し・セルをタブで区切り、行の境界を保持する", () => {
+  const text = buildArticleCopyText({
+    content: "<table><tr><th>項目</th><th>値</th></tr><tr><td>左</td><td>右</td></tr></table>",
+  })
+  expect(text).toMatch(/項目\t値\s+左\t右/)
+})

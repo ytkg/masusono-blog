@@ -60,4 +60,18 @@ describe("userId", () => {
       `user_id=existing%2Fid; Max-Age=31536000; Path=/; SameSite=Lax${protocol === "https:" ? "; Secure" : ""}`,
     )
   })
+
+  it("Cookieの読込みが拒否されたら利用可能なIDとして返さない", () => {
+    vi.spyOn(document, "cookie", "get").mockImplementation(() => {
+      throw new DOMException("denied", "SecurityError")
+    })
+    expect(getUserIdFromCookie()).toBeNull()
+    expect(ensureUserIdCookie()).toBeNull()
+  })
+
+  it("UUID生成APIがないブラウザでも例外を出さずIDなしで続ける", () => {
+    vi.stubGlobal("crypto", {})
+    expect(ensureUserIdCookie()).toBeNull()
+    expect(getUserIdFromCookie()).toBeNull()
+  })
 })

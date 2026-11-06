@@ -47,4 +47,35 @@ describe("useMediaUpload", () => {
     expect(onUploaded).toHaveBeenCalledOnce()
     expect(result.current.uploading).toBe(false)
   })
+
+  it("ちょうど5MiBの画像を送信し、成功後に入力をリセットする", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ media: { id: "large" } })))
+    const onUploaded = vi.fn()
+    const { result } = renderHook(() => useMediaUpload({ csrfToken: "csrf", onUnauthorized: vi.fn(), onUploaded }))
+    const input = { value: "selected" }
+    result.current.fileInputRef.current = input
+    const file = new File([new Uint8Array(5 * 1024 * 1024)], "large.png", { type: "image/png" })
+    await act(async () => result.current.uploadFile(file))
+    expect(fetch).toHaveBeenCalledOnce()
+    const sent = fetch.mock.calls[0][1].body.get("file")
+    expect(sent.name).toBe("large.png")
+    expect(sent.size).toBe(5 * 1024 * 1024)
+    expect(onUploaded).toHaveBeenCalledOnce()
+    expect(result.current.uploadError).toBeNull()
+    expect(result.current.uploading).toBe(false)
+    expect(input.value).toBe("")
+  })
+
+  it("ファイル選択がキャンセルされたら送信や完了通知を行わない", async () => {
+    vi.stubGlobal("fetch", vi.fn())
+    const onUploaded = vi.fn()
+    const onUnauthorized = vi.fn()
+    const { result } = renderHook(() => useMediaUpload({ onUploaded, onUnauthorized }))
+    await act(async () => result.current.uploadFile(undefined))
+    expect(fetch).not.toHaveBeenCalled()
+    expect(onUploaded).not.toHaveBeenCalled()
+    expect(onUnauthorized).not.toHaveBeenCalled()
+    expect(result.current.uploading).toBe(false)
+    expect(result.current.uploadError).toBeNull()
+  })
 })
