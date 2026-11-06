@@ -53,6 +53,28 @@ RSpec.describe Api::App::MasudaRun::RankingsCreateUsecase do
     end
   end
 
+  [ 1.5, -0.5, nil, true, [], {}, "1.5", Float::NAN, Float::INFINITY ].each do |value|
+    context "scoreが#{value.inspect}の場合" do
+      let(:score) { value }
+
+      it "外部への登録や付与を行わず拒否する" do
+        expect { result }.to raise_error(ArgumentError, "score must be a non-negative integer")
+        expect(Microcms::MasudaRun::CreateRankingService).not_to have_received(:execute)
+        expect(PointsGrantService).not_to have_received(:execute)
+      end
+    end
+  end
+
+  [ [ "1234", 1234 ], [ 1.0, 1 ], [ -0.0, 0 ], [ 9_007_199_254_740_992, 9_007_199_254_740_992 ] ].each do |value, expected|
+    context "整数値のscoreが#{value.inspect}の場合" do
+      let(:score) { value }
+
+      it "値を変えず整数として登録する" do
+        expect(result[:json][:score]).to eq(expected)
+      end
+    end
+  end
+
   context "scoreが数値でない場合" do
     let(:score) { "abc" }
 

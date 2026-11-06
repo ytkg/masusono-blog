@@ -1,12 +1,12 @@
 # テスト監査のファイル一覧
 
-一覧の基準: `63509376`。契約照合は PR #844 (`75176fc7`) と [Issue #845](https://github.com/ytkg/masusono-blog/issues/845) の変更を含むソースで更新した。全体の目的と完了条件は [監査記録](testing-audit.md)、追跡は [Issue #819](https://github.com/ytkg/masusono-blog/issues/819)。
+一覧の基準: `63509376`。契約照合は PR #844 (`75176fc7`) と [Issue #845](https://github.com/ytkg/masusono-blog/issues/845) と [Issue #847](https://github.com/ytkg/masusono-blog/issues/847) の変更を含むソースで更新した。全体の目的と完了条件は [監査記録](testing-audit.md)、追跡は [Issue #819](https://github.com/ytkg/masusono-blog/issues/819)。
 
 アプリ・バッチ・運用スクリプト・設定・CI・DB定義を含む。画像・フォント・lockfile・暗号化資格情報・テスト自体は一覧から除く。隣接テスト欄はファイル名からの候補であり、内容を照合した証拠ではない。既存の過去の部分監査を未転記の行も「未照合」にしており、テストがないという意味ではない。
 
 「契約照合済」は現行の呼出元における正常・異常・境界・競合・後始末と、記載したunit / SSR / visualの対応を読み、具体的な残不足がないと判断した状態。任意入力の全組合せや将来仕様の保証ではない。「部分照合」は記載した契約のみ確認済みで、残る確認がある状態。残る確認が必要な場合は理由欄に明記する。全体の完了は未照合と未解決の契約を解消し、unit / request / SSR / visual / scriptの責務を照合してから判定する。
 
-対象 415 ファイル。契約照合済 25件、未照合 381件、部分照合 9件。未照合は既存テストがないという意味ではない。
+対象 415 ファイル。契約照合済 34件、未照合 364件、部分照合 17件。未照合は既存テストがないという意味ではない。
 
 | 実装ファイル | 状態 | テストまたは候補 | 確認した契約・追加不要理由／残作業 |
 | --- | --- | --- | --- |
@@ -48,24 +48,24 @@
 | `app/controllers/api/app/articles_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/api/app/bookshelf_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/api/app/calendar_articles_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/controllers/api/app/masuda_run/rankings_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/controllers/api/app/masuda_run/rankings_controller.rb` | 部分照合 | spec/requests/api_app_masuda_run_rankings_spec.rb; spec/requests/api_error_contract_spec.rb | GET/POSTのJSON/type/status/no-storeと共通エラー、実usecaseで小数拒否・整数値互換・付与失敗を照合。非String userId入力の扱いは残る。 |
 | `app/controllers/api/app/masuda_tataki/points_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/api/app/navigation_failures_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/api/app/sentence_articles_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/api/app/users_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/api/app/web_push/subscriptions_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/api/app/web_push/vapid_keys_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/controllers/api_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/controllers/api_controller.rb` | 部分照合 | spec/requests/api_error_contract_spec.rb; spec/requests/api_app_bookshelf_spec.rb; spec/requests/api_app_masuda_tataki_points_spec.rb | 全6入口の代表4xx/5xx/timeout/connection、408/429、399/400/499/500/599/600の範囲境界、generic Faradayを既存消費側で照合。共通JSON/no-store/no-ETag/requestId。セッション/CSRF方針の全呼出元との照合は残る。 |
 | `app/controllers/application_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/article_images_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/authors_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/blog_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/controllers/feeds_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/controllers/feeds_controller.rb` | 契約照合済 | spec/requests/feeds_spec.rb; spec/requests/api_error_contract_spec.rb | RSS本文/type/status/no-store、120件・重複・不正日時、CORS任意originと4xx/5xx/timeout/connectionの共通JSON。独自分岐のないrender入口に追加unit不要。 |
 | `app/controllers/home_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/numbers_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/others_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/controllers/search_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/controllers/sitemaps_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/controllers/sitemaps_controller.rb` | 契約照合済 | spec/requests/sitemaps_spec.rb; spec/requests/api_error_contract_spec.rb | XML本文/type/status/no-store、120件・空日時fallback・重複・不正日時、4xx/5xx/timeout/connectionの共通JSON。独自分岐なし。 |
 | `app/controllers/webhooks/microcms/articles_controller.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/application/AppProviders.jsx` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/frontend/application/InertiaApp.jsx` | 未照合 | app/frontend/application/InertiaApp.test.jsx | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -268,7 +268,7 @@
 | `app/models/article.rb` | 未照合 | spec/models/article_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/models/article_content_image_url_optimizer.rb` | 未照合 | spec/models/article_content_image_url_optimizer_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/models/author.rb` | 未照合 | spec/models/author_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/models/author_image_url_optimizer.rb` | 未照合 | spec/models/author_image_url_optimizer_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/models/author_image_url_optimizer.rb` | 契約照合済 | spec/models/author_image_url_optimizer_spec.rb; spec/services/author_payload_builder_spec.rb | microCMS HTTPS画像の192px化・既存query保持/上書き、対象外host/http/relative/不正型/URLの同一値返却。URL汎用parserの契約は別行で照合する。 |
 | `app/models/current_request.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/models/masuda_run_ranking.rb` | 未照合 | spec/models/masuda_run_ranking_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/models/microcms_image_url.rb` | 未照合 | spec/models/microcms_image_url_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -279,17 +279,17 @@
 | `app/services/article_ogp_image.rb` | 未照合 | spec/services/article_ogp_image_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/article_payload_builder.rb` | 未照合 | spec/services/article_payload_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/articles_page_query.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/author_payload_builder.rb` | 未照合 | spec/services/author_payload_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/services/author_payload_builder.rb` | 契約照合済 | spec/services/author_payload_builder_spec.rb | id/名前の必須値、payload全キー、画像4別名のString/Hash/欠落/不正型とicon優先を照合。CMSのauthor Hashが呼出元契約。 |
 | `app/services/bookshelf/candidates.rb` | 未照合 | spec/services/bookshelf/candidates_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/bookshelf/catalog.rb` | 未照合 | spec/services/bookshelf/catalog_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/bookshelf/cover.rb` | 未照合 | spec/services/bookshelf/cover_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/bookshelf/isbn.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/calendar_date_validator.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/concerns/author_name_extractor.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/services/calendar_date_validator.rb` | 部分照合 | spec/services/rss_xml_builder_spec.rb; spec/services/sitemap_xml_builder_spec.rb; spec/services/concerns/date_display_formatter_spec.rb | 完全な年月日の不正暦日・閏日を表示/XML両経路で照合。部分日付と表示側の非String入力の契約確認が残る。 |
+| `app/services/concerns/author_name_extractor.rb` | 部分照合 | spec/services/author_payload_builder_spec.rb; spec/services/article_payload_builder_spec.rb; spec/services/rss_article_items_builder_spec.rb | 著者Hash/String/nil・名前trim、画像4別名/型とicon優先を消費側で照合。複数キーで上位が空/不正な場合の意図確認が残る。 |
 | `app/services/concerns/date_display_formatter.rb` | 未照合 | spec/services/concerns/date_display_formatter_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/concerns/required_user_id.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/concerns/xml_date_formatter.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/concerns/xml_escaper.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/services/concerns/xml_date_formatter.rb` | 部分照合 | spec/services/rss_xml_builder_spec.rb; spec/services/sitemap_xml_builder_spec.rb | 両XML呼出元のnil/空白/不正型/存在しない月日、閏日・小数秒・年を跨ぐ両オフセットを照合。失敗は項目を残し日付タグだけ省略。 部分文字列 `12` / `Feb 30` が現在日時依存で補完されることをプローブで確認。年を欠く入力の許容契約が未確定。 |
+| `app/services/concerns/xml_escaper.rb` | 契約照合済 | spec/services/rss_xml_builder_spec.rb; spec/services/sitemap_xml_builder_spec.rb | 両XML呼出元で制御文字除去、RSSのテキスト/属性で全5記号と既存entityの文字列復元をstrict/nonet parserで照合。重複するhelper単体テストは追加不要。 |
 | `app/services/microcms/articles/update_tags_service.rb` | 未照合 | spec/services/microcms/articles/update_tags_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/microcms/connection_factory.rb` | 未照合 | spec/services/microcms/connection_factory_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/microcms/create_content_service.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -319,10 +319,10 @@
 | `app/services/numbers/metrics_trend_builder.rb` | 未照合 | spec/services/numbers/metrics_trend_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/points_grant_service.rb` | 未照合 | spec/services/points_grant_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/related_articles_builder.rb` | 未照合 | spec/services/related_articles_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/rss_article_items_builder.rb` | 未照合 | spec/services/rss_article_items_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/rss_xml_builder.rb` | 未照合 | spec/services/rss_xml_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/sitemap_entries_builder.rb` | 未照合 | spec/services/sitemap_entries_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/sitemap_xml_builder.rb` | 未照合 | spec/services/sitemap_xml_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/services/rss_article_items_builder.rb` | 契約照合済 | spec/services/rss_article_items_builder_spec.rb; spec/usecases/feeds_show_usecase_spec.rb; spec/requests/feeds_spec.rb | ID欠落除外/最初の重複保持、URLと本文/日時の受渡し、著者Hash/String/nilとtrimを照合。日付検証はXML側で対応済。 |
+| `app/services/rss_xml_builder.rb` | 部分照合 | spec/services/rss_xml_builder_spec.rb; spec/usecases/feeds_show_usecase_spec.rb; spec/requests/feeds_spec.rb | 全項目とatom属性の記号・既存entityの復元、XML制御文字、日付欠落/不正型/無効暦日/UTC境界、任意著者/本文と120件のRSSを照合。正常文字列をXML構造として解釈しない。 部分文字列 `12` / `Feb 30` が現在日時依存で補完されることをプローブで確認。年を欠く入力の許容契約が未確定。 |
+| `app/services/sitemap_entries_builder.rb` | 契約照合済 | spec/services/sitemap_entries_builder_spec.rb; spec/usecases/sitemaps_index_usecase_spec.rb; spec/requests/sitemaps_spec.rb | 静的→著者→記事の順序、ID欠落除外、種類別の重複排除、日時の優先順位/空値fallback、固定priorityを照合。非空で不正な日時はXML側が省略し、ここで再選択する仕様ではない。 |
+| `app/services/sitemap_xml_builder.rb` | 部分照合 | spec/services/sitemap_xml_builder_spec.rb; spec/usecases/sitemaps_index_usecase_spec.rb; spec/requests/sitemaps_spec.rb | locの記号/制御文字、lastmodの欠落/不正型/暦日/UTC境界、属性出力を照合。priorityは現行呼出元の固定数値であり任意型の入力検証は不要。 部分文字列 `12` / `Feb 30` が現在日時依存で補完されることをプローブで確認。年を欠く入力の許容契約が未確定。 |
 | `app/services/web_push/article_notification_payload.rb` | 未照合 | spec/services/web_push/article_notification_payload_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/web_push/article_published_notifier.rb` | 未照合 | spec/services/web_push/article_published_notifier_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/web_push/send_notification_service.rb` | 未照合 | spec/services/web_push/send_notification_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -334,7 +334,7 @@
 | `app/usecases/admin/sessions_create_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/admin/sessions_show_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/analytics/configuration_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/usecases/api/app/masuda_run/rankings_create_usecase.rb` | 未照合 | spec/usecases/api/app/masuda_run/rankings_create_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/usecases/api/app/masuda_run/rankings_create_usecase.rb` | 部分照合 | spec/usecases/api/app/masuda_run/rankings_create_usecase_spec.rb; spec/requests/api_app_masuda_run_rankings_spec.rb | Issue #847: 端数拒否、整数値Float/文字列互換、0点、型不正/NaN/Infinity、上限追加なし、登録失敗時付与なし/付与失敗非致命を照合。userIdの非String JSON型の扱いは確認が残る。 |
 | `app/usecases/api/app/masuda_run/rankings_index_usecase.rb` | 未照合 | spec/usecases/api/app/masuda_run/rankings_index_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/api/app/masuda_tataki/points_create_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/api/app/navigation_failures_create_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
@@ -353,13 +353,13 @@
 | `app/usecases/bookshelf_cover_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/bookshelf_index_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/calendar_articles_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/usecases/feeds_show_usecase.rb` | 未照合 | spec/usecases/feeds_show_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/usecases/feeds_show_usecase.rb` | 契約照合済 | spec/usecases/feeds_show_usecase_spec.rb; spec/requests/feeds_spec.rb; spec/requests/api_error_contract_spec.rb | 全件取得と固定channel/URL/content type、120件・重複・不正日時、upstream失敗のHTTP契約を照合。手順だけの薄いusecaseへの同じmock検証は不要。 |
 | `app/usecases/home_index_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/numbers_index_usecase.rb` | 未照合 | spec/usecases/numbers_index_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/others_index_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/search_index_usecase.rb` | 未照合 | spec/usecases/search_index_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/sentence_articles_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/usecases/sitemaps_index_usecase.rb` | 未照合 | spec/usecases/sitemaps_index_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/usecases/sitemaps_index_usecase.rb` | 契約照合済 | spec/usecases/sitemaps_index_usecase_spec.rb; spec/requests/sitemaps_spec.rb; spec/requests/api_error_contract_spec.rb | 記事/著者全件と固定base/type、static/author/article、120件/重複/不正日時、upstream失敗を照合。 |
 | `app/usecases/webhooks/microcms/articles_create_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/views/inertia.html.erb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/views/layouts/_apple_splash_screens.html.erb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |

@@ -84,6 +84,48 @@ RSpec.describe "Api::App::MasudaRun::Rankings", type: :request do
         .with(body: { userId: "cookie-user", amount: 1234 }.to_json)).to have_been_made.once
     end
 
+    context "実際のスコア検証を使う場合" do
+      before do
+        allow(Api::App::MasudaRun::RankingsCreateUsecase).to receive(:call).and_call_original
+        allow(Microcms::MasudaRun::CreateRankingService).to receive(:execute).and_return({ id: "new-ranking-id" })
+        allow(PointsGrantService).to receive(:execute)
+      end
+
+      [ 1.5, -0.5 ].each do |score|
+        it "JSONの小数#{score}を切り捨てず400で拒否する" do
+          post "/api/app/masuda_run/rankings.json", params: { userId: "cookie-user", score: score }, as: :json
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response.headers["Cache-Control"]).to eq("no-store")
+          expect(response.headers["ETag"]).to be_nil
+          expect(response.parsed_body).to eq("error" => {
+            "code" => "invalid_request", "message" => "score must be a non-negative integer",
+            "request_id" => response.headers.fetch("X-Request-Id")
+          })
+          expect(Microcms::MasudaRun::CreateRankingService).not_to have_received(:execute)
+          expect(PointsGrantService).not_to have_received(:execute)
+        end
+      end
+
+      it "JSONの整数値1.0との互換性を維持する" do
+        post "/api/app/masuda_run/rankings.json", params: { userId: "cookie-user", score: 1.0 }, as: :json
+
+        expect(response).to have_http_status(:created)
+        expect(response.parsed_body).to eq("id" => "new-ranking-id", "userId" => "cookie-user", "score" => 1)
+      end
+
+      it "ポイントAPIの上限を超えてもランキング登録の成功を維持する" do
+        allow(PointsGrantService).to receive(:execute).and_call_original
+        score = PointsGrantService::MAX_AMOUNT + 1
+
+        post "/api/app/masuda_run/rankings.json", params: { userId: "cookie-user", score: score }, as: :json
+
+        expect(response).to have_http_status(:created)
+        expect(response.parsed_body).to eq("id" => "new-ranking-id", "userId" => "cookie-user", "score" => score)
+        expect(a_request(:post, PointsGrantService::ENDPOINT)).not_to have_been_made
+      end
+    end
+
     it "不正リクエスト時は400を返す" do
       allow(Api::App::MasudaRun::RankingsCreateUsecase).to receive(:call).and_raise(ArgumentError, "user_id is required")
 

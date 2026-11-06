@@ -52,4 +52,23 @@ RSpec.describe RssXmlBuilder do
     document = Nokogiri::XML(xml) { |config| config.strict.nonet }
     expect(document.at_xpath("/rss/channel/title").text).to eq("本文😊\t\n末尾")
   end
+
+  it "テキストと属性の記号をXMLとして解釈せず、元の文字列へ復元できる" do
+    text = %q(A & <item>"quoted" 'single' &amp; 日本語)
+    url = %q(https://example.test/?a=1&b="two"&c='three')
+    xml = described_class.call(title: text, link: url, description: text, feed_url: url,
+      items: [ { title: text, link: url, guid: url, description: text, author: text } ])
+    document = Nokogiri::XML(xml) { |config| config.strict.nonet }
+    namespaces = { "atom" => "http://www.w3.org/2005/Atom", "dc" => "http://purl.org/dc/elements/1.1/" }
+
+    [ "/rss/channel/title", "/rss/channel/description", "/rss/channel/item/title",
+      "/rss/channel/item/description", "/rss/channel/item/dc:creator" ].each do |path|
+      expect(document.at_xpath(path, namespaces).text).to eq(text)
+    end
+    [ "/rss/channel/link", "/rss/channel/item/link", "/rss/channel/item/guid" ].each do |path|
+      expect(document.at_xpath(path).text).to eq(url)
+    end
+    expect(document.at_xpath("/rss/channel/atom:link", namespaces)["href"]).to eq(url)
+    expect(document.xpath("/rss/channel/item").length).to eq(1)
+  end
 end

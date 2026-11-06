@@ -40,7 +40,7 @@ module Api
 
         def normalize_score(score)
           normalized = Integer(score, exception: false)
-          return normalized if normalized && normalized >= 0
+          return normalized if normalized && normalized >= 0 && (!score.is_a?(Numeric) || score == normalized)
 
           raise ArgumentError, "score must be a non-negative integer"
         end

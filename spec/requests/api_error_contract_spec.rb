@@ -77,7 +77,10 @@ RSpec.describe "API error contract", type: :request do
   end
 
   [ [ 408, :gateway_timeout, "upstream_timeout" ], [ 429, :service_unavailable, "upstream_rate_limited" ],
-    [ 302, :bad_gateway, "upstream_error" ] ].each do |upstream_status, status, code|
+    [ 302, :bad_gateway, "upstream_error" ],
+    [ 399, :bad_gateway, "upstream_error" ], [ 400, 424, "upstream_client_error" ],
+    [ 499, 424, "upstream_client_error" ], [ 500, :bad_gateway, "upstream_server_error" ],
+    [ 599, :bad_gateway, "upstream_server_error" ], [ 600, :bad_gateway, "upstream_error" ] ].each do |upstream_status, status, code|
     it "upstream #{upstream_status}を#{code}の統一JSONにマップする" do
       allow(Api::App::MasudaRun::RankingsIndexUsecase).to receive(:call).and_raise(
         Microcms::FetchContentsService::FetchError.new(status: upstream_status, body: "upstream failure")
