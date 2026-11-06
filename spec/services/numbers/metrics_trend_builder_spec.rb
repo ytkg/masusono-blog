@@ -116,4 +116,12 @@ RSpec.describe Numbers::MetricsTrendBuilder do
       ], start_date: Date.new(2026, 3, 1), end_date: Date.new(2026, 3, 1))
     expect(result.fetch(:series).pluck(:finalValue)).to eq([ "2 本", "7 字" ])
   end
+
+  it "年や日付を欠く値を現在の年月で補完して計上しない" do
+    result = described_class.call(
+      articles: [ "12", "Feb 30", "12:34:56", 12 ].map { |value| { publishedAt: value, content: "invalid" } },
+      start_date: Date.new(2026, 1, 1), end_date: Date.new(2026, 12, 31))
+
+    expect(result.fetch(:series).pluck(:finalValue)).to eq([ "0 本", "0 字" ])
+  end
 end

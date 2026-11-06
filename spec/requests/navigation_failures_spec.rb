@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Navigation failure reports", type: :request do
+  include ActiveSupport::Testing::TimeHelpers
   let(:failure) do
     {
       kind: "http_exception", path: "/authors?q=private", source_path: "/search?q=private",
@@ -91,5 +92,67 @@ RSpec.describe "Navigation failure reports", type: :request do
     expect(response.headers["Cache-Control"]).to include("no-store")
     expect(response.parsed_body.dig("error", "code")).to eq("rate_limited")
     expect(StructuredLogging::EventLogger).to have_received(:navigation_failure).exactly(20).times
+  end
+
+  [ false, true ].each do |multibyte|
+    [ 2048, 2049 ].each do |size|
+      it "#{multibyte ? 'UTF-8' : 'ASCII'}本文#{size}バイトを境界として扱う" do
+        payload = { failure: failure.merge(body: "") }
+        padding_size = size - payload.to_json.bytesize
+        payload[:failure][:body] = multibyte ? "あ" * (padding_size / 3) + "x" * (padding_size % 3) : "x" * padding_size
+        body = payload.to_json
+        expect(body.bytesize).to eq(size)
+
+        post "/api/app/navigation_failures", params: body, headers: { "CONTENT_TYPE" => "application/json" }
+
+        expect(response).to have_http_status(size == 2048 ? :no_content : :content_too_large)
+        expect(response.headers["Cache-Control"]).to include("no-store")
+        if size == 2048
+          expect(StructuredLogging::EventLogger).to have_received(:navigation_failure).once
+        else
+          expect(StructuredLogging::EventLogger).not_to have_received(:navigation_failure)
+        end
+      end
+    end
+  end
+
+  [ 2048, 2049 ].each do |size|
+    it "Content-Lengthのないchunked本文#{size}バイトも実バイト数で扱う" do
+      payload = { failure: failure.merge(body: "") }
+      payload[:failure][:body] = "x" * (size - payload.to_json.bytesize)
+
+      post "/api/app/navigation_failures", params: payload.to_json,
+        headers: { "CONTENT_TYPE" => "application/json" },
+        env: { "CONTENT_LENGTH" => nil, "HTTP_TRANSFER_ENCODING" => "chunked" }
+
+      expect(response).to have_http_status(size == 2048 ? :no_content : :content_too_large)
+      if size == 2048
+        expect(StructuredLogging::EventLogger).to have_received(:navigation_failure).once
+      else
+        expect(StructuredLogging::EventLogger).not_to have_received(:navigation_failure)
+      end
+    end
+  end
+
+  it "Content-LengthもTransfer-Encodingもない本文を診断として記録しない" do
+    post "/api/app/navigation_failures", params: { failure: failure }.to_json,
+      headers: { "CONTENT_TYPE" => "application/json" }, env: { "CONTENT_LENGTH" => nil }
+
+    expect(response).to have_http_status(:bad_request)
+    expect(StructuredLogging::EventLogger).not_to have_received(:navigation_failure)
+  end
+
+  it "制限は送信元IPごとに分かれ、1分の期限後に解除される" do
+    headers = { "REMOTE_ADDR" => "192.0.2.21" }
+    21.times { post "/api/app/navigation_failures", params: { failure: }, headers:, as: :json }
+    expect(response).to have_http_status(:too_many_requests)
+
+    post "/api/app/navigation_failures", params: { failure: }, headers: { "REMOTE_ADDR" => "192.0.2.22" }, as: :json
+    expect(response).to have_http_status(:no_content)
+
+    travel 61.seconds do
+      post "/api/app/navigation_failures", params: { failure: }, headers:, as: :json
+      expect(response).to have_http_status(:no_content)
+    end
   end
 end

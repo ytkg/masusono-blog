@@ -61,4 +61,27 @@ RSpec.describe Api::App::Users::CreateUsecase do
       expect { result }.to raise_error(ArgumentError, "user_id is required")
     end
   end
+
+  [ 123, true, false, [], {} ].each do |value|
+    context "user_idが文字列でない#{value.inspect}の場合" do
+      let(:user_id) { value }
+
+      it "外部処理を呼ばず拒否する" do
+        expect { result }.to raise_error(ArgumentError, "user_id must be a string")
+        expect(Microcms::Users::UpsertByContentIdService).not_to have_received(:execute)
+      end
+    end
+  end
+
+
+  [ 123, true, false, [], {} ].each do |value|
+    context "nameが文字列でない#{value.inspect}の場合" do
+      let(:name) { value }
+
+      it "外部処理を呼ばず拒否する" do
+        expect { result }.to raise_error(ArgumentError, "name must be a string")
+        expect(Microcms::Users::UpsertByContentIdService).not_to have_received(:execute)
+      end
+    end
+  end
 end

@@ -70,6 +70,26 @@ RSpec.describe Numbers::MetricsQuery do
       end
     end
 
+
+    context "著者名の型や前後空白が異なる場合" do
+      let(:articles) do
+        [
+          { content: "a", author: { name: " 増田 " } },
+          { content: "bc", author: "増田" },
+          { content: "d", author: { name: " " } },
+          { content: "ef", author: nil }
+        ]
+      end
+
+      it "同じ表示名と不明な著者をそれぞれまとめる" do
+        expect(rows).to eq([
+          { label: "全体", articles: "4 本", chars: "6 字", averageChars: "2 字" },
+          { label: "増田", articles: "2 本", chars: "3 字", averageChars: "2 字" },
+          { label: "不明", articles: "2 本", chars: "3 字", averageChars: "2 字" }
+        ])
+      end
+    end
+
     context "記事がない場合" do
       let(:articles) { [] }
 

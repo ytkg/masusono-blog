@@ -131,3 +131,24 @@ RSpec40例を追加。RUNのJSON `1.5` / `-0.5` が `1` / `0` で登録される
 一覧は契約照合済34件、部分照合17件、未照合364件。非StringのuserId、表示日付の部分値、複数著者画像キーで上位が不正な場合などの契約確認が残る。前回からの部分照合や他領域も含め、全体監査 #819 は継続中。
 
 追加プローブで、XML日付の文字列 `12` が現在の年月を補完し、`Feb 30` が年補完後に翌月へ丸められることを確認した。年を欠く文字列の許容契約は未確定なので、XMLの日付helperと両builderは部分照合に戻した。今回の画面比較中に変更したのはこの監査記録だけで、検証対象の実装は同一。
+
+
+## 2026-11-05 入力型・完全な日付・診断サイズ
+
+[Issue #849](https://github.com/ytkg/masusono-blog/issues/849)。親は PR #848 / `1505c2d5`。RSpec72例を追加した。
+
+実装前の46例の失敗により、APIの文字列契約をすり抜けるJSON値と、年/日付を欠く値の現在日時依存の補完を確認した。RUN/UsersのuserIdは共通presence検証で型も拒否し、Usersのnameは正規化前に型を検証する。nil/空/空白のrequiredエラー、正常なtrim・Unicode・固定content IDを維持し、バッチも使うIdentity.normalizeは変更していない。
+
+CalendarDateValidatorの全5呼出元を読み、年月日がそろっていて有効な暦日のみ通すよう修正した。表示は元の値を返し、両XMLは日付タグだけ省略し、Numbersの集計は対象から除く。完全なDate/Time/RFC文字列と従来のISO/JST・閏日の互換性を維持する。ISOのみ許容する前年検索・本棚は既に部分値を除外しており、全RSpecで互換性を確認した。
+
+診断のASCII/UTF-8 2048/2049バイト、Content-Lengthなしchunked、length/encoding双方なし、IP別20/21・61秒後解除は既存実装で成功し、実装修正は不要だった。インストール済みRailsのcontent_length/raw_post実装も読み、chunkedはraw bodyのbytesizeを参照し、両ヘッダーなしは本文を診断として解釈しないことを確認した。
+
+Numbersは既存の全分布境界・キャッシュ・四捨五入・空件数等のテストを対応付け、著者Hash/String/空白/nil集約、template/noscript除外、名前の途中と先頭の数値順を補完した。
+
+検証:
+
+- 最終 `bin/ci` 成功: RSpec841例、Vitest122ファイル989例、SSR13例、Nodeスクリプト、RuboCop/ESLint/Prettier、Gem audit、Brakeman。
+- 型guard除去でrequest10例、部分日付guardを旧式に戻すと7例、診断の `>` を `>=` に変えると3例が失敗。全て復元して最終bin/ciを実行した。
+- 全画面比較は `scripts/push.sh` で実施し結果をPRに記載する。外部実通信・設定変更・デプロイは行っていない。
+
+一覧は照合済51件、部分13件、未照合351件。全体監査 #819 は継続中。診断whitelistとpayload builderの全項目対応、複数著者画像で上位キーが不正な場合、Numbersの両日付キーの優先契約、既存Frontend/運用/設定の照合が残る。

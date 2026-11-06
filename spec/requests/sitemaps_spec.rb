@@ -62,4 +62,16 @@ RSpec.describe "Sitemaps", type: :request do
     expect(response.body).to include("/articles/invalid-date")
     expect(document.xpath("//*[local-name()='lastmod']")).to be_empty
   end
+
+  it "年を欠く日付を補完せず、記事とno-storeを維持する" do
+    allow(Article).to receive(:all).and_return([ { id: "partial-date", title: "記事", publishedAt: "Feb 30" } ])
+    allow(Author).to receive(:all).and_return([])
+    get "/sitemap.xml"
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Cache-Control"]).to eq("no-store")
+    document = Nokogiri::XML(response.body) { |config| config.strict.nonet }
+    expect(response.body).to include("/articles/partial-date")
+    expect(document.xpath("//*[local-name()='lastmod']")).to be_empty
+  end
 end

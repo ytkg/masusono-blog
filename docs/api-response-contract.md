@@ -43,6 +43,7 @@ Response: `{ "groups": Array<{ "monthDay": String, "articles": Array<Article> }>
 ### POST /api/app/users.json
 
 - Request: `{ "userId": "String", "name": "String" }`
+- 両項目は空白だけの値を除く必須の文字列。文字列以外は文字列化せず `400 Bad Request` と共通エラー形式（`invalid_request`）で拒否する。
 - Response (`201 Created`): `{ "id": "String", "userId": "String", "name": "String" }`
 
 ## GET /api/app/masuda_run/rankings.json
@@ -62,7 +63,7 @@ Response: `{ "groups": Array<{ "monthDay": String, "articles": Array<Article> }>
 ## POST /api/app/masuda_run/rankings.json
 
 - Request: `{ "userId": "String", "score": Integer }`
-- `userId` は空白だけの値を除く必須値。`score` は0以上の整数（整数として解釈できる文字列や `1.0` のような整数値も受け付ける）。端数のある数値は切り捨てずに拒否する。
+- `userId` は空白だけの値を除く必須の文字列。文字列以外は `400 Bad Request` で拒否する。`score` は0以上の整数（整数として解釈できる文字列や `1.0` のような整数値も受け付ける）。端数のある数値は切り捨てずに拒否する。
 - Response (`201 Created`): `{ "id": "String", "userId": "String", "score": Integer }`
 - ランキング登録成功後、同じ `userId` にスコア全額をポイント付与する（0点は対象外）。付与失敗でもランキング登録は成功とし、失敗をログに記録する。付与 API に冪等性がないため自動再送しない。
 - 不正な入力は `400 Bad Request` と共通エラー形式（`invalid_request`）。
@@ -107,7 +108,8 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 - Content-Type: `application/xml; charset=utf-8`
 - Response: XML sitemap。記事・著者の各IDは最初の項目を採用し、同じURLを重複出力しない。
 - `lastmod` は空でない改訂日時・更新日時・公開日時の順に選び、有効な日時だけを出力する。
-- RSSの `pubDate` とサイトマップの `lastmod` は、存在しない閏日や月末を翌月へ丸めず省略する。記事項目自体と `Cache-Control: no-store` は維持する。
+- 日付の整形・集計には年月日のそろった値を使う。年や日付を欠く値に現在日時を補完しない。表示日付は元の値を保持し、日付による集計は対象から除く。
+- RSSの `pubDate` とサイトマップの `lastmod` は、年月日を欠く値や存在しない閏日・月末を省略する。記事項目自体と `Cache-Control: no-store` は維持する。
 
 ## GET /feed.xml
 
