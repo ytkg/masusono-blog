@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { createNavigationFailureReporter } from "./navigationFailureReporter"
+import { createNavigationFailureReporter, localUrl } from "./navigationFailureReporter"
 
 let reporter
 beforeEach(() => {
@@ -79,5 +79,52 @@ describe("navigation failure reporter", () => {
     window.dispatchEvent(new Event("online"))
     reporter.report(visit, "network_error")
     expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(["", "http://[invalid", "//example.com/private", "/\\example.com/private"])(
+    "不正・外部URL %j を診断対象として扱わない",
+    (url) => {
+      expect(localUrl(url)).toBeNull()
+    },
+  )
+
+  it("配信完了の通知はHTTPエラーでも応答を受け取った後に一度だけ呼ぶ", async () => {
+    const response = Promise.withResolvers()
+    fetch.mockReturnValueOnce(response.promise)
+    const onDelivered = vi.fn()
+    reporter.reportPayload({ kind: "network_error", path: "/authors" }, onDelivered)
+    expect(onDelivered).not.toHaveBeenCalled()
+    response.resolve({ ok: false, status: 503 })
+    await response.promise
+    expect(onDelivered).toHaveBeenCalledOnce()
+    window.dispatchEvent(new Event("online"))
+    expect(fetch).toHaveBeenCalledOnce()
+  })
+
+  it("通信失敗時には配信完了を通知せず、再送成功後に一度だけ通知する", async () => {
+    fetch.mockRejectedValueOnce(new Error("offline"))
+    const onDelivered = vi.fn()
+    reporter.reportPayload({ kind: "network_error", path: "/authors" }, onDelivered)
+    await Promise.resolve()
+    expect(onDelivered).not.toHaveBeenCalled()
+    window.dispatchEvent(new Event("online"))
+    await Promise.resolve()
+    expect(onDelivered).toHaveBeenCalledOnce()
+    window.dispatchEvent(new Event("online"))
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
+
+  it("呼出元の指定した上限をオフラインの待機キューにも適用する", async () => {
+    reporter.dispose()
+    reporter = createNavigationFailureReporter({ maxReports: 1 })
+    vi.spyOn(navigator, "onLine", "get").mockReturnValue(false)
+    reporter.reportPayload({ kind: "first" })
+    reporter.reportPayload({ kind: "second" })
+    expect(fetch).not.toHaveBeenCalled()
+    vi.spyOn(navigator, "onLine", "get").mockReturnValue(true)
+    window.dispatchEvent(new Event("online"))
+    await Promise.resolve()
+    expect(fetch).toHaveBeenCalledOnce()
+    expect(JSON.parse(fetch.mock.calls[0][1].body).failure.kind).toBe("first")
   })
 })

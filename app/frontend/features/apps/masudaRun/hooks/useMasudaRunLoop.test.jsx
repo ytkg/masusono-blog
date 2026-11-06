@@ -201,3 +201,40 @@ it.each([0, 200])("衝突で終了し、既存ベスト %i を超えた場合だ
   unmount()
   expect(refs.reqRef.current).toBeNull()
 })
+
+it.each(["canvas", "context"])("%sが取得できなければ描画ループを開始しない", (missing) => {
+  vi.stubGlobal("ResizeObserver", undefined)
+  vi.stubGlobal("requestAnimationFrame", vi.fn())
+  vi.stubGlobal("cancelAnimationFrame", vi.fn())
+  const refs = {
+    worldRef: { current: createInitialWorld() },
+    canvasRef: { current: missing === "canvas" ? null : { getContext: () => null } },
+    canvasWrapRef: { current: document.createElement("div") },
+    reqRef: { current: null },
+  }
+  const { unmount } = renderHook(() => useMasudaRunLoop({ state: "playing", refs }))
+  expect(requestAnimationFrame).not.toHaveBeenCalled()
+  unmount()
+  expect(cancelAnimationFrame).not.toHaveBeenCalled()
+  expect(refs.worldRef.current.t).toBe(0)
+})
+
+it("ラッパー要素が欠落した場合はResizeObserverへ渡さず、監視を片付ける", () => {
+  const observe = vi.fn()
+  const disconnect = vi.fn()
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      observe = observe
+      disconnect = disconnect
+    },
+  )
+  const refs = {
+    canvasRef: { current: null },
+    canvasWrapRef: { current: null },
+  }
+  const { unmount } = renderHook(() => useMasudaRunLoop({ active: false, refs }))
+  expect(observe).not.toHaveBeenCalled()
+  unmount()
+  expect(disconnect).toHaveBeenCalledOnce()
+})

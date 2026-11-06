@@ -15,10 +15,12 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Validate checked push scripts
+      - name: Validate checked push and worktree scripts
         run: |
           bash -n scripts/check-visual.sh scripts/push.sh scripts/visual-docs-only.sh
           python3 scripts/test_visual_gate.py
+          bash -n .codex/skills/masusono-worktree/scripts/{create-worktree,compose}.sh
+          python3 scripts/test_worktree_scripts.py
       - name: Check for documentation-only changes
         id: changes
         env:

@@ -202,6 +202,33 @@ describe("Service Workerの更新", () => {
   })
 })
 
+describe("旧キャッシュ削除の後始末", () => {
+  it("旧キャッシュの削除がすべて終わってからページを制御する", async () => {
+    const deletion = Promise.withResolvers()
+    const started = Promise.withResolvers()
+    caches.keys.mockResolvedValue(["masusono-cache-old", "masusono-cache-older"])
+    caches.delete.mockImplementationOnce(() => {
+      started.resolve()
+      return deletion.promise
+    })
+    const activation = lifecycle("activate")
+    await started.promise
+    expect(caches.delete).toHaveBeenCalledTimes(2)
+    expect(worker.clients.claim).not.toHaveBeenCalled()
+    deletion.resolve(true)
+    await activation
+    expect(worker.clients.claim).toHaveBeenCalledOnce()
+  })
+
+  it("旧キャッシュ削除が失敗した場合はページを制御せず失敗を伝える", async () => {
+    const failure = new Error("storage unavailable")
+    caches.keys.mockResolvedValue(["masusono-cache-old"])
+    caches.delete.mockRejectedValue(failure)
+    await expect(lifecycle("activate")).rejects.toBe(failure)
+    expect(worker.clients.claim).not.toHaveBeenCalled()
+  })
+})
+
 describe("プッシュ通知", () => {
   beforeEach(() => {
     worker.registration = { showNotification: vi.fn().mockResolvedValue() }
@@ -264,5 +291,65 @@ describe("プッシュ通知", () => {
     await waitUntil.mock.calls[0][0]
     expect(close).toHaveBeenCalledOnce()
     expect(worker.clients.openWindow).toHaveBeenCalledWith(target)
+  })
+
+  it.each([
+    "//example.com/articles/new",
+    "/\\example.com/articles/new",
+    "/\n/example.com/articles/new",
+    "///example.com/articles/new",
+    "//[invalid",
+  ])("外部へ解決される通知URL %j を受信時にルートへ置き換える", async (url) => {
+    const waitUntil = vi.fn()
+    listeners.get("push")({ data: { json: () => ({ url }) }, waitUntil })
+    await waitUntil.mock.calls[0][0]
+    expect(worker.registration.showNotification).toHaveBeenCalledWith(
+      "増田とその他！",
+      expect.objectContaining({ data: { url: "/" } }),
+    )
+  })
+
+  it.each([
+    "//example.com/articles/new",
+    "/\\example.com/articles/new",
+    "https://example.com/articles/new",
+    "javascript:alert(1)",
+    "//[invalid",
+    123,
+  ])("保存済み通知の不正URL %j もクリック時に再検証する", async (url) => {
+    const waitUntil = vi.fn()
+    listeners.get("notificationclick")({ notification: { close: vi.fn(), data: { url } }, waitUntil })
+    await waitUntil.mock.calls[0][0]
+    expect(worker.clients.openWindow).toHaveBeenCalledWith("https://masusono.com/")
+  })
+
+  it("壊れた通知JSONでも既定の通知を表示する", async () => {
+    const waitUntil = vi.fn()
+    listeners.get("push")({
+      data: {
+        json: () => {
+          throw new SyntaxError("invalid JSON")
+        },
+      },
+      waitUntil,
+    })
+    await waitUntil.mock.calls[0][0]
+    expect(worker.registration.showNotification).toHaveBeenCalledWith(
+      "増田とその他！",
+      expect.objectContaining({ body: "", data: { url: "/" } }),
+    )
+  })
+
+  it("記事URLのクエリとフラグメントを通知からクリックまで保持する", async () => {
+    const url = "/articles/new?from=push#comments"
+    const waitUntil = vi.fn()
+    listeners.get("push")({ data: { json: () => ({ url }) }, waitUntil })
+    await waitUntil.mock.calls[0][0]
+    const { data } = worker.registration.showNotification.mock.calls[0][1]
+    expect(data.url).toBe(url)
+    const clicked = vi.fn()
+    listeners.get("notificationclick")({ notification: { close: vi.fn(), data }, waitUntil: clicked })
+    await clicked.mock.calls[0][0]
+    expect(worker.clients.openWindow).toHaveBeenCalledWith(`https://masusono.com${url}`)
   })
 })

@@ -100,11 +100,26 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", onFetch)
 
+function notificationPath(value) {
+  if (typeof value !== "string" || !value.startsWith("/")) return "/"
+  try {
+    const url = new URL(value, self.location.origin)
+    return url.origin === self.location.origin ? `${url.pathname}${url.search}${url.hash}` : "/"
+  } catch {
+    return "/"
+  }
+}
+
 self.addEventListener("push", (event) => {
-  const payload = event.data?.json() || {}
+  let payload
+  try {
+    payload = event.data?.json() || {}
+  } catch {
+    payload = {}
+  }
   const title = typeof payload.title === "string" && payload.title.trim() ? payload.title : "増田とその他！"
   const body = typeof payload.body === "string" ? payload.body : ""
-  const url = typeof payload.url === "string" && payload.url.startsWith("/") ? payload.url : "/"
+  const url = notificationPath(payload.url)
 
   event.waitUntil(
     self.registration.showNotification(title, {
@@ -118,7 +133,7 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close()
-  const targetUrl = new URL(event.notification.data?.url || "/", self.location.origin).href
+  const targetUrl = new URL(notificationPath(event.notification.data?.url), self.location.origin).href
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
