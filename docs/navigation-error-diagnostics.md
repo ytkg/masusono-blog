@@ -13,7 +13,7 @@ resource.type="cloud_run_revision"
 jsonPayload.event="navigation_failed"
 ```
 
-`response_request_id` がある場合、その ID で `request_completed` ログを検索すると、失敗した Rails リクエストを照合できる。`report_request_id` は診断の POST 自体の ID なので区別する。
+`response_request_id` がある場合、その ID で `request_completed` ログを検索すると、失敗した Rails リクエストを照合できる。`report_request_id` は診断の POST 自体の ID なので区別する。本番のログ文脈はRailsのrequest ID解決後に設定し、microCMSの失敗ログにも同じIDとクエリを除いたパスを付ける。
 
 - `status=200` と `content_type=text/html`: HTML 応答の混入やキャッシュを調べる。
 - `status>=500`: Rails の例外や Cloud Run の応答を調べる。

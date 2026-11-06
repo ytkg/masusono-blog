@@ -37,7 +37,7 @@ Rails.application.configure do
   config.log_tags = []
   config.logger = ActiveSupport::Logger.new(STDOUT)
   config.logger.formatter = StructuredLogging::JsonFormatter.new
-  config.middleware.insert_before 0, StructuredLogging::RequestContext
+  config.middleware.insert_after ActionDispatch::RequestId, StructuredLogging::RequestContext
   StructuredLogging::RequestSubscriber.install!
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!).

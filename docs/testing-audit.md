@@ -152,3 +152,22 @@ Numbersは既存の全分布境界・キャッシュ・四捨五入・空件数�
 - 全画面比較は `scripts/push.sh` で実施し結果をPRに記載する。外部実通信・設定変更・デプロイは行っていない。
 
 一覧は照合済51件、部分13件、未照合351件。全体監査 #819 は継続中。診断whitelistとpayload builderの全項目対応、複数著者画像で上位キーが不正な場合、Numbersの両日付キーの優先契約、既存Frontend/運用/設定の照合が残る。
+
+
+## 2026-11-05 本番ログの文脈と診断契約
+
+[Issue #851](https://github.com/ytkg/masusono-blog/issues/851)。親は PR #850 / `c13acc4d`。RSpec52例を追加した。
+
+本番環境を別Rubyプロセスで起動し、実際のmiddleware登録からstackを組む赤テストを追加。RequestContextがRequestIdより前、さらにExecutorの外にあり、下流ではIDとpathが両方nilとなることを確認した。登録をRequestIdの直後へ移し、ID解決後かつExecutor内で文脈を設定する。通常・連続・ID自動生成・例外応答と終了後nil、実microCMSログの文脈と診断ログの送信ID、request_completedとの相関まで検証した。テスト内で本番アプリと検証用terminalを起動するが外部サーバーやデプロイは使わない。
+
+本番の実診断APIへ機微情報を含むfixtureを送り、標準のParametersログ自体が出ていること、その値がFILTEREDであること、検証済みイベントも本文/トークン/検索語を含まないことを確認した。WebMockで本番boot前から子プロセスの外部HTTPも禁止し、検証中のSkylight agentも無効化している。
+
+診断の全公開キー・全列挙値、path512/513、content_type100/101、build12桁、schemeだけを持つURI、JSON formatterの非String/改行/引用符、loggerのlevel境界・microCMS warning・予約キー保護を補完。既存のRequestContext outer復元とRequestSubscriber二重installのテストは重複させず、本番の実接続と対応付けた。
+
+検証:
+
+- 最終bin/ci成功。全画面比較の結果をPRへ記載する。RSpec893例、Vitest122ファイル989例、SSR13例、Nodeスクリプト、lint/format、Gem audit、Brakeman成功。
+- 登録順を旧式へ戻すと1例、診断whitelistのsince_resume_ms除去で2例、URI scheme検証除去で1例、formatterのTypeError処理除去で3例が失敗。標準パラメータfilter除去でも本番テストが失敗することを確認し、すべて復元した。
+- 外部実通信・設定変更・デプロイは行っていない。
+
+一覧は照合済59件、部分14件、未照合342件。本番設定はログ配線部分のみを照合し、cache/queue/storage等を一括完了扱いにしていない。endpoint等のパラメータfilter、既存Frontend・設定・運用の未照合も残る。全体監査 #819 は継続する。

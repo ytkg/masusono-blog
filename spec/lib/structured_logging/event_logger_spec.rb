@@ -78,4 +78,31 @@ RSpec.describe StructuredLogging::EventLogger do
       )
     }
   end
+
+  [ [ 399, :info ], [ 400, :warn ], [ 499, :warn ], [ 500, :error ] ].each do |status, level|
+    it "ステータス#{status}を#{level}で記録する" do
+      described_class.request_completed(payload: { status: status }, duration_ms: 1)
+
+      expect(logger).to have_received(level).with(include("status=#{status}"))
+    end
+  end
+
+  it "microCMSの警告にも現在のリクエスト文脈を付ける" do
+    CurrentRequest.set(request_id: "warning-id", path: "/authors") do
+      described_class.microcms_warning(error_type: "fixture_warning")
+    end
+
+    expect(logger).to have_received(:warn).with(a_string_including("microcms_request_warning", "request_id=warning-id", "path=/authors"))
+  end
+
+  it "payload内の予約キーで診断イベントと送信IDを上書きさせない" do
+    allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+    CurrentRequest.set(request_id: "actual-id") do
+      described_class.navigation_failure(payload: { kind: "network_error", event: "forged", report_request_id: "forged" })
+    end
+
+    expect(logger).to have_received(:warn) { |message|
+      expect(JSON.parse(message)).to include("event" => "navigation_failed", "report_request_id" => "actual-id")
+    }
+  end
 end

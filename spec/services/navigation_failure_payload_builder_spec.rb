@@ -41,7 +41,7 @@ RSpec.describe NavigationFailurePayloadBuilder do
       expect(result).not_to have_key(:source_path)
     end
   end
-  [ "/authors/%ZZ", "/authors/非公開", "//evil.example/authors", "/authors/" + "a" * 504 ].each do |path|
+  [ "https:/authors", "/authors/%ZZ", "/authors/非公開", "//evil.example/authors", "/authors/" + "a" * 504 ].each do |path|
     context "パスが#{path.inspect}の場合" do
       let(:params) { { "kind" => "network_error", "path" => path } }
 
@@ -86,6 +86,56 @@ RSpec.describe NavigationFailurePayloadBuilder do
 
     it "切り詰めず除外する" do
       expect(result).to eq(kind: "network_error")
+    end
+  end
+
+  {
+    "kind" => %w[http_exception network_error navigation_stalled navigation_slow navigation_interrupted module_load_error],
+    "stage" => %w[release tap request response data_ready module_start module_end commit frame],
+    "controller_state" => %w[none installing installed activating activated redundant],
+    "data_source" => %w[cached in_flight network],
+    "visibility" => %w[visible hidden]
+  }.each do |key, values|
+    values.each do |value|
+      context "公開列挙値#{key}=#{value}の場合" do
+        let(:params) { { "kind" => "network_error", key => value } }
+
+        it { expect(result).to eq({ kind: "network_error" }.merge(key.to_sym => value)) }
+      end
+    end
+  end
+
+  [ nil, "unknown", true, 123, [] ].each do |kind|
+    context "kindが#{kind.inspect}の場合" do
+      let(:params) { { "kind" => kind } }
+
+      it { expect { result }.to raise_error(ArgumentError) }
+    end
+  end
+
+  [ 512, 513 ].each do |size|
+    context "パスが#{size}バイトの場合" do
+      let(:params) { { "kind" => "network_error", "path" => "/articles/" + "a" * (size - 10) } }
+
+      it "512バイトまで保持し、それを超える値は省く" do
+        expect(result[:path]).to eq(size == 512 ? params["path"] : nil)
+      end
+    end
+  end
+
+  [ 100, 101 ].each do |size|
+    context "content_typeが#{size}バイトの場合" do
+      let(:params) { { "kind" => "network_error", "content_type" => "a/" + "b" * (size - 2) } }
+
+      it { expect(result[:content_type]).to eq(size == 100 ? params["content_type"] : nil) }
+    end
+  end
+
+  [ "20261105000", "2026110500000", "20261105x000", 202611050000 ].each do |version|
+    context "build_versionが#{version.inspect}の場合" do
+      let(:params) { { "kind" => "network_error", "build_version" => version } }
+
+      it { expect(result).to eq(kind: "network_error") }
     end
   end
 end

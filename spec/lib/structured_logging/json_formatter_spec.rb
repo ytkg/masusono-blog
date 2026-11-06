@@ -39,4 +39,21 @@ RSpec.describe StructuredLogging::JsonFormatter do
       expect(JSON.parse(formatted_log)).to include("message" => message)
     end
   end
+
+  [ nil, 123, { detail: "plain" } ].each do |value|
+    context "ログが#{value.inspect}の場合" do
+      let(:message) { value }
+
+      it { expect(JSON.parse(formatted_log)).to include("message" => value.to_s) }
+    end
+  end
+
+  context "通常ログに改行と引用符を含む場合" do
+    let(:message) { "line 1\n\"line 2\" 日本語" }
+
+    it "元の文字列をJSONの1行に保持する" do
+      expect(formatted_log.lines.size).to eq(1)
+      expect(JSON.parse(formatted_log).fetch("message")).to eq(message)
+    end
+  end
 end
