@@ -171,3 +171,24 @@ Numbersは既存の全分布境界・キャッシュ・四捨五入・空件数�
 - 外部実通信・設定変更・デプロイは行っていない。
 
 一覧は照合済59件、部分14件、未照合342件。本番設定はログ配線部分のみを照合し、cache/queue/storage等を一括完了扱いにしていない。endpoint等のパラメータfilter、既存Frontend・設定・運用の未照合も残る。全体監査 #819 は継続する。
+
+
+## 2026-11-05 上流JSON・ページング境界
+
+[Issue #853](https://github.com/ytkg/masusono-blog/issues/853) と [Issue #854](https://github.com/ytkg/masusono-blog/issues/854)。親は PR #852 / `b9c0756f`。RSpec77例を追加し、不要になった低水準parserの2例を削除した（総数は893→968）。
+
+query付きURLへの回数照合を修正したテストで元の実装を再実行し、60例中47例の失敗を確認した。不正JSON、過深nest、非Object root、欠落/非配列contents、不正な要素をHTTP取得境界でFetchError502へ統一。元の本文をerror bodyへ含めず、JSON parserのcauseも切り離す。HTTP失敗はJSON解析より先に元のstatusを使う。正常0件の空配列、全件取得/RUN限定のmetadataなし旧形式は維持し、ページ指定取得は従来どおり要求と一致するmetadataを必須とする。
+
+非配列contentsを空一覧へ変換する旧testは、不正応答を正常0件に見せるため修正した。RUNの限定取得も共通parse_pageを使うようにし、唯一のproduction callerがなくなったparse_contents/contents_fromと重複testを削除。任意の総件数だけは壊れたmetadataを不明nilとし、0件と区別する既存契約を維持した。
+
+7つの公開入口で共通JSON/no-store/no-ETag/request IDと再送なしを実HTTP fixtureで確認。購読の不正lookupでPOST/PATCH/DELETEを始めず、バックアップの不正取得でload_job/truncateへ進まないこともfake HTTP/BigQueryで確認した。実BigQuery/microCMSの状態変更は行っていない。
+
+記事offsetの複合入力は元実装で全16例成功し、型例外の仮説は再現しなかった。余分な型guardは取り消してIssueを訂正し、Hash/配列/nilの回帰testだけを残した。空ページなのに上流の総件数が続きを示す場合もcursorを停止するtestを補完した。
+
+検証:
+
+- 最終bin/ci成功: RSpec968例、Vitest122ファイル989例、SSR13例、Nodeスクリプト、RuboCop/ESLint/Prettier、Gem audit、Brakeman。
+- 非配列を空へ戻す/要素型guard除去/RUN検証迂回/cause維持/metadata root guard除去で、それぞれ7/10/4/5/5例が失敗。空cursor guard除去でも1例失敗。全復元し対象120例を再確認した。
+- 全画面比較は標準CI完了後に `scripts/push.sh` で実行し、PRへ結果を記録する。比較中にビルド・RSpec・全体CIを重ねない。
+
+一覧は照合済68件、部分16件、未照合331件。購読のPOST応答/id検証や、バックアップがページ保護で返る部分結果をsnapshotへ使う契約は未完了。前回からのFrontend/設定/運用の照合も含め、全体監査 #819 は継続する。

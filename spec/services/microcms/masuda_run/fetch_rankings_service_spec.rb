@@ -118,4 +118,23 @@ RSpec.describe Microcms::MasudaRun::FetchRankingsService do
     response = double(success?: true, body: { contents: [], totalCount: 0 }.to_json)
     expect(described_class.fetch_total_count(api_key: "test-key", response:)).to eq(0)
   end
+
+  [ "{", "[]", "null", "true", "123", '"private-body"' ].each do |body|
+    it "解析できない総件数の本文#{body.inspect}を不明値として返す" do
+      response = double(success?: true, body: body)
+      expect(described_class.fetch_total_count(api_key: "test-key", response:)).to be_nil
+    end
+  end
+
+  it "総件数照会のHTTPエラーを不正JSONより優先する" do
+    response = double(success?: false, status: 429, body: "{")
+    expect { described_class.fetch_total_count(api_key: "test-key", response:) }.to raise_error(Microcms::FetchContentsService::FetchError) { |error|
+      expect(error.status).to eq(429)
+    }
+  end
+
+  it "総件数照会の本文がnilでも不明値にする" do
+    response = double(success?: true, body: nil)
+    expect(described_class.fetch_total_count(api_key: "test-key", response:)).to be_nil
+  end
 end

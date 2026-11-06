@@ -85,7 +85,17 @@ RSpec.describe "Public articles pagination", type: :request do
     expect(response.parsed_body).to eq("articles" => [], "pagination" => { "nextOffset" => nil })
   end
 
-  [ "-1", "1.5", "0x10", "invalid" ].each do |offset|
+  it "上流が続きを示していても空ページなら同じ位置で再取得し続けない" do
+    stub_microcms_get(endpoint:, query: { limit: "10", offset: "10", orders: "-publishedAt" },
+                      contents: [], total_count: 128, limit: 10, offset: 10)
+
+    get "/api/app/articles", params: { offset: 10 }
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body).to eq("articles" => [], "pagination" => { "nextOffset" => nil })
+  end
+
+  [ "-1", "1.5", "0x10", "invalid", { value: "1" }, [ "1" ], nil ].each do |offset|
     it "不正なoffset #{offset} はmicroCMSへ送らず400にする" do
       get "/api/app/articles", params: { offset: }
 
