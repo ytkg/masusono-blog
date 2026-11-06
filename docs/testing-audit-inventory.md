@@ -6,7 +6,7 @@
 
 「契約照合済」は現行の呼出元における正常・異常・境界・競合・後始末と、記載したunit / SSR / visualの対応を読み、具体的な残不足がないと判断した状態。任意入力の全組合せや将来仕様の保証ではない。「部分照合」は記載した契約のみ確認済みで、残る確認がある状態。残る確認が必要な場合は理由欄に明記する。全体の完了は未照合と未解決の契約を解消し、unit / request / SSR / visual / scriptの責務を照合してから判定する。
 
-対象 415 ファイル。契約照合済 69件、未照合 331件、部分照合 15件。未照合は既存テストがないという意味ではない。
+対象 415 ファイル。契約照合済 71件、未照合 329件、部分照合 15件。未照合は既存テストがないという意味ではない。
 
 | 実装ファイル | 状態 | テストまたは候補 | 確認した契約・追加不要理由／残作業 |
 | --- | --- | --- | --- |
@@ -275,7 +275,7 @@
 | `app/services/admin/articles_page_builder.rb` | 未照合 | spec/services/admin/articles_page_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/admin/auth_client.rb` | 未照合 | spec/services/admin/auth_client_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/admin/authenticated_session.rb` | 未照合 | spec/services/admin/authenticated_session_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/api/app/web_push/subscription_input.rb` | 未照合 | spec/services/api/app/web_push/subscription_input_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/services/api/app/web_push/subscription_input.rb` | 契約照合済 | spec/services/api/app/web_push/subscription_input_spec.rb; spec/requests/web_push_invalid_keys_spec.rb | Issue #858でHash/Parameters・文字列/シンボルキー・空白、必須/型、endpoint2000/2001・鍵1000/1001、全許可ホスト・HTTPS/不正URI/偽ホストを照合。鍵の非文字列は400となり外部保存へ進まない。 |
 | `app/services/article_ogp_image.rb` | 未照合 | spec/services/article_ogp_image_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/article_payload_builder.rb` | 未照合 | spec/services/article_payload_builder_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/articles_page_query.rb` | 契約照合済 | spec/requests/articles_pagination_spec.rb; spec/requests/upstream_response_shape_spec.rb | 10進非負offset、初回10/末尾full/部分/空/上流総件数不一致でも空ならcursor停止、実受信件数でのcursor更新、body整形、upstream失敗伝播を実queryで照合。empty guard除去を新規testが検出。 |
@@ -308,7 +308,7 @@
 | `app/services/microcms/users/fetch_by_user_ids_service.rb` | 未照合 | spec/services/microcms/users/fetch_by_user_ids_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/microcms/users/identity.rb` | 未照合 | spec/services/microcms/users/identity_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/services/microcms/users/upsert_by_content_id_service.rb` | 未照合 | spec/services/microcms/users/upsert_by_content_id_service_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
-| `app/services/microcms/web_push_subscriptions_service.rb` | 部分照合 | spec/services/microcms/web_push_subscriptions_service_spec.rb | 既存CRUD/header/HTTP失敗と不正lookupによるPOST/PATCH/DELETE中断をfake HTTPで照合。POST成功の不正JSON/id欠落・lookupのid欠落/型を処理前に検証する契約が残る。 |
+| `app/services/microcms/web_push_subscriptions_service.rb` | 部分照合 | spec/services/microcms/web_push_subscriptions_service_spec.rb | 既存CRUD/header/HTTP失敗と不正lookupによるPOST/PATCH/DELETE中断をfake HTTPで照合。Issue #858でPOST成功の不正JSON/root/idとlookup ID欠落/型を共通502化、削除ID全件検証とdirect update/deleteの不正ID送信抑止を照合。作成再送なし・parser cause抑止も検証。取得上限で部分一覧が返る際の更新/削除契約、filterとIDの特殊文字は追加照合が必要。 |
 | `app/services/navigation_failure_payload_builder.rb` | 契約照合済 | spec/services/navigation_failure_payload_builder_spec.rb; spec/requests/navigation_failures_spec.rb; spec/requests/production_logging_spec.rb | 全kind/stage/controller state/data source/visibility、Boolean・全timing受渡し、不正列挙/型/整数範囲、公開pathの外部/scheme/非公開/不正URI/512境界、token/MIMEのASCII whitelistと100境界、build12桁、検索語/未知項目除去を照合。 |
 | `app/services/numbers/article_character_counter.rb` | 契約照合済 | spec/services/numbers/article_character_counter_spec.rb; spec/services/numbers/article_metric_spec.rb | タグ/属性/画像代替除外、entityとgrapheme、結合emoji、空白/不可視文字、script/style/template/noscript/iframe/hidden部分木除外、aria-hidden可視保持、本文欠落を照合。 |
 | `app/services/numbers/article_metric.rb` | 契約照合済 | spec/services/numbers/article_metric_spec.rb; spec/services/numbers/article_character_counter_spec.rb | 本文HTMLと欠落時の文字数委譲のみ。異常・Unicodeは委譲先で検証済みで重複unit不要。 |
@@ -340,7 +340,7 @@
 | `app/usecases/api/app/navigation_failures_create_usecase.rb` | 契約照合済 | spec/requests/navigation_failures_spec.rb; spec/requests/production_logging_spec.rb | 検証済payloadをloggerへ渡すだけの手順。全公開項目・未知項目抑止・invalid400・本番イベント/ID/機微情報除外を実usecase経由で照合。重複mock単体不要。 |
 | `app/usecases/api/app/users/create_usecase.rb` | 契約照合済 | spec/usecases/api/app/users/create_usecase_spec.rb; spec/requests/api_string_input_contract_spec.rb; spec/requests/api_app_users_spec.rb | userId/nameの型・必須値、ID/nameのtrimとUnicode保持、固定content ID/保存/JSONを照合。Identityの汎用文字列変換は変更せずAPI入口で検証。 |
 | `app/usecases/api/app/users/show_usecase.rb` | 契約照合済 | spec/usecases/api/app/users/show_usecase_spec.rb; spec/requests/api_app_users_spec.rb; spec/requests/api_error_contract_spec.rb | 正常・未登録name nil、必須ID/非String拒否、404と権限エラー区別、共通upstreamエラーを照合。 |
-| `app/usecases/api/app/web_push/subscriptions_create_usecase.rb` | 未照合 | spec/usecases/api/app/web_push/subscriptions_create_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
+| `app/usecases/api/app/web_push/subscriptions_create_usecase.rb` | 契約照合済 | spec/usecases/api/app/web_push/subscriptions_create_usecase_spec.rb; spec/requests/web_push_response_contract_spec.rb; spec/requests/web_push_invalid_keys_spec.rb | 入力正規化・保存への引渡し・id整形をunitと実HTTP consumerで照合。入力不正は400で保存せず、作成応答/lookupの不正IDは共通502/no-store/request ID、作成再送なし。 |
 | `app/usecases/api/app/web_push/subscriptions_destroy_usecase.rb` | 未照合 | — | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/api/app/web_push/subscriptions_show_usecase.rb` | 未照合 | spec/usecases/api/app/web_push/subscriptions_show_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |
 | `app/usecases/api/app/web_push/vapid_public_key_usecase.rb` | 未照合 | spec/usecases/api/app/web_push/vapid_public_key_usecase_spec.rb | 契約と既存テストの照合・追加不要理由は未記録。 |

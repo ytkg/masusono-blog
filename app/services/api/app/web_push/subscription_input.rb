@@ -34,6 +34,8 @@ module Api
         private
 
         def required_string(value, name, max_length)
+          raise ArgumentError, "#{name} must be a string" unless value.is_a?(String) || value.nil?
+
           normalized = value.to_s.strip
           raise ArgumentError, "#{name} is required" if normalized.empty?
           raise ArgumentError, "#{name} is too long" if normalized.length > max_length

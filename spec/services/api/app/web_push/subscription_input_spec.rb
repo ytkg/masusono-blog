@@ -63,6 +63,13 @@ RSpec.describe Api::App::WebPush::SubscriptionInput do
     it { expect { result }.to raise_error(ArgumentError, "subscription p256dh is required") }
   end
 
+  %w[android.googleapis.com fcm.googleapis.com updates.push.services.mozilla.com web.push.apple.com].each do |host|
+    context "許可した配信先#{host}の場合" do
+      let(:subscription) { { endpoint: "https://#{host}/id", keys: { p256dh: "key", auth: "auth" } } }
+      it { is_expected.to eq([ "https://#{host}/id", "key", "auth" ]) }
+    end
+  end
+
   [ 2_000, 2_001 ].each do |length|
     context "endpointが#{length}文字の場合" do
       let(:endpoint) { "https://web.push.apple.com/".ljust(length, "x") }

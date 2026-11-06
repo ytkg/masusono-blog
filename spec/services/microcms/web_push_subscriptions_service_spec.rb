@@ -119,4 +119,30 @@ RSpec.describe Microcms::WebPushSubscriptionsService do
       end
     end
   end
+
+  [ :update, :delete ].each do |operation|
+    [ nil, "", " ", false, 123, [], {} ].each do |id|
+      it "#{operation}へ渡る不正ID#{id.inspect}はHTTP送信前に拒否する" do
+        arguments = { id: }
+        arguments[:attributes] = attributes if operation == :update
+
+        expect { described_class.public_send(operation, **arguments) }
+          .to raise_error(Microcms::FetchContentsService::FetchError) { |error|
+            expect(error.status).to eq(502)
+            expect(error.body).to eq("Invalid microCMS response")
+          }
+        expect(a_request(:any, /web_push_subscriptions/)).not_to have_been_made
+      end
+    end
+  end
+
+  it "JSONパース例外に上流本文を残さない" do
+    stub_request(:post, endpoint).to_return(status: 201, body: "{private-token")
+
+    expect { described_class.create(attributes:) }
+      .to raise_error(Microcms::FetchContentsService::FetchError) { |error|
+        expect(error.body).to eq("Invalid microCMS response")
+        expect(error.cause).to be_nil
+      }
+  end
 end

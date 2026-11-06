@@ -97,11 +97,14 @@ Rails セッションを使い、認証トークンはレスポンスに含め�
 
 - Request: `{ "subscription": { "endpoint": "String", "keys": { "p256dh": "String", "auth": "String" } } }`
 - Response (`201 Created`): `{ "id": "String" }`
+- endpointと鍵は空でない文字列のみ受け付け、他の型は文字列へ変換せず共通`400 invalid_request`で返す。前後の空白を除いた上限はendpoint 2,000文字、各鍵1,000文字。
+- 作成成功応答に空でない文字列IDがなければ共通`502 upstream_server_error`で返す。書き込み済みの可能性があるため、サーバーで自動再送しない。
 
 ### DELETE /api/app/web_push/subscription.json
 
 - Request: `{ "endpoint": "String" }`
 - Response: `204 No Content`
+- 取得一覧の全IDを検証してから削除を開始する。不正IDは共通502とし、この検証での部分削除を防ぐ。削除開始後のHTTP失敗をロールバックするものではない。
 
 ## GET /sitemap.xml
 
