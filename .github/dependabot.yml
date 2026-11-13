@@ -22,6 +22,11 @@ updates:
         patterns:
           - "@inertiajs/react"
           - "@inertiajs/vite"
+      vitest:
+        applies-to: version-updates
+        patterns:
+          - "vitest"
+          - "@vitest/*"
 
   - package-ecosystem: "bundler"
     directory: "/"
