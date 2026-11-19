@@ -15,6 +15,7 @@ describe("ArticleBody", () => {
     render(<ArticleBody html={html} hasBody shouldCollapse />)
 
     const excerpt = screen.getByText(`${"あ".repeat(80)}…`)
+    const excerptColor = getComputedStyle(excerpt).color
 
     expect(screen.queryByTestId("article-body-html")).not.toBeInTheDocument()
 
@@ -24,7 +25,7 @@ describe("ArticleBody", () => {
     const expandedBody = screen.getByTestId("article-body-html")
 
     expect(expandedBody).toHaveTextContent("あ".repeat(81))
-    expect(getComputedStyle(excerpt).color).toBe(getComputedStyle(expandedBody).color)
+    expect(getComputedStyle(expandedBody).color).toBe(excerptColor)
     expect(screen.getByRole("button", { name: "閉じる" })).toHaveAttribute("aria-expanded", "true")
   })
 
