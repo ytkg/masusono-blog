@@ -54,7 +54,7 @@ on:
 
 jobs:
   rspec:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       RAILS_ENV: test
       COVERAGE: "true"
