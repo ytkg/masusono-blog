@@ -38,7 +38,7 @@ jobs:
   ci:
     needs: policy
     if: needs.policy.outputs.skip != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
