@@ -34,6 +34,47 @@ RSpec.describe Bookshelf::Candidates do
     expect(books.last[:amazonUrl]).to eq("https://www.amazon.co.jp/dp/4101010013")
   end
 
+  it "rejects credentials, unsupported schemes and malformed URIs" do
+    urls = [
+      "https://user:password@amazon.co.jp/dp/4101010013",
+      "ftp://amazon.co.jp/dp/4101010013",
+      "//amazon.co.jp/dp/4101010013",
+      "https://amazon.co.jp/dp/4101010013%ZZ"
+    ]
+
+    urls.each do |url|
+      html = %(<a href="#{url}">本</a>)
+      expect(described_class.call([ article("a", "2026-01-01T00:00:00Z", html) ])).to be_empty
+    end
+  end
+
+  it "accepts HTTP, case-insensitive hosts and a trailing product path" do
+    html = %(<a href="http://AMAZON.CO.JP/gp/product/4101010013/ref=test">本</a>)
+
+    book = described_class.call([ article("a", "2026-01-01T00:00:00Z", html) ]).sole
+
+    expect(book[:isbn]).to eq("9784101010014")
+    expect(book[:amazonUrl]).to eq("https://www.amazon.co.jp/dp/4101010013")
+  end
+
+  it "skips articles without IDs or content and anchors without hrefs" do
+    articles = [ nil, "", " " ].map { |id| article(id, "2026-01-01T00:00:00Z", link("4101010013")) }
+    articles << article("no-content", "2026-01-01T00:00:00Z", nil)
+    articles << article("no-href", "2026-01-01T00:00:00Z", "<a>本</a>")
+
+    expect(described_class.call(articles)).to be_empty
+  end
+
+  it "compares first appearances by instant across time zones" do
+    books = described_class.call([
+      article("earlier", "2026-01-01T00:30:00+09:00", link("4101010013")),
+      article("later", "2025-12-31T16:00:00Z", link("4101010013") + link("080442957X"))
+    ])
+
+    expect(books.pluck(:isbn)).to eq(%w[9780804429573 9784101010014])
+    expect(books.last[:first][:id]).to eq("earlier")
+  end
+
   it "breaks ties by reference article ID and then link order" do
     books = described_class.call([
       article("b", "2026-01-01T00:00:00Z", link("4101010013")),
