@@ -79,4 +79,46 @@ RSpec.describe WebPush::ArticlePublishedNotifier do
     expect(result).to eq(described_class::Result.new(sent_count: 0, removed_count: 0, failed_count: 0))
     expect(notification_service).not_to have_received(:call)
   end
+
+  context "成功・期限切れ・配信失敗が混在する場合" do
+    let(:subscriptions) do
+      [ subscription, { id: "expired" }, { id: "failed" }, { id: "last" } ]
+    end
+
+    before do
+      allow(subscriptions_service).to receive(:execute).and_return(subscriptions)
+      response = instance_double(Net::HTTPGone, body: "gone", code: "410", message: "Gone")
+      allow(notification_service).to receive(:call).with(subscription: subscriptions[1], **WebPush::ArticleNotificationPayload.call(article:))
+        .and_raise(WebPush::ExpiredSubscription.new(response, "private-endpoint.example"))
+      allow(notification_service).to receive(:call).with(subscription: subscriptions[2], **WebPush::ArticleNotificationPayload.call(article:))
+        .and_raise(StandardError, "private endpoint and keys")
+    end
+
+    it "最後まで配信し、成功・削除・失敗を重複せず集計する" do
+      expect(result).to eq(described_class::Result.new(sent_count: 2, removed_count: 1, failed_count: 1))
+      expect(subscriptions_service).to have_received(:delete).with(id: "expired").once
+      expect(logger).to have_received(:warn).with(
+        "[WebPush::ArticlePublishedNotifier] delivery failed subscription_id=failed error=StandardError"
+      ).once
+    end
+
+    it "期限切れ購読の削除に失敗しても後続に配信し、秘密をログに含めない" do
+      allow(subscriptions_service).to receive(:delete).with(id: "expired").and_raise(StandardError, "private credentials")
+
+      expect(result).to eq(described_class::Result.new(sent_count: 2, removed_count: 0, failed_count: 2))
+      expect(logger).to have_received(:warn).with(
+        "[WebPush::ArticlePublishedNotifier] delivery failed subscription_id=expired error=StandardError"
+      )
+      expect(logger).to have_received(:warn).with(
+        "[WebPush::ArticlePublishedNotifier] delivery failed subscription_id=failed error=StandardError"
+      )
+    end
+  end
+
+  it "購読一覧の取得失敗を配信成功や空の結果として扱わない" do
+    allow(subscriptions_service).to receive(:execute).and_raise(Faraday::TimeoutError)
+
+    expect { result }.to raise_error(Faraday::TimeoutError)
+    expect(notification_service).not_to have_received(:call)
+  end
 end
