@@ -234,7 +234,7 @@ test.describe("author profiles", () => {
 test("search suggestions", async ({ page }) => {
   await openPage(page, "/search")
   for (const name of ["著者から探す", "タグから探す", "読了目安から探す"]) {
-    await expectSectionHeading(page.getByRole("heading", { name, level: 2 }))
+    await expectSectionHeading(page.getByRole("heading", { name, level: 2 }), "12px")
   }
   await screenshot(page, "search-suggestions")
 })
