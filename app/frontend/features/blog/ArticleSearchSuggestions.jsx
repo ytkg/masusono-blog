@@ -39,7 +39,7 @@ function SearchSuggestionSection({ items, label, prefix, onSelect }) {
 
   return (
     <Box>
-      <SectionHeading>{label}</SectionHeading>
+      <SectionHeading sx={{ mb: 1.5 }}>{label}</SectionHeading>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
         {items.map((item) => {
           const { label: itemLabel, query } = suggestionData(item, prefix)
@@ -65,7 +65,7 @@ export default function ArticleSearchSuggestions({ articles, onSelect }) {
   const suggestedTags = extractArticleTags(articles)
 
   return (
-    <Box sx={{ display: "grid", gap: 1.5 }}>
+    <Box sx={{ display: "grid", gap: 2 }}>
       <SearchSuggestionSection items={suggestedAuthors} label="著者から探す" prefix="@" onSelect={onSelect} />
       <SearchSuggestionSection items={suggestedTags} label="タグから探す" prefix="#" onSelect={onSelect} />
       <SearchSuggestionSection
